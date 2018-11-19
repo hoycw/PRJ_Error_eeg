@@ -14,25 +14,25 @@ eval(SBJ_vars_cmd);
 data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '.mat'];
 load(data_fname);
 
-%% REJECTVISUAL
-% Summary
-if (isempty(SBJ_vars.trial_reject_ix) || dorejectvisual == true)
+%% REJECT VISUAL
+if (isempty(SBJ_vars.trial_reject_ix) || dorejectvisual)
     cfg = [];
     cfg.method   = 'summary';  % 'summary' for trials+channels; 'channel' for individual trials
-    clean   = ft_rejectvisual(cfg, eeg);
-    rejected(1) = {input('specify componenets for rejection in an array: eeg summary method')}
+    clean   = ft_rejectvisual(cfg, trials);
+    % specify trials and/or channels for rejection in an array:
+    
     cfg = [];
     cfg.method   = 'summary';   % 'summary' for trials+channels; 'channel' for individual trials
-    clean   = ft_rejectvisual(cfg, eog_bp);
+    clean   = ft_rejectvisual(cfg, eog);
     rejected(2) = {input('specify componenets for rejection in an array: eog summary method')}
     % Trials
     cfg = [];
     cfg.method   = 'channel';   % 'summary' for trials+channels; 'channel' for individual trials
-    clean   = ft_rejectvisual(cfg, eeg);
+    clean   = ft_rejectvisual(cfg, trials);
     rejected(3) = {input('specify componenets for rejection in an array: eeg channel method')}
     cfg = [];
     cfg.method   = 'channel';   % 'summary' for trials+channels; 'channel' for individual trials
-    clean   = ft_rejectvisual(cfg, eog_bp);
+    clean   = ft_rejectvisual(cfg, eog);
     rejected(4) = {input('specify componenets for rejection in an array: eog channel method')}
     eegsummary = rejected{1}
     eogsummary = rejected{2}
@@ -53,24 +53,25 @@ save([data_out_filename_cleaned 'rejectedcomponents'] , 'bad_trials', 'bad_chann
 cfg           = [];
 cfg.unmixing  = icaunmixing;
 cfg.topolabel = icatopolabel;
-ica           = ft_componentanalysis(cfg, eeg);
+ica           = ft_componentanalysis(cfg, trials);
 
 %% eog vs ica Correlation
 % low pass filter at 8 hz right before correlatin (dont do before ica) for
 % eog_bp and ica
 cfg           = [];
-cfg.lpfilter ='yes';
-cfg.lpfilter = 8;
-eeg = ft_preprocessing(cfg,eeg);
+cfg.bpfilter  = 'yes';
+cfg.bpfreq    = [1 15];  % from ft_rejectvisual help page
+cfg.bpfiltord = 4;       % from ft_rejectvisual help page
+eog_bp = ft_preprocessing(cfg,eog_trials);
 eog_corr = cat(2, [1:numel(ica.topolabel)]', zeros([length(ica.topolabel), 2]));
 for x = 1:length(ica.trial) %number trials
     for y = 1:numel(ica.label)
-        for z = 2: 3
+        for z = 2:3 % 
         % CWH: why do we start at 2, AKA what's in the first column? SS: the
         % labels of component numbers
-            temp = corrcoef(eog_bp.trial{1,x}((z-1),:), ica.trial{1,x}(y,:)); %components
+            temp = corrcoef(eog_trials.trial{1,x}((z-1),:), ica.trial{1,x}(y,:)); %components
             eog_corr(y, z) = temp(1,2);
-    end
+        end
     end
 end
 
@@ -135,7 +136,7 @@ cfg = []
 !!! don't use input, jsut manually enter in SBJ_vars and then load that.
 rejcomp = input('specify components for rejection in an array format');
 cfg.component = rejcomp;
-data = ft_rejectcomponent(cfg,ica, eeg);
+data = ft_rejectcomponent(cfg,ica, trials);
 % after selecting a couple components to reject, rebuild the data without them
 % If you aren't sure which ones to reject (likely), just pick your top
 % couple and do it anyways so you have the code to do it once we meet and

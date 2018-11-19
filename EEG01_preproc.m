@@ -79,26 +79,30 @@ if strcmp(proc_vars.resample_yn,'yes')
 end
 
 %% Extract and process EOG
-% Grab first channel
+% Grab first horizontal channel
 cfg = [];
 cfg.channel = SBJ_vars.ch_lab.eog_h{1};
 eog_h = ft_selectdata(cfg,data);
 eog_h.label{1} = 'eog_h';
-% Subtract second channel
+% Subtract second horizontal channel
 eog_h2_ix = strcmp(data.label,SBJ_vars.ch_lab.eog_h{2});
 eog_h.trial{1}(1,:) = eog_h.trial{1}(1,:)-data.trial{1}(eog_h2_ix,:);
 
-% Grab first channel
+% Grab first vertical channel
 cfg.channel = SBJ_vars.ch_lab.eog_v{1};
 eog_v = ft_selectdata(cfg,data);
 eog_v.label{1} = 'eog_v';
-% Subtract second channel
+% Subtract second vertical channel
 eog_v2_ix = strcmp(data.label,SBJ_vars.ch_lab.eog_v{2});
 eog_v.trial{1}(1,:) = eog_v.trial{1}(1,:)-data.trial{1}(eog_v2_ix,:);
 
+% Add in Status channel to segment trials
+cfg.channel = 'Status';
+status = ft_selectdata(cfg,data);
+
 % Combine bipolar EOG
 cfg = [];
-eog = ft_appenddata(cfg,eog_h,eog_v);
+eog = ft_appenddata(cfg,eog_h,eog_v,status);
 
 % Remove unipolar EOG
 eog_v_low_ix = ~strcmp(SBJ_vars.ch_lab.eog_v,'Fp2');    % only toss the lower one
@@ -114,7 +118,7 @@ data = ft_selectdata(cfg,data);
 %% Cut into trials
 cfg = [];
 cfg.dataset             = SBJ_vars.dirs.raw_filename;
-cfg.trialdef.eventtype  = 'STATUS';
+cfg.trialdef.eventtype  = 'Status';
 cfg.trialdef.eventvalue = 2;        % feedback cocde
 cfg.trialdef.prestim    = -0.7;
 cfg.trialdef.poststim   = 1.5;
@@ -143,6 +147,6 @@ icaunmixing = icomp.unmixing;
 icatopolabel = icomp.topolabel;
 
 data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '.mat'];
-save(data_fname, 'icaunmixing', 'icatopolabel', 'trials', 'eog_trials', 'artifacts_data_raw');
+save(data_fname, 'icaunmixing', 'icatopolabel', 'trials', 'eog_trials');
 
 

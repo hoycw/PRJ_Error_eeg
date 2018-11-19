@@ -19,18 +19,16 @@ cfg.dataset  = SBJ_vars.dirs.raw_filename;
 cfg.lpfilter = 'no';
 cfg.hpfilter = 'no';
 cfg.bpfilter = 'yes';
-%low pass filter at 8 hz
 cfg.bpfreq   = [0.1 200];
-%cfg.trialdef.eventtype  = 'STATUS';
-%cfg.trialdef.eventvalue = 2;
-%cfg.trialdef.prestim    = -.3;
-%cfg.trialdef.poststim   = 1;
-%cfg.trialfun            = 'tt_trialfun';
-%cfg = ft_definetrial(cfg);
-dataraw = ft_preprocessing(cfg);
-cfg.viewmode = 'vertical';
-browsed_data_raw = ft_databrowser(cfg, dataraw);
-%data = ft_rejectartifact(cfg, dataraw);
-save(data_out_filename_rawdatainspect, 'browsed_data_raw', 'dataraw');
+raw = ft_preprocessing(cfg);
+
+%% Plot and mark bad epochs
+load([root_dir 'PRJ_Error_eeg/scripts/utils/cfg_plot_eeg.mat']);
+browsed_raw = ft_databrowser(cfg_plot, raw);
+bad_epochs = browsed_raw.artfctdef.visual.artifact;
+
+%% Save out bad epochs
+out_fname = [SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat'];
+save(out_fname, 'bad_epochs');
 
 end
