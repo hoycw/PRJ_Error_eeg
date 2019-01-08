@@ -15,6 +15,11 @@ data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '.mat'];
 load(data_fname);
 
 %% REJECT VISUAL
+!!! Behavioral comparison
+% Import behavioral data
+% Match BHV vs EEG trials
+% Exclude example and training data
+% Exclude outlier RTs?
 if (isempty(SBJ_vars.trial_reject_ix) || dorejectvisual)
     cfg = [];
     cfg.method   = 'summary';  % 'summary' for trials+channels; 'channel' for individual trials
@@ -44,7 +49,8 @@ else
     bad_trials = SBJ_vars.trial_reject_ix;
     bad_channels = SBJ_vars.channels_reject_ix;
 end
-save([data_out_filename_cleaned 'rejectedcomponents'] , 'bad_trials', 'bad_channels');
+!!! saving out the rejected trials + channels, etc.
+save([clean_fname 'rejectedcomponents'] , 'bad_trials', 'bad_channels');
 % Summary vs. Trial Comparison
 % compare the lists of trials rejected based on eeg  summary vs. trial, eog
 % summary vs. trial, and then all eeg vs. all eog
@@ -76,6 +82,7 @@ for x = 1:length(ica.trial) %number trials
 end
 
 %% Select Top components based on correlation values
+!!! get right top_cut from proc_vars
 num_top_comp = ceil(size(eog_corr,1)*SBJ_vars.top_comp_cut);
 top_comps = zeros(num_top_comp,6);
 [correlation, top_horiz_ix] = sort(abs(eog_corr(:,2)),'descend');
@@ -92,10 +99,9 @@ top_comps
 % correlation values, etc.)
 % this prints out the correlation with the horizontal in column 2/5 and the
 % vertical in column 3/6 -- not sure if there is a way to label this
+!!! clean_fname = clean' datestr(now,'mm-dd-yyyy HH-MM')
 
-save(data_out_filename_cleaned, 'eog_corr');
-
-
+save(clean_fname, 'eog_corr');
 
 %% Viewing ICA components based on top correlations
 figure
@@ -158,6 +164,7 @@ data=ft_selectdata(cfg, data);
 % ICA-reconstructed dataset (which I think should still have all trials...)
 cfg.viewmode = 'vertical';
 browsed_data_raw = ft_databrowser(cfg, data);
+!!!ica_fname = 'Pilot02ICASorted' datestr(now,'mm-dd-yyyy HH-MM')
 save(data_out_filename_ICA, 'browsed_data_raw');
 artifacts_data_raw = browsed_data_raw.artfctdef.visual.artifact;
 rawdata = cfg.dataset;

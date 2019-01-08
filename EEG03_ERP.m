@@ -1,4 +1,4 @@
-function erpscript(filename, SBJ)
+function EEG03_ERP(filename, SBJ)
 addpath(genpath('/Users/SCS22/Desktop/Knight_Lab/Preprocessing_Work/'));
 data_in_filename = [SBJ, 'cleaned']
 load(data_in_filename, 'data');
@@ -17,5 +17,6 @@ cfg.layout    = 'biosemi64.lay';
 cfg.interactive = 'yes';
 cfg.showoutline = 'yes';
 ft_multiplotER(cfg, erps)
+erp_fname = !!!;
 savefig(data_out_filename_erp);
 save(data_out_filename_erp, 'erps');

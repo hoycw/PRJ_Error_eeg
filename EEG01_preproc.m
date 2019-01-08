@@ -10,13 +10,13 @@ addpath(genpath([root_dir 'PRJ_Error_eeg/scripts/']));
 addpath(ft_dir);
 ft_defaults
 
-%% Load and preprocess the data
+%% Set up processing and SBJ variables
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_proc_vars.m'];
 eval(proc_vars_cmd);
 
-%% Load, preprocess, and downsample the data
+%% Load and preprocess the data
 % Update ears ref channels with prefix/suffix
 if isfield(SBJ_vars.ch_lab,'prefix')
     ear_lab1 = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{1}];
@@ -51,8 +51,8 @@ for bad_ix = 1:numel(SBJ_vars.ch_lab.bad)
     bad_neg = {bad_neg{:},['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.bad{bad_ix} SBJ_vars.ch_lab.suffix]};
 end
 rep_neg = {};
-for rep_ix = 1:numel(SBJ_vars.ch_lab.replacements)
-    rep_neg = {rep_neg{:},['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.replacements{rep_ix}{1} SBJ_vars.ch_lab.suffix]};
+for rep_ix = 1:numel(SBJ_vars.ch_lab.replace)
+    rep_neg = {rep_neg{:},['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.replace{rep_ix}{1} SBJ_vars.ch_lab.suffix]};
 end
 ears_neg = {['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{1} SBJ_vars.ch_lab.suffix],...
             ['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{2} SBJ_vars.ch_lab.suffix]};
@@ -64,9 +64,9 @@ data = ft_selectdata(cfg,data);
 for ch_ix = 1:numel(data.label)
     data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
     data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
-    for x = 1:numel(SBJ_vars.ch_lab.replacements)
-        if strcmp(SBJ_vars.ch_lab.replacements{x}{2},data.label{ch_ix})
-            data.label{ch_ix} = SBJ_vars.ch_lab.replacements{x}{1}; % replaces the label of the externals with the channel they represent
+    for x = 1:numel(SBJ_vars.ch_lab.replace)
+        if strcmp(SBJ_vars.ch_lab.replace{x}{2},data.label{ch_ix})
+            data.label{ch_ix} = SBJ_vars.ch_lab.replace{x}{1}; % replaces the label of the externals with the channel they represent
         end
     end
 end
@@ -96,15 +96,16 @@ eog_v.label{1} = 'eog_v';
 eog_v2_ix = strcmp(data.label,SBJ_vars.ch_lab.eog_v{2});
 eog_v.trial{1}(1,:) = eog_v.trial{1}(1,:)-data.trial{1}(eog_v2_ix,:);
 
-% Add in Status channel to segment trials
-cfg.channel = 'Status';
-status = ft_selectdata(cfg,data);
+% Add in trigger channel to segment trials
+cfg.channel = SBJ_vars.ch_lab.trigger;
+trigger = ft_selectdata(cfg,data);
 
 % Combine bipolar EOG
 cfg = [];
-eog = ft_appenddata(cfg,eog_h,eog_v,status);
+eog = ft_appenddata(cfg,eog_h,eog_v,trigger);
 
 % Remove unipolar EOG
+warning('WARNING!!! Assuming Fp2 is the second vertical EOG!');
 eog_v_low_ix = ~strcmp(SBJ_vars.ch_lab.eog_v,'Fp2');    % only toss the lower one
 eog_neg = [fn_ch_lab_negate(SBJ_vars.ch_lab.eog_h),fn_ch_lab_negate(SBJ_vars.ch_lab.eog_v(eog_v_low_ix))];
 cfg = [];
@@ -118,12 +119,13 @@ data = ft_selectdata(cfg,data);
 %% Cut into trials
 cfg = [];
 cfg.dataset             = SBJ_vars.dirs.raw_filename;
-cfg.trialdef.eventtype  = 'Status';
-cfg.trialdef.eventvalue = 2;        % feedback cocde
-cfg.trialdef.prestim    = -0.7;
-cfg.trialdef.poststim   = 1.5;
+cfg.trialdef.eventtype  = SBJ_vars.ch_lab.trigger;
+cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
+cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
+cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
 cfg.trialfun            = 'ft_trialfun_general';
 cfg = ft_definetrial(cfg);
+!!! error: segmenting before downsampling, so wrong sample idx here
 trials = ft_preprocessing(cfg,data);
 eog_trials = ft_preprocessing(cfg,eog);
 
@@ -147,6 +149,6 @@ icaunmixing = icomp.unmixing;
 icatopolabel = icomp.topolabel;
 
 data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '.mat'];
-save(data_fname, 'icaunmixing', 'icatopolabel', 'trials', 'eog_trials');
+save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog', 'trials', 'eog_trials');
 
 
