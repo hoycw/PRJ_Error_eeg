@@ -23,7 +23,7 @@ if isfield(SBJ_vars.ch_lab,'prefix')
     ear_lab2 = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{2}];
 else
     ear_lab1 = [SBJ_vars.ch_lab.ears{1}];
-    ear_lab1 = [SBJ_vars.ch_lab.ears{2}];
+    ear_lab2 = [SBJ_vars.ch_lab.ears{2}];
 end
 if isfield(SBJ_vars.ch_lab,'suffix')
     ear_lab1 = [ear_lab1 SBJ_vars.ch_lab.suffix];

@@ -22,7 +22,7 @@ cfg.dataset  = SBJ_vars.dirs.raw_filename;
 cfg.lpfilter = 'no';
 cfg.hpfilter = 'no';
 cfg.bpfilter = 'yes';
-cfg.bpfreq   = [0.1 20];
+cfg.bpfreq   = [0.5 40];%0.1 is too low for filter settings, 20 is too low to see muscle artifact, consider ditching filtering?
 raw = ft_preprocessing(cfg);
 
 %% Plot and mark bad epochs
@@ -41,7 +41,7 @@ if view_previous
         load(out_fname);
         cfg_plot.artfctdef.visual.artifact = bad_epochs;
     else
-        warning('Previous bad_epochs from raw data cleaning doesnt exist!');
+        warning('Previous bad_epochs from raw data cleaning doesnt exist! Please mark bad epochs.');
     end
 end
 browsed_raw = ft_databrowser(cfg_plot, raw);
