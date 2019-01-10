@@ -14,9 +14,22 @@ eval(SBJ_vars_cmd);
 data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '.mat'];
 load(data_fname);
 
+%% Import behavioral data
+%   Total_Trial,Block,Condition,Hit,RT,Timestamp,Tolerance,Trial,Score,ITI,ITI type
+fprintf('\tReading behavioral csv file\n');
+bhv_file = fopen([SBJ_vars.dirs.events SBJ '_behav.csv'], 'r');
+bhv_fields = textscan(bhv_file, '%s %s %s %s %s %s %s %s %s %s %s', 1, 'Delimiter', ',');
+bhv_data = textscan(bhv_file, '%d %d %s %d %f %f %f %d %d %f %f',...
+    'Delimiter', ',', 'HeaderLines', 1);
+fclose(bhv_file);
+
+for t_ix = 1:numel(bhv_data{1})
+    for f_ix = 1:numel(bhv_fields)
+        bhv.(strrep(bhv_fields{f_ix}{1},' ','_')) = bhv_data{f_ix};
+    end
+end
+
 %% REJECT VISUAL
-!!! Behavioral comparison
-% Import behavioral data
 % Match BHV vs EEG trials
 % Exclude example and training data
 % Exclude outlier RTs?

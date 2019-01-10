@@ -44,6 +44,13 @@ cfg.refmethod  = proc_vars.ref_method;
 cfg.refchannel = {ear_lab1, ear_lab2};
 data = ft_preprocessing(cfg);
 
+% %% Downsample
+% if strcmp(proc_vars.resample_yn,'yes')
+%     cfg=[];
+%     cfg.resamplefs = proc_vars.resample_freq;
+%     data = ft_resampledata(cfg, data);
+% end
+
 %% Fix channel labels
 % Remove bad channels
 bad_neg = {};
@@ -69,13 +76,6 @@ for ch_ix = 1:numel(data.label)
             data.label{ch_ix} = SBJ_vars.ch_lab.replace{x}{1}; % replaces the label of the externals with the channel they represent
         end
     end
-end
-
-%% Downsample
-if strcmp(proc_vars.resample_yn,'yes')
-    cfg=[];
-    cfg.resamplefs = proc_vars.resample_freq;
-    data = ft_resampledata(cfg, data);
 end
 
 %% Extract and process EOG
@@ -117,17 +117,22 @@ data = ft_selectdata(cfg,data);
 %cfg.baselinewindow  = [-0.25 -0.05]; %set baseline to -.2 to 0 seconds, then correct it before you resample
 
 %% Cut into trials
+% Must segment before downsampling because trigger channel read from
+% original file
 cfg = [];
 cfg.dataset             = SBJ_vars.dirs.raw_filename;
-cfg.trialdef.eventtype  = SBJ_vars.ch_lab.trigger;
+cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
 cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
 cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
 cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
-cfg.trialfun            = 'ft_trialfun_general';
+cfg.trialfun            = 'tt_trialfun';%'ft_trialfun_general';%
 cfg = ft_definetrial(cfg);
-!!! error: segmenting before downsampling, so wrong sample idx here
-trials = ft_preprocessing(cfg,data);
-eog_trials = ft_preprocessing(cfg,eog);
+if any(cfg.trl(:,1)<1)  % If the recording was started part way through, toss events not recorded
+    cfg.trl(cfg.trl(:,1)<1,:) = [];
+end
+%!!! error: segmenting before downsampling, so wrong sample idx here
+trials = ft_redefinetrial(cfg,data);
+eog_trials = ft_redefinetrial(cfg,eog);
 
 %!!! WTF was this about?
 % cfg = [];
@@ -137,6 +142,8 @@ eog_trials = ft_preprocessing(cfg,eog);
 % cfg.artfctdef.visual.artifact = 'artifacts_data_raw';
 % cfg = ft_rejectartifact(cfg);
 % cfg.implicitref   = []; %REF is implicit, what is 0d to, RM is the other one, do average reference with the mastoid
+
+%% Exclude bad_trials
 
 %% ICA
 cfg        = [];
