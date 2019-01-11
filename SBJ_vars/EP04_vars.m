@@ -52,22 +52,23 @@ SBJ_vars.ch_lab.bad     = {...
     };
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
-%--------------------------------------
-% Time Parameters
-%--------------------------------------
-% events start ~155 or 160s to ~384; ~580 to end (~1360?)
-SBJ_vars.analysis_time = {};
+SBJ_vars.trial_reject_ix = [];
 
 %--------------------------------------
-% Trials and Channels to Reject
+% Noise Notes
 %--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-% original trial_reject_ix = [52 61 77 125 154 156 185 187 131 132 133 205 254 265 280 283 4303 311 318 319 320];
-%SBJ_vars.trial_reject_ix = [52 61 77 125 154 156 185 187 131 132 133 205 254 265 280 283 303 311 318 319 320];
-%SBJ_vars.channels_reject_ix = {'T7','T8'};
+% recording info sheet notes:
+    % Channels: 
+% PSD Notes:
+    % Channels:
+% Raw View notes:
+    % Channels:
+% databrowser post-IC rejection:
+    % Channels:
+    % Trials (n/???): 
+% ft summary:
+    % Channels:
+    % Trials (n/???):
+% ft channel:
+    % Trials (n/???):
 
-%--------------------------------------
-% Component Paramaters
-%--------------------------------------
-% SBJ_vars.top_comp_cut = 0.1;
-%SBJ_vars.rejcomp = [1];

@@ -13,7 +13,7 @@ end
 % Behavioral Processing
 proc_vars.rt_bounds = [0.3 2.0];          % bounds on a reasonable RT to be detected with KLA algorithm
 % Varaince-Based Trial Rejection Parameters
-proc_vars.var_std_warning_thresh = 3;
+proc_vars.var_std_warn_thresh = 3;
 
 % Data Preprocessing
 proc_vars.plot_psd      = '1by1';         % type of plot for channel PSDs
@@ -36,5 +36,4 @@ proc_vars.notch_type    = 'bandstop';     % method for nothc filtering out line 
 % dft_yn      = 'no';
 % bs_yn       = 'no';                % Parameters for this in SBJ_vars
 
-
-proc_vars.ica_corr_thresh = 0.1;          % proportion of ICA components to keep after sorting by max EOG correlation
+proc_vars.eog_ic_corr_cut = 0.3;        % EOG IC correlation threshold for tossing ICs

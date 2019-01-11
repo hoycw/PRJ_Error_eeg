@@ -17,9 +17,6 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERPs/' SBJ '/' an_id '/'];
-if ~exist(fig_dir,'dir')
-   mkdir(fig_dir);
-end
 
 %% Load EEG and Behavioral Data
 load([SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat']);
@@ -68,7 +65,6 @@ for ch_ix = 1:numel(ew_erp.label)
     title('Hard');
     
     saveas(gcf,[fig_dir fig_name]);
-    close(gcf);
 end
 
 else

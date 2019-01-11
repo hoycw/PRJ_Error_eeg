@@ -128,13 +128,9 @@ cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
 cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
 cfg.trialfun            = 'tt_trialfun';%'ft_trialfun_general';%
 cfg_trl = ft_definetrial(cfg);
-
-% If the recording was started part way through, toss events not recorded
-if any(cfg_trl.trl(:,1)<1)  
+if any(cfg_trl.trl(:,1)<1)  % If the recording was started part way through, toss events not recorded
     cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
 end
-event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
-
 trials = ft_redefinetrial(cfg_trl,data);
 eog_trials = ft_redefinetrial(cfg_trl,eog);
 
@@ -150,19 +146,13 @@ eog_trials = ft_redefinetrial(cfg_trl,eog);
 %% Exclude bad_trials
 load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
 
-% Find epochs that overlap with bad_epochs from raw visual inspection
+% Find epochs that overlap with bad_epochs from Bob
 if ~isempty(bad_epochs)
-    bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
-        event_onsets,proc_vars.trial_lim_s*data.fsample);
+    skip_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
+        cfg_trl.trl(:,1)-cfg_trl.trl(:,3),proc_vars.trial_lim_s*data.fsample);
 else
-    bad_raw_trials = [];
+    skip_trials = [];
 end
-
-% Exclude bad trials
-cfgs = [];
-cfgs.trials = setdiff(1:numel(trials.trial),bad_raw_trials);
-trials = ft_selectdata(cfgs,trials);
-% eog_trials = ft_selectdata(cfgs,eog_trials);
 
 %% ICA
 cfg        = [];
@@ -174,7 +164,7 @@ icomp = ft_componentanalysis(cfg, trials);
 icaunmixing = icomp.unmixing;
 icatopolabel = icomp.topolabel;
 
-data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
-save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog', 'cfg_trl', 'event_onsets', 'bad_raw_trials');% 'trials', 'eog_trials',
+data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '.mat'];
+save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog', 'trials', 'eog_trials');
 
 

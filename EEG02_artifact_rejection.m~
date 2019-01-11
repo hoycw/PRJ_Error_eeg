@@ -11,8 +11,6 @@ ft_defaults
 %% Load the data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_proc_vars.m'];
-eval(proc_vars_cmd);
 
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
@@ -79,14 +77,6 @@ end
 avg_eog_ic_corr = mean(eog_ic_corr,3);
 heog_ics = find(abs(avg_eog_ic_corr(1,:))>proc_vars.eog_ic_corr_cut);
 veog_ics = find(abs(avg_eog_ic_corr(2,:))>proc_vars.eog_ic_corr_cut);
-if any([isempty(heog_ics), isempty(veog_ics)])
-    error('No EOG ICs found!');
-end
-
-% IC rejection
-cfg = [];
-cfg.component = [heog_ics veog_ics];
-clean_trials = ft_rejectcomponent(cfg, ica, trials);
 
 % Print the results
 figure;
@@ -98,25 +88,29 @@ subplot(1,2,2);
 histogram(avg_eog_ic_corr(2,:),50);
 title('VEOG ICA Correlations');
 xlabel('Correlation (r)');
-eog_ic_fname = [SBJ_vars.dirs.preproc SBJ '_eog_ic_corr_' proc_id '.png'];
-saveas(gcf,eog_ic_fname);
 
-fprintf('==================== EOG vs. ICA Correlations =========================\n');
 fprintf(['%i ICs correlate with HEOG, r = ' repmat('%.02f ',[1 numel(heog_ics)]) '\n'],...
         numel(heog_ics),avg_eog_ic_corr(1,heog_ics));
 fprintf(['%i ICs correlate with VEOG, r = ' repmat('%.02f ',[1 numel(veog_ics)]) '\n'],...
         numel(veog_ics),avg_eog_ic_corr(2,veog_ics));
-fprintf('=======================================================================\n');
 
 % View ICs with EOG correlations
 cfg = [];
+cfg.component = eog_ic_ix;
 cfg.layout    = 'biosemi64.lay';
+% cfg.comment   = 'no';
+% ft_topoplotIC(cfg, ica)
 cfg.channel = [heog_ics veog_ics]; 
 cfg.viewmode  = 'component';
 ft_databrowser(cfg, ica);
 
+% IC rejection
+cfg = [];
+cfg.component = [heog_ics veog_ics];
+clean_trials = ft_rejectcomponent(cfg, ica, trials);
+
 %% Visual Trial Rejection
-if dorejectvisual
+if (isempty(SBJ_vars.trial_reject_ix) || dorejectvisual)
     cfg = [];
     cfg.method = 'summary';  % 'summary' for trials+channels; 'channel' for individual trials
     clean_summ = ft_rejectvisual(cfg, clean_trials);
@@ -125,32 +119,23 @@ if dorejectvisual
     cfg = [];
     cfg.method  = 'channel';   % 'summary' for trials+channels; 'channel' for individual trials
     clean_trial = ft_rejectvisual(cfg, clean_trials);
-    
-    % Report channels and trials identified above in SBJ_vars, then re-run
-    exit;
 end
 
 %% Clean up and save data
 % Get bad trials and channels from SBJ_vars
-%   NOTE: these are indices into the post-raw rejection trial list
 bad_trials = SBJ_vars.trial_reject_ix;
 bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
 
 % Remove from ICA cleaned data
 cfgs = [];
-cfgs.trials = setdiff(1:numel(clean_trials.trial),bad_trials);
+cfgs.trial = setdiff(1:numel(clean_trials.trial),bad_trials);
 cfgs.channel = {'all',bad_ch_neg{:}};
 trials = ft_selectdata(cfgs,clean_trials);
-
-% Remove from behavioral
-for f_ix = 1:numel(bhv_fields)
-    bhv.(bhv_fields{f_ix})(bad_trials) = [];
-end
     
 % Save outputs
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat'];
-save(clean_data_fname, '-v7.3', 'trials');
 
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat'];
-save(clean_bhv_fname, '-v7.3', 'bhv');
+save(data_out_filename_cleaned, 'data')
+% !!! clean_fname = clean' datestr(now,'mm-dd-yyyy HH-MM')
+% save(clean_fname, 'eog_corr');
+
 

@@ -9,7 +9,7 @@ function trl = tt_trialfun(cfg);
 
 hdr   = ft_read_header(cfg.dataset);
 event = ft_read_event(cfg.dataset);
-printf('%i events found!\n',numel(event));
+fprintf('%i events found!\n',numel(event));
  
 trl = [];
  
