@@ -11,7 +11,11 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP11';
+<<<<<<< HEAD
 SBJ_vars.raw_file = 'pilot_11.bdf';
+=======
+SBJ_vars.raw_file = 'Pilot_11.bdf';
+>>>>>>> 99dbfcfb4b2bb8dcce3bbcf9d06a7281e4f4b0f1
 SBJ_vars.bhv_file = 'Pilot11_2_response_log_20181128144407_rm1st3trl.txt';
 SBJ_vars.block_prefix = '';
 

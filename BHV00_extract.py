@@ -40,7 +40,7 @@ logs = {
         'EP08': 'Pilot08_response_log_20181101084314.txt',
         'EP09': 'Pilot09_response_log_20181127081927.txt',
         'EP10': 'Pilot10_response_log_20181127141339.txt',
-        'EP11': 'Pilot11_2_response_log_20181128144407.txt'
+        'EP11': 'Pilot11_2_response_log_20181128144407_rm1st3trl.txt'
         }
 #         'EP05': '.txt',# both log files are empty!
 # logs = {'Rana_1.6': 'Rana2_response_log_20170321103129_DATA.txt',
