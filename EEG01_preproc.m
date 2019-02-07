@@ -2,11 +2,12 @@ function EEG01_preproc(SBJ, proc_id)
 %% Import and preprocess EEG data, then run ICA
 
 %% Check which root directory
-if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
-addpath(genpath([root_dir 'PRJ_Error_eeg/scripts/']));
+addpath([root_dir 'PRJ_Error_eeg/scripts/']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath(ft_dir);
 ft_defaults
 
