@@ -11,7 +11,11 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP11';
+<<<<<<< HEAD
+SBJ_vars.raw_file = 'pilot_11.bdf';
+=======
 SBJ_vars.raw_file = 'Pilot_11.bdf';
+>>>>>>> 99dbfcfb4b2bb8dcce3bbcf9d06a7281e4f4b0f1
 SBJ_vars.bhv_file = 'Pilot11_2_response_log_20181128144407_rm1st3trl.txt';
 SBJ_vars.block_prefix = '';
 
@@ -47,17 +51,16 @@ SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {...
-    };
-%SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.ch_lab.bad     = {'P4', 'PO8', 'O2','FT7', 'T7', 'C6'};
+%f7, fc5SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
-SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_ix = [192, 265, 288, 312, 346, 356, 362:366, 377, 436, 447, 487, 589];
 
 %--------------------------------------
-% Noise Notes
+% Noise Not es
 %--------------------------------------
 % recording info sheet notes:
-    %'PO7','O1','Iz','Oz'... % noisy channels
+    %'PO7','O1','Iz,','Oz'... % noisy channels
 % PSD Notes:
     %'AF3','CP2','Iz','Oz','O1','O2','PO3','PO7','PO8','POz' - PSD looks noisy
     %'F1' - strange flat PSD
