@@ -1,5 +1,5 @@
-%% Pilot02 Processing Variables
-if exist('/home/knight/hoycw/','dir');root_dir='/home/knight/hoycw/';ft_dir=[root_dir 'Apps/fieldtrip/'];
+%% Pilot04 Processing Variables
+if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
@@ -10,9 +10,9 @@ ft_defaults
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = 'EP02';
-SBJ_vars.raw_file = 'Pilot02.bdf' ;
-SBJ_vars.bhv_file = 'EEG_pilot2_response_log_20170425110628.txt' ;
+SBJ_vars.SBJ = 'EP04';
+SBJ_vars.raw_file = 'Pilot04.bdf' ;
+SBJ_vars.bhv_file = 'Pilot4_response_log_20180322141434.txt' ;
 SBJ_vars.block_prefix = '';
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];

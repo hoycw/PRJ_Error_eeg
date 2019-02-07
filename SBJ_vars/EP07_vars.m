@@ -10,9 +10,9 @@ ft_defaults
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = 'EP06';
-SBJ_vars.raw_file = 'TT_Cyclone_pilot06.bdf';
-SBJ_vars.bhv_file = 'TT_Cyclone_pilot06_response_log_20180426140027.txt';
+SBJ_vars.SBJ = 'EP07';
+SBJ_vars.raw_file = 'Pilot07.bdf';
+SBJ_vars.bhv_file = 'Pilot07_response_log_20181031155619.txt';
 SBJ_vars.block_prefix = '';
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
@@ -47,16 +47,11 @@ SBJ_vars.ch_lab.replace = {{'F6', 'EXG6'},{'P8','EXG7'},{'P2','EXG8'}}; % {{'fin
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {...
-    'Iz','Oz','PO8','POz','PO3','O2',... % noisy channels
-    'T8','F6','AF3','TP7','PO7','O1'... % noisy channels
+SBJ_vars.ch_lab.bad     = {'01','O2', 'PO7', 'AF8','PO8', 'Iz', 'Oz'  'T7'
     };
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
-SBJ_vars.trial_reject_ix = [...
-    142, 228, 375, 376, 387, 398, 402, 409,...
-    410, 420, 441, 462, 463, 479, 490, 497,...
-    513, 533, 543, 548, 552:554, 570, 580];
+SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
 
 %--------------------------------------
 % Noise Notes
