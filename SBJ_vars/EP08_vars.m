@@ -1,4 +1,4 @@
-%% Pilot05 Processing Variables
+%% Pilot08 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -10,9 +10,9 @@ ft_defaults
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = 'EP07';
-SBJ_vars.raw_file = 'Pilot07.bdf';
-SBJ_vars.bhv_file = 'Pilot07_response_log_20181031155619.txt';
+SBJ_vars.SBJ = 'EP08';
+SBJ_vars.raw_file = 'Pilot08.bdf';
+SBJ_vars.bhv_file = 'Pilot08_response_log_20181101084314.txt';
 SBJ_vars.block_prefix = '';
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
@@ -43,15 +43,14 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
-SBJ_vars.ch_lab.replace = {{'F6', 'EXG6'},{'P8','EXG7'},{'P2','EXG8'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
+SBJ_vars.ch_lab.replace = {{'O2', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'01','O2', 'PO7', 'AF8','PO8', 'Iz', 'Oz'  'T7'
-    };
+SBJ_vars.ch_lab.bad     = {'T8', 'FT8', 'PO4', 'C6', 'PO8', 'F8', 'AF8', 'O2', 'P2'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
-SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
+SBJ_vars.trial_reject_ix = [88, 94, 103, 154, 157, 217, 327, 343, 370, 406, 417, 440, 490, 499, 511, 545];
 
 %--------------------------------------
 % Noise Notes
@@ -63,11 +62,13 @@ SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410
     %'F1' - strange flat PSD
     %'F6','P2','P8' empty
 % Raw View notes:
-    % POz has big ripples, PO3 at times too
-    % TP8 also has big fluctuations
+    % FT8 spiking, toss it
+    % T8 messy, f8 and f6 messy, af8 messy
     % PO8 has big noise at times
-    % O2 breaks loose at some point
-    % AF3 becomes very onisy at some point
+    % FT8 loose at 170- 200 seconds, will get rid of anyways
+    % P2 gets weird at 230s
+    %IZ gets messy 970
+    %02 1680-1700
 % databrowser post-IC rejection:
     % channels: Iz, Oz, PO8, PO3, T8 (trial 31), POz (esp. t 151), 216 starts O2 loose, F6 (t 351), AF3 (t 413), F4(t 417), TP7 (t 436)
     % trials: 142 (EOG missed?), 228, 375, 376, 387, 398 (P5), 402, 409, 410, 420, 441, 462, 463, 479, 490, 497, 513, 533, 543, 548, 552:554, 559?, 570, 576?, 580
@@ -87,7 +88,7 @@ SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410
 %--------------------------------------
 % SBJ_vars.analysis_time = {};
 
-%--------------------------------------
+%-------------------------s-------------
 % Trials and Channels to Reject
 %--------------------------------------
 % These should be indices AFTER SBJ05 has run!
