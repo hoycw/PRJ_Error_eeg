@@ -11,7 +11,7 @@ else
 end
 %proc_vars.RT_std_thresh = 3;            % rejection threshold for RTs
 % Behavioral Processing
-proc_vars.rt_bounds = [0.3 2.0];          % bounds on a reasonable RT to be detected with KLA algorithm
+proc_vars.rt_bounds = [0.6 1.4];          % bounds on a reasonable RT to be detected with KLA algorithm
 % Varaince-Based Trial Rejection Parameters
 proc_vars.var_std_warn_thresh = 3;
 

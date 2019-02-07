@@ -40,8 +40,9 @@ if numel(bhv.Trial)~=numel(event_onsets)
 end
 
 % Identify and exclude training and bad raw visual trials
-training_trial_n = find(bhv.Block==-1);
-exclude_trials = unique(vertcat(training_trial_n,bad_raw_trials));
+training_trial_ix = find(bhv.Block==-1);
+% Sheila: add proc_vars.rt_bounds exclusion here, then to the vertcat below
+exclude_trials = unique(vertcat(training_trial_ix,bad_raw_trials));
 for f_ix = 1:numel(bhv_fields)
     bhv.(bhv_fields{f_ix})(exclude_trials) = [];
 end
@@ -128,7 +129,7 @@ if dorejectvisual
     clean_trial = ft_rejectvisual(cfg, clean_trials);
     
     % Report channels and trials identified above in SBJ_vars, then re-run
-    exit;
+    % exit;
 end
 
 %% Clean up and save data
