@@ -8,7 +8,7 @@ elseif exist('/Volumes/hoycw_clust/','dir')
     app_dir   = '/Users/colinhoy/Code/Apps/';
 elseif exist('/Users/SCS22/','dir');
     root_dir='/Users/SCS22/Desktop/Knight_Lab/';
-    ft_dir='/Users/SCS22/Documents/MATLAB/';
+    app_dir='/Users/SCS22/Documents/MATLAB/';
 else
     error('root directory not found. where are you running this?');
 end

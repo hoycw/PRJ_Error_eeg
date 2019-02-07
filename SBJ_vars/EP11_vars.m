@@ -11,8 +11,8 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP11';
-SBJ_vars.raw_file = 'pilot_11.bdf';
-SBJ_vars.bhv_file = 'maybeEP10_Pilot11_response_log_20181127141339.txt';
+SBJ_vars.raw_file = 'Pilot_11.bdf';
+SBJ_vars.bhv_file = 'Pilot11_2_response_log_20181128144407_rm1st3trl.txt';
 SBJ_vars.block_prefix = '';
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
