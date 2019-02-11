@@ -11,11 +11,7 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP11';
-<<<<<<< HEAD
-SBJ_vars.raw_file = 'pilot_11.bdf';
-=======
 SBJ_vars.raw_file = 'Pilot_11.bdf';
->>>>>>> 99dbfcfb4b2bb8dcce3bbcf9d06a7281e4f4b0f1
 SBJ_vars.bhv_file = 'Pilot11_2_response_log_20181128144407_rm1st3trl.txt';
 SBJ_vars.block_prefix = '';
 
@@ -54,8 +50,8 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'P4', 'PO8', 'O2','FT7', 'T7', 'C6'};
 %f7, fc5SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
-SBJ_vars.trial_reject_ix = [192, 265, 288, 312, 346, 356, 362:366, 377, 436, 447, 487, 589];
-
+%SBJ_vars.trial_reject_ix = [192, 265, 288, 312, 346, 356, 362:366, 377, 436, 447, 487, 589];
+SBJ_vars.trial_reject_n = [191, 264, 287, 311, 345, 55, 361, 362, 363, 364, 365, 376, 435, 446, 486, 588];
 %--------------------------------------
 % Noise Not es
 %--------------------------------------
