@@ -33,12 +33,12 @@ sample_rate = (numel(roi_erp{1}.time)-1)/(roi_erp{1}.time(end)-roi_erp{1}.time(1
 cfg_trim = [];
 cfg_trim.latency = plt_vars.plt_lim;
 for an_ix = 1:numel(roi_erp)
+    % Trim data to plotting epoch
+    roi_erp{an_ix} = ft_selectdata(cfg_trim,roi_erp{an_ix});
+    
     % Get rid of .trial field to avoid following bug that tosses .avg, .var, and .dof:
     %   "Warning: timelock structure contains field with and without repetitions"
     roi_erp{an_ix} = rmfield(roi_erp{an_ix},'trial');    
-    
-    % Trim data to plotting epoch
-    roi_erp{an_ix} = ft_selectdata(cfg_trim,roi_erp{an_ix});    
 end
 
 %% Plot Results
@@ -80,7 +80,7 @@ for ch_ix = 1:numel(stat.label)
     
 %     subplot(plot_rc(1),plot_rc(2),ch_ix);
     plot_info.ax     = gca;
-    plot_info.title  = strcat(stat.label{ch_ix});
+    plot_info.title  = strcat(stat.label{ch_ix}, ' (', einfo(ch_ix,2), ')');
     plot_info.legend = plt_vars.legend;
     
     % Compute means and variance
@@ -88,7 +88,7 @@ for ch_ix = 1:numel(stat.label)
     sem = NaN([numel(cond_lab) size(roi_erp{1}.avg,2)]);
     for an_ix = 1:numel(cond_lab)
         means(an_ix,:) = roi_erp{an_ix}.avg(ch_ix,:);
-        sem(an_ix,:) = squeeze(sqrt(roi_erp{an_ix}.var(ch_ix,:))./sqrt(numel(roi_erp{an_ix}.cfg.previous.trials)))';
+        sem(an_ix,:) = squeeze(sqrt(roi_erp{an_ix}.var(ch_ix,:))./sqrt(numel(roi_erp{an_ix}.trialinfo)))';
     end
     % Find significant time periods
     if sum(stat.mask(ch_ix,:))>0

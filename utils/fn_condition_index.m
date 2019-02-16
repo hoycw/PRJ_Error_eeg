@@ -22,10 +22,10 @@ for cond_ix = 1:numel(cond_lab)
             condition_n(bhv.Hit==0) = cond_ix;
         case 'Er'
             warning('WARNING!!! Assuming target_time = 1 sec...');
-            condition_n(bhv.rt<1) = cond_ix;
+            condition_n(bhv.RT<1) = cond_ix;
         case 'Lt'
             warning('WARNING!!! Assuming target_time = 1 sec...');
-            condition_n(bhv.rt>1) = cond_ix;
+            condition_n(bhv.RT>1) = cond_ix;
         case 'EzWn'
             matches = logical(strcmp('easy',bhv.Condition)) & logical(bhv.Hit==1);
             condition_n(matches) = cond_ix;

@@ -1,4 +1,4 @@
-function EEG03a_ERP_stats(SBJ,conditions,proc_id,an_id)
+function EEG03a_ERP_stats(SBJ,conditions,pipeline_id,an_id)
 % Calculates ERPs, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 
@@ -19,8 +19,8 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 
 % Load Data
-load([SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat']);
-load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat']);
+load([SBJ_vars.dirs.preproc SBJ '_clean_' pipeline_id '.mat']);
+load([SBJ_vars.dirs.events SBJ '_behav_' pipeline_id '_clean.mat']);
 
 % Select Conditions of Interest
 [cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
@@ -53,6 +53,37 @@ for cond_ix = 1:numel(cond_lab)
     roi_erp{cond_ix} = ft_timelockanalysis(cfgavg,roi);
     % Grab n_trials for design matrix
     n_trials(cond_ix) = size(roi_erp{cond_ix}.trial,1);
+end
+
+%% Contrast conditions
+if strcmp(conditions,'DifOut') || numel(cond_lab)>2
+    error(['Analysis not implemented for ' conditions ' yet, too many conditions: ' strjoin(cond_lab,',')]);
+%     % Compute Win - Loss
+%     cfgdif = [];
+%     cfgdif.operation = 'subtract';
+%     cfgdif.parameter = 'avg';
+%     wn_ix = find(~cellfun(@isempty,strfind(cond_lab,'Wn')));
+%     ls_ix = find(~cellfun(@isempty,strfind(cond_lab,'Ls')));
+%     difwave = cell(size(wn_ix));
+%     for dif_ix = 1:numel(wn_ix)
+%         difwave{dif_ix} = roi_erp{wn_ix(dif_ix)};
+%         % Compute difference in means (ERP difference wave)
+%         difwave{dif_ix}.avg = difwave{dif_ix}.avg - roi_erp{ls_ix(dif_ix)}.avg;
+%         difwave{dif_ix} = rmfield(difwave{dif_ix},'trial'); % remove trial since that doesn't make sense anymore
+%         % Compute variance of difference in 2 RVs = var(X) + var(Y) - 2*covariance(X,Y)
+%         wl_cov = cov(difwave{dif_ix}.avg, roi_erp{ls_ix(dif_ix)}.avg);
+%         difwave{dif_ix}.var = difwave{dif_ix}.var + roi_erp{ls_ix(dif_ix)}.var - 2*wl_cov(1,2);
+%     end
+%     stat_lab = {strrep(cond_lab{wn_ix(1)},'Wn',''), strrep(cond_lab{wn_ix(2)},'Wn','')};
+%     
+%     cfgdw = [];
+%     cfgdw.method = 'stats';
+%     cfgdw.statistic = 'ttest2';
+%     cfgdw.alpha = 0.05;
+%     cfgdw.tail = 0;
+%     cfgdw.parameter = 'avg';
+%     cfgdw.design = [1 2];
+%     stat = ft_timelockstatistics(cfgdw, difwave{:});
 end
 
 %% Run Statistics
