@@ -1,7 +1,7 @@
 %% Pipeline Processing Variables: "eeg_ft" for EEG analysis
 % Trial Cut Parameteres
 proc_vars.event_type    = 'S';          % 'S'/'F': lock trial to stim/feedback
-proc_vars.trial_lim_s   = [-0.2 2.8];    % data segments (in seconds) to grab around events
+proc_vars.trial_lim_s   = [-0.25 2.8];    % data segments (in seconds) to grab around events
 if strcmp(proc_vars.event_type,'S')
     proc_vars.event_code = 1;
 elseif strcmp(proc_vars.event_type,'F')
