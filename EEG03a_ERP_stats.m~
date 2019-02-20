@@ -1,4 +1,4 @@
-function EEG03a_ERP_stats(SBJ,conditions,pipeline_id,an_id)
+function EEG03a_ERP_stats(SBJ,conditions,proc_id,an_id)
 % Calculates ERPs, computes cluster-based statistics, and plots the results
 % clear all; %close all;
 
@@ -15,53 +15,33 @@ ft_defaults
 %% Data Preparation
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' an_id '_proc_vars.m'];
+an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 
 % Load Data
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat'];
-save(clean_data_fname, '-v7.3', 'trials');
-
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat'];
-load(strcat(SBJ_vars.dirs.preproc,SBJ,'_preproc_',pipeline_id,'.mat'));
-load(strcat(SBJ_vars.dirs.events,SBJ,'_trl_info_final.mat'));
+load([SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat']);
+load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat']);
 
 % Select Conditions of Interest
-[cond_lab, ~, ~] = fn_condition_label_styles(conditions);
-cond_idx = fn_condition_index(conditions,trl_info);
+[cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
+cond_idx = fn_condition_index(conditions, bhv);
 
 % Select Channel(s)
 cfgs = [];
-cfgs.channel = SBJ_vars.ch_lab.ROI;
-roi = ft_selectdata(cfgs,data);
+cfgs.channel = ROI;
+roi = ft_selectdata(cfgs, trials);
 
 %% Compute ERPs
 % Preprocess the data
 cfgpp = [];
-cfgpp.hpfilter  = hp_yn;
-cfgpp.hpfreq    = hp_freq;
-cfgpp.hpfiltord = hp_filtord;            % Leaving blank causes instability error, 1 or 2 works 
-cfgpp.lpfilter  = lp_yn;
-cfgpp.lpfreq    = lp_freq;
-roi = ft_preprocessing(cfgpp,roi);
-
-% Cut into Trials
-if strcmp(event_type,'stim')
-    events = trl_info.trl_onset;
-elseif strcmp(event_type,'resp')
-    events = trl_info.rsp_onset;
-elseif strcmp(event_type,'fb')
-    events = trl_info.fdb_onset;
-else
-    error(stract('ERROR: unknown event_type ',event_type));
-end
-roi_trl = fn_ft_cut_trials_equal_len(roi,events,trl_info.cond_n,trial_lim_s*roi.fsample);
-
-% Baseline Correction
-cfg = [];
+cfgpp.hpfilter     = hp_yn;
+cfgpp.hpfreq       = hp_freq;
+cfgpp.hpfiltord    = hp_filtord;            % Leaving blank causes instability error, 1 or 2 works 
+cfgpp.lpfilter     = lp_yn;
+cfgpp.lpfreq       = lp_freq;
 cfg.demean         = demean_yn;
 cfg.baselinewindow = bsln_lim;
-roi_trl = ft_preprocessing(cfg,roi_trl);
+roi = ft_preprocessing(cfgpp, roi);
 
 % Average ERPs
 roi_erp = {};
@@ -70,9 +50,44 @@ cfgavg = [];
 cfgavg.keeptrials = 'yes';
 for cond_ix = 1:numel(cond_lab)
     cfgavg.trials = find(cond_idx==cond_ix);
-    roi_erp{cond_ix} = ft_timelockanalysis(cfgavg,roi_trl);
+    roi_erp{cond_ix} = ft_timelockanalysis(cfgavg,roi);
     % Grab n_trials for design matrix
     n_trials(cond_ix) = size(roi_erp{cond_ix}.trial,1);
+end
+
+%% Contrast conditions
+if strcmp(conditions,'DifOut') || numel(cond_lab)>2
+    error(['Analysis not implemented for ' conditions ' yet, too many conditions: ' strjoin(cond_lab,',')]);
+%     % Compute Win - Loss
+%     cfgdif = [];
+%     cfgdif.operation = 'subtract';
+%     cfgdif.parameter = 'avg';
+%     wn_ix = find(~cellfun(@isempty,strfind(cond_lab,'Wn')));
+%     ls_ix = find(~cellfun(@isempty,strfind(cond_lab,'Ls')));
+%     difwave = cell(size(wn_ix));
+%     for dif_ix = 1:numel(wn_ix)
+%         difwave{dif_ix} = roi_erp{wn_ix(dif_ix)};
+%         % Compute difference in means (ERP difference wave)
+%         difwave{dif_ix}.avg = difwave{dif_ix}.avg - roi_erp{ls_ix(dif_ix)}.avg;
+%         difwave{dif_ix} = rmfield(difwave{dif_ix},'trial'); % remove trial since that doesn't make sense anymore
+%         % Compute variance of difference in 2 RVs = var(X) + var(Y) - 2*covariance(X,Y)
+%         wl_cov = cov(difwave{dif_ix}.avg, roi_erp{ls_ix(dif_ix)}.avg);
+%         difwave{dif_ix}.var = difwave{dif_ix}.var + roi_erp{ls_ix(dif_ix)}.var - 2*wl_cov(1,2);
+%     end
+%     stat_lab = {strrep(cond_lab{wn_ix(1)},'Wn',''), strrep(cond_lab{wn_ix(2)},'Wn','')};
+%     
+%     cfgdw = [];
+%     cfgdw.method = 'stats';
+%     cfgdw.statistic = 'ttest2';
+%     cfgdw.alpha = 0.05;
+%     cfgdw.tail = 0;
+%     cfgdw.parameter = 'avg';
+%     cfgdw.design = [1 2];
+%     stat = ft_timelockstatistics(cfgdw, difwave{:});
+elseif numel(cond_lab)<=2
+    ; % pass
+else
+    error(['Analysis not implemented for ' conditions ' yet, too many conditions: ' strjoin(cond_lab,',')]);
 end
 
 %% Run Statistics
@@ -85,7 +100,7 @@ end
 % design(2,1:size(roi_erp_con.trial,1)) = 1;
 % design(2,(size(roi_erp_con.trial,1)+1):(size(roi_erp_con.trial,1) + size(roi_erp_inc.trial,1)))= 2;
 design = zeros(2,sum(n_trials));
-for cond_ix = 1:numel(cond_lab)
+for cond_ix = 1:numel(stat_lab)
     if cond_ix==1
         design(1,1:n_trials(cond_ix)) = cond_ix;                                % Conditions (Independent Variable)
         design(2,1:n_trials(cond_ix)) = 1:n_trials(cond_ix);                    % Trial Numbers
@@ -111,7 +126,7 @@ cfg_stat.design           = design;
 [stat] = ft_timelockstatistics(cfg_stat, roi_erp{:});
 
 %% Save Results
-data_out_filename = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_ROI_',conditions,'_',an_id,'.mat');
+data_out_filename = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',conditions,'_',an_id,'.mat');
 fprintf('Saving %s\n',data_out_filename);
 save(data_out_filename,'-v7.3','roi_erp','stat');
 

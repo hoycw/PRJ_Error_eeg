@@ -26,7 +26,7 @@ switch factor_name
         markers = {'o', 'o', 'd', 'd'};
     case 'Tim'
         labels = {'Er', 'Lt'};
-        colors = {[1 1 1], [0 0 0]};
+        colors = {[247,104,161]./256, [122,1,119]./256};    % pink and purple
         line_styles = {'-', '-'};
         markers = {'o', 'o'};
     case 'EzOut'
