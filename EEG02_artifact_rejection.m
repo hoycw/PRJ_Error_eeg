@@ -40,16 +40,23 @@ if numel(bhv.Trial)~=numel(event_onsets)
 end
 
 % Identify and exclude training and bad raw visual trials
-training_trial_ix = find(bhv.Block==-1);
-response_time_low = find(bhv.RT <=proc_vars.rt_bounds(1))
-response_time_high = find(bhv.RT>= proc_vars.rt_bounds(2))
+training_trial_ix = find(bhv.Block==-1); % returns index of trial number -- one indexed
+response_time_low = find(bhv.RT <=proc_vars.rt_bounds(1)); % returns index of trial number -- one indexed
+response_time_high = find(bhv.RT>= proc_vars.rt_bounds(2)); % returns index of trial number - one indexed
 exclude_trials = unique(vertcat(training_trial_ix,bad_raw_trials,response_time_low, response_time_high));
+if dorejectvisual == 0;
+    bad_trials_rejectvis = intersect(bhv.Total_Trial,SBJ_vars.trial_reject_n+1); % returns index of trial number - one indexed
+    bad_trials = unique(vertcat(bad_trials_rejectvis, exclude_trials))';
+    bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
+else
+    bad_trials = exclude_trials';
+end
 %for f_ix = 1:numel(bhv_fields)
    % bhv.(bhv_fields{f_ix})(exclude_trials) = [];
 %end
 
 % Resegment trials
-cfg_trl.trl(exclude_trials,:) = [];
+cfg_trl.trl(bad_trials,:) = [];
 trials = ft_redefinetrial(cfg_trl,data);
 eog_trials = ft_redefinetrial(cfg_trl,eog);
 
@@ -130,29 +137,28 @@ if dorejectvisual
     clean_trial = ft_rejectvisual(cfg, clean_trials);
     
     % Report channels and trials identified above in SBJ_vars, then re-run
-    % exit;
+    return;
 end
 
 %% Clean up and save data
 % Get bad trials and channels from SBJ_vars
 %   NOTE: these are indices into the post-raw rejection trial list
-bad_trials = setdiff(SBJ_vars.trial_reject_n+1, exclude_trials')'
+%bad_trials = setdiff(SBJ_vars.trial_reject_n+1, exclude_trials')'
  %bhv.total_trial is zero indexed so need to add one to get trial number
  %for SBJ_vars.trial_reject_n+1
-bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
+%bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
 
 % Remove from ICA cleaned data
-cfgs = [];
-cfgs.trials = setdiff(1:numel(clean_trials.trial),bad_trials);
-cfgs.channel = {'all',bad_ch_neg{:}};
-trials = ft_selectdata(cfgs,clean_trials);
+%cfgs = [];
+%cfgs.trials = setdiff(1:numel(clean_trials.trial),bad_trials);
+%cfgs.channel = {'all',bad_ch_neg{:}};
+%trials = ft_selectdata(cfgs,clean_trials);
 
 % Remove from behavioral
-behav_trials_rm = vertcat(exclude_trials, bad_trials);
+behav_trials_rm = bad_trials;
 behav_trials_rm = unique(behav_trials_rm, 'rows');
 for f_ix = 1:numel(bhv_fields)
-    bhv.(bhv_fields{f_ix})(behav_trials_rm) = []
-    bhv.(bhv_fields{f_ix})
+    bhv.(bhv_fields{f_ix})(behav_trials_rm) = [];
 end
     
 % Save outputs
