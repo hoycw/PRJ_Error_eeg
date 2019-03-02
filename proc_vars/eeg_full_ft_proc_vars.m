@@ -1,7 +1,7 @@
 %% Pipeline Processing Variables: "eeg_ft" for EEG analysis
 % Trial Cut Parameteres
 proc_vars.event_type    = 'S';          % 'S'/'F': lock trial to stim/feedback
-proc_vars.trial_lim_s   = [-0.25 3.8];    % data segments (in seconds) to grab around events
+proc_vars.trial_lim_s   = [-0.25 2.8];    % data segments (in seconds) to grab around events
 if strcmp(proc_vars.event_type,'S')
     proc_vars.event_code = 1;
 elseif strcmp(proc_vars.event_type,'F')
@@ -23,7 +23,7 @@ proc_vars.demean_yn     = 'yes';
 proc_vars.reref_yn      = 'yes';
 proc_vars.ref_method    = 'avg';
 proc_vars.bp_yn         = 'yes';
-proc_vars.bp_freq       = [0.5 40];
+proc_vars.bp_freq       = [0.1 30];
 proc_vars.hp_yn         = 'no';
 %proc_vars.hp_freq       = 0.1;            % [] skips this step
 %proc_vars.hp_order      = 4;              % Leaving blank causes instability error, 1 or 2 works
