@@ -47,11 +47,11 @@ SBJ_vars.ch_lab.replace = {{'O2', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'T8', 'FT8', 'PO4', 'C6', 'PO8', 'F8', 'AF8', 'O2', 'P2'};
+SBJ_vars.ch_lab.bad     = {'T8', 'FT8', 'PO4', 'C6', 'PO8', 'F8', 'F6', 'AF8', 'O2', 'P2','Iz'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
-
+SBJ_vars.trial_reject_n = [];
 %SBJ_vars.trial_reject_ix = [88, 94, 103, 154, 157, 217, 327, 343, 370, 406, 417, 440, 490, 499, 511, 545];
-SBJ_vars.trial_reject_n = [87, 93, 102, 153, 156, 216, 326, 342, 369, 405, 416, 439, 489, 510, 544];
+%SBJ_vars.trial_reject_n = [87, 93, 102, 153, 156, 216, 326, 342, 369, 405, 416, 439, 489, 510, 544];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------

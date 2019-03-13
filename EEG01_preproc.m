@@ -39,6 +39,7 @@ cfg.lpfilter   = proc_vars.lp_yn;
 cfg.hpfilter   = proc_vars.hp_yn;
 cfg.bpfilter   = proc_vars.bp_yn;
 cfg.bpfreq     = proc_vars.bp_freq;
+%cfg.bpfiltord = proc_vars.bp_order;
 cfg.demean     = proc_vars.demean_yn;
 cfg.reref      = proc_vars.reref_yn;
 cfg.refmethod  = proc_vars.ref_method;
@@ -66,6 +67,8 @@ ears_neg = {['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{1} SBJ_vars.ch_lab.
             ['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{2} SBJ_vars.ch_lab.suffix]};
 cfg = [];
 cfg.channel = {'all',bad_neg{:},rep_neg{:},ears_neg{:}};
+
+%cfg.channel = {'all',rep_neg{:},ears_neg{:}};
 data = ft_selectdata(cfg,data);
 
 % Strip Pre/Suffix if Necessary
@@ -118,26 +121,6 @@ data = ft_selectdata(cfg,data);
 %cfg.demean          = 'yes'; %baseline correct data before you resample?
 %cfg.baselinewindow  = [-0.25 -0.05]; %set baseline to -.2 to 0 seconds, then correct it before you resample
 
-%% Cut into trials
-% Must segment before downsampling because trigger channel read from
-% original file
-cfg = [];
-cfg.dataset             = SBJ_vars.dirs.raw_filename;
-cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
-cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
-cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
-cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
-cfg.trialfun            = 'tt_trialfun';%'ft_trialfun_general';%
-cfg_trl = ft_definetrial(cfg);
-
-% If the recording was started part way through, toss events not recorded
-if any(cfg_trl.trl(:,1)<1)  
-    cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
-end
-event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
-
-trials = ft_redefinetrial(cfg_trl,data);
-eog_trials = ft_redefinetrial(cfg_trl,eog);
 
 %!!! WTF was this about?
 % cfg = [];
@@ -152,23 +135,33 @@ eog_trials = ft_redefinetrial(cfg_trl,eog);
 load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
 
 % Find epochs that overlap with bad_epochs from raw visual inspection
-if ~isempty(bad_epochs)
-    bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
-        event_onsets,proc_vars.trial_lim_s*data.fsample);
-else
-    bad_raw_trials = [];
-end
+%if ~isempty(bad_epochs)
+    %bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
+       % event_onsets,proc_vars.trial_lim_s*data.fsample);
+    
+%else
+ %   bad_raw_trials = [];
+%end
 
 % Exclude bad trials
-cfgs = [];
-cfgs.trials = setdiff(1:numel(trials.trial),bad_raw_trials);
-trials = ft_selectdata(cfgs,trials);
+%cfgs = [];
+%cfgs.trials = setdiff(1:numel(trials.trial),bad_raw_trials);
+%trials = ft_selectdata(cfgs,trials);
 % eog_trials = ft_selectdata(cfgs,eog_trials);
 
 %% ICA
-cfg        = [];
-cfg.method = 'runica'; % this is the default and uses the implementation from EEGLAB
-icomp = ft_componentanalysis(cfg, trials);
+cfgs        = [];
+cfgs.hpfilter = proc_vars.ICA_hp_yn
+cfgs.hpfreq = proc_vars.ICA_hp_freq
+cfgs.artfctdef.visual.artifact = bad_epochs;
+cfgs.artfctdef.reject = 'nan';
+data = ft_rejectartifact(cfgs, data);
+%cfgs.trials.trial(bad_raw_trials) = NaN;
+data_ICA   = ft_preprocessing(cfgs, data)
+cfgs.method = 'runica'; % this is the default and uses the implementation from EEGLAB
+%cfgs.channel = setxor(data.label(1:64), SBJ_vars.ch_lab.bad);
+icomp = ft_componentanalysis(cfg, data_ICA);
+
 %!!! try before vs. after trial segmentation
 
 %% save the ICA unmixing and topolabel, eeg, and eog_bp
@@ -176,6 +169,6 @@ icaunmixing = icomp.unmixing;
 icatopolabel = icomp.topolabel;
 
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
-save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog', 'cfg_trl', 'event_onsets', 'bad_raw_trials');% 'trials', 'eog_trials',
+save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog', 'event_onsets','bad_epochs');% 'trials', 'eog_trials',
 
 

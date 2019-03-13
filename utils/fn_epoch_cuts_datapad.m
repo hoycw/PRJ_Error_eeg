@@ -18,7 +18,7 @@ if buff_lim(1)>0
 end
 
 % Cutoff signals by time range
-t_len = (ends-starts)-buff_lim(1)+buff_lim(2)+1;
+t_len = round(ends-starts)-buff_lim(1)+buff_lim(2)+1;
 epochs = NaN(length(starts),max(t_len));
 for k = 1:length(starts)
     epochs(k,:) = signal(int64(starts(k)+buff_lim(1):starts(k)+buff_lim(1)+max(t_len)-1));

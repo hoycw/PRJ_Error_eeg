@@ -32,13 +32,39 @@ for f_ix = 1:numel(bhv_fields)
     bhv.(bhv_fields{f_ix}) = bhv_data{f_ix};
 end
 
-%% Exclude training and bad visual trials
+%% Cut into trials
+% Must segment before downsampling because trigger channel read from
+% original file
+cfg = [];
+cfg.dataset             = SBJ_vars.dirs.raw_filename;
+cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
+cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
+cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
+cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
+cfg.trialfun            = 'tt_trialfun';%'ft_trialfun_general';%
+cfg_trl = ft_definetrial(cfg);
+
+% If the recording was started part way through, toss events not recorded
+if any(cfg_trl.trl(:,1)<1)  
+    cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
+end
+event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
+
 % Check that behavioral and EEG event triggers line up
 if numel(bhv.Trial)~=numel(event_onsets)
     error(['Mismatch in behavioral and neural trial counts: ' num2str(numel(bhv.Trial))...
         ' behavioral; ' num2str(numel(event_onsets)) ' neural']);
 end
 
+trials = ft_redefinetrial(cfg_trl,data);
+eog_trials = ft_redefinetrial(cfg_trl,eog);
+if ~isempty(bad_epochs)
+    bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
+       event_onsets,proc_vars.trial_lim_s*data.fsample);
+    
+else
+   bad_raw_trials = [];
+end
 % Identify and exclude training and bad raw visual trials
 training_trial_ix = find(bhv.Block==-1); % returns index of trial number -- one indexed
 response_time_low = find(bhv.RT <=proc_vars.rt_bounds(1)); % returns index of trial number -- one indexed
@@ -47,7 +73,7 @@ exclude_trials = unique(vertcat(training_trial_ix,bad_raw_trials,response_time_l
 if dorejectvisual == 0;
     bad_trials_rejectvis = intersect(bhv.Total_Trial,SBJ_vars.trial_reject_n+1); % returns index of trial number - one indexed
     bad_trials = unique(vertcat(bad_trials_rejectvis, exclude_trials))';
-    bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
+    %bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
 else
     bad_trials = exclude_trials';
 end
@@ -75,6 +101,7 @@ cfg.bpfiltord = 4;       % from ft_rejectvisual help page
 eog_bp = ft_preprocessing(cfg,eog_trials);
 
 % Correlation between both EOGs and all ICs for all trials
+
 eog_ic_corr = zeros([numel(eog_bp.label), numel(ica.topolabel), numel(eog_bp.trial)]);
 for eog_ix = 1:2
     for ic_ix = 1:numel(ica.label)
@@ -93,10 +120,7 @@ if any([isempty(heog_ics), isempty(veog_ics)])
     error('No EOG ICs found!');
 end
 
-% IC rejection
-cfg = [];
-cfg.component = [heog_ics veog_ics];
-clean_trials = ft_rejectcomponent(cfg, ica, trials);
+
 
 % Print the results
 figure;
@@ -121,9 +145,31 @@ fprintf('=======================================================================
 % View ICs with EOG correlations
 cfg = [];
 cfg.layout    = 'biosemi64.lay';
-cfg.channel = [heog_ics veog_ics]; 
+cfg.channel = 'all'; 
 cfg.viewmode  = 'component';
 ft_databrowser(cfg, ica);
+bad_comp = input('List bad component numbers here');
+% IC rejection
+
+cfg = [];
+cfg.component = unique([bad_comp, heog_ics, veog_ics]);
+cfg.demean = 'no';
+clean_trials = ft_rejectcomponent(cfg, ica);
+
+%Repair Bad Channels
+cfg = [];
+cfg.method = 'average';
+cfg.missingchannel = SBJ_vars.ch_lab.bad(:); % not in data (excluded from ica)
+cfg.layout = 'biosemi64.lay';
+cfgn = [];
+cfgn.channel = 'all';
+cfgn.layout = 'biosemi64.lay';
+cfgn.method = 'template';
+
+cfg.neighbours = ft_prepare_neighbours(cfgn);
+
+clean_trials = ft_channelrepair(cfg, clean_trials);
+
 
 %% Visual Trial Rejection
 if dorejectvisual
@@ -137,9 +183,20 @@ if dorejectvisual
     clean_trial = ft_rejectvisual(cfg, clean_trials);
     
     % Report channels and trials identified above in SBJ_vars, then re-run
+    
     return;
 end
 
+%% FINAL CHECK
+cfg_plot = [];
+cfg_plot.viewmode = 'vertical';
+out = ft_databrowser(cfg_plot, clean_trials);
+cfg.arfcdef = 'complete';
+
+%bad_final_trials = input('list trials that still look bad (and add them to bad trials in sbj vars as well!')
+%cfgs = [];
+%cfgs.trials = setdiff(1:numel(clean_trials.trial),bad_final_trials);
+%clean_trials = ft_selectdata(cfgs,clean_trials);
 %% Clean up and save data
 % Get bad trials and channels from SBJ_vars
 %   NOTE: these are indices into the post-raw rejection trial list

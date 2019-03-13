@@ -57,8 +57,10 @@ if view_previous
         warning('Previous bad_epochs from raw data cleaning doesnt exist! Please mark bad epochs.');
     end
 end
+
 browsed_raw = ft_databrowser(cfg_plot, raw);
 bad_epochs  = browsed_raw.artfctdef.visual.artifact;
+
 % prevent ft_databrowser bugs
 fake_ep     = find(diff(bad_epochs,1,2)<10);
 bad_epochs(fake_ep,:) = [];
