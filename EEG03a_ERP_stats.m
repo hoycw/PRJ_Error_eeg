@@ -29,7 +29,7 @@ cond_idx = fn_condition_index(conditions, bhv);
 % Select Channel(s)
 cfgs = [];
 cfgs.channel = ROI;
-roi = ft_selectdata(cfgs, trials);
+roi = ft_selectdata(cfgs, clean_trials);
 
 %% Compute ERPs
 % Preprocess the data

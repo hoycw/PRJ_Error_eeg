@@ -24,3 +24,4 @@ plt_vars.sig_alpha = 0.3;
 plt_vars.evnt_width = 2;
 plt_vars.evnt_color = 'k';
 plt_vars.evnt_style = '--';
+plt_vars.clim_perc = [5, 95];

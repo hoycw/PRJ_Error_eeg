@@ -20,12 +20,12 @@ eval(SBJ_vars_cmd);
 
 cfg=[];
 cfg.dataset  = SBJ_vars.dirs.raw_filename;
-% cfg.demean   = 'yes';
+cfg.demean   = 'yes';
 % cfg.lpfilter = 'no';
-cfg.hpfilter = 'yes';
-cfg.hpfreq   = 1; %changed to 1 because EP07 was erroring line 54 of filter_with_correlation 
-% cfg.bpfilter = 'yes';
-% cfg.bpfreq   = [0.5 40];%0.1 is too low for filter settings, 20 is too low to see muscle artifact, consider ditching filtering?
+%cfg.hpfilter = 'yes';
+%cfg.hpfreq   = 1; %changed to 1 because EP07 was erroring line 54 of filter_with_correlation 
+cfg.bpfilter = 'yes';
+cfg.bpfreq   = [0.5 40];%0.1 is too low for filter settings, 20 is too low to see muscle artifact, consider ditching filtering?
 raw = ft_preprocessing(cfg);
 
 %% Plot PSDs for noise profile

@@ -48,11 +48,13 @@ SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'P4', 'PO8', 'O2','FT7', 'T7', 'C6', 'C2'};
+SBJ_vars.ica_reject     = [2, 4, 7, 8, 11, 16, 18, 20, 21, 22, 23, 24, 25, 28, 30, 33, 42, 45, 47, 50, 54, 55, 57, 58, 59];
 %f7, fc5SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [192, 265, 288, 312, 346, 356, 362:366, 377, 436, 447, 487, 589];
 %SBJ_vars.trial_reject_n = [191, 264, 287, 311, 345, 55, 361, 362, 363, 364, 365, 376, 435, 446, 486, 588];
-SBJ_vars.trial_reject_n = [];
+SBJ_vars.trial_reject_n = [264, 265, 353, 360, 412,413, 416, 417, 418, 420];
+SBJ_vars.ica_reject = [2 4 8 15 16 26 23 25 21 20 24 34  33 31];
 %--------------------------------------
 % Noise Not es
 %--------------------------------------

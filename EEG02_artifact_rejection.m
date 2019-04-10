@@ -148,7 +148,13 @@ cfg.layout    = 'biosemi64.lay';
 cfg.channel = 'all'; 
 cfg.viewmode  = 'component';
 ft_databrowser(cfg, ica);
+
+
+%% NEW SCRIPT STARTS HERE
+
 bad_comp = input('List bad component numbers here');
+
+
 % IC rejection
 
 cfg = [];

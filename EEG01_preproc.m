@@ -39,19 +39,19 @@ cfg.lpfilter   = proc_vars.lp_yn;
 cfg.hpfilter   = proc_vars.hp_yn;
 cfg.bpfilter   = proc_vars.bp_yn;
 cfg.bpfreq     = proc_vars.bp_freq;
-%cfg.bpfiltord = proc_vars.bp_order;
+cfg.bpfiltord = proc_vars.bp_order;
 cfg.demean     = proc_vars.demean_yn;
 cfg.reref      = proc_vars.reref_yn;
 cfg.refmethod  = proc_vars.ref_method;
 cfg.refchannel = {ear_lab1, ear_lab2};
 data = ft_preprocessing(cfg);
 
-% %% Downsample
-% if strcmp(proc_vars.resample_yn,'yes')
-%     cfg=[];
-%     cfg.resamplefs = proc_vars.resample_freq;
-%     data = ft_resampledata(cfg, data);
-% end
+%% Downsample
+%if strcmp(proc_vars.resample_yn,'yes')
+    % cfg=[];
+    % cfg.resamplefs = proc_vars.resample_freq;
+    % data = ft_resampledata(cfg, data);
+%end
 
 %% Fix channel labels
 % Remove bad channels
@@ -169,6 +169,6 @@ icaunmixing = icomp.unmixing;
 icatopolabel = icomp.topolabel;
 
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
-save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog', 'event_onsets','bad_epochs');% 'trials', 'eog_trials',
+save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog','bad_epochs');% 'trials', 'eog_trials',
 
 
