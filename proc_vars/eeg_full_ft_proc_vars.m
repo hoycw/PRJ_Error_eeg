@@ -27,7 +27,7 @@ proc_vars.bp_freq       = [0.1 30];
 proc_vars.bp_order = 2;
 proc_vars.hp_yn         = 'no';
 proc_vars.hp_freq       = 0.1;            % [] skips this step
-proc_vars.hp_order      = 4;              % Leaving blank causes instability error, 1 or 2 works
+proc_vars.hp_order      = 2;              % Leaving blank causes instability error, 1 or 2 works
 proc_vars.lp_yn         = 'no';
 proc_vars.lp_freq       = 30;            % [] skips this step
 proc_vars.notch_yn      = 'no';
@@ -39,4 +39,4 @@ proc_vars.ICA_hp_freq = 2;
 % dft_yn      = 'no';
 % bs_yn       = 'no';                % Parameters for this in SBJ_vars
 
-proc_vars.eog_ic_corr_cut = 0.2;        % EOG IC correlation threshold for tossing ICs
+proc_vars.eog_ic_corr_cut = 0.4;        % EOG IC correlation threshold for tossing ICs

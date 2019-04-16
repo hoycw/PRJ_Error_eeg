@@ -31,3 +31,9 @@ cfg_stat.neighbours       = [];%neighbors;
 cfg_stat.ivar             = 1;  %row of design matrix containing independent variable
 % cfg_stat.uvar             = 2;  %row containing dependent variable, not needed for indepsamp
 
+cfg_tfr.method = 'wavelet'
+cfg_tfr.output = 'pow';
+cfg_tfr.taper = 'hanning';
+cfg_tfr.foi = [2:30]; 
+cfg_tfr.width = 2; %default
+cfg_tfr.toi  = 0:0.004:2.8; 

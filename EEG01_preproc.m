@@ -34,7 +34,7 @@ end
 % Load and preprocess
 cfg=[];
 cfg.dataset    = SBJ_vars.dirs.raw_filename;
-cfg.continuous = 'yes'; %!!! try segmenting trial on import
+cfg.continuous = 'yes'; 
 cfg.lpfilter   = proc_vars.lp_yn;
 cfg.hpfilter   = proc_vars.hp_yn;
 cfg.bpfilter   = proc_vars.bp_yn;
@@ -46,15 +46,14 @@ cfg.refmethod  = proc_vars.ref_method;
 cfg.refchannel = {ear_lab1, ear_lab2};
 data = ft_preprocessing(cfg);
 
-%% Downsample
-%if strcmp(proc_vars.resample_yn,'yes')
-    % cfg=[];
-    % cfg.resamplefs = proc_vars.resample_freq;
-    % data = ft_resampledata(cfg, data);
-%end
+
 
 %% Fix channel labels
 % Remove bad channels
+null_neg = {};
+for null_ix = 1:numel(SBJ_vars.ch_lab.null)
+    null_neg = {null_neg{:},['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.null{null_ix} SBJ_vars.ch_lab.suffix]};
+end
 bad_neg = {};
 for bad_ix = 1:numel(SBJ_vars.ch_lab.bad)
     bad_neg = {bad_neg{:},['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.bad{bad_ix} SBJ_vars.ch_lab.suffix]};
@@ -66,7 +65,7 @@ end
 ears_neg = {['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{1} SBJ_vars.ch_lab.suffix],...
             ['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{2} SBJ_vars.ch_lab.suffix]};
 cfg = [];
-cfg.channel = {'all',bad_neg{:},rep_neg{:},ears_neg{:}};
+cfg.channel = {'all',bad_neg{:},rep_neg{:},ears_neg{:},null_neg{:}};
 
 %cfg.channel = {'all',rep_neg{:},ears_neg{:}};
 data = ft_selectdata(cfg,data);
@@ -131,25 +130,32 @@ data = ft_selectdata(cfg,data);
 % cfg = ft_rejectartifact(cfg);
 % cfg.implicitref   = []; %REF is implicit, what is 0d to, RM is the other one, do average reference with the mastoid
 
-%% Exclude bad_trials
-load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
+% %% Cut into trials
+% % Must segment before downsampling because trigger channel read from
+% % original file
+% % Need to cut into trials here so that can NaN out bad trials later in
+% % script
+% cfg = [];
+% cfg.dataset             = SBJ_vars.dirs.raw_filename;
+% cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
+% cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
+% cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
+% cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
+% cfg.trialfun            = 'tt_trialfun';%'ft_trialfun_general';%
+% cfg_trl = ft_definetrial(cfg);
+% 
+% % If the recording was started part way through, toss events not recorded
+% if any(cfg_trl.trl(:,1)<1)  
+%     cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
+% end
+% event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
+% 
+% trials = ft_redefinetrial(cfg_trl,data);
+% eog_trials = ft_redefinetrial(cfg_trl,eog);
 
-% Find epochs that overlap with bad_epochs from raw visual inspection
-%if ~isempty(bad_epochs)
-    %bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
-       % event_onsets,proc_vars.trial_lim_s*data.fsample);
-    
-%else
- %   bad_raw_trials = [];
-%end
-
-% Exclude bad trials
-%cfgs = [];
-%cfgs.trials = setdiff(1:numel(trials.trial),bad_raw_trials);
-%trials = ft_selectdata(cfgs,trials);
-% eog_trials = ft_selectdata(cfgs,eog_trials);
 
 %% ICA
+load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
 cfgs        = [];
 cfgs.hpfilter = proc_vars.ICA_hp_yn
 cfgs.hpfreq = proc_vars.ICA_hp_freq
