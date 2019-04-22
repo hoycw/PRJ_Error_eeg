@@ -54,10 +54,10 @@ SBJ_vars.ica_reject     = [2, 4, 7, 8, 11, 16, 18, 20, 21, 22, 23, 24, 25, 28, 3
 
 %SBJ_vars.trial_reject_ix = [192, 265, 288, 312, 346, 356, 362:366, 377, 436, 447, 487, 589];
 %SBJ_vars.trial_reject_n = [191, 264, 287, 311, 345, 55, 361, 362, 363, 364, 365, 376, 435, 446, 486, 588];
-SBJ_vars.trial_reject_n = [134, 261, 322, 360, 419, 445];
-SBJ_vars.ica_reject = [2 4 8 15 16 26 23 25 21 20 24 34  33 31];
+SBJ_vars.trial_reject_n = [339 183 240 419];
+SBJ_vars.ica_reject = [1 2 4 5 7 8 14 15 16 19 26 22 23 24 29 34 31 36 43 50 53 55 56];
 %--------------------------------------
-% Noise Notes
+% Noise Not
 %--------------------------------------
 % recording info sheet notes:
     %'PO7','O1','Iz,','Oz'... % noisy channels

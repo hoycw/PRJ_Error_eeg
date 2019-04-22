@@ -48,13 +48,12 @@ SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'PO4', 'Pz','FC5','Oz', 'O2', 'T7', 'O1', 'P9', 'C5', 'Iz', 'POz'};
+SBJ_vars.ch_lab.bad     = {'PO4', 'Pz','FC5','Oz', 'O2', 'T7', 'O1', 'P9', 'C5', 'Iz', 'POz', 'FC6'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
-
 %SBJ_vars.trial_reject_ix = [85, 102:104, 120:129, 169, 192, 208, 209, 256, 266, 275, 303, 312, 345, 387, 406, 434, 455, 447, 531];
 %SBJ_vars.trial_reject_n = [162, 189, 260, 266, 269, 289, 321, 334, 341, 542, 634, 84, 101, 102, 103, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 168, 191, 207, 208, 255, 265, 274, 302, 311, 344, 386, 405, 433, 454, 446, 530]
-SBJ_vars.trial_reject_n = [581 580 549 370 368 106 77]
-SBJ_vars.ica_reject = [1 5 11 13 14 16 17 19 21 22 26 29 30 39 32 34 37 41 46 43 49 56];
+SBJ_vars.trial_reject_n = [106 424 586 587]
+SBJ_vars.ica_reject = [1 5 10 11 12 13 14 15 17 19 20 22 30 36 38 32 40 41 46 43 47 50 54 56];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------
