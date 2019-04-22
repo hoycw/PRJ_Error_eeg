@@ -56,6 +56,42 @@ tfr_diff.powspctrm = tfr{1}.powspctrm - tfr{2}.powspctrm;
 %     cfg_tfr.trials = find(cond_idx==cond_ix);
 %     tfr{cond_ix}   = ft_freqanalysis(cfg_tfr, roi);
 % end
+%% Baseline Corrections
+% do i need to do this for the diff plot
+% for cond_ix = 1:2
+%     switch bsln_type
+%         case {'zscore', 'demean', 'my_relchange'}
+%             tfr{cond_ix} = fn_bsln_ft_tfr(tfr{cond_ix},bsln_lim,bsln_type,n_boots);
+%         case 'relchange'
+%             cfgbsln = [];
+%             cfgbsln.baseline     = bsln_lim;
+%             cfgbsln.baselinetype = bsln_type;
+%             cfgbsln.parameter    = 'powspctrm';
+%             tfr{cond_ix} = ft_freqbaseline(cfgbsln,tfr{cond_ix});
+%         otherwise
+%             error(['No baseline implemented for bsln_type: ' bsln_type]);
+%     end
+% end
+
+%% Stats
+% Create design matrix
+n_trials = numel(clean_trials.trial);
+design = zeros(2,n_trials);
+for an_ix = 1:2
+    if an_ix==1
+        design(1,(1:numel(cond_easy))) = an_ix;                                % Conditions (Independent Variable)
+        design(2,(1:numel(cond_easy))) = 1:numel(cond_easy);                    % Trial Numbers
+    else
+        design(1,(numel(cond_easy)+1:n_trials))= an_ix; % Conditions (Independent Variable)
+        design(2,(numel(cond_easy)+1:n_trials))= 1:numel(cond_hard);
+    end
+end
+
+% Calculate statistics
+cfg_stat.design           = design;
+tfr{1}.trial = [1:numel(cond_easy)];
+tfr{2}.trial = [1:numel(cond_hard)];
+[stat] = ft_freqstatistics(cfg_stat, tfr{:});
 
 %% Plot
 fig_name = [SBJ 'TFA Plot'];
@@ -77,15 +113,35 @@ for cond_ix = 1:2;
     end    
 end
 %% Diff Plot
+    tfr_diff.statmask = stat.mask;
     cfg = [];
     cfg.baseline     = [-0.25 0];
     cfg.baselinetype = 'absolute';
     cfg.showlabels   = 'yes';
     cfg.layout       = 'biosemi64.lay';
-    cfg.ylim         = [4 20];
+    cfg.ylim         = [4 30];
     %cfg.zlim = clims;
     subplot(1,3, 3)
     ft_singleplotTFR(cfg, tfr_diff);
     title('Difference (Easy-Hard)')
     TFA_stack_name = [SBJ_vars.dirs.proc SBJ '_TFAPlot' '.png'];
     saveas(gcf,TFA_stack_name); 
+    
+    sig_ch = {};
+    if sum(squeeze(stat.mask(:,:,:)))>0
+        sig_ch = {sig_ch{:} stat.label{'ROI'}};
+        % Link this figure to sig dir
+        sig_dir = [fig_dir 'sig_ch/'];
+        if ~exist(sig_dir,'dir')
+            mkdir(sig_dir);
+        end
+        cd(sig_dir);
+        link_cmd = ['ln -s ../' fig_name ' .'];
+        system(link_cmd);
+    end
+% Save out list of channels with significant differences
+sig_report_filename = [fig_dir 'sig_ch_list.txt'];
+sig_report = fopen(sig_report_filename,'a');
+fprintf(sig_report,'%s\n',an_id,an_id);
+fprintf(sig_report,'%s\n',sig_ch{:});
+fclose(sig_report);

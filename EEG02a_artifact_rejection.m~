@@ -44,7 +44,6 @@ cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
 cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
 cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
 cfg.trialfun            = 'tt_trialfun';%'ft_trialfun_general';%
-cfg.dsrate = proc_vars.resample_freq;
 cfg_trl = ft_definetrial(cfg);
 
 % If the recording was started part way through, toss events not recorded
@@ -52,7 +51,6 @@ if any(cfg_trl.trl(:,1)<1)
     cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
 end
 event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
-
 
 % Check that behavioral and EEG event triggers line up
 if numel(bhv.Trial)~=numel(event_onsets)
@@ -64,7 +62,7 @@ trials = ft_redefinetrial(cfg_trl,data);
 eog_trials = ft_redefinetrial(cfg_trl,eog);
 %% Exclude bad_trials
 load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
-% Fix to allow downsampling -- high risk code
+
 %Find epochs that overlap with bad_epochs from raw visual inspection
 if ~isempty(bad_epochs)
     bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
@@ -74,10 +72,10 @@ else
 end
 
 % Exclude bad trials
-cfgs = [];
-cfgs.trials = setdiff([1:numel(trials.trial)], bad_raw_trials);
-trials = ft_selectdata(cfgs, trials)
-eog_trials = ft_selectdata(cfgs, eog_trials)
+cfg_trl.trl(bad_raw_trials,:) = [];
+trials = ft_redefinetrial(cfg_trl,trials);
+eog_trials = ft_redefinetrial(cfg_trl,eog);
+
 
 for f_ix = 1:numel(bhv_fields)
     bhv.(bhv_fields{f_ix})(bad_raw_trials) = [];
@@ -95,10 +93,9 @@ for f_ix = 1:numel(bhv_fields)
 end
 
 % Resegment trials
-cfgs = [];
-cfgs.trials = setdiff([1:numel(trials.trial)], bad_trials);
-trials = ft_selectdata(cfgs, trials)
-eog_trials = ft_selectdata(cfgs, eog_trials)
+cfg_trl.trl(bad_trials,:) = [];
+trials = ft_redefinetrial(cfg_trl,trials);
+eog_trials = ft_redefinetrial(cfg_trl,eog);
 
 
 

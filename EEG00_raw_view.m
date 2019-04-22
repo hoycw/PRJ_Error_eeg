@@ -1,4 +1,4 @@
-function EEG00_raw_view(SBJ,view_previous)
+function EEG00_raw_view(SBJ,view_previous, proc_id)
 %% View raw data and mark epochs to toss
 % INPUTS:
 %   SBJ [str] - name of the subject to load
@@ -17,6 +17,8 @@ ft_defaults
 %% Load and preprocess the data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_proc_vars.m'];
+eval(proc_vars_cmd);
 
 cfg=[];
 cfg.dataset  = SBJ_vars.dirs.raw_filename;
@@ -28,7 +30,16 @@ cfg.hpfiltord = 2;
 %cfg.bpfilter = 'yes';
 %cfg.bpfreq   = [0.5 40];%0.1 is too low for filter settings, 20 is too low to see muscle artifact, consider ditching filtering?
 raw = ft_preprocessing(cfg);
-
+%% Downsample
+%Just looked over script a final time! This is one thing I wanted to check
+%that its in the right spot that I forgot to mention -- I wanted it to go
+%after filtering and trial cutting, but wasn't sure if this was too late!
+%(April 13,2019)
+if strcmp(proc_vars.resample_yn,'yes')
+      cfg=[];
+    cfg.resamplefs = proc_vars.resample_freq;
+    raw = ft_resampledata(cfg, raw);
+end
 %% Plot PSDs for noise profile
 fprintf('============== Plotting PSDs %s, %s ==============\n',SBJ,SBJ_vars.raw_file);
 psd_dir = strcat(SBJ_vars.dirs.import,'raw_psds/');

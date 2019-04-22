@@ -20,8 +20,8 @@ for i=1:length(event)
     % it is a trigger, see whether it has the right value
     if ismember(event(i).value, cfg.trialdef.eventvalue)
       % add this to the trl definition
-      begsample     = event(i).sample/hdr.Fs*cfg.dsrate + round(cfg.trialdef.prestim*cfg.dsrate);
-      endsample     = event(i).sample/hdr.Fs*cfg.dsrate + round(cfg.trialdef.poststim*cfg.dsrate)-1;
+      begsample     = event(i).sample/hdr.Fs*cfg.dsrate + cfg.trialdef.prestim*cfg.dsrate;
+      endsample     = event(i).sample/hdr.Fs*cfg.dsrate + cfg.trialdef.poststim*cfg.dsrate - 1;
       offset        = cfg.trialdef.prestim*cfg.dsrate;  
       trigger       = event(i).value; % remember the trigger (=condition) for each trial
       trl(end+1, :) = [round([begsample endsample offset])  trigger]; 

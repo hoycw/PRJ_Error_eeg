@@ -19,6 +19,7 @@ eval(proc_vars_cmd);
 
 %% Load and preprocess the data
 % Update ears ref channels with prefix/suffix
+
 if isfield(SBJ_vars.ch_lab,'prefix')
     ear_lab1 = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{1}];
     ear_lab2 = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{2}];
@@ -46,7 +47,16 @@ cfg.refmethod  = proc_vars.ref_method;
 cfg.refchannel = {ear_lab1, ear_lab2};
 data = ft_preprocessing(cfg);
 
-
+%% Downsample
+%Just looked over script a final time! This is one thing I wanted to check
+%that its in the right spot that I forgot to mention -- I wanted it to go
+%after filtering and trial cutting, but wasn't sure if this was too late!
+%(April 13,2019)
+if strcmp(proc_vars.resample_yn,'yes')
+      cfg=[];
+    cfg.resamplefs = proc_vars.resample_freq;
+    data = ft_resampledata(cfg, data);
+end
 
 %% Fix channel labels
 % Remove bad channels
