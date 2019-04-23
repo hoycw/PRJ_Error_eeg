@@ -1,4 +1,4 @@
-%% Pilot08 Processing Variables
+%% EEG Pilot 08 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -48,7 +48,7 @@ SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T8', 'FT8', 'PO4', 'C6', 'PO8', 'F8', 'F6', 'AF8', 'O2', 'P2','Iz','Pz'};
-SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'}
+SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 SBJ_vars.trial_reject_n = [504 556 492 406];
 SBJ_vars.ica_reject = [1 8 9 13 15 17 20 22 23 26 27 30 36 43 40 44 47 50 55];

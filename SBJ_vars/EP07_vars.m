@@ -1,4 +1,4 @@
-%% Pilot07 Processing Variables
+%% EEG Pilot 07 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -53,7 +53,7 @@ SBJ_vars.ch_lab.bad     = {...
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_n = [18, 161, 189, 220, 240, 243, 248, 332, 342, 350, 409, 425, 435, 439, 484, 486, 500, 507, 508, 529, 558]
+SBJ_vars.trial_reject_n = [18, 161, 189, 220, 240, 243, 248, 332, 342, 350, 409, 425, 435, 439, 484, 486, 500, 507, 508, 529, 558];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------

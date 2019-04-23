@@ -155,25 +155,24 @@ if ~isempty(bad_epochs)
     cfg.artfctdef.reject          = 'nan';
     data = ft_rejectartifact(cfg, data);
 end
-if strcmp(proc_vars.ICA_hp_yn,'yes')
-    cfg = [];
-    cfg.hpfilter = proc_vars.ICA_hp_yn;
-    cfg.hpfreq   = proc_vars.ICA_hp_freq;
-    data_ICA = ft_preprocessing(cfg, data);
-else
-    data_ICA = data;
-end
+cfg = [];
+cfg.hpfilter                  = proc_vars.ICA_hp_yn;
+cfg.hpfreq                    = proc_vars.ICA_hp_freq;
+data_ICA   = ft_preprocessing(cfg, data);
+
 
 % Run ICA
-cfg = [];
-cfg.method = 'runica'; % default, uses the implementation from EEGLAB
+cfg.method = 'runica'; % this is the default and uses the implementation from EEGLAB
+%cfgs.channel = setxor(data.label(1:64), SBJ_vars.ch_lab.bad);
 icomp = ft_componentanalysis(cfg, data_ICA);
 
-%% Save ICA unmixing and topolabel, data, eog, and bad_epochs
-icaunmixing  = icomp.unmixing;
+%!!! try before vs. after trial segmentation
+
+%% save the ICA unmixing and topolabel, eeg, and eog_bp
+icaunmixing = icomp.unmixing;
 icatopolabel = icomp.topolabel;
 
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
-save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog','bad_epochs');
+save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog','bad_epochs');% 'trials', 'eog_trials',
 
 

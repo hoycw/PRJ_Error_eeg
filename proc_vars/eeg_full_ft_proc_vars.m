@@ -1,4 +1,4 @@
-%% Pipeline Processing Variables: "eeg_ft" for EEG analysis
+%% Pipeline Processing Variables: "eeg_full_ft" for EEG analysis
 % Trial Cut Parameteres
 proc_vars.event_type    = 'S';          % 'S'/'F': lock trial to stim/feedback
 proc_vars.trial_lim_s   = [-0.25 2.8];    % data segments (in seconds) to grab around events
@@ -9,7 +9,7 @@ elseif strcmp(proc_vars.event_type,'F')
 else
     error(['Unknown event_type: ' proc_vars.event_type]);
 end
-%proc_vars.RT_std_thresh = 3;            % rejection threshold for RTs
+
 % Behavioral Processing
 proc_vars.rt_bounds = [0.6 1.4];          % bounds on a reasonable RT to be detected with KLA algorithm
 % Varaince-Based Trial Rejection Parameters
@@ -24,19 +24,16 @@ proc_vars.reref_yn      = 'yes';
 proc_vars.ref_method    = 'avg';
 proc_vars.bp_yn         = 'yes';
 proc_vars.bp_freq       = [0.1 30];
-proc_vars.bp_order = 2;
+proc_vars.bp_order      = 2;
 proc_vars.hp_yn         = 'no';
 proc_vars.hp_freq       = 0.1;            % [] skips this step
 proc_vars.hp_order      = 2;              % Leaving blank causes instability error, 1 or 2 works
 proc_vars.lp_yn         = 'no';
-proc_vars.lp_freq       = 30;            % [] skips this step
+proc_vars.lp_freq       = 30;             % [] skips this step
 proc_vars.notch_yn      = 'no';
 proc_vars.notch_type    = 'bandstop';     % method for nothc filtering out line noise
-proc_vars.ICA_hp_yn = 'yes';
-proc_vars.ICA_hp_freq = 2;
 
-% cleanline   = 'yes';                % Use Tim Mullen's cleanline function
-% dft_yn      = 'no';
-% bs_yn       = 'no';                % Parameters for this in SBJ_vars
-
+% ICA preprocessing
+proc_vars.ICA_hp_yn       = 'yes';
+proc_vars.ICA_hp_freq     = 2;
 proc_vars.eog_ic_corr_cut = 0.4;        % EOG IC correlation threshold for tossing ICs

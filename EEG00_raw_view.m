@@ -3,6 +3,7 @@ function EEG00_raw_view(SBJ,view_previous, proc_id)
 % INPUTS:
 %   SBJ [str] - name of the subject to load
 %   view_previous [0/1] - binary no/yes to load previous bad_epochs to view
+%   proc_id [str] - name of processing pipeline
 
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
@@ -23,23 +24,18 @@ eval(proc_vars_cmd);
 cfg=[];
 cfg.dataset  = SBJ_vars.dirs.raw_filename;
 cfg.demean   = 'yes';
-% cfg.lpfilter = 'no';
 cfg.hpfilter = 'yes';
 cfg.hpfreq   = 0.5;
 cfg.hpfiltord = 2;
-%cfg.bpfilter = 'yes';
-%cfg.bpfreq   = [0.5 40];%0.1 is too low for filter settings, 20 is too low to see muscle artifact, consider ditching filtering?
 raw = ft_preprocessing(cfg);
+
 %% Downsample
-%Just looked over script a final time! This is one thing I wanted to check
-%that its in the right spot that I forgot to mention -- I wanted it to go
-%after filtering and trial cutting, but wasn't sure if this was too late!
-%(April 13,2019)
 if strcmp(proc_vars.resample_yn,'yes')
-      cfg=[];
+    cfg = [];
     cfg.resamplefs = proc_vars.resample_freq;
     raw = ft_resampledata(cfg, raw);
 end
+
 %% Plot PSDs for noise profile
 fprintf('============== Plotting PSDs %s, %s ==============\n',SBJ,SBJ_vars.raw_file);
 psd_dir = strcat(SBJ_vars.dirs.import,'raw_psds/');
@@ -73,9 +69,8 @@ end
 browsed_raw = ft_databrowser(cfg_plot, raw);
 bad_epochs  = browsed_raw.artfctdef.visual.artifact;
 
-% prevent ft_databrowser bugs
-fake_ep     = find(diff(bad_epochs,1,2)<10);
-bad_epochs(fake_ep,:) = [];
+% Prevent ft_databrowser tiny epoch bugs
+bad_epochs(diff(bad_epochs,1,2)<10,:) = [];
 
 %% Save out bad epochs
 if prev_exists
