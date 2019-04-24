@@ -42,7 +42,6 @@ if any(cfg_trl.trl(:,1)<1)
 end
 event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
 
-
 % Check that behavioral and EEG event triggers line up
 if numel(bhv.Trial)~=numel(event_onsets)
     error(['Mismatch in behavioral and neural trial counts: ' num2str(numel(bhv.Trial))...
@@ -147,7 +146,7 @@ if gen_figs
     fn_icabrowser_modified(SBJ, cfg, ica);
     
     % Plot IC single trial stacks + ERPs
-    stacked_data_icacomp(SBJ, SBJ_vars.dirs.raw_filename, SBJ_vars.dirs.proc, proc_id, ica);
+    fn_plot_ERP_stack(SBJ, proc_id, 'ERPstack_full_evnts', ica, fig_vis, 0);
     
     % Plot IC in ft_databrowser
     if fig_vis
@@ -161,9 +160,9 @@ end
 
 %% Save Data
 clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' proc_id '.mat'];
-save(clean_data_fname, '-v7.3', 'trials','cfg_trl','ica', 'heog_ics', 'veog_ics','eog_trials');
+save(clean_data_fname, '-v7.3', 'trials', 'cfg_trl', 'ica', 'heog_ics', 'veog_ics', 'eog_trials');
 
 clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' proc_id '_clean.mat'];
-save(clean_bhv_fname, '-v7.3', 'bhv','bhv_fields');
+save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
 end

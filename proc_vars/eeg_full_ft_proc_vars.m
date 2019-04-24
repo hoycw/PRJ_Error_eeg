@@ -34,8 +34,8 @@ proc_vars.notch_yn      = 'no';
 proc_vars.notch_type    = 'bandstop';     % method for nothc filtering out line noise
 
 % ICA preprocessing
-proc_vars.ICA_hp_yn       = 'yes';
-proc_vars.ICA_hp_freq     = 2;
+proc_vars.ICA_hp_yn       = 'no';
+%proc_vars.ICA_hp_freq     = 0.1;
 proc_vars.eog_ic_corr_cut = 0.4;        % EOG IC correlation threshold for tossing ICs
 proc_vars.eog_bp_yn       = 'yes';
 proc_vars.eog_bp_freq     = [1 15];  % from ft_rejectvisual help page

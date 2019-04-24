@@ -10,7 +10,7 @@ function trl = tt_trialfun(cfg);
 %   cfg.resamp_freq [int] - sampling rate if data was resampled (e.g., downsampling)
 
 hdr   = ft_read_header(cfg.dataset);
-event = ft_read_event(cfg.dataset);
+event = ft_read_event(cfg.dataset, 'header', hdr);
 fprintf('%i events found!\n',numel(event));
 
 % Compute resampling factor

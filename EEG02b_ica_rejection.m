@@ -16,34 +16,28 @@ data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
 data_cleanname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' proc_id '.mat'];
 load(data_cleanname)
-
-%% Import behavioral data
-%   Total_Trial,Block,Condition,Hit,RT,Timestamp,Tolerance,Trial,Score,ITI,ITI type
 clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' proc_id '_clean.mat'];
 load(clean_bhv_fname);
-bad_comp = SBJ_vars.ica_reject;
 
-
-% IC rejection
+%% IC rejection
 cfg = [];
-cfg.component = unique([bad_comp, heog_ics, veog_ics]);
+cfg.component = unique([SBJ_vars.ica_reject, heog_ics, veog_ics]);
 cfg.demean = 'no';
 clean_trials = ft_rejectcomponent(cfg, ica);
 
-%Repair Bad Channels
+%% Repair Bad Channels
 cfg = [];
-cfg.method = 'average';
+cfg.method         = 'average';
 cfg.missingchannel = SBJ_vars.ch_lab.bad(:); % not in data (excluded from ica)
-cfg.layout = 'biosemi64.lay';
+cfg.layout         = 'biosemi64.lay';
+
 cfgn = [];
 cfgn.channel = 'all';
-cfgn.layout = 'biosemi64.lay';
-cfgn.method = 'template';
-
+cfgn.layout  = 'biosemi64.lay';
+cfgn.method  = 'template';
 cfg.neighbours = ft_prepare_neighbours(cfgn);
 
 clean_trials = ft_channelrepair(cfg, clean_trials);
-
 
 %% Visual Trial Rejection
 if dorejectvisual
@@ -58,44 +52,27 @@ if dorejectvisual
     clean_summ_deriv = ft_rejectvisual(cfg, clean_deriv);
     % Report channels and trials identified above in SBJ_vars, then re-run
 else
-    bad_final_trials = SBJ_vars.trial_reject_n;
     cfgs = [];
-    cfgs.trials = setdiff([1:numel(clean_trials.trial)], bad_final_trials);
-    clean_trials = ft_selectdata(cfgs, clean_trials)
+    cfgs.trials = setdiff([1:numel(clean_trials.trial)], SBJ_vars.trial_reject_n);
+    clean_trials = ft_selectdata(cfgs, clean_trials);
 end
 
 %% FINAL CHECK
 cfg_plot = [];
 cfg_plot.viewmode = 'vertical';
-out = ft_databrowser(cfg_plot, clean_trials);
+out = ft_databrowser(cfg_plot, clean_trials);   %SHEILA: do you use the out here? what are you checking here?
 
-bad_final_trials = SBJ_vars.trial_reject_n;
+% SHEILA: you're confusing trial_n and ix again here- since some trials are
+% already gone from the bhv struct, using _n here will be wrong...
 for f_ix = 1:numel(bhv_fields);
-     bhv.(bhv_fields{f_ix})(bad_final_trials) = [];
+     bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_n) = [];
 end
-%bad_final_trials = input('list trials that still look bad (and add them to bad trials in sbj vars as well!')
-%cfgs = [];
-%cfgs.trials = setdiff(1:numel(clean_trials.trial),bad_final_trials);
-%clean_trials = ft_selectdata(cfgs,clean_trials);
-%% Clean up and save data
-% Get bad trials and channels from SBJ_vars
-%   NOTE: these are indices into the post-raw rejection trial list
-%bad_trials = setdiff(SBJ_vars.trial_reject_n+1, exclude_trials')'
-%bhv.total_trial is zero indexed so need to add one to get trial number
-%for SBJ_vars.trial_reject_n+1
-%bad_ch_neg = fn_ch_lab_negate(SBJ_vars.ch_lab.bad);
 
-% Remove from ICA cleaned data
-%cfgs = [];
-%cfgs.trials = setdiff(1:numel(clean_trials.trial),bad_trials);
-%cfgs.channel = {'all',bad_ch_neg{:}};
-%trials = ft_selectdata(cfgs,clean_trials);
-
-
-    
-% Save outputs
+%% Save outputs
 clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat'];
 save(clean_data_fname, '-v7.3', 'clean_trials');
 
 clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat'];
 save(clean_bhv_fname, '-v7.3', 'bhv');
+
+end
