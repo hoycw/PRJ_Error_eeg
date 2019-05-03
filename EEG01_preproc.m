@@ -36,7 +36,6 @@ end
 
 % Load and preprocess
 cfg = [];
-cfg.dataset    = SBJ_vars.dirs.raw_filename;
 cfg.continuous = 'yes'; 
 % cfg.lpfilter   = proc_vars.lp_yn;
 % cfg.hpfilter   = proc_vars.hp_yn;
@@ -47,7 +46,13 @@ cfg.demean     = proc_vars.demean_yn;
 cfg.reref      = proc_vars.reref_yn;
 cfg.refmethod  = proc_vars.ref_method;
 cfg.refchannel = {ear_lab1, ear_lab2};
-data = ft_preprocessing(cfg);
+
+data = cell(size(SBJ_vars.block_name));
+for b_ix = 1:numel(SBJ_vars.block_name)
+    cfg.dataset    = SBJ_vars.dirs.raw_filename{b_ix};
+    data{b_ix} = ft_preprocessing(cfg);
+end
+data = fn_concat_blocks(data);
 
 %% Downsample
 if strcmp(proc_vars.resample_yn,'yes')
@@ -146,7 +151,7 @@ data = ft_selectdata(cfg,data);
 
 %% ICA
 % Load raw bad epochs to NaN out
-load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
+bad_epochs = fn_combine_raw_bad_epochs(SBJ);
 
 % Preprocess data for ICA (NaN bad epochs)
 if ~isempty(bad_epochs)

@@ -11,9 +11,9 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP06';
-SBJ_vars.raw_file = 'TT_Cyclone_pilot06.bdf';
-SBJ_vars.bhv_file = 'TT_Cyclone_pilot06_response_log_20180426140027.txt';
-SBJ_vars.block_prefix = '';
+SBJ_vars.raw_file = {'TT_Cyclone_pilot06.bdf'};
+SBJ_vars.bhv_file = {'TT_Cyclone_pilot06_response_log_20180426140027.txt'};
+SBJ_vars.block_prefix = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];

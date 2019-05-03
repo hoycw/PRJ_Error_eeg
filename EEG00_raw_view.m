@@ -1,4 +1,4 @@
-function EEG00_raw_view(SBJ,view_previous, proc_id)
+function EEG00_raw_view(SBJ,view_previous, proc_id, block)
 %% View raw data and mark epochs to toss
 % INPUTS:
 %   SBJ [str] - name of the subject to load
@@ -21,8 +21,13 @@ eval(SBJ_vars_cmd);
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_proc_vars.m'];
 eval(proc_vars_cmd);
 
+if numel(SBJ_vars.block_name)>1
+        block_suffix = ['_' SBJ_vars.block_name{block}];
+else
+        block_suffix = '';
+end
 cfg=[];
-cfg.dataset  = SBJ_vars.dirs.raw_filename;
+cfg.dataset  = SBJ_vars.dirs.raw_filename{block};
 cfg.demean   = 'yes';
 cfg.hpfilter = 'yes';
 cfg.hpfreq   = 0.5;
@@ -44,14 +49,14 @@ if ~exist(psd_dir,'dir')
 end
 
 fn_plot_PSD_1by1_save(raw.trial{1},raw.label,raw.fsample,...
-    strcat(psd_dir,SBJ,'_raw_psd'),'png');
+    strcat(psd_dir,SBJ,'_raw_psd',block_suffix),'png');
 
 %% Plot and mark bad epochs
 % Load cfg with plotting parameters
 load([root_dir 'PRJ_Error_eeg/scripts/utils/cfg_plot_eeg.mat']);
 
 % Load previous if available
-out_fname = [SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat'];
+out_fname = [SBJ_vars.dirs.events SBJ '_raw_bad_epochs' block_suffix '.mat'];
 if exist(out_fname)
     prev_exists = 1;
 else
