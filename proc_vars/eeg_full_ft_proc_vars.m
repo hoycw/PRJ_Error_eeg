@@ -18,6 +18,7 @@ proc_vars.var_std_warn_thresh = 3;
 % Data Preprocessing
 proc_vars.plot_psd      = '1by1';         % type of plot for channel PSDs
 proc_vars.resample_yn   = 'yes';
+proc_vars.origsample_freq = 1024;
 proc_vars.resample_freq = 250;
 proc_vars.demean_yn     = 'yes';
 proc_vars.reref_yn      = 'yes';
@@ -35,8 +36,8 @@ proc_vars.notch_type    = 'bandstop';     % method for nothc filtering out line 
 
 % ICA preprocessing
 proc_vars.ICA_hp_yn       = 'no';
-%proc_vars.ICA_hp_freq     = 0.1;
-proc_vars.eog_ic_corr_cut = 0.4;        % EOG IC correlation threshold for tossing ICs
+proc_vars.ICA_hp_freq     = 0.1;
+proc_vars.eog_ic_corr_cut = 0.3;        % EOG IC correlation threshold for tossing ICs % changed to 0.3, ran into a lot of components that were generating errors because not hitting threshold for horizontal eogs
 proc_vars.eog_bp_yn       = 'yes';
 proc_vars.eog_bp_freq     = [1 15];  % from ft_rejectvisual help page
 proc_vars.eog_bp_filtord  = 4;       % from ft_rejectvisual help page

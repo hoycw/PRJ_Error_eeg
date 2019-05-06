@@ -12,8 +12,8 @@ ft_defaults
 %--------------------------------------
 SBJ_vars.SBJ = 'EP06';
 SBJ_vars.raw_file = {'TT_Cyclone_pilot06.bdf'};
-SBJ_vars.bhv_file = {'TT_Cyclone_pilot06_response_log_20180426140027.txt'};
-SBJ_vars.block_prefix = {''};
+SBJ_vars.bhv_file = 'TT_Cyclone_pilot06_response_log_20180426140027.txt';
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -57,7 +57,7 @@ SBJ_vars.ch_lab.bad     = {...
     %142, 228, 375, 376, 387, 398, 402, 409,...
     %410, 420, 441, 462, 463, 479, 490, 497,...
     %513, 533, 543, 548, 552:554, 570, 580];
-SBJ_vars.trial_reject_n = [141, 227, 374, 375, 386, 397, 401, 408, 409, 419, 440, 461, 462, 478, 489, 496, 512, 532, 542, 547, 551, 552, 553, 569, 579];
+SBJ_vars.trial_reject_ix = [141, 227, 374, 375, 386, 397, 401, 408, 409, 419, 440, 461, 462, 478, 489, 496, 512, 532, 542, 547, 551, 552, 553, 569, 579];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------

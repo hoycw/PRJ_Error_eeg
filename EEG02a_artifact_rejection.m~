@@ -54,8 +54,8 @@ end
 event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
 
 % Cut the data into trials
-trials = ft_redefinetrial(cfg_trl,data);
-eog_trials = ft_redefinetrial(cfg_trl,eog);
+    trials = ft_redefinetrial(cfg_trl,data);
+    eog_trials = ft_redefinetrial(cfg_trl,eog);
 % Check that behavioral and EEG event triggers line up
 if numel(bhv.Trial)~=numel(event_onsets)
     error(['Mismatch in behavioral and neural trial counts: ' num2str(numel(bhv.Trial))...
@@ -155,7 +155,7 @@ if gen_figs
     fn_icabrowser_modified(SBJ, cfg, ica);
     
     % Plot IC single trial stacks + ERPs
-    fn_plot_ERP_stack(SBJ, proc_id, 'ERPstack_full_evnts', ica, 'off', 1);
+    fn_plot_ERP_stack(SBJ, proc_id, 'ERPstack_full_evnts', ica, fig_vis, 1);
     
     % Plot IC in ft_databrowser
     if fig_vis

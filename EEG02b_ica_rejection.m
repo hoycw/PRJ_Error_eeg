@@ -53,19 +53,18 @@ if dorejectvisual
     % Report channels and trials identified above in SBJ_vars, then re-run
 else
     cfgs = [];
-    cfgs.trials = setdiff([1:numel(clean_trials.trial)], SBJ_vars.trial_reject_n);
+    cfgs.trials = setdiff([1:numel(clean_trials.trial)], SBJ_vars.trial_reject_ix);
     clean_trials = ft_selectdata(cfgs, clean_trials);
 end
 
 %% FINAL CHECK
-cfg_plot = [];
+% Load cfg with plotting parameters
+load([root_dir 'PRJ_Error_eeg/scripts/utils/cfg_plot_eeg.mat']);cfg_plot = [];
 cfg_plot.viewmode = 'vertical';
-out = ft_databrowser(cfg_plot, clean_trials);   %SHEILA: do you use the out here? what are you checking here?
+ft_databrowser(cfg_plot, clean_trials);   %SHEILA: do you use the out here? what are you checking here? its just to make sure that i caught everything -- i don't use the output
 
-% SHEILA: you're confusing trial_n and ix again here- since some trials are
-% already gone from the bhv struct, using _n here will be wrong...
 for f_ix = 1:numel(bhv_fields);
-     bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_n) = [];
+     bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix) = [];
 end
 
 %% Save outputs

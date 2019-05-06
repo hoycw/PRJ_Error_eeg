@@ -87,12 +87,10 @@ for ch_ix = 1:numel(data.label)
     % SHEILA: we actually weren't using this below, so you computed it and
     % left it... however, maybe it's nice ot see outliers for data
     % cleaning, so try with and without and decide which is better.
-%     clims = NaN([1 2]);
-%     clims(1) = prctile(plot_data(:),5);
-%     clims(2) = prctile(plot_data(:),95);
-%     clims = [min(clims(:,1)) max(clims(:,2))];    % what was this
-%     supposed to do that the prctile doesn't do? we're not notrmalizing
-%     this across channels (though we could add a knob for that)
+    %clims = NaN([1 2]);
+    %clims(1) = prctile(plot_data(:),5);
+    %clims(2) = prctile(plot_data(:),95);
+
     
     % Plot single trial stack
     imagesc(plot_data);
@@ -117,6 +115,7 @@ for ch_ix = 1:numel(data.label)
         legend(plt_vars.evnt_type,'Location',plt_vars.legend_loc);
     end
     colorbar;
+    %caxis(clims);
     
     % Plot ERP
     subplot('Position', [0.1, 0.1, 0.70, 0.15]);
@@ -125,7 +124,7 @@ for ch_ix = 1:numel(data.label)
     
     % Save figure
     if save_fig
-        comp_stack_fname = [SBJ_vars.dirs.proc SBJ '_ERPstack_' data.label{ch_ix} '.png'];  % SHEILA: add a sub directory for ERPstack
+        comp_stack_fname = [SBJ_vars.dirs.proc_stack SBJ data.label{ch_ix} '_ERP_stack.png'];  % SHEILA: add a sub directory for ERPstack 
         saveas(gcf,comp_stack_fname);
     end
 end

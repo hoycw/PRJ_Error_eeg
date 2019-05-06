@@ -11,9 +11,9 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP10';
-SBJ_vars.raw_file = 'pilot10.bdf';
+SBJ_vars.raw_file = {'pilot10.bdf'};
 SBJ_vars.bhv_file = 'Pilot10_response_log_20181127141339.txt';
-SBJ_vars.block_prefix = '';
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -52,7 +52,7 @@ SBJ_vars.ch_lab.bad     = {'PO4', 'Pz','FC5','Oz', 'O2', 'T7', 'O1', 'P9', 'C5',
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 %SBJ_vars.trial_reject_ix = [85, 102:104, 120:129, 169, 192, 208, 209, 256, 266, 275, 303, 312, 345, 387, 406, 434, 455, 447, 531];
 %SBJ_vars.trial_reject_n = [162, 189, 260, 266, 269, 289, 321, 334, 341, 542, 634, 84, 101, 102, 103, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 168, 191, 207, 208, 255, 265, 274, 302, 311, 344, 386, 405, 433, 454, 446, 530]
-SBJ_vars.trial_reject_n = [106 424 586 587];
+SBJ_vars.trial_reject_ix = [106 424 586 587];
 SBJ_vars.ica_reject = [1 5 10 11 12 13 14 15 17 19 20 22 30 36 38 32 40 41 46 43 47 50 54 56];
 %--------------------------------------
 % Noise Notes

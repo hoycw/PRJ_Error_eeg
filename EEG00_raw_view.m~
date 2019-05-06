@@ -26,6 +26,12 @@ if numel(SBJ_vars.block_name)>1
 else
         block_suffix = '';
 end
+if block>1;
+    cfg=[];
+    cfg.dataset  = SBJ_vars.dirs.raw_filename{block};
+    reference = ft_preprocessing(cfg);
+    end_time = reference.time{end};
+end
 cfg=[];
 cfg.dataset  = SBJ_vars.dirs.raw_filename{block};
 cfg.demean   = 'yes';
@@ -73,6 +79,9 @@ end
 
 browsed_raw = ft_databrowser(cfg_plot, raw);
 bad_epochs  = browsed_raw.artfctdef.visual.artifact;
+end_time = blocks{b_ix}.time{1}(end)
+if block >1;
+    bad_epochs = bad_epochs + sum(end_times(1:b_ix-1))+time_step
 % Prevent ft_databrowser tiny epoch bugs
 bad_epochs(diff(bad_epochs,1,2)<10,:) = [];
 

@@ -11,9 +11,9 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP07';
-SBJ_vars.raw_file = 'pilot07.bdf';
+SBJ_vars.raw_file = {'pilot07.bdf'};
 SBJ_vars.bhv_file = 'pilot07_response_log_20180426140027.txt';
-SBJ_vars.block_prefix = '';
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -21,6 +21,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/ERP_stacks/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -43,17 +44,19 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
+SBJ_vars.ch_lab.null = {'EXG6', 'EXG7', 'EXG8'}
 SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
- '01','O2', 'PO7', 'AF8','PO8', 'Iz', 'Oz'  'T7'
+ 'AF8', 'Iz', 'T7', 'T8', 'FT8'
     };
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_n = [18, 161, 189, 220, 240, 243, 248, 332, 342, 350, 409, 425, 435, 439, 484, 486, 500, 507, 508, 529, 558];
+SBJ_vars.trial_reject_ix = [18, 161, 189, 220, 240, 243, 248, 332, 342, 350, 409, 425, 435, 439, 484, 486, 500, 507, 508, 529, 558];
+SBJ_vars.ica_reject = [1, 2, 3, 4, 6, 7, 9, 10, 12, 13, 18, 19, 20, 26, 45, 59, 52, 59];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------

@@ -1,5 +1,13 @@
 function [combined] = fn_concat_blocks(blocks)
-error('Sheila adapt this to PRJ_Error_eeg! (paths, check variables, etc.)');
+%% Check which root directory
+if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
+elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
+
+addpath([root_dir 'PRJ_Error_eeg/scripts/']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
+addpath(ft_dir);
+ft_defaults
 %% Concatenate two fieldtrip data structures with continuous data (e.g., two task blocks)
 %   Will lump any additional datasets into the first one (to keep the
 %   properties of that first block and keep ft happy

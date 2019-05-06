@@ -11,9 +11,9 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP08';
-SBJ_vars.raw_file = 'Pilot08.bdf';
+SBJ_vars.raw_file = {'Pilot08.bdf'};
 SBJ_vars.bhv_file = 'Pilot08_response_log_20181101084314.txt';
-SBJ_vars.block_prefix = '';
+SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -50,7 +50,7 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T8', 'FT8', 'PO4', 'C6', 'PO8', 'F8', 'F6', 'AF8', 'O2', 'P2','Iz','Pz'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
-SBJ_vars.trial_reject_n = [504 556 492 406];
+SBJ_vars.trial_reject_ix = [504 556 492 406];
 SBJ_vars.ica_reject = [1 8 9 13 15 17 20 22 23 26 27 30 36 43 40 44 47 50 55];
 %SBJ_vars.trial_reject_ix = [88, 94, 103, 154, 157, 217, 327, 343, 370, 406, 417, 440, 490, 499, 511, 545];
 %SBJ_vars.trial_reject_n = [87, 93, 102, 153, 156, 216, 326, 342, 369, 405, 416, 439, 489, 510, 544];
