@@ -45,7 +45,7 @@ if numel(SBJ_vars.block_name)>1;
        cfg_trl = cfg_trl_unconcat{1};
     end
 else
-    cfg_trl = cfg_trl_unconcat{1}
+    cfg_trl = cfg_trl_unconcat{1};
 end
 % If the recording was started part way through, toss events not recorded
     if any(cfg_trl.trl(:,1)<1)

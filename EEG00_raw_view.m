@@ -4,6 +4,7 @@ function EEG00_raw_view(SBJ,view_previous, proc_id, block)
 %   SBJ [str] - name of the subject to load
 %   view_previous [0/1] - binary no/yes to load previous bad_epochs to view
 %   proc_id [str] - name of processing pipeline
+%   block [int] - which block number to run
 
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];

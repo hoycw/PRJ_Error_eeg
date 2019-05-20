@@ -61,7 +61,7 @@ end
 % Load cfg with plotting parameters
 load([root_dir 'PRJ_Error_eeg/scripts/utils/cfg_plot_eeg.mat']);cfg_plot = [];
 cfg_plot.viewmode = 'vertical';
-ft_databrowser(cfg_plot, clean_trials);   %SHEILA: do you use the out here? what are you checking here? its just to make sure that i caught everything -- i don't use the output
+ft_databrowser(cfg_plot, clean_trials);
 
 for f_ix = 1:numel(bhv_fields);
      bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix) = [];

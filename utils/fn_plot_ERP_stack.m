@@ -47,29 +47,6 @@ evnt_ix(2) = find(data.time{1}==prdm_vars.target);
 % Feedback
 evnt_ix(3) = find(data.time{1}==prdm_vars.target+prdm_vars.fb_delay);
 
-%% Import behavioral data
-% %   Total_Trial,Block,Condition,Hit,RT,Timestamp,Tolerance,Trial,Score,ITI,ITI type
-% 
-% events = ft_read_event(SBJ_vars.dirs.raw_filename);
-% eventvalues = extractfield(events, 'value');
-% eventsamples = extractfield(events, 'sample');
-% if numel(eventvalues) ~= numel(eventsamples)
-%    difference = numel(eventsamples)-numel(eventvalues);
-%    eventsamples = eventsamples(difference+1:end);
-% end
-% stimulus_ix = find(eventvalues == 1);
-% feedback_ix = find(eventvalues == 2);
-% stimulus_onset = eventsamples(stimulus_ix);
-% feedback_onset = eventsamples(feedback_ix);
-% stim_onset = find(data.time{1,1} == 0);
-% stim_onset_array(1:numel(stimulus_onset)) = stim_onset;
-% [~,fb_onset] = min(abs(1.8-data.time{1,1}));
-% fb_onset_array(1:numel(feedback_onset)) = fb_onset;
-% [~,one_sec] = min(abs(1 - data.time{1,1}));
-% one_sec_array(1:numel(feedback_onset)) = one_sec;
-% %for x = 1: numel(feedback_onset);
-%     %trial_sample = feedback_onset(x)/numel(data.time{1,x}(1,:))
-
 %% Plot Data
 % keep manual screen position - better in dual monitor settings
 
@@ -84,9 +61,6 @@ for ch_ix = 1:numel(data.label)
         plot_data(t_ix, :) = squeeze(data.trial{t_ix}(ch_ix,:));
     end
     % Get color limits
-    % SHEILA: we actually weren't using this below, so you computed it and
-    % left it... however, maybe it's nice ot see outliers for data
-    % cleaning, so try with and without and decide which is better.
     %clims = NaN([1 2]);
     %clims(1) = prctile(plot_data(:),5);
     %clims(2) = prctile(plot_data(:),95);
@@ -103,8 +77,6 @@ for ch_ix = 1:numel(data.label)
     end
     
     ax = gca;
-%     ax.XTick = [1, 257, 513, 769, 1025, 1281, 1537, 1793, 2049, 2305, 2561, 2817, 3073];
-%     ax.XTickLabel = [-.25, 0, 0.25, .5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75];
     ax.YLabel.String = 'Trials';
     ax.XLim          = [0,size(data.trial{1},2)];
     ax.XTick         = 0:plt_vars.x_step_sz*data.fsample:size(data.trial{1},2);
@@ -124,7 +96,7 @@ for ch_ix = 1:numel(data.label)
     
     % Save figure
     if save_fig
-        comp_stack_fname = [SBJ_vars.dirs.proc_stack SBJ data.label{ch_ix} '_ERP_stack.png'];  % SHEILA: add a sub directory for ERPstack 
+        comp_stack_fname = [SBJ_vars.dirs.proc_stack SBJ data.label{ch_ix} '_ERP_stack.png'];
         saveas(gcf,comp_stack_fname);
     end
 end
