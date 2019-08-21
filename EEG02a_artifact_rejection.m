@@ -1,11 +1,18 @@
 function EEG02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis)
+% This function generates figures for both the ERP stacks and the ICA Plots
+%SBJ = 'EEG#'
+%Proc_id = 'egg_full_ft'
+%gen_figs = 0 (if no, don't generate), 1 (if yes)
+%fig_vis = 1 if a data_browser view of the time course of the ICA
+%components is desired
 
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip_private']);
 addpath(ft_dir);
 ft_defaults
 
@@ -21,8 +28,14 @@ data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
-[bhv, bhv_fields] = fn_read_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
+[bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], []);
+bhv_fields = fieldnames(bhv) %will be removed in future matlab release
 
+[bhv_oddball] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav_odball.csv'], []);
+bhv_fields_oddball = fieldnames(bhv_oddball) %will be removed in future matlab release
+bhv = [bhv, bhv_oddball]; %should concatenate the structures
+%This stores teh number of trials for the task for later use
+bhv.numtrials = numel(bhv.trl_n) - numel(bhv_fields_oddball.trl_n);
 %% Cut into trials
 % Need to recut trials on updated data with the nans
 for b_ix = 1: numel(SBJ_vars.block_name);
@@ -54,12 +67,13 @@ end
 event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
 
 % Cut the data into trials
-trials = ft_redefinetrial(cfg_trl,data);
-eog_trials = ft_redefinetrial(cfg_trl,eog);
+trials = ft_redefinetrial_allowoverlap(cfg_trl,data);
+eog_trials = ft_redefinetrial_allowoverlap(cfg_trl,eog);
+
 % Check that behavioral and EEG event triggers line up
-if numel(bhv.Trial)~=numel(event_onsets)
-    error(['Mismatch in behavioral and neural trial counts: ' num2str(numel(bhv.Trial))...
-        ' behavioral; ' num2str(numel(event_onsets)) ' neural']);
+if (numel(bhv.trl_n))~=numel(event_onsets_trials)
+    error(['Mismatch in behavioral and neural trial counts: ' num2str((numel(bhv.trl_n)))...
+        ' behavioral; ' num2str(numel(event_onsets_trials)) ' neural']);
 end
 %% Exclude bad_trials
 % Find trials that overlap with bad_epochs from raw visual inspection
@@ -72,9 +86,9 @@ else
 end
 
 % Identify training and bad behavioral trials
-training_ix = find(bhv.Block==-1);
-rt_low_ix   = find(bhv.RT <= proc_vars.rt_bounds(1));
-rt_high_ix  = find(bhv.RT >= proc_vars.rt_bounds(2));
+training_ix = find(bhv.blk==-1);
+rt_low_ix   = find(bhv.rt <= proc_vars.rt_bounds(1));
+rt_high_ix  = find(bhv.rt >= proc_vars.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
 
 % Exclude bad trials
@@ -125,7 +139,7 @@ end
 %% Generate Figures
 if gen_figs 
     % Plot EOG-ICA Correlations
-    figure('Visible',fig_vis); hold on;
+    figure('Visible',0); hold on;
     scatter(avg_eog_ic_corr(1,:),avg_eog_ic_corr(2,:));
     scatter(avg_eog_ic_corr(1,heog_ics),avg_eog_ic_corr(2,heog_ics),'filled','r');
     scatter(avg_eog_ic_corr(1,veog_ics),avg_eog_ic_corr(2,veog_ics),'filled','r');
@@ -156,16 +170,13 @@ if gen_figs
     
     % Plot IC single trial stacks + ERPs
     fn_plot_ERP_stack(SBJ, proc_id, 'ERPstack_full_evnts', ica, 'off', 1);
-    
-    % Plot IC in ft_databrowser
-    if fig_vis
-        cfg = [];
-        cfg.layout   = 'biosemi64.lay';
-        cfg.channel  = 'all';
-        cfg.viewmode = 'component';
-        ft_databrowser(cfg, ica);
-    end
+end    
+% Plot IC in ft_databrowser
+if fig_vis
+        load([root_dir 'PRJ_Error_eeg/scripts/utils/cfg_plot_eeg.mat']);
+        ft_databrowser_allowoverlap(cfg, ica);
 end
+
 
 %% Save Data
 clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' proc_id '.mat'];

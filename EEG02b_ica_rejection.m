@@ -1,6 +1,6 @@
 function EEG02b_ica_rejection(SBJ,proc_id, dorejectvisual)
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -43,35 +43,28 @@ clean_trials = ft_channelrepair(cfg, clean_trials);
 if dorejectvisual
     cfg = [];
     cfg.method = 'summary';  % 'summary' for trials+channels; 'channel' for individual trials
-    clean_trials = ft_rejectvisual(cfg, clean_trials);
+    clean_sum = ft_rejectvisual(cfg, clean_trials);
     cfg = [];
     cfg.derivative = 'yes';
     clean_deriv = ft_preprocessing(cfg, clean_trials);
     cfg = [];
     cfg.method = 'summary';
     clean_summ_deriv = ft_rejectvisual(cfg, clean_deriv);
+    cfg_plot.viewmode = 'vertical';
+    cfg_plot.ylim = [-15 15];
+    ft_databrowser_allowoverlap(cfg_plot, clean_trials);
     % Report channels and trials identified above in SBJ_vars, then re-run
+    % these aren't saved to clean trials because that will mess up the
+    % indices for the data rejection
 else
-    cfgs = [];
-    cfgs.trials = setdiff([1:numel(clean_trials.trial)], SBJ_vars.trial_reject_ix);
-    clean_trials = ft_selectdata(cfgs, clean_trials);
-end
-
-%% FINAL CHECK
-% Load cfg with plotting parameters
-load([root_dir 'PRJ_Error_eeg/scripts/utils/cfg_plot_eeg.mat']);cfg_plot = [];
-cfg_plot.viewmode = 'vertical';
-ft_databrowser(cfg_plot, clean_trials);
-
-for f_ix = 1:numel(bhv_fields);
-     bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix) = [];
+    fprintf("\nGo run EEG02c please!\n");
 end
 
 %% Save outputs
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat'];
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02b_' proc_id '.mat'];
 save(clean_data_fname, '-v7.3', 'clean_trials');
 
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat'];
-save(clean_bhv_fname, '-v7.3', 'bhv');
+clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02b_' proc_id '_clean.mat'];
+save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
 end
