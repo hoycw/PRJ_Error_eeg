@@ -71,9 +71,9 @@ trials = ft_redefinetrial_allowoverlap(cfg_trl,data);
 eog_trials = ft_redefinetrial_allowoverlap(cfg_trl,eog);
 
 % Check that behavioral and EEG event triggers line up
-if (numel(bhv.trl_n))~=numel(event_onsets_trials)
+if (numel(bhv.trl_n))~=numel(event_onsets)
     error(['Mismatch in behavioral and neural trial counts: ' num2str((numel(bhv.trl_n)))...
-        ' behavioral; ' num2str(numel(event_onsets_trials)) ' neural']);
+        ' behavioral; ' num2str(numel(event_onsets)) ' neural']);
 end
 %% Exclude bad_trials
 % Find trials that overlap with bad_epochs from raw visual inspection
