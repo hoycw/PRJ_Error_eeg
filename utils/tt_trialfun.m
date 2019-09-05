@@ -32,7 +32,7 @@ for i=1:length(event)
       begsample     = event(i).sample*resamp_factor + round(cfg.trialdef.prestim*srate);
       endsample     = event(i).sample*resamp_factor + round(cfg.trialdef.poststim*srate)-1;
       offset        = cfg.trialdef.prestim*srate;  
-      trigger       = event(i).value; % remember the trigger (=condition) for each trial
+      trigger       = event(i).value; % remember the trigger (=event type S/F) for each trial
       trl(end+1, :) = [round([begsample endsample offset])  trigger]; 
     end
   end

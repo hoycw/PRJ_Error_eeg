@@ -1,4 +1,4 @@
-function EEG02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, ignore_trials)
+function EEG02a_artifact_rejection_oddball(SBJ, proc_id, tt_proc_id, gen_figs, fig_vis, ignore_trials)
 % This function generates figures for both the ERP stacks and the ICA Plots
 %SBJ = 'EEG#'
 %Proc_id = 'egg_full_ft'
@@ -24,36 +24,36 @@ eval(proc_vars_cmd);
 
 %% Load data
 % Load EEG
-data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
+data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' tt_proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
 [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
-bhv_fields = fieldnames(bhv) %will be removed in future matlab release
 
 [bhv_oddball] = fn_load_behav_csv_oddball([SBJ_vars.dirs.events SBJ '_behav_oddball.csv'], []);
-bhv_fields_oddball = fieldnames(bhv_oddball) %will be removed in future matlab release
+%!!! Sheila: remove this behavioral concat, which we shouldn't need anymore
 bhv = concat_behav(bhv, bhv_oddball); %should concatenate the structures
 
 %This stores teh number of trials for the task for later use
 bhv.numtrials = numel(bhv.trl_n) - numel(bhv_oddball.trl_n);
 bhv.numtrials_odd = numel(bhv_oddball.trl_n);
+
 %% Cut into trials
 % Need to recut trials on updated data with the nans
-for b_ix = 1: numel(SBJ_vars.block_name);
+for b_ix = 1: numel(SBJ_vars.block_name)
     cfg = [];
     cfg.dataset             = SBJ_vars.dirs.raw_filename{b_ix};
     cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
     cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
     cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
     cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
-    cfg.trialfun            = 'tt_trialfun_oddball';
+    cfg.trialfun            = 'oddball_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc_vars.resample_freq;
     cfg_trl_unconcat{b_ix} = ft_definetrial(cfg);
 end
-if numel(SBJ_vars.block_name)>1;
-    for b_ix = 2: numel(SBJ_vars.block_name);
+if numel(SBJ_vars.block_name)>1
+    for b_ix = 2: numel(SBJ_vars.block_name)
        cfg_trl_unconcat{b_ix}.trl(:,1) = cfg_trl_unconcat{b_ix}.trl(:,1)+SBJ_vars.endsample{b_ix-1}/proc_vars.origsample_freq*proc_vars.resample_freq;
        cfg_trl_unconcat{b_ix}.trl(:,2) = cfg_trl_unconcat{b_ix}.trl(:,2)+SBJ_vars.endsample{b_ix-1}/proc_vars.origsample_freq*proc_vars.resample_freq;
        cfg_trl_unconcat{1}.trl = vertcat(cfg_trl_unconcat{b_ix-1}.trl, cfg_trl_unconcat{b_ix}.trl);

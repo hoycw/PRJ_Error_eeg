@@ -30,11 +30,10 @@ load(data_fname);
 % Load Behavior
 [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
 %before EP06 this needs to be function fn_load_behav_csv_old (the format of the csv folders changed slightly)
-bhv_fields = fieldnames(bhv) %will be removed in future matlab release
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
-for b_ix = 1: numel(SBJ_vars.block_name);
+for b_ix = 1:numel(SBJ_vars.block_name)
     cfg = [];
     cfg.dataset             = SBJ_vars.dirs.raw_filename{b_ix};
     cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
@@ -44,33 +43,32 @@ for b_ix = 1: numel(SBJ_vars.block_name);
     cfg.trialfun            = 'tt_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc_vars.resample_freq;
-    cfg_trl_unconcat{b_ix} = ft_definetrial(cfg);
+    cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
 end
-if numel(SBJ_vars.block_name)>1;
-    for b_ix = 2: numel(SBJ_vars.block_name);
+if numel(SBJ_vars.block_name)>1
+    for b_ix = 2:numel(SBJ_vars.block_name)
        cfg_trl_unconcat{b_ix}.trl(:,1) = cfg_trl_unconcat{b_ix}.trl(:,1)+SBJ_vars.endsample{b_ix-1}/proc_vars.origsample_freq*proc_vars.resample_freq;
        cfg_trl_unconcat{b_ix}.trl(:,2) = cfg_trl_unconcat{b_ix}.trl(:,2)+SBJ_vars.endsample{b_ix-1}/proc_vars.origsample_freq*proc_vars.resample_freq;
        cfg_trl_unconcat{1}.trl = vertcat(cfg_trl_unconcat{b_ix-1}.trl, cfg_trl_unconcat{b_ix}.trl);
-       cfg_trl = cfg_trl_unconcat{1};
     end
-else
-    cfg_trl = cfg_trl_unconcat{1};
 end
+cfg_trl = cfg_trl_unconcat{1};
 % If the recording was started part way through, toss events not recorded
-    if any(cfg_trl.trl(:,1)<1)
-        cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
-    end
+if any(cfg_trl.trl(:,1)<1)
+    cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
+end
 event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
 
 % Cut the data into trials
-trials = ft_redefinetrial_allowoverlap(cfg_trl,data);
-eog_trials = ft_redefinetrial_allowoverlap(cfg_trl,eog);
+trials = ft_redefinetrial(cfg_trl,data);
+eog_trials = ft_redefinetrial(cfg_trl,eog);
 
 % Check that behavioral and EEG event triggers line up
 if (numel(bhv.trl_n))~=numel(event_onsets)
     error(['Mismatch in behavioral and neural trial counts: ' num2str((numel(bhv.trl_n)))...
         ' behavioral; ' num2str(numel(event_onsets)) ' neural']);
 end
+
 %% Exclude bad_trials
 % Find trials that overlap with bad_epochs from raw visual inspection
 %load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
@@ -171,7 +169,7 @@ end
 % Plot IC in ft_databrowser
 if fig_vis
         cfg = [];
-        cfg.viewmode = 'component'
+        cfg.viewmode = 'component';
         cfg.channel = 'all';
         cfg.layout   = 'biosemi64.lay';
         ft_databrowser_allowoverlap(cfg, ica);

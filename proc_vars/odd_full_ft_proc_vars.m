@@ -1,24 +1,17 @@
-%% Pipeline Processing Variables: "eeg_full_ft" for EEG analysis
+%% Pipeline Processing Variables: "odd_full_ft" for EEG analysis
 % Trial Cut Parameteres
-proc_vars.event_type    = 'S';          % 'S'/'F': lock trial to stim/feedback
-proc_vars.trial_lim_s   = [-0.2 2.8];    % data segments (in seconds) to grab around events
-if strcmp(proc_vars.event_type,'S')
-    proc_vars.event_code = 1;
-elseif strcmp(proc_vars.event_type,'F')
-    proc_vars.event_code = 2;
-else
-    error(['Unknown event_type: ' proc_vars.event_type]);
-end
+proc_vars.event_type    = 'S';           % 'S': lock trial to stimulus onset
+proc_vars.trial_lim_s   = [-0.2 1.7];    % data segments (in seconds) to grab around events
+proc_vars.event_code    = [1 2 3];       % ['std' 'tar' 'odd'] (as noted in the logs)
 
 % Behavioral Processing
-proc_vars.rt_bounds = [0.6 1.4];          % bounds on a reasonable RT to be detected with KLA algorithm
+% proc_vars.rt_bounds = [0.6 1.4];          % bounds on a reasonable RT to be detected with KLA algorithm
 % Varaince-Based Trial Rejection Parameters
 proc_vars.var_std_warn_thresh = 3;
 
 % Data Preprocessing
 proc_vars.plot_psd      = '1by1';         % type of plot for channel PSDs
 proc_vars.resample_yn   = 'yes';
-proc_vars.origsample_freq = 1024;
 proc_vars.resample_freq = 250;
 proc_vars.demean_yn     = 'yes';
 proc_vars.reref_yn      = 'yes';

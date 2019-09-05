@@ -74,7 +74,7 @@ if view_previous
     end
 end
 
-browsed_raw = ft_databrowser_allowoverlap(cfg_plot, raw);
+browsed_raw = ft_databrowser(cfg_plot, raw);
 bad_epochs  = browsed_raw.artfctdef.visual.artifact;
 % Prevent ft_databrowser tiny epoch bugs
 bad_epochs(diff(bad_epochs,1,2)<10,:) = [];
