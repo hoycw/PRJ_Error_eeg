@@ -90,8 +90,8 @@ end
 % Identify training and bad behavioral trials
 training_ix = find(bhv.blk==-1);
 index = numel(bhv.trl_n) - bhv.numtrials;
-rt_low_ix   = find(bhv.rt(index+1:end) <= proc_vars.rt_bounds(1));
-rt_high_ix  = find(bhv.rt >= proc_vars.rt_bounds(2));
+% rt_low_ix   = find(bhv.rt(index+1:end) <= proc_vars.rt_bounds(1));
+% rt_high_ix  = find(bhv.rt >= proc_vars.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
 bhv.numtrials = bhv.numtrials - numel(find(exclude_trials>bhv.numtrials_odd));
 bhv.numtrials_odd = bhv.numtrials_odd - numel(find(exclude_trials<=bhv.numtrials_odd));

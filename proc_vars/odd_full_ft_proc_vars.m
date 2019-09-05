@@ -5,7 +5,7 @@ proc_vars.trial_lim_s   = [-0.2 1.7];    % data segments (in seconds) to grab ar
 proc_vars.event_code    = [1 2 3];       % ['std' 'tar' 'odd'] (as noted in the logs)
 
 % Behavioral Processing
-% proc_vars.rt_bounds = [0.6 1.4];          % bounds on a reasonable RT to be detected with KLA algorithm
+% proc_vars.rt_bounds = [0.15 1.7];          % bounds on a reasonable RT to be detected with KLA algorithm
 % Varaince-Based Trial Rejection Parameters
 proc_vars.var_std_warn_thresh = 3;
 
