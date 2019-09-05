@@ -27,24 +27,24 @@ fprintf('\tReading behavioral csv file: %s\n',csv_fname);
 bhv_file = fopen(csv_fname);
 
 % Read field names
-py_fields  = {'Total_Trial', 'Block', 'Condition', 'Hit', 'RT', 'Timestamp',...
-              'Tolerance', 'Trial', 'Score', 'ITI', 'ITI type'};
-new_fields = {'trl_n','blk','cond','hit','rt','time',...
-              'tol','blk_trl_n','score','ITI','ITI_type'};
+py_fields  = {'Total_Trial', 'Block', 'Trial', 'Condition', 'Hit', 'RT',  'Tolerance', 'Timestamp',...
+              'Score', 'ITI', 'ITI type'};
+new_fields = {'trl_n','blk','blk_trl_n', 'cond','hit','rt','tol', 'time',...
+              'score','ITI','ITI_type'};
 bhv_fields = textscan(bhv_file, '%s %s %s %s %s %s %s %s %s %s %s', 1, 'Delimiter', ',');
 % Check that loaded fields match expected py_fields
 if numel(py_fields)~=numel(bhv_fields)
     error('Mismatched fields in behav csv than expected!');
 end
 for f = 1:numel(py_fields)
-    if ~strcmp(py_fields{f},bhv_fields{f})
-        error(['Mismatched field in behav csv and expected: ' py_fields{f} ' vs. ' bhv_fields{f}]);
+   if ~strcmp(py_fields{f},bhv_fields{f})
+      error(['Mismatched field in behav csv and expected: ' py_fields{f} ' vs. ' bhv_fields{f}]);
     end
 end
 
 % Read data
 %   orig version: formatspec = '%d%d%s%d%f%f%f%d%d%f%s';
-bhv_data = textscan(bhv_file,'%d %d %s %d %f %f %f %d %d %f %f',...
+bhv_data = textscan(bhv_file,'%d %d %d %s %d %f %f %f %d %f %f',...
                 'Delimiter',',','HeaderLines',1);
 fclose(bhv_file);
 

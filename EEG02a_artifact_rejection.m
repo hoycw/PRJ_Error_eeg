@@ -1,4 +1,4 @@
-function EEG02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis)
+function EEG02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, ignore_trials)
 % This function generates figures for both the ERP stacks and the ICA Plots
 %SBJ = 'EEG#'
 %Proc_id = 'egg_full_ft'
@@ -28,14 +28,10 @@ data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
-[bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], []);
+[bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
+%before EP06 this needs to be function fn_load_behav_csv_old (the format of the csv folders changed slightly)
 bhv_fields = fieldnames(bhv) %will be removed in future matlab release
 
-[bhv_oddball] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav_odball.csv'], []);
-bhv_fields_oddball = fieldnames(bhv_oddball) %will be removed in future matlab release
-bhv = [bhv, bhv_oddball]; %should concatenate the structures
-%This stores teh number of trials for the task for later use
-bhv.numtrials = numel(bhv.trl_n) - numel(bhv_fields_oddball.trl_n);
 %% Cut into trials
 % Need to recut trials on updated data with the nans
 for b_ix = 1: numel(SBJ_vars.block_name);
@@ -92,11 +88,12 @@ rt_high_ix  = find(bhv.rt >= proc_vars.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
 
 % Exclude bad trials
-cfgs = [];
+cfgs = [];  
 cfgs.trials = setdiff([1:numel(trials.trial)], exclude_trials');
 trials = ft_selectdata(cfgs, trials);
 eog_trials = ft_selectdata(cfgs, eog_trials);
 
+bhv_fields = fieldnames(bhv);
 for f_ix = 1:numel(bhv_fields)
     bhv.(bhv_fields{f_ix})(exclude_trials) = [];
 end
@@ -139,7 +136,7 @@ end
 %% Generate Figures
 if gen_figs 
     % Plot EOG-ICA Correlations
-    figure('Visible',0); hold on;
+    figure('Visible',1); hold on;
     scatter(avg_eog_ic_corr(1,:),avg_eog_ic_corr(2,:));
     scatter(avg_eog_ic_corr(1,heog_ics),avg_eog_ic_corr(2,heog_ics),'filled','r');
     scatter(avg_eog_ic_corr(1,veog_ics),avg_eog_ic_corr(2,veog_ics),'filled','r');
@@ -173,7 +170,10 @@ if gen_figs
 end    
 % Plot IC in ft_databrowser
 if fig_vis
-        load([root_dir 'PRJ_Error_eeg/scripts/utils/cfg_plot_eeg.mat']);
+        cfg = [];
+        cfg.viewmode = 'component'
+        cfg.channel = 'all';
+        cfg.layout   = 'biosemi64.lay';
         ft_databrowser_allowoverlap(cfg, ica);
 end
 

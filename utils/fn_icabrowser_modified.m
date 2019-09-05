@@ -42,9 +42,10 @@ il = 0;
 logar = 1; % default logarithmic or linear scale for powspctrm
 
 % set path
-path = cfg.path;
-if ~exist(path, 'dir'),
-    mkdir path;
+cd(cfg.path)
+path = [cfg.path 'plot/'];
+if ~exist(path, 'dir')
+    mkdir plot;
 end
 prefix = cfg.prefix;
 
@@ -82,9 +83,9 @@ for x = 1: numel(comp.label)
     
     % keep manual screen position - better in dual monitor settings
     fig_name = [SBJ comp.label(il,1)];
-    fig_name = strcat(fig_name(1), fig_name(2), '_fig1');
+    fig_name = strcat(fig_name(1), fig_name(2), '_ICA_plots');
     fig_name = char(fig_name);
-    f = figure('units','normalized','outerposition', manpos, 'Name', fig_name, 'Visible', cfg.fig_vis);
+    f = figure('units','normalized','outerposition', manpos, 'Name', fig_name, 'Visible', 0);
     l = l + 1;
     
     
@@ -104,7 +105,7 @@ for x = 1: numel(comp.label)
     Fs = comp.fsample;
     N = floor(size(fft_data,2));
     xdft = fft(fft_data(i,:));
-    xdft = xdft(1:N/2+1);
+    xdft = xdft(1:floor(N/2)+1);
     psdx = (1/(Fs*N)).*abs(xdft).^2;
     psdx(2:end-1) = 2*psdx(2:end-1);
     
@@ -156,7 +157,7 @@ for x = 1: numel(comp.label)
             0.76 0.29 0.075 0.035; ...
             0.76 0.07 0.075 0.035];
     end
-    fig_path = [cfg.path fig_name '.png'];
+    fig_path = [path fig_name '.png'];
     saveas(f, fig_path);
 end
 end

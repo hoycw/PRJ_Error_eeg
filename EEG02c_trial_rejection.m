@@ -33,22 +33,12 @@ if visual
 end
 
 for f_ix = 1:numel(bhv_fields);
-     bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix) = [];
+    bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix) = [];
 end
-%Break the trials up
-cfg_oddball = [];
-trialsnum = numel(bhv.numtrials);
-totalnum = numel(bhv.trl_n);
-cfg_oddball.trials = [(trialsnum+1):totalnum];
-clean_oddball = ft_selectdata(cfg_oddball, trials);
-cfg_trials.trials = [1:trialsnum];
-clean_trials = ft_selectdata(cfg_trials, trials);
 
 %% Save outputs
 clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat'];
 save(clean_data_fname, '-v7.3', 'clean_trials');
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean_oddball_' proc_id '.mat'];
-save(clean_data_fname, '-v7.3', 'clean_oddball');
 
 clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat'];
 save(clean_bhv_fname, '-v7.3', 'bhv');

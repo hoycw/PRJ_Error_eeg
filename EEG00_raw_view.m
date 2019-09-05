@@ -8,11 +8,13 @@ function EEG00_raw_view(SBJ,view_previous, proc_id, block)
 
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist ('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip_private']);
 addpath(ft_dir);
 ft_defaults
 
@@ -72,7 +74,7 @@ if view_previous
     end
 end
 
-browsed_raw = ft_databrowser(cfg_plot, raw);
+browsed_raw = ft_databrowser_allowoverlap(cfg_plot, raw);
 bad_epochs  = browsed_raw.artfctdef.visual.artifact;
 % Prevent ft_databrowser tiny epoch bugs
 bad_epochs(diff(bad_epochs,1,2)<10,:) = [];

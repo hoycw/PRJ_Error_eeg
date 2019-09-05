@@ -6,7 +6,8 @@ function EEG01_preproc(SBJ, proc_id)
 
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist ('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -116,6 +117,12 @@ eog_v.trial{1}(1,:) = eog_v.trial{1}(1,:)-data.trial{1}(eog_v2_ix,:);
 cfg = [];
 eog = ft_appenddata(cfg,eog_h,eog_v);
 
+%% Downsample
+if strcmp(proc_vars.resample_yn,'yes')
+    cfg = [];
+    cfg.resamplefs = proc_vars.resample_freq;
+    eog = ft_resampledata(cfg, eog);
+end
 % Remove unipolar EOG
 warning('WARNING!!! Assuming Fp2 is the second vertical EOG!');
 eog_v_low_ix = ~strcmp(SBJ_vars.ch_lab.eog_v,'Fp2');    % only toss the lower one
@@ -158,7 +165,7 @@ if ~isempty(bad_epochs)
     cfg = [];
     cfg.artfctdef.visual.artifact = bad_epochs;
     cfg.artfctdef.reject          = 'nan';
-    data = ft_rejectartifact(cfg, data);
+    data = ft_rejectartifact_allowoverlap(cfg, data);
 end
 if strcmp(proc_vars.ICA_hp_yn,'yes')
     cfg = [];
