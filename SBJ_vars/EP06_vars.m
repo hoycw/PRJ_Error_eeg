@@ -1,6 +1,6 @@
 %% EEG Pilot 06 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -21,6 +21,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -47,18 +48,22 @@ SBJ_vars.ch_lab.replace = {{'F6', 'EXG6'},{'P8','EXG7'},{'P2','EXG8'}}; % {{'fin
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
+SBJ_vars.ch_lab.null = {};
 SBJ_vars.ch_lab.bad     = {...
     'Iz','Oz','PO8','POz','PO3','O2',... % noisy channels
-    'T8','F6','AF3','TP7','PO7','O1'... % noisy channels
-    };
+    'AF3','PO7','O1', ... % noisy channels
+    'T7', 'P9', 'FT7'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [...
     %142, 228, 375, 376, 387, 398, 402, 409,...
     %410, 420, 441, 462, 463, 479, 490, 497,...
     %513, 533, 543, 548, 552:554, 570, 580];
-SBJ_vars.trial_reject_ix = [141, 227, 374, 375, 386, 397, 401, 408, 409, 419, 440, 461, 462, 478, 489, 496, 512, 532, 542, 547, 551, 552, 553, 569, 579];
-%--------------------------------------
+SBJ_vars.trial_reject_ix = [1, 2, 26, 27, 67, 258, 462, 463, 513, 136, 273, 604, 620, 620];
+SBJ_vars.ica_reject = [1, 2, 3, 4, 5, 7, 8, 11, 12, 13, 14, 15, 16, 18, 19, 28, 34, 35, 36, 37, 39, 43, 45, 46, 47, 49, 50, 51, 52, 53];
+% 43 may be 60 Hz line noise???
+%very unsure about getting rid of 48
+    %--------------------------------------
 % Noise Notes
 %--------------------------------------
 % recording info sheet notes:

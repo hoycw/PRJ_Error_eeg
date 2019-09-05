@@ -1,6 +1,6 @@
 %% EEG Pilot 10 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -21,6 +21,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -44,16 +45,16 @@ SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
-SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
+SBJ_vars.ch_lab.replace = {{'POz', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'PO4', 'Pz','FC5','Oz', 'O2', 'T7', 'O1', 'P9', 'C5', 'Iz', 'POz', 'FC6'};
+SBJ_vars.ch_lab.bad     = {'Pz', 'POz', 'Oz'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 %SBJ_vars.trial_reject_ix = [85, 102:104, 120:129, 169, 192, 208, 209, 256, 266, 275, 303, 312, 345, 387, 406, 434, 455, 447, 531];
 %SBJ_vars.trial_reject_n = [162, 189, 260, 266, 269, 289, 321, 334, 341, 542, 634, 84, 101, 102, 103, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 168, 191, 207, 208, 255, 265, 274, 302, 311, 344, 386, 405, 433, 454, 446, 530]
-SBJ_vars.trial_reject_ix = [106 424 586 587];
-SBJ_vars.ica_reject = [1 5 10 11 12 13 14 15 17 19 20 22 30 36 38 32 40 41 46 43 47 50 54 56];
+SBJ_vars.trial_reject_ix = [7 8 10 110 139 142 155 156 406 471 41 120 170 259 408 619];
+SBJ_vars.ica_reject = [1 5 11 12 13 14 15 16 17 18 19 20 22 25 27 28 35 38 41 42 45 47 49 52 54 55 56 61];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------

@@ -1,6 +1,6 @@
 %% EEG Pilot 11 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -21,6 +21,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -48,8 +49,9 @@ SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.null = {'EXG6', 'EXG7', 'EXG8'};
-SBJ_vars.ch_lab.bad     = {'P4', 'PO8', 'O2','FT7', 'T7', 'C6', 'C2'};
-SBJ_vars.ica_reject     = [2, 4, 7, 8, 11, 16, 18, 20, 21, 22, 23, 24, 25, 28, 30, 33, 42, 45, 47, 50, 54, 55, 57, 58, 59];
+SBJ_vars.ch_lab.bad     = {'Iz', 'C2'};
+SBJ_vars.ica_reject     = [1, 4, 5, 7, 9, 12, 14, 15, 17, 18, 31, 33, 34, 35, 37, 40, 46, 47, 51, 54, 58, 59, 61];
+SBJ_vars.trial_reject   = [131 187 372 392 393 452 453];
 %f7, fc5SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [192, 265, 288, 312, 346, 356, 362:366, 377, 436, 447, 487, 589];

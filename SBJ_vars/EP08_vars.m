@@ -1,6 +1,6 @@
 %% EEG Pilot 08 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -21,6 +21,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -47,11 +48,11 @@ SBJ_vars.ch_lab.replace = {{'O2', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'T8', 'FT8', 'PO4', 'C6', 'PO8', 'F8', 'F6', 'AF8', 'O2', 'P2','Iz','Pz'};
+SBJ_vars.ch_lab.bad     = {'T8', 'FT8'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
-SBJ_vars.trial_reject_ix = [504 556 492 406];
-SBJ_vars.ica_reject = [1 8 9 13 15 17 20 22 23 26 27 30 36 43 40 44 47 50 55];
+SBJ_vars.trial_reject_ix = [39 109 171 339 353 427 501 526 465 558 573]; % NOTE: trial_reject_ix looks at the values in clean values in eeg02a and takes those indices (not the ones from the original) before the training etc.
+SBJ_vars.ica_reject = [1 5 9 12 17 18 19 23 26 28 29 30 32 34 36 37 40 42 47 50 51 52 55 56 58 59 60 61];
 %SBJ_vars.trial_reject_ix = [88, 94, 103, 154, 157, 217, 327, 343, 370, 406, 417, 440, 490, 499, 511, 545];
 %SBJ_vars.trial_reject_n = [87, 93, 102, 153, 156, 216, 326, 342, 369, 405, 416, 439, 489, 510, 544];
 %--------------------------------------

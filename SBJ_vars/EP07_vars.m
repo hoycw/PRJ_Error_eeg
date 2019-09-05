@@ -1,6 +1,7 @@
 %% EEG Pilot 07 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist ('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -21,7 +22,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
-SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/ERP_stacks/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -50,13 +51,14 @@ SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
- 'AF8', 'Iz', 'T7', 'T8', 'FT8'
+ 'AF8', 'Iz', 'T7', 'F8'
     };
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_ix = [18, 161, 189, 220, 240, 243, 248, 332, 342, 350, 409, 425, 435, 439, 484, 486, 500, 507, 508, 529, 558];
-SBJ_vars.ica_reject = [1, 2, 3, 4, 6, 7, 9, 10, 12, 13, 18, 19, 20, 26, 45, 59, 52, 59];
+SBJ_vars.trial_reject_ix = [67, 17, 254, 499, 456, 486, 548, 599, 577, 418, 457, 536, 510, 609, 253, 254, 288, 296, 333, 110];
+SBJ_vars.ica_reject = [1, 2, 3, 4, 5, 9, 10, 11, 12, 13, 15, 19, 22, 26, 29, 31, 35, 38, 39, 44, 53, 60, 61];
+%very unsure about component 5 and also unsure about component 12 -- component 5 seems to take care of a fair amount of noise but also has a time correlated response after feedback is received
 %--------------------------------------
 % Noise Notes
 %--------------------------------------

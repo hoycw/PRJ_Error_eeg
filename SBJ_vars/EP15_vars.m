@@ -1,6 +1,6 @@
-%% EEG Pilot 07 Processing Variables
+%% EEG Pilot 09 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
-elseif exist('/Users/SCS22/','dir'); root_dir='/Users/SCS22/Desktop/Knight_Lab/';ft_dir='/Users/SCS22/Documents/MATLAB/fieldtrip/';
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -10,9 +10,9 @@ ft_defaults
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = 'EP07';
-SBJ_vars.raw_file = {'pilot07.bdf'};
-SBJ_vars.bhv_file = 'pilot07_response_log_20180426140027.txt';
+SBJ_vars.SBJ = 'EP15';
+SBJ_vars.raw_file = {'Pilot15.bdf'};
+SBJ_vars.bhv_file = 'Pilot15_response_log_20190429183425.txt';
 SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
@@ -21,6 +21,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -43,18 +44,17 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
-SBJ_vars.ch_lab.null = {'EXG6', 'EXG7', 'EXG8'
-SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
+SBJ_vars.ch_lab.replace = {{'F1', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {...
- 'AF8', 'Iz', 'T7', 'T8', 'FT8'
-    };
+SBJ_vars.ch_lab.bad     = {'T7', 'PO4'};
+SBJ_vars.ch_lab.null    = {'EXG7', 'EXG8'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
+SBJ_vars.endsample = {}
+SBJ_vars.trial_reject_ix = [95 117 156 169 181 180 204 229 124 152 296 394 333 484];
+SBJ_vars.ica_reject = [3 9 10 12 15 18 19 21 22 26 27 30 33 36 42 44 52 53 60];
 
-%SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_ix = [18, 161, 189, 220, 240, 243, 248, 332, 342, 350, 409, 425, 435, 439, 484, 486, 500, 507, 508, 529, 558];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------

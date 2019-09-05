@@ -1,4 +1,4 @@
-%% EEG Pilot 09 Processing Variables
+%% EEG Pilot 08 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -10,19 +10,18 @@ ft_defaults
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = 'EP09';
-SBJ_vars.raw_file = {'pilot09-2.bdf'};
-SBJ_vars.bhv_file = 'pilot09_response_log_20180426140027.txt';
-SBJ_vars.block_name = {'r1'};
-%NOTE: I ended up ignoring the whole first set because in my notes it says
-%that the participent was misunderstanding the task for all of block 1 and
-%hte battery cut out at the beginning of block 2.
+SBJ_vars.SBJ = 'EP04';
+SBJ_vars.raw_file = {'Pilot04.bdf'};
+SBJ_vars.bhv_file = 'Pilot4_response_log_20180322141434.txt';
+SBJ_vars.block_name = {''};
+
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
 SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -45,17 +44,17 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
-SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
+SBJ_vars.ch_lab.replace = {{'Fz', 'EXG6'}, {'AFz', 'EXG7'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'P2', 'P9', 'P1'};
-SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
+SBJ_vars.ch_lab.bad     = {};
+SBJ_vars.ch_lab.null    = {'EXG8'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
-SBJ_vars.endsample = {913408,1922048};
-SBJ_vars.trial_reject_ix = [27, 52, 61, 62, 69, 98, 128, 180, 210, 222, 230, 234, 254, 271, 272, 279, 311, 325, 326, 337, 339, 377, 379, 392, 393, 405, 440, 455, 457, 463, 508, 519, 521, 527, 528]
-SBJ_vars.ica_reject = [1 2 6 8 9 17 15 16 17 12 21 25 36 30 37 39 44 43 59 51 53 47 48 58 60]
-
+SBJ_vars.trial_reject_ix = [39 109 171 339 353 427 501 526 465 558 573]; % NOTE: trial_reject_ix looks at the values in clean values in eeg02a and takes those indices (not the ones from the original) before the training etc.
+SBJ_vars.ica_reject = [1 5 9 12 17 18 19 23 26 28 29 30 32 34 36 37 40 42 47 50 51 52 55 56 58 59 60 61];
+%SBJ_vars.trial_reject_ix = [88, 94, 103, 154, 157, 217, 327, 343, 370, 406, 417, 440, 490, 499, 511, 545];
+%SBJ_vars.trial_reject_n = [87, 93, 102, 153, 156, 216, 326, 342, 369, 405, 416, 439, 489, 510, 544];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------
@@ -66,11 +65,13 @@ SBJ_vars.ica_reject = [1 2 6 8 9 17 15 16 17 12 21 25 36 30 37 39 44 43 59 51 53
     %'F1' - strange flat PSD
     %'F6','P2','P8' empty
 % Raw View notes:
-    % POz has big ripples, PO3 at times too
-    % TP8 also has big fluctuations
+    % FT8 spiking, toss it
+    % T8 messy, f8 and f6 messy, af8 messy
     % PO8 has big noise at times
-    % O2 breaks loose at some point
-    % AF3 becomes very onisy at some point
+    % FT8 loose at 170- 200 seconds, will get rid of anyways
+    % P2 gets weird at 230s
+    %IZ gets messy 970
+    %02 1680-1700
 % databrowser post-IC rejection:
     % channels: Iz, Oz, PO8, PO3, T8 (trial 31), POz (esp. t 151), 216 starts O2 loose, F6 (t 351), AF3 (t 413), F4(t 417), TP7 (t 436)
     % trials: 142 (EOG missed?), 228, 375, 376, 387, 398 (P5), 402, 409, 410, 420, 441, 462, 463, 479, 490, 497, 513, 533, 543, 548, 552:554, 559?, 570, 576?, 580
