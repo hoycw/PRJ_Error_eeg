@@ -23,8 +23,8 @@ SBJ = sys.argv[1]#raw_input('Enter SBJ ID to process:')#'IR63'
 
 
 # In[3]:
-
 prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+#prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.png'
 data_dir = prj_dir+'data/'
@@ -42,21 +42,21 @@ with open(prdm_fname, 'rb') as f:
 
 # In[5]:
 
-# print 'paradigm: ', prdm['prdm_name'], ' v', prdm['prdm_version']
+# print ('paradigm: ', prdm['prdm_name'], ' v', prdm['prdm_version'])
 # print
-# print 'interval: ', prdm['target'], 's'
-# print 'feedback_delay: ', prdm['fb_delay'], 's'
-# print 'feedback duration: ', prdm['fb'], 's'
-# print 'total trial length: ', prdm['trl_len'], 's'
+# print ('interval: ', prdm['target'], 's')
+# print ('feedback_delay: ', prdm['fb_delay'], 's')
+# print ('feedback duration: ', prdm['fb'], 's')
+# print ('total trial length: ', prdm['trl_len'], 's')
 # print
-# print 'n_blocks: ', prdm['n_blocks']
-# print 'n_trials/block: ', prdm['n_trials']
-# print 'n_full_vis_examples: ', prdm['n_examples']
-# print 'n_training/condition: ', prdm['n_training']
+# print ('n_blocks: ', prdm['n_blocks'])
+# print ('n_trials/block: ', prdm['n_trials'])
+# print ('n_full_vis_examples: ', prdm['n_examples'])
+# print ('n_training/condition: ', prdm['n_training'])
 # print
 # # ITI_bounds = [np.mean(a,b) for a, b in zip(ITIs[:-1],ITIs[1:])]
-# print 'ITIs:',prdm['ITIs']#, ITI_bounds
-# print 'tolerance_lim:', prdm['tol_lim']
+# print ('ITIs:',prdm['ITIs']#, ITI_bounds)
+# print ('tolerance_lim:', prdm['tol_lim'])
 
 
 # ### Load Log Info
@@ -171,7 +171,7 @@ plt.close()
 data_all = data
 # Exclude: Training/Examples, non-responses, first trial of each block
 if data[data['RT']<0].shape[0]>0:
-    print 'WARNING: '+str(data[data['RT']<0].shape[0])+' trials with no response!'
+    print ('WARNING: '+str(data[data['RT']<0].shape[0])+' trials with no response!')
 data = data[(data['Block']!=-1) & (data['RT']>0) & (data['ITI']>0)]
 
 
@@ -216,7 +216,9 @@ elif len(prdm['ITIs'])==3:
                                data.loc[data['ITI type']==itis[1],('RT')].values,
                                data.loc[data['ITI type']==itis[2],('RT')].values)
 else:
-    print 'WARNING: some weird paradigm version without 3 or 4 ITIs!'
+    f,iti_p = scipy.stats.f_oneway(data.loc[data['ITI type']==itis[0],('RT')].values,
+                               data.loc[data['ITI type']==itis[1],('RT')].values)
+                        
 # print f, p
 
 

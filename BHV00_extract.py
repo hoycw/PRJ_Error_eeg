@@ -6,7 +6,7 @@
 
 # In[1]:
 
-#get_ipython().magic(u'matplotlib inline')
+#get_python().magic(u'matplotlib inline')
 import sys 
 import os
 import numpy as np
@@ -23,8 +23,8 @@ SBJ = sys.argv[1]#raw_input('Enter SBJ ID to process:')#'IR63'
 
 
 # In[103]:
-
 prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+#prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.png'
 data_dir = prj_dir+'data/'
@@ -35,13 +35,31 @@ sbj_dir  = data_dir+SBJ+'/'
 logs = {
         'EP02': 'EEG_pilot2_response_log_20170425110628.txt',
         'EP04': 'Pilot4_response_log_20180322141434.txt',
+        'EP05': 'TT_Cyclone_pilot05_response_log_20180426115107.txt',
         'EP06': 'TT_Cyclone_pilot06_response_log_20180426140027.txt',
         'EP07': 'Pilot07_response_log_20181031155619.txt',
         'EP08': 'Pilot08_response_log_20181101084314.txt',
         'EP09': 'Pilot09_response_log_20181127081927.txt',
         'EP10': 'Pilot10_response_log_20181127141339.txt',
-        'EP11': 'Pilot11_2_response_log_20181128144407_rm1st3trl.txt'
-        }
+        'EP11': 'Pilot11_2_response_log_20181128144407_rm1st3trl.txt',
+        'EP14': 'Pilot14_response_log_20190425165756.txt',
+	'EP15': 'Pilot15_response_log_20190429183425.txt',
+	'EP16': 'Pilot16_response_log_20190430172240.txt',
+	'EP17': 'Pilot17_response_log_20190502172924.txt',
+	'EP18': 'Pilot18_response_log_20190507110645.txt',
+	'EP19': 'Pilot19again_response_log_20190701180728.txt',
+        'EEG01': 'eeg01_response_log_20190712151410.txt',
+        'EEG02': 'eeg02_response_log_20190715153326.txt',
+        'EEG03': 'EEG03_response_log_20190722152821.txt',
+        'EEG04': 'eeg04TT_response_log_20190723111922.txt',
+        'EEG05': 'eeg05_response_log_20190724153120.txt',
+        'EEG06': 'eeg06_response_log_20190730111030.txt',
+        'EEG07': 'eeg07startover_response_log_20190802155314.txt',
+        'EEG08': 'eeg08_response_log_20190809152412.txt',
+        'EEG09': 'eeg09_response_log_20190812175722.txt',
+        'EEG10': 'eeg10_response_log_20190815161826.txt',
+        'EEG11': 'eeg11_response_log_20190816133923.txt'
+}
 #         'EP05': '.txt',# both log files are empty!
 # logs = {'Rana_1.6': 'Rana2_response_log_20170321103129_DATA.txt',
 #         'Adi_1.7': 'adi_response_log_20170321153641.txt',
@@ -163,21 +181,21 @@ io.savemat(prdm_fname,prdm)
 
 # In[107]:
 
-print 'paradigm: ', prdm['prdm_name'], ' v', prdm['prdm_version']
+print ('paradigm: ', prdm['prdm_name'], ' v', prdm['prdm_version'])
 print
-print 'interval: ', prdm['target'], 's'
-print 'feedback_delay: ', prdm['fb_delay'], 's'
-print 'feedback duration: ', prdm['fb'], 's'
-print 'total trial length: ', prdm['trl_len'], 's'
+print ('interval: ', prdm['target'], 's')
+print ('feedback_delay: ', prdm['fb_delay'], 's')
+print ('feedback duration: ', prdm['fb'], 's')
+print ('total trial length: ', prdm['trl_len'], 's')
 print
-print 'n_blocks: ', prdm['n_blocks']
-print 'n_trials/block: ', prdm['n_trials']
-print 'n_full_vis_examples: ', prdm['n_examples']
-print 'n_training/condition: ', prdm['n_training']
+print ('n_blocks: ', prdm['n_blocks'])
+print ('n_trials/block: ', prdm['n_trials'])
+print ('n_full_vis_examples: ', prdm['n_examples'])
+print ('n_training/condition: ', prdm['n_training'])
 print
 # ITI_bounds = [np.mean(a,b) for a, b in zip(ITIs[:-1],ITIs[1:])]
-print 'ITIs:',prdm['ITIs'], ITI_bounds
-print 'tolerance_lim:', prdm['tol_lim']
+print ('ITIs:',prdm['ITIs'], ITI_bounds)
+print ('tolerance_lim:', prdm['tol_lim'])
 
 
 # ### Extract Trial Info
