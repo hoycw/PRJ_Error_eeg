@@ -51,13 +51,12 @@ SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {...
-
-    };
+SBJ_vars.ch_lab.bad     = {};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_ix = [182, 183, 865, 859, 998, 923, 564, 137, 455];
+SBJ_vars.trial_reject_ix = [599, 523, 461, 465, 164];
+SBJ_vars.trial_reject_ix_oddball = [187, 341, 141];
 SBJ_vars.ica_reject = [1, 5, 6, 7, 9, 11, 12, 15, 19, 20, 22, 24, 30, 35, 42, 50, 51, 53, 54, 58, 59, 60, 62, 63, 64];
 %--------------------------------------
 % Noise Notes

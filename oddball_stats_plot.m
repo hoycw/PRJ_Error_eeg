@@ -7,7 +7,7 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
-addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip_private']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip-private']);
 addpath(ft_dir);
 ft_defaults
 

@@ -24,10 +24,15 @@ end
 
 % Find event cuts and built trl matrix
 trl = [];
+oddball_section = 1;
 for i=1:length(event)
   if strcmp(event(i).type, cfg.trialdef.eventtype)
+    if event(i).value == 255
+       % This marks the end of the oddball section and the start of the TT
+        oddball_section = 0;
+    end
     % it is a trigger, see whether it has the right value
-    if ismember(event(i).value, cfg.trialdef.eventvalue)
+    if ~oddball_section & ismember(event(i).value, cfg.trialdef.eventvalue)
       % add this to the trl definition
       begsample     = event(i).sample*resamp_factor + round(cfg.trialdef.prestim*srate);
       endsample     = event(i).sample*resamp_factor + round(cfg.trialdef.poststim*srate)-1;

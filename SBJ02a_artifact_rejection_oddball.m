@@ -1,4 +1,4 @@
-function EEG02a_artifact_rejection_oddball(SBJ, proc_id, gen_figs, fig_vis, ignore_trials)
+function SBJ02a_artifact_rejection_oddball(SBJ, proc_id, tt_proc_id, gen_figs, fig_vis, ignore_trials)
 % This function generates figures for both the ERP stacks and the ICA Plots
 %SBJ = 'EEG#'
 %Proc_id = 'egg_full_ft'
@@ -23,19 +23,11 @@ eval(proc_vars_cmd);
 
 %% Load data
 % Load EEG
-data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
+data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' tt_proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
 [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
-
-[bhv_oddball] = fn_load_behav_csv_oddball([SBJ_vars.dirs.events SBJ '_behav_oddball.csv'], []);
-%!!! Sheila: remove this behavioral concat, which we shouldn't need anymore
-bhv = concat_behav(bhv, bhv_oddball); %should concatenate the structures
-
-%This stores teh number of trials for the task for later use
-bhv.numtrials = numel(bhv.trl_n) - numel(bhv_oddball.trl_n);
-bhv.numtrials_odd = numel(bhv_oddball.trl_n);
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
@@ -46,7 +38,7 @@ for b_ix = 1: numel(SBJ_vars.block_name)
     cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
     cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
     cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
-    cfg.trialfun            = 'tt_trialfun';
+    cfg.trialfun            = 'oddball_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc_vars.resample_freq;
     cfg_trl_unconcat{b_ix} = ft_definetrial(cfg);
@@ -88,7 +80,6 @@ end
 
 % Identify training and bad behavioral trials
 training_ix = find(bhv.blk==-1);
-index = numel(bhv.trl_n) - bhv.numtrials;
 % rt_low_ix   = find(bhv.rt(index+1:end) <= proc_vars.rt_bounds(1));
 % rt_high_ix  = find(bhv.rt >= proc_vars.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));

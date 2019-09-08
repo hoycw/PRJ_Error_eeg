@@ -57,7 +57,8 @@ SBJ_vars.ch_lab.bad     = {...
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_ix = [1:14, 21:23, 63, 194, 441, 846];
+SBJ_vars.trial_reject_ix = [69 70 506];
+SBJ_vars.trial_reject_ix_oddball = [1:8 12:16 20 21 39 63];
 SBJ_vars.ica_reject = [1, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 19, 20, 22, 28, 29, 32, 33, 34, 40, 41, 45, 47, 50, 53, 61];
 %--------------------------------------
 % Noise Notes

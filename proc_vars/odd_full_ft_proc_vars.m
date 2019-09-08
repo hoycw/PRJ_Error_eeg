@@ -1,11 +1,11 @@
 %% Pipeline Processing Variables: "odd_full_ft" for EEG analysis
 % Trial Cut Parameteres
 proc_vars.event_type    = 'S';           % 'S': lock trial to stimulus onset
-proc_vars.trial_lim_s   = [-0.2 1.7];    % data segments (in seconds) to grab around events
+proc_vars.trial_lim_s   = [-0.2 1.3];    % data segments (in seconds) to grab around events
 proc_vars.event_code    = [1 2 3];       % ['std' 'tar' 'odd'] (as noted in the logs)
 
 % Behavioral Processing
-% proc_vars.rt_bounds = [0.15 1.7];          % bounds on a reasonable RT to be detected with KLA algorithm
+% proc_vars.rt_bounds = [0.2 0.7];          % bounds on a reasonable RT to be detected with KLA algorithm
 % Varaince-Based Trial Rejection Parameters
 proc_vars.var_std_warn_thresh = 3;
 
@@ -34,3 +34,4 @@ proc_vars.eog_ic_corr_cut = 0.3;        % EOG IC correlation threshold for tossi
 proc_vars.eog_bp_yn       = 'yes';
 proc_vars.eog_bp_freq     = [1 15];  % from ft_rejectvisual help page
 proc_vars.eog_bp_filtord  = 4;       % from ft_rejectvisual help page
+proc_vars.rt_bounds = [0.15 0.5]

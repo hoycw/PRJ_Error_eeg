@@ -57,9 +57,10 @@ SBJ_vars.ch_lab.bad     = {...
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_ix = [708, 738, 870, 871, 820, 74, 359];
+SBJ_vars.trial_reject_ix = [];
 SBJ_vars.ica_reject = [1, 3, 4, 11, 12, 14, 15, 16, 17, 19, 20, 27, 28, 30, 32, 34, 51, 60];
-%--------------------------------------
+SBJ_vars.trial_reject_ix_oddball = [79, 80, 91, 366];
+    %--------------------------------------
 % Noise Notes
 %--------------------------------------
 % recording info sheet notes:

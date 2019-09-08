@@ -24,7 +24,8 @@ SBJ = 'EEG01'
 
 # In[3]:
 
-prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+#prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.png'
 data_dir = prj_dir+'data/'
@@ -101,18 +102,18 @@ io.savemat(prdm_fname,prdm)
 
 # In[7]:
 
-print 'paradigm: ', prdm['prdm_name'], ' v', prdm['prdm_version'], ' type: ', prdm['prdm_type']
+print ('paradigm: ', prdm['prdm_name'], ' v', prdm['prdm_version'], ' type: ', prdm['prdm_type'])
 print
-print 'Stimulus duration: ', prdm['stim_dur'], 's'
+print ('Stimulus duration: ', prdm['stim_dur'], 's')
 print
-print 'n_blocks: ', prdm['n_blocks']
-print 'n_trials/block: ', prdm['n_trials']
-print 'n_training: ', prdm['n_training']
+print ('n_blocks: ', prdm['n_blocks'])
+print ('n_trials/block: ', prdm['n_trials'])
+print ('n_training: ', prdm['n_training'])
 print
-print 'block_order: ', prdm['block_order']
-print 'oddball_order: ', prdm['odd_order']
+print ('block_order: ', prdm['block_order'])
+print ('oddball_order: ', prdm['odd_order'])
 # ITI_bounds = [np.mean(a,b) for a, b in zip(ITIs[:-1],ITIs[1:])]
-print 'ITIs:',prdm['ITIs'], ITI_bounds
+print ('ITIs:',prdm['ITIs'], ITI_bounds)
 
 
 # ### Extract Trial Info

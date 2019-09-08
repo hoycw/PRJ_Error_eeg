@@ -23,8 +23,8 @@ SBJ = sys.argv[1]#raw_input('Enter SBJ ID to process:')#'IR63'
 
 
 # In[103]:
-prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
-#prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
+#prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.png'
 data_dir = prj_dir+'data/'
@@ -58,7 +58,8 @@ logs = {
         'EEG08': 'eeg08_response_log_20190809152412.txt',
         'EEG09': 'eeg09_response_log_20190812175722.txt',
         'EEG10': 'eeg10_response_log_20190815161826.txt',
-        'EEG11': 'eeg11_response_log_20190816133923.txt'
+        'EEG11': 'eeg11_response_log_20190816133923.txt',
+        'EEG12': 'eeg12_response_log_20190819143555.txt'
 }
 #         'EP05': '.txt',# both log files are empty!
 # logs = {'Rana_1.6': 'Rana2_response_log_20170321103129_DATA.txt',

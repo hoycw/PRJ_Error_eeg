@@ -1,4 +1,4 @@
-function EEG02a_artifact_rejection_oddball(SBJ, proc_id, gen_figs, fig_vis, ignore_trials)
+function ODD02a_artifact_rejection(SBJ, proc_id, odd_proc_id, gen_figs, fig_vis, ignore_trials, plt_id)
 % This function generates figures for both the ERP stacks and the ICA Plots
 %SBJ = 'EEG#'
 %Proc_id = 'egg_full_ft'
@@ -12,59 +12,53 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip-private']);
 addpath(ft_dir);
 ft_defaults
 
 %% Processing variables
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_proc_vars.m'];
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' odd_proc_id '_proc_vars.m'];
 eval(proc_vars_cmd);
-
 %% Load data
 % Load EEG
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
-[bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
-
-[bhv_oddball] = fn_load_behav_csv_oddball([SBJ_vars.dirs.events SBJ '_behav_oddball.csv'], []);
-%!!! Sheila: remove this behavioral concat, which we shouldn't need anymore
-bhv = concat_behav(bhv, bhv_oddball); %should concatenate the structures
-
-%This stores teh number of trials for the task for later use
-bhv.numtrials = numel(bhv.trl_n) - numel(bhv_oddball.trl_n);
-bhv.numtrials_odd = numel(bhv_oddball.trl_n);
+[bhv] = fn_load_behav_csv_oddball([SBJ_vars.dirs.events SBJ '_behav_oddball.csv'], []);
+%before EP06 this needs to be function fn_load_behav_csv_old (the format of the csv folders changed slightly)
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
-for b_ix = 1: numel(SBJ_vars.block_name)
+for b_ix = 1:numel(SBJ_vars.block_name)
     cfg = [];
     cfg.dataset             = SBJ_vars.dirs.raw_filename{b_ix};
     cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
     cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
     cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
     cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
-    cfg.trialfun            = 'tt_trialfun';
+    cfg.trialfun            = 'oddball_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc_vars.resample_freq;
-    cfg_trl_unconcat{b_ix} = ft_definetrial(cfg);
+    cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
 end
+hdr = ft_read_header(SBJ_vars.dirs.raw_filename{1});
+endsample = hdr.nSamples;
+origFs = hdr.Fs;
 if numel(SBJ_vars.block_name)>1
-    for b_ix = 2: numel(SBJ_vars.block_name)
-       cfg_trl_unconcat{b_ix}.trl(:,1) = cfg_trl_unconcat{b_ix}.trl(:,1)+SBJ_vars.endsample{b_ix-1}/proc_vars.origsample_freq*proc_vars.resample_freq;
-       cfg_trl_unconcat{b_ix}.trl(:,2) = cfg_trl_unconcat{b_ix}.trl(:,2)+SBJ_vars.endsample{b_ix-1}/proc_vars.origsample_freq*proc_vars.resample_freq;
+    for b_ix = 2:numel(SBJ_vars.block_name)
+       cfg_trl_unconcat{b_ix}.trl(:,1) = cfg_trl_unconcat{b_ix}.trl(:,1)+endsample/origFs*proc_vars.resample_freq;
+       cfg_trl_unconcat{b_ix}.trl(:,2) = cfg_trl_unconcat{b_ix}.trl(:,2)+endsample/origFs*proc_vars.resample_freq;
        cfg_trl_unconcat{1}.trl = vertcat(cfg_trl_unconcat{b_ix-1}.trl, cfg_trl_unconcat{b_ix}.trl);
-       cfg_trl = cfg_trl_unconcat{1};
     end
-else
-    cfg_trl = cfg_trl_unconcat{1};
 end
+cfg_trl = cfg_trl_unconcat{1};
 % If the recording was started part way through, toss events not recorded
-    if any(cfg_trl.trl(:,1)<1)
-        cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
-    end
+if any(cfg_trl.trl(:,1)<1)
+    cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
+end
 event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
 
 % Cut the data into trials
@@ -76,6 +70,7 @@ if (numel(bhv.trl_n))~=numel(event_onsets)
     error(['Mismatch in behavioral and neural trial counts: ' num2str((numel(bhv.trl_n)))...
         ' behavioral; ' num2str(numel(event_onsets)) ' neural']);
 end
+
 %% Exclude bad_trials
 % Find trials that overlap with bad_epochs from raw visual inspection
 %load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
@@ -88,12 +83,9 @@ end
 
 % Identify training and bad behavioral trials
 training_ix = find(bhv.blk==-1);
-index = numel(bhv.trl_n) - bhv.numtrials;
-% rt_low_ix   = find(bhv.rt(index+1:end) <= proc_vars.rt_bounds(1));
-% rt_high_ix  = find(bhv.rt >= proc_vars.rt_bounds(2));
+rt_low_ix   = find(bhv.rt <= proc_vars.rt_bounds(1) & bhv.rt>0);
+rt_high_ix  = find(bhv.rt >= proc_vars.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
-bhv.numtrials = bhv.numtrials - numel(find(exclude_trials>bhv.numtrials_odd));
-bhv.numtrials_odd = bhv.numtrials_odd - numel(find(exclude_trials<=bhv.numtrials_odd));
 
 % Exclude bad trials
 cfgs = [];  
@@ -103,9 +95,7 @@ eog_trials = ft_selectdata(cfgs, eog_trials);
 
 bhv_fields = fieldnames(bhv);
 for f_ix = 1:numel(bhv_fields)
-    if ~(strcmp(bhv_fields{f_ix}, 'numtrials')) && ~(strcmp(bhv_fields{f_ix}, 'numtrials_odd'))
-        bhv.(bhv_fields{f_ix})(exclude_trials) = [];
-    end
+    bhv.(bhv_fields{f_ix})(exclude_trials) = [];
 end
 
 %% EOG vs. ICA Correlation
@@ -140,7 +130,7 @@ avg_eog_ic_corr = mean(eog_ic_corr,3);
 heog_ics = find(abs(avg_eog_ic_corr(1,:))>proc_vars.eog_ic_corr_cut);
 veog_ics = find(abs(avg_eog_ic_corr(2,:))>proc_vars.eog_ic_corr_cut);
 %if any([isempty(heog_ics), isempty(veog_ics)])
-   % error('No EOG ICs found!');
+    %error('No EOG ICs found!');
 %end
 
 %% Generate Figures
@@ -173,23 +163,26 @@ if gen_figs
     cfg.prefix   = 'ICA';
     cfg.viewmode = 'component';
     cfg.fig_vis  = fig_vis;
-    fn_icabrowser_modified(SBJ, cfg, ica);
+    fn_icabrowser_modified_odd(SBJ, cfg, ica);
     
     % Plot IC single trial stacks + ERPs
-    fn_plot_ERP_stack(SBJ, proc_id, 'ERPstack_full_evnts', ica, 'off', 1);
+    fn_plot_ERP_stack_odd(SBJ, odd_proc_id, plt_id, ica, 'off', 1);
 end    
 % Plot IC in ft_databrowser
 if fig_vis
-        load([root_dir 'PRJ_Error_eeg/scripts/utils/cfg_plot_eeg.mat']);
+        cfg = [];
+        cfg.viewmode = 'component';
+        cfg.channel = 'all';
+        cfg.layout   = 'biosemi64.lay';
         ft_databrowser(cfg, ica);
 end
 
 
 %% Save Data
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' proc_id '.mat'];
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' odd_proc_id '.mat'];
 save(clean_data_fname, '-v7.3', 'trials', 'cfg_trl', 'ica', 'heog_ics', 'veog_ics', 'eog_trials');
 
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' proc_id '_clean.mat'];
+clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' odd_proc_id '_clean.mat'];
 save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
 end
