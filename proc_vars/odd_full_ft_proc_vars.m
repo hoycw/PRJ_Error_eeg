@@ -34,4 +34,4 @@ proc_vars.eog_ic_corr_cut = 0.3;        % EOG IC correlation threshold for tossi
 proc_vars.eog_bp_yn       = 'yes';
 proc_vars.eog_bp_freq     = [1 15];  % from ft_rejectvisual help page
 proc_vars.eog_bp_filtord  = 4;       % from ft_rejectvisual help page
-proc_vars.rt_bounds = [0.15 0.5]
+proc_vars.rt_bounds = [0.1 1.3];

@@ -39,11 +39,7 @@ if ~strcmp(proc_vars.event_type,'S')
     error('mismatch in events in plt_vars and proc_vars!');
 end
 
-evnt_ix = zeros([2 1]);
-% Stimulus
-evnt_ix(1) = find(data.time{1}==0);
-% Response
-evnt_ix(2) = find(data.time{1}==prdm_vars.target);
+evnt_ix = find(data.time{1}==0);
 
 %% Plot Data
 % keep manual screen position - better in dual monitor settings
@@ -69,7 +65,7 @@ for ch_ix = 1:numel(data.label)
     set(gca,'YDir','normal');
     
     % Plot events
-    for e_ix = 1:2
+    for e_ix = 1:numel(plt_vars.evnt_type)
         line([evnt_ix(e_ix) evnt_ix(e_ix)],ylim,...
             'LineWidth',plt_vars.evnt_width(e_ix),'Color',plt_vars.evnt_color{e_ix},'LineStyle',plt_vars.evnt_style{e_ix});
     end

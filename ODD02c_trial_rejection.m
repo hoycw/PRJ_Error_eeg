@@ -33,7 +33,7 @@ if visual
 end
 
 for f_ix = 1:numel(bhv_fields)
-        bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix_oddball) = [];
+    bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix_oddball) = [];
 end
 
 %% Save outputs

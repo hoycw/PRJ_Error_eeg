@@ -31,7 +31,7 @@ for i=1:length(event)
         % This marks the end of the oddball section and the start of the TT
         oddball_section = 0;
     end
-    % Add trials in the oddball section with real event codes (1,2,3)
+    % Add oddball stim onsets: real event codes (1,2,3) = (std,tar,odd)
     if oddball_section && event(i).value~=254
       begsample     = event(i).sample*resamp_factor + round(cfg.trialdef.prestim*srate);
       endsample     = event(i).sample*resamp_factor + round(cfg.trialdef.poststim*srate)-1;

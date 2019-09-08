@@ -31,8 +31,8 @@ for i=1:length(event)
        % This marks the end of the oddball section and the start of the TT
         oddball_section = 0;
     end
-    % it is a trigger, see whether it has the right value
-    if ~oddball_section & ismember(event(i).value, cfg.trialdef.eventvalue)
+    % Add TT events: event code (1, 2) = (stim, feedback)
+    if ~oddball_section && ismember(event(i).value, cfg.trialdef.eventvalue)
       % add this to the trl definition
       begsample     = event(i).sample*resamp_factor + round(cfg.trialdef.prestim*srate);
       endsample     = event(i).sample*resamp_factor + round(cfg.trialdef.poststim*srate)-1;

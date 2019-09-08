@@ -28,12 +28,11 @@ data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
-if strcmp(SBJ, 'EP01') || strcmp(SBJ, 'EP02') || strcmp(SBJ, 'EP03') || strcmp(SBJ, 'EP04') || strcmp(SBJ, 'EP05')
+if any(strcmp(SBJ, {'EP01','EP02','EP03','EP04','EP05'}))
      [bhv] = fn_load_behav_csv_old([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
 else
      [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
 end
-%before EP06 this needs to be function fn_load_behav_csv_old (the format of the csv folders changed slightly)
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
@@ -134,9 +133,11 @@ end
 avg_eog_ic_corr = mean(eog_ic_corr,3);
 heog_ics = find(abs(avg_eog_ic_corr(1,:))>proc_vars.eog_ic_corr_cut);
 veog_ics = find(abs(avg_eog_ic_corr(2,:))>proc_vars.eog_ic_corr_cut);
-%if any([isempty(heog_ics), isempty(veog_ics)])
-    %error('No EOG ICs found!');
-%end
+if all([isempty(heog_ics), isempty(veog_ics)])
+    error('No EOG ICs found!');
+elseif isempty(heog_ics); warning('No HEOG IC found!');
+elseif isempty(veog_ics); warning('No VEOG IC found!');
+end
 
 %% Generate Figures
 if gen_figs 
@@ -181,7 +182,6 @@ if fig_vis
         cfg.layout   = 'biosemi64.lay';
         ft_databrowser(cfg, ica);
 end
-
 
 %% Save Data
 clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' proc_id '.mat'];

@@ -61,7 +61,7 @@ end
 
 % Axes and Labels
 plot_info.ax.YLim          = ylims;
-plot_info.ax.YLabel.String = 'HFA (z-score)';
+plot_info.ax.YLabel.String = plot_info.y_lab;
 plot_info.ax.XLim          = [0,size(data,2)];
 plot_info.ax.XTick         = 0:plot_info.x_step:size(data,2);
 plot_info.ax.XTickLabel    = plot_info.x_lab;

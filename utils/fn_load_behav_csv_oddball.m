@@ -1,4 +1,4 @@
-function [bhv] = fn_load_behav_csv(csv_fname,ignore_trials)
+function [bhv] = fn_load_behav_csv_oddball(csv_fname,ignore_trials)
 %% Load trial info csv exported from python
 %   Also converts from python 0-based to MATLAB 1-based indexing
 % INPUTS:
@@ -38,7 +38,7 @@ if numel(py_fields)~=numel(bhv_fields)
 end
 for f = 1:numel(py_fields)
    if ~strcmp(py_fields{f},bhv_fields{f})
-      error(['Mismatched field in behav csv and expected: ' py_fields{f} ' vs. ' bhv_fields{f}]);
+      error(strcat('Mismatched field in behav csv and expected: ', py_fields{f}, ' vs. ', bhv_fields{f}{1}));
     end
 end
 

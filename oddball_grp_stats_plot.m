@@ -1,4 +1,21 @@
-function oddball_stats_plot(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+function oddball_grp_stats_plot(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+
+% load all SBJ roi_erp
+roi_erp = cell(size(SBJs));
+for s = 1:numel(SBJs)
+    tmp = load(stat_fname); roi_erp{s} = tmp.roi_erp;
+end
+cfg_avg = [];
+cfg_avg.channel = {'all'};
+cfg_avg.latency = an.stat_lim;
+cfg_avg.keepindividual = 'yes';
+cfg_avg.method = 'across';
+cfg_avg.parameter = 'avg';
+gstat = cell(size(cond_lab));
+for cond_ix = 1:numel(cond_lab)
+    gstat = ft_timelockgrandaverage(cfg_avg, roi_erp{:}{cond_ix});
+end
+
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
@@ -48,24 +65,25 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Calculate statistics
-stat = cell(size(cond_comp));
+stat   = cell(size(cond_comp));
+design = cell(size(cond_comp));
 for st_ix = 1:numel(cond_comp)
     cond_ixs = cond_comp{st_ix};
     
     % Create make design matrix and stats
-    design = zeros(2, n_trials(cond_ixs(1)) + n_trials(cond_ixs(2)));
+    design{st_ix} = zeros(2, n_trials(cond_ixs(1)) + n_trials(cond_ixs(2)));
     for c_ix = 1:2
         if c_ix==1
-            design(1,1:n_trials(cond_ixs(c_ix))) = cond_ixs(c_ix);                               % Conditions (Independent Variable)
-            design(2,1:n_trials(cond_ixs(c_ix))) = 1:n_trials(cond_ixs(c_ix));                   % Trial Numbers
+            design{st_ix}(1,1:n_trials(cond_ixs(c_ix))) = cond_ixs(c_ix);                               % Conditions (Independent Variable)
+            design{st_ix}(2,1:n_trials(cond_ixs(c_ix))) = 1:n_trials(cond_ixs(c_ix));                   % Trial Numbers
         else
-            design(1,n_trials(cond_ixs(c_ix-1))+1:sum(n_trials(cond_ixs))) = cond_ixs(c_ix); % Conditions (Independent Variable)
-            design(2,n_trials(cond_ixs(c_ix-1))+1:sum(n_trials(cond_ixs)))= 1:n_trials(cond_ixs(c_ix));
+            design{st_ix}(1,n_trials(cond_ixs(c_ix-1))+1:sum(n_trials(cond_ixs))) = cond_ixs(c_ix); % Conditions (Independent Variable)
+            design{st_ix}(2,n_trials(cond_ixs(c_ix-1))+1:sum(n_trials(cond_ixs)))= 1:n_trials(cond_ixs(c_ix));
         end
     end
     
     % Compute stats between ERPs
-    cfg_stat.design           = design;
+    cfg_stat.design           = design{st_ix};
     [stat{st_ix}] = ft_timelockstatistics(cfg_stat, roi_erp{cond_ixs(1)}, roi_erp{cond_ixs(2)});
 end
 %{
@@ -172,11 +190,12 @@ for ch_ix = 1:numel(an.ROI)
         end
     end
     
-    %% Save stats and figure
+    %% Save stats variable
+    stats_fname = [SBJ_vars.dirs.proc SBJ '_' an_id '.mat'];
+    save(stats_fname, '-v7.3', 'design', 'roi_erp', 'stat');
+    
+    % Save figure
     if save_fig
-        stats_fname = [SBJ_vars.dirs.proc SBJ '_' an_id '.mat'];
-        save(stats_fname, '-v7.3', 'design', 'roi_erp', 'stat');
-        
         fig_fname = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_fname);
         saveas(gcf,fig_fname);

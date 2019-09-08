@@ -1,10 +1,11 @@
 function ODD02a_artifact_rejection(SBJ, proc_id, odd_proc_id, gen_figs, fig_vis, ignore_trials, plt_id)
 % This function generates figures for both the ERP stacks and the ICA Plots
-%SBJ = 'EEG#'
-%Proc_id = 'egg_full_ft'
-%gen_figs = 0 (if no, don't generate), 1 (if yes)
-%fig_vis = 1 if a data_browser view of the time course of the ICA
-%components is desired
+% INPUTS:
+%   SBJ = 'EEG#'
+%   proc_id = 'egg_full_ft'
+%   proc_id_odd = 'odd_full_ft'
+%   gen_figs = 0 (if no, don't generate), 1 (if yes)
+%   fig_vis = 1 if a data_browser view of the time course of the ICA components is desired
 
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
@@ -21,6 +22,7 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m']
 eval(SBJ_vars_cmd);
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' odd_proc_id '_proc_vars.m'];
 eval(proc_vars_cmd);
+
 %% Load data
 % Load EEG
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
@@ -28,7 +30,6 @@ load(data_fname);
 
 % Load Behavior
 [bhv] = fn_load_behav_csv_oddball([SBJ_vars.dirs.events SBJ '_behav_oddball.csv'], []);
-%before EP06 this needs to be function fn_load_behav_csv_old (the format of the csv folders changed slightly)
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
@@ -129,9 +130,11 @@ end
 avg_eog_ic_corr = mean(eog_ic_corr,3);
 heog_ics = find(abs(avg_eog_ic_corr(1,:))>proc_vars.eog_ic_corr_cut);
 veog_ics = find(abs(avg_eog_ic_corr(2,:))>proc_vars.eog_ic_corr_cut);
-%if any([isempty(heog_ics), isempty(veog_ics)])
-    %error('No EOG ICs found!');
-%end
+if all([isempty(heog_ics), isempty(veog_ics)])
+    error('No EOG ICs found!');
+elseif isempty(heog_ics); warning('No HEOG IC found!');
+elseif isempty(veog_ics); warning('No VEOG IC found!');
+end
 
 %% Generate Figures
 if gen_figs 
