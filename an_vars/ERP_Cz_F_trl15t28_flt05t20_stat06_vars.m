@@ -1,10 +1,10 @@
 an.ROI         = {'Cz'};             % Channel to be analyzed
-an.event_type  = 'S';           % event around which to cut trials
-an.trial_lim_s = [-0.2 1.3];       % window in SEC for cutting trials
-%an.plt_lim     = [-0.2 1];         % window for plotting these results
+an.event_type  = 'F';           % event around which to cut trials
+an.trial_lim_s = [-0.25 2.8];       % window in SEC for cutting trials
+%plt_lim     = [-0.2 1];         % window for plotting these results
 an.demean_yn   = 'yes';
-an.bsln_lim    = [-0.2 -0.05];    % window in SEC for baseline correction
-an.stat_lim    = [0 0.6];            % window in SEC for stats
+an.bsln_lim    = [-0.2 -0.05];    % window in SEC for baseline correctionan.
+an.stat_lim    = [1.6 2.5];            % window in SEC for stats
 an.n_boots     = 1000;             % Repetitions for non-parametric stats
 an.lp_yn       = 'yes';
 an.lp_freq     = 20;
@@ -38,7 +38,7 @@ cfg_avg.keepindividual = 'no';
 cfg_avg.method = 'across';
 cfg_avg.parameter = 'avg';
 
-cfg_tfr.method = 'wavelet';
+cfg_tfr.method = 'wavelet'
 cfg_tfr.output = 'pow';
 cfg_tfr.taper = 'hanning';
 cfg_tfr.foi = [2:30]; 

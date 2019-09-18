@@ -1,4 +1,4 @@
-function oddball_grp_stats_plot(SBJs, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+function plot_hit_v_err_grp(SBJs, plt_id, an_id, fig_vis, save_fig, fig_ftype)
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip/';
@@ -21,9 +21,8 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
-cond_lab = {'std','tar','odd'};
+cond_lab = [1 0];
 cond_colors = {[0 0 1],[0 1 0],[1 0 0]};
-cond_comp = {[1 2], [1 3]}; % std vs. tar; std vs. odd
 for s = 1:length(SBJs)
     clean_stats_fname{s} = [SBJ_vars_all{s}.dirs.proc SBJs{s} '_' an_id '.mat'];
     load(clean_stats_fname{s});
@@ -44,14 +43,14 @@ for cond_ix = 1:numel(cond_lab)
     gstat{cond_ix} = ft_timelockgrandaverage(cfg_avg, averages{1:numel(SBJs)});
 end
 
-stat   = cell(size(cond_comp));
-design = cell(size(cond_comp));
+stat   = cell(size(1));
+design = cell(size(1));
 n_subjs = numel(SBJs);
-for st_ix = 1:numel(cond_comp)
-    cond_ixs = cond_comp{st_ix};
+for st_ix = 1
+    cond_ixs = [1 2];
     
     % Create make design matrix and stats
-    design{st_ix} = zeros(2, n_subjs*numel(cond_comp));
+    design{st_ix} = zeros(2, n_subjs);
     for c_ix = 1:2
         if c_ix==1
             design{st_ix}(1,1:n_subjs) = cond_ixs(c_ix);                               % Conditions (Independent Variable)
@@ -98,14 +97,14 @@ for ch_ix = 1:numel(an.ROI)
     event_info.color     = {plt_vars.evnt_color};
     event_info.style     = {plt_vars.evnt_style};
     % Condition plotting params
-    cond_info.name       = cond_lab;
+    cond_info.name       = {'correct', 'error'};
     cond_info.style      = {'-', '-', '-'};
     cond_info.color      = cond_colors;
     cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 3]);
 
     %% Plot all ERPs together
     subplot(numel(cond_lab),1,1); hold on;
-    plot_info.title  = strjoin(cond_lab,',');
+    plot_info.title  = 'Easy vs. Hard Conditions';
     plot_info.ax     = gca;
 %% calculate statistics
         % Compute means and variance
@@ -130,13 +129,13 @@ for ch_ix = 1:numel(an.ROI)
     fn_plot_ts_errbr(plot_info,means,sem,event_info,cond_info);
     
     %% Plot Stat Comparisons
-    for st_ix = 1:numel(cond_comp)
-        cond_ixs = cond_comp{st_ix};
-        subplot(numel(cond_lab),1,st_ix+1); hold on;
-        plot_info.title  = strjoin(cond_lab(cond_ixs),'-');
+    for st_ix = 1
+        cond_ixs =[1 2];
+        subplot(numel(cond_lab),1,st_ix); hold on;
+        plot_info.title  = 'Easy vs. Hard Conditions';
         plot_info.ax     = gca;
         % Condition plotting params
-        cond_info.name       = cond_lab(cond_ixs);
+        cond_info.name       = {'correct', 'error'};
         cond_info.style      = repmat({'-'},size(cond_ixs));
         cond_info.color      = cond_colors(cond_ixs);
         cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 numel(cond_ixs)]);
