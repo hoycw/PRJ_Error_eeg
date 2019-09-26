@@ -1,4 +1,13 @@
-function CALC_Individ_FRNpeaks(SBJ, proc_id, plt_id, an_id)
+function CALC_FRN_Individ(SBJ, proc_id, plt_id, an_id)
+%Purpose: This function loads the data for each condition for a given subject.  Then it allows users to input the index of the peak that represents the index of the first positivity and then the corresponding negativity.  Then it computes the difference between the two values and stores them.
+%Inputs
+%SBJ = string (ie) 'EEG01'
+%proc_id = 'eeg_full_ft'
+%plt_id = 'ts_F15to28_evnts_sigPatch'
+%an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06'
+%fig_vis = whether or not the plot should pop up ('on' or 'off')
+%save_fig = 0 or 1
+%fig_ftype = 'png' (a string)
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
@@ -17,10 +26,11 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
-stats_fname = [SBJ_vars.dirs.proc SBJ '_' an_id 'stats_4cond.mat'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/FRN/' an_id '/'];
+stats_dir = [root_dir 'PRJ_Error_eeg/results/Stats/4_Conditions/' an_id '/'];
+stats_fname = [stats_dir SBJ '_DiffWave.mat'];
 load(stats_fname);
-fig_name = [SBJ '_4Conds_Cz'];
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' SBJ '/4_Conditions/' an_id '/'];
+fig_name = [SBJ '_FRN_' an.ROI{ch_ix}];
 for x = 1:numel(roi_erp)
     openfig([fig_dir fig_name '.fig'])
     findpeaks(roi_erp{x}.avg) %need this to get arrows
@@ -38,6 +48,6 @@ for x = 1:numel(roi_erp)
     peak_neg(x) = -peak(index_neg(x));
     peak_diff(x) = peak_pos(x) - peak_neg(x);
 end   
-stats_fname = [SBJ_vars.dirs.proc SBJ '_' an_id 'FRNdiffs_4cond.mat'];
+stats_fname = [stats_dir an_id SBJ '_FRN.mat'];
 save(stats_fname, '-v7.3', 'peak_diff');
  

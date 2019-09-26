@@ -1,4 +1,14 @@
-function CALCPLOT_Grp_FRNpeaks(SBJs, proc_id, plt_id, an_id)
+function PLOTSTATS_FRN_Group(SBJs, proc_id, plt_id, an_id)
+%Purpose: This function takes in teh data from CALC_FRN_Individ for each subject, and then averages the peak_diffs for each condition.  Then it plots the mean values for each conditions FRN and computes the statistical significance of the difference between every condition.
+%Inputs
+%SBJ = string (ie) 'EEG01'
+%proc_id = 'eeg_full_ft'
+%plt_id = 'ts_F15to28_evnts_sigPatch'
+%an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06'
+%fig_vis = whether or not the plot should pop up ('on' or 'off')
+%save_fig = 0 or 1
+%fig_ftype = 'png' (a string)
+
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
