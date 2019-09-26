@@ -1,5 +1,13 @@
-function plot_err_v_corr(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
-
+function PLOTSTAT_HitErr_Individ(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+%Purpose: This function loads the subject data, and computes the ERP for each %condition.  Then it computes %the stats comparing the ERPs for Error vs Correct %Trials using cluster based stats, and plots %them with error bars and highlighted %statistically significant regions
+%Inputs
+%SBJ = string (ie) 'EEG01'
+%proc_id = 'eeg_full_ft'
+%plt_id = 'ts_F15to28_evnts_sigPatch'
+%an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06'
+%fig_vis = whether or not the plot should pop up ('on' or 'off')
+%save_fig = 0 or 1
+%fig_ftype = 'png' (a string)
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
@@ -28,7 +36,7 @@ load(data_cleanname);
 %% Compute ERPs
 % Select Channel(s)
 cfgs = [];
-cfgs.channel = 'Cz';
+cfgs.channel = an.ROI;
 roi = ft_selectdata(cfgs, clean_trials);
 
 cond_lab = [1 0];
@@ -36,45 +44,42 @@ cond_colors = {[0 0 1],[0 1 0],[1 0 0]};
 roi_erp  = cell(size(cond_lab));
 n_trials = zeros(size(cond_lab));
 cfgavg = [];
-cfgavg.keeptrials = 'yes';
-
+cfgavg.keeptrials = 'no';
 
 for cond_ix = 1:numel(cond_lab)
-    cfgavg.trials = find(bhv.hit == cond_lab(cond_ix))
+    cfgavg.trials = find(bhv.hit == cond_lab(cond_ix));
+    n_trials(cond_ix) = numel(cfgavg.trials);
     roi_erp{cond_ix} = ft_timelockanalysis(cfgavg,roi);
-    roi_erp{cond_ix}.avg = squeeze(mean(roi_erp{cond_ix}.trial,1))';
-    roi_erp{cond_ix}.var = squeeze(var(roi_erp{cond_ix}.trial,[],1))';
-    n_trials(cond_ix) = size(roi_erp{cond_ix}.trial, 1);
 end
 
 
-for st_ix = 1
-    cond_ixs = [1 2];
-    
-    % Create make design matrix and stats
-    design = zeros(2, n_trials(cond_ixs(1)) + n_trials(cond_ixs(2)));
-    for c_ix = 1:2
-        if c_ix==1
-            design(1,1:n_trials(cond_ixs(c_ix))) = cond_ixs(c_ix);                               % Conditions (Independent Variable)
-            design(2,1:n_trials(cond_ixs(c_ix))) = 1:n_trials(cond_ixs(c_ix));                   % Trial Numbers
-        else
-            design(1,n_trials(cond_ixs(c_ix-1))+1:sum(n_trials(cond_ixs))) = cond_ixs(c_ix); % Conditions (Independent Variable)
-            design(2,n_trials(cond_ixs(c_ix-1))+1:sum(n_trials(cond_ixs)))= 1:n_trials(cond_ixs(c_ix));
-        end
+cond_ixs = [1 2];
+
+% Create make design matrix and stats
+design = zeros(2, n_trials(cond_ixs(1)) + n_trials(cond_ixs(2)));
+for c_ix = 1:2
+    if c_ix==1
+        design(1,1:n_trials(cond_ixs(c_ix))) = cond_ixs(c_ix);                               % Conditions (Independent Variable)
+        design(2,1:n_trials(cond_ixs(c_ix))) = 1:n_trials(cond_ixs(c_ix));                   % Trial Numbers
+    else
+        design(1,n_trials(cond_ixs(c_ix-1))+1:sum(n_trials(cond_ixs))) = cond_ixs(c_ix); % Conditions (Independent Variable)
+        design(2,n_trials(cond_ixs(c_ix-1))+1:sum(n_trials(cond_ixs)))= 1:n_trials(cond_ixs(c_ix));
     end
-    
-    % Compute stats between ERPs
-    cfg_stat.design           = design;
-    [stat{st_ix}] = ft_timelockstatistics(cfg_stat, roi_erp{cond_ixs(1)}, roi_erp{cond_ixs(2)});
 end
+
+% Compute stats between ERPs
+cfg_stat.design           = design;
+cfg_stat.parameter = 'avg';
+[stat] = ft_timelockstatistics(cfg_stat, roi_erp{cond_ixs(1)}, roi_erp{cond_ixs(2)});
+
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' SBJ '/oddball/' an_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/HitErr/' an_id '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end
 end
 for ch_ix = 1:numel(an.ROI)
-    fig_name = [SBJ '_oddball_' an.ROI{ch_ix}];
+    fig_name = [SBJ '_Hit vs. Err_' an.ROI{ch_ix}];
     f = figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible', fig_vis);   %this size is for single plots
     
@@ -100,7 +105,7 @@ for ch_ix = 1:numel(an.ROI)
     cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 3]);
 
     %% Plot all ERPs together
-    subplot(numel(cond_lab),1,1); hold on;
+    hold on;
     plot_info.title  = 'Easy v. Hard Conditions';
     plot_info.ax     = gca;
     
@@ -114,7 +119,11 @@ for ch_ix = 1:numel(an.ROI)
     
     fn_plot_ts_errbr(plot_info,means,sem,event_info,cond_info);
     if save_fig
-        stats_fname = [SBJ_vars.dirs.proc SBJ '_' an_id '.mat'];
+        stats_dir = [root_dir 'PRJ_Error_eeg/results/Stats/HitErr/' an_id '/'];
+        if ~exist(stats_dir,'dir')
+            mkdir(stats_dir);
+        end
+        stats_fname = [stats_dir an_id SBJ '_HitErr.mat'];
         save(stats_fname, '-v7.3', 'design', 'roi_erp', 'stat');
         
         fig_fname = [fig_dir fig_name '.' fig_ftype];

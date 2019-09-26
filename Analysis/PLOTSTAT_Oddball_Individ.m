@@ -1,4 +1,13 @@
-function plot_err_v_corr_individ(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+function PLOTSTAT_Oddball_Individ(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+%Purpose: This function computes the ERPs for standard, target and oddball trials.  Then it runs time locked statistics and plots the error bars and significant clusters.
+%SBJ = cell of strings of subjects you want to plot {'EEG01', 'EEG02',
+    %etc}
+%proc_id = 'odd_full_ft'
+%plt_id = 'ts_F15to28_evnts_sigPatch'
+%an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06'
+%fig_vis = whether or not the plot should pop up ('on' or 'off')
+%save_fig = save  the figure or not (1 or 0)
+%fig_ftype = file type the figure should be saved as (i.e. 'png')
 
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
@@ -8,7 +17,7 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
-addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip-private']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip-private/']);
 addpath(ft_dir);
 ft_defaults
 
@@ -25,31 +34,31 @@ load(clean_bhv_fname);
 data_cleanname = [SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat'];
 load(data_cleanname);
 
+% Condition info
+cond_lab = {'std','tar','odd'};
+cond_colors = {[0.6350, 0.0780, 0.1840], [0.3010, 0.7450, 0.9330], 	[0.4660, 0.6740, 0.1880], [0.4940, 0.1840, 0.5560]};
+cond_comp = {[1 2], [1 3]}; % std vs. tar; std vs. odd !!!Don't hard code this!
+
 %% Compute ERPs
 % Select Channel(s)
 cfgs = [];
 cfgs.channel = an.ROI;
 roi = ft_selectdata(cfgs, clean_trials);
 
-cond_lab = [1 0];
-cond_colors = {[0 0 1],[0 1 0],[1 0 0]};
 roi_erp  = cell(size(cond_lab));
 n_trials = zeros(size(cond_lab));
 cfgavg = [];
-cfgavg.keeptrials = 'yes';
-
-
+cfgavg.keeptrials = 'no';
 for cond_ix = 1:numel(cond_lab)
-    cfgavg.trials = find(bhv.hit == cond_lab(cond_ix))
+    cfgavg.trials = find(clean_trials.trialinfo == cond_ix);
+    n_trials(cond_ix) = numel(cfgavg.trials);
     roi_erp{cond_ix} = ft_timelockanalysis(cfgavg,roi);
-    roi_erp{cond_ix}.avg = squeeze(mean(roi_erp{cond_ix}.trial,1))';
-    roi_erp{cond_ix}.var = squeeze(var(roi_erp{cond_ix}.trial,[],1))';
-    n_trials(cond_ix) = size(roi_erp{cond_ix}.trial, 1);
 end
 
-
-for st_ix = 1
-    cond_ixs = [1 2];
+%% Calculate statistics
+stat = cell(size(cond_comp));
+for st_ix = 1:numel(cond_comp)
+    cond_ixs = cond_comp{st_ix};
     
     % Create make design matrix and stats
     design = zeros(2, n_trials(cond_ixs(1)) + n_trials(cond_ixs(2)));
@@ -65,14 +74,18 @@ for st_ix = 1
     
     % Compute stats between ERPs
     cfg_stat.design           = design;
+    cfg_stat.parameter = 'avg';
     [stat{st_ix}] = ft_timelockstatistics(cfg_stat, roi_erp{cond_ixs(1)}, roi_erp{cond_ixs(2)});
 end
+
+%% Plot ERPs and stats
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' SBJ '/oddball/' an_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/Oddball/' an_id '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end
 end
+
 for ch_ix = 1:numel(an.ROI)
     fig_name = [SBJ '_oddball_' an.ROI{ch_ix}];
     f = figure('Name',fig_name,'units','normalized',...
@@ -89,19 +102,19 @@ for ch_ix = 1:numel(an.ROI)
     plot_info.legend_loc = plt_vars.legend_loc;
     % Event plotting params
     event_info.name      = {an.event_type};
-    [~,event_info.time]  = min(abs(roi_erp{1}.time-1.8));
+    [~,event_info.time]  = min(abs(roi_erp{1}.time-0));
     event_info.width     = plt_vars.evnt_width;
     event_info.color     = {plt_vars.evnt_color};
     event_info.style     = {plt_vars.evnt_style};
     % Condition plotting params
-    cond_info.name       = {'hit', 'miss'};
+    cond_info.name       = cond_lab;
     cond_info.style      = {'-', '-', '-'};
     cond_info.color      = cond_colors;
     cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 3]);
 
     %% Plot all ERPs together
     subplot(numel(cond_lab),1,1); hold on;
-    plot_info.title  = 'Easy v. Hard Conditions';
+    plot_info.title  = strjoin(cond_lab,',');
     plot_info.ax     = gca;
     
     % Compute means and variance
@@ -113,8 +126,54 @@ for ch_ix = 1:numel(an.ROI)
     end
     
     fn_plot_ts_errbr(plot_info,means,sem,event_info,cond_info);
+    
+    %% Plot Stat Comparisons
+    for st_ix = 1:numel(cond_comp)
+        cond_ixs = cond_comp{st_ix};
+        subplot(numel(cond_lab),1,st_ix+1); hold on;
+        plot_info.title  = strjoin(cond_lab(cond_ixs),'-');
+        plot_info.ax     = gca;
+        % Condition plotting params
+        cond_info.name       = cond_lab(cond_ixs);
+        cond_info.style      = repmat({'-'},size(cond_ixs));
+        cond_info.color      = cond_colors(cond_ixs);
+        cond_info.alpha      = repmat(plt_vars.errbar_alpha,[1 numel(cond_ixs)]);
+        
+        % Compute means and variance
+        means = NaN([numel(cond_ixs) size(roi_erp{1}.avg,2)]);
+        sem   = NaN([numel(cond_ixs) size(roi_erp{1}.avg,2)]);
+        for cond_ix = 1:numel(cond_ixs)
+            means(cond_ix,:) = roi_erp{cond_ixs(cond_ix)}.avg(ch_ix,:);
+            sem(cond_ix,:)   = squeeze(sqrt(roi_erp{cond_ixs(cond_ix)}.var(ch_ix,:))./sqrt(numel(roi_erp{cond_ixs(cond_ix)}.cfg.previous.trials)))';
+        end
+        
+        %Find significant time periods
+        if sum(stat{st_ix}.mask(ch_ix,:))>0
+            sig_chunks = fn_find_chunks(stat{st_ix}.mask(ch_ix,:));
+            sig_chunks(stat{st_ix}.mask(ch_ix,sig_chunks(:,1))==0,:) = [];
+            % If stat and roi_erp aren't on same time axis, adjust sig_chunk indices
+            if (size(stat{st_ix}.time,2)~=size(roi_erp{1}.time,2)) || (sum(stat{st_ix}.time==roi_erp{1}.time)~=numel(stat{st_ix}.time))
+                for chunk_ix = 1:size(sig_chunks,1)
+                    sig_chunks(chunk_ix,1) = find(roi_erp{1}.time==stat{st_ix}.time(sig_chunks(chunk_ix,1)));
+                    sig_chunks(chunk_ix,2) = find(roi_erp{1}.time==stat{st_ix}.time(sig_chunks(chunk_ix,2)));
+                end
+            end
+            fprintf('%s -- %i SIGNIFICANT CLUSTERS FOUND, plotting with significance shading...\n',...
+                stat{st_ix}.label{ch_ix},size(sig_chunks,1));
+            fn_plot_ts_errbr_sig(plot_info,means,sem,sig_chunks,event_info,cond_info);
+        else
+            fprintf('%s -- NO SIGNIFICANT CLUSTERS FOUND, plotting without significance shading...\n',stat{st_ix}.label{ch_ix});
+            fn_plot_ts_errbr(plot_info,means,sem,event_info,cond_info);
+        end
+    end
+    
+    %% Save stats and figure
     if save_fig
-        stats_fname = [SBJ_vars.dirs.proc SBJ '_' an_id '.mat'];
+        stats_dir = [root_dir 'PRJ_Error_eeg/results/Stats/Oddball/' an_id '/'];
+        if ~exist(stats_dir,'dir')
+            mkdir(stats_dir);
+        end
+        stats_fname = [stats_dir an_id SBJ '_Oddball.mat'];
         save(stats_fname, '-v7.3', 'design', 'roi_erp', 'stat');
         
         fig_fname = [fig_dir fig_name '.' fig_ftype];
@@ -123,3 +182,5 @@ for ch_ix = 1:numel(an.ROI)
         %eval(['export_fig ' fig_filename]);
     end
 end
+end
+

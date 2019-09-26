@@ -1,4 +1,14 @@
-function oddball_grp_stats_plot(SBJs, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+function PLOTSTAT_Oddball_Group(SBJs, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+%This function takes in the data from PLOTSTAT_oddball_individ (so that must be run %first).  Then it computes the averages at a group level, and plots them.  Then it %runs time locked statistics at the group level and plots it
+%SBJs = cell of strings of subjects you want to plot {'EEG01', 'EEG02',
+    %etc}
+%proc_id = 'eeg_full_ft'
+%plt_id = 'ts_F15to28_evnts_sigPatch'
+%an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06'
+%fig_vis = whether or not the plot should pop up ('on' or 'off')
+%save_fig = save  the figure or not (1 or 0)
+%fig_ftype = file type the figure should be saved as (i.e. 'png')
+%conds = 'DifWL' or 'DifEH' (win/loss vs easy/hard)
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip/';
@@ -22,10 +32,12 @@ eval(plt_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 cond_lab = {'std','tar','odd'};
-cond_colors = {[0 0 1],[0 1 0],[1 0 0]};
+cond_colors = {[0.6350, 0.0780, 0.1840], [0.3010, 0.7450, 0.9330], 	[0.4660, 0.6740, 0.1880], [0.4940, 0.1840, 0.5560]};
 cond_comp = {[1 2], [1 3]}; % std vs. tar; std vs. odd
+stats_dir = [root_dir 'PRJ_Error_eeg/results/Stats/Oddball/' an_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/Oddball/' an_id '/'];
 for s = 1:length(SBJs)
-    clean_stats_fname{s} = [SBJ_vars_all{s}.dirs.proc SBJs{s} '_' an_id '.mat'];
+    clean_stats_fname{s} = [stats_dir an_id SBJs{s} '_Oddball.mat'];
     load(clean_stats_fname{s});
 end
 
@@ -35,13 +47,13 @@ for s = 1:length(SBJs)
     tmp = load(clean_stats_fname{s}); roi_erp{s} = tmp.roi_erp;
 end
 
-gstat = cell(size(cond_lab));
+gavg = cell(size(cond_lab));
 averages = cell(numel(SBJs));
 for cond_ix = 1:numel(cond_lab)
     for index = 1: numel(SBJs)
         averages{index}= roi_erp{1, 1}{cond_ix};
     end
-    gstat{cond_ix} = ft_timelockgrandaverage(cfg_avg, averages{1:numel(SBJs)});
+    gavg{cond_ix} = ft_timelockgrandaverage(cfg_avg, averages{1:numel(SBJs)});
 end
 
 stat   = cell(size(cond_comp));
@@ -55,7 +67,7 @@ for st_ix = 1:numel(cond_comp)
     for c_ix = 1:2
         if c_ix==1
             design{st_ix}(1,1:n_subjs) = cond_ixs(c_ix);                               % Conditions (Independent Variable)
-            design{st_ix}(2,1:n_subjs) = 1:n_subjs;                   % Trial Numbers
+            design{st_ix}(2,1:n_subjs) = 1:n_subjs; % Trial Numbers
         else
             design{st_ix}(1,n_subjs+1:n_subjs*c_ix) = cond_ixs(c_ix); % Conditions (Independent Variable)
             design{st_ix}(2,(n_subjs+1):n_subjs*c_ix)= 1:n_subjs;
@@ -65,19 +77,19 @@ for st_ix = 1:numel(cond_comp)
     % Compute stats between ERPs
     cfg_stat.design           = design{st_ix};
     cfg_stat.parameter        = 'avg';
-    [stat{st_ix}] = ft_timelockstatistics(cfg_stat, gstat{cond_ixs(1)}, gstat{cond_ixs(2)});
+    [stat{st_ix}] = ft_timelockstatistics(cfg_stat, gavg{cond_ixs(1)}, gavg{cond_ixs(2)});
 end
 
 %% Plot ERPs and stats
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/oddball/' an_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/Oddball/' an_id '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end
 end
 %%
 for ch_ix = 1:numel(an.ROI)
-    fig_name = ['oddball_avg' an.ROI{ch_ix}];
+    fig_name = ['Oddball_Avg_' an.ROI{ch_ix}];
     f = figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible', fig_vis);   %this size is for single plots
     %%
@@ -109,19 +121,19 @@ for ch_ix = 1:numel(an.ROI)
     plot_info.ax     = gca;
 %% calculate statistics
         % Compute means and variance
-        means = NaN([numel(cond_lab) size(gstat{1}.avg,2)]);
-        sem   = NaN([numel(cond_lab) size(gstat{1}.avg,2)]);
+        means = NaN([numel(cond_lab) size(gavg{1}.avg,2)]);
+        sem   = NaN([numel(cond_lab) size(gavg{1}.avg,2)]);
         temp = cell(size(numel(SBJs)));
-        store = zeros(numel(SBJs),length(gstat{1}.avg));
+        store = zeros(numel(SBJs),length(gavg{1}.avg));
         for c_ix = 1:numel(cond_lab)
-            means(c_ix,:) = gstat{c_ix}.avg(ch_ix,:);
+            means(c_ix,:) = gavg{c_ix}.avg(ch_ix,:);
             for s = 1:numel(SBJs)
                 temp{s} = roi_erp{s}{c_ix};
-                for n = 1: length(gstat{1}.avg)
+                for n = 1: length(gavg{1}.avg)
                     store(s,n) = temp{s}.avg(n);
                 end
             end
-            for t_ix = 1: length(gstat{1}.avg)
+            for t_ix = 1: length(gavg{1}.avg)
                 sem(c_ix,t_ix) = std(store(:,t_ix))/ sqrt(numel(SBJs));
             end
         end
@@ -162,12 +174,12 @@ for ch_ix = 1:numel(an.ROI)
     end
     
     %% Save stats variable
-    stats_fname = [fig_dir an_id 'oddball_avg.mat'];
-    save(stats_fname, '-v7.3', 'design', 'roi_erp', 'stat');
+    stats_fname = [stats_dir an_id 'Group_Oddball.mat'];
+    save(stats_fname, '-v7.3', 'design', 'roi_erp', 'gavg', 'stat');
     
     % Save figure
     if save_fig
-        fig_fname = [fig_dir an_id 'oddball_avg.' fig_ftype];
+        fig_fname = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_fname);
         saveas(gcf,fig_fname);
         %eval(['export_fig ' fig_filename]);

@@ -1,5 +1,14 @@
-function PLOT_Indiv_4Conds(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
-
+function PLOTSTAT_4Conds_Individ(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+%Purpose
+%This function loads the subject data and finds the 4 Conditions: easy/right, easy/wrong, %hard/right, hard/wrong. Then it computes the ERP for all 4 conditions, and computes the stats using cluster based stats, and plots %them with error bars and highlighted statistically significant regions.
+%Inputs
+%SBJ = string (ie) 'EEG01'
+%proc_id = 'eeg_full_ft'
+%plt_id = 'ts_F15to28_evnts_sigPatch'
+%an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06'
+%fig_vis = whether or not the plot should pop up ('on' or 'off')
+%save_fig = 0 or 1
+%fig_ftype = 'png' (a string)
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';

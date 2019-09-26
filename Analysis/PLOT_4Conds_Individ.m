@@ -1,7 +1,7 @@
-function PLOT_Individ_4Conds(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
-%SBJS = cell of strings of subjects you want to plot {'EEG01', 'EEG02',
+function PLOT_4Conds_Individ(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+%SBJ = cell of strings of subjects you want to plot {'EEG01', 'EEG02',
 %etc}
-%proc_id = 
+%proc_id = 'eeg_full_ft'
 %plt_id = 'ts_F15to28_evnts_sigPatch'
 %an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06'
 %fig_vis = whether or not the plot should pop up ('on' or 'off')
@@ -15,7 +15,7 @@ else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtri
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
-addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip-private']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/fieldtrip-private/']);
 addpath(ft_dir);
 ft_defaults
 
@@ -86,7 +86,7 @@ end
 %}
 
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' SBJ '/4_Conditions/' an_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/4_Conditions/' an_id '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end
@@ -132,11 +132,17 @@ for ch_ix = 1:numel(an.ROI)
     
     fn_plot_ts_errbr(plot_info,means,sem,event_info,cond_info);
     if save_fig
-        stats_fname = [SBJ_vars.dirs.proc SBJ '_' an_id 'stats_4cond.mat'];
+        stats_dir = [root_dir 'PRJ_Error_eeg/results/Stats/4_Conditions/' an_id '/'];
+        if ~exist(stats_dir,'dir')
+            mkdir(stats_dir);
+        end
+        stats_fname = [stats_dir an_id SBJ '_4Conds.mat'];
         save(stats_fname, '-v7.3', 'roi_erp');
         fig_fname = [fig_dir fig_name '.' fig_ftype];
+        fig_fname2 = [fig_dir fig_name '.fig'];
         fprintf('Saving %s\n',fig_fname);
         saveas(gcf,fig_fname);
+        saveas(gcf,fig_fname2);
         %eval(['export_fig ' fig_filename]);
     end
 end
