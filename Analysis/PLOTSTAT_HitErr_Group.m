@@ -1,5 +1,5 @@
 function PLOTSTAT_HitErr_Group(SBJs, plt_id, an_id, fig_vis, save_fig, fig_ftype)
-%Purpose:This function loads the subjects data retrieved from running PLOTSTAT_err_v_corr_individ.  Then it plots the ERPs at the group level for the hit vs miss conditions, with error bars and significant clusters.
+%Purpose:This function loads the subjects data retrieved from running PLOTSTAT_HitErr_Invid.  Then it plots the ERPs at the group level for the hit vs miss conditions, with error bars and significant clusters.
 %Inputs
 %SBJ = string (ie) 'EEG01'
 %proc_id = 'eeg_full_ft'

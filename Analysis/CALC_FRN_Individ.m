@@ -1,5 +1,5 @@
 function CALC_FRN_Individ(SBJ, proc_id, plt_id, an_id)
-%Purpose: This function loads the data for each condition for a given subject.  Then it allows users to input the index of the peak that represents the index of the first positivity and then the corresponding negativity.  Then it computes the difference between the two values and stores them.
+%Purpose: This function loads the data for each condition for a given subject.  Then it allows users to input the index of the peak that represents the index of the first positivity and then the corresponding negativity.  Then it computes the difference between the two values and stores them.  It pulls data from the 4_Conds_individ function.
 %Inputs
 %SBJ = string (ie) 'EEG01'
 %proc_id = 'eeg_full_ft'

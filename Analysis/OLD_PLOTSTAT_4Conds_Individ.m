@@ -1,4 +1,4 @@
-function PLOTSTAT_4Conds_Individ(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+function OLD_PLOTSTAT_4Conds_Individ(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
 %Purpose
 %This function loads the subject data and finds the 4 Conditions: easy/right, easy/wrong, %hard/right, hard/wrong. Then it computes the ERP for all 4 conditions, and computes the stats using cluster based stats, and plots %them with error bars and highlighted statistically significant regions.
 %Inputs

@@ -1,4 +1,5 @@
 function PLOT_4Conds_Group(SBJs, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+%Purpose: This function loads the data from PLOT_4Conds_Individ and computes a total average and plots it for all 4 conditons (easy/miss, easy/hit, hard/hit, hard/miss).
 %SBJS = cell of strings of subjects you want to plot {'EEG01', 'EEG02',
 %etc}
 %proc_id = 

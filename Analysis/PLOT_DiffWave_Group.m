@@ -1,5 +1,5 @@
 function PLOT_DiffWave_Group(SBJs, plt_id, an_id, fig_vis, save_fig, fig_ftype, conds)
-%Purpose: This function computes the difference wave for the easy/hard conditons or the win/loss %conditions.  Then it plots these difference waves with error bars.
+%Purpose: This function computes the difference wave for the easy/hard conditons or the win/loss %conditions.  Then it plots these difference waves with error bars.  It uses data from the 4_Conds_individ function.
 %SBJs = cell of strings of subjects you want to plot {'EEG01', 'EEG02',
     %etc}
 %proc_id = 'eeg_full_ft'

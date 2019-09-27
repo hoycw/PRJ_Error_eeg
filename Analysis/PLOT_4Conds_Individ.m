@@ -1,5 +1,6 @@
 function PLOT_4Conds_Individ(SBJ, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
-%SBJ = cell of strings of subjects you want to plot {'EEG01', 'EEG02',
+%Purpose:This function loads the subjects data and computes the erp for all 4 possible conditions (easy/miss, easy/hit, hard/hit, hard/miss) and plots them.
+%SBJS = {'EEG01', 'EEG02',
 %etc}
 %proc_id = 'eeg_full_ft'
 %plt_id = 'ts_F15to28_evnts_sigPatch'
