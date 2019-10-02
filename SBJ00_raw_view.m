@@ -20,7 +20,7 @@ ft_defaults
 %% Load and preprocess the data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_proc_vars.m'];
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' odd_proc_id '_vars.m'];
 eval(proc_vars_cmd);
 
 if numel(SBJ_vars.block_name)>1
@@ -37,9 +37,9 @@ cfg.hpfiltord = 2;
 raw = ft_preprocessing(cfg);
 
 %% Downsample
-if strcmp(proc_vars.resample_yn,'yes')
+if strcmp(proc.resample_yn,'yes')
     cfg = [];
-    cfg.resamplefs = proc_vars.resample_freq;
+    cfg.resamplefs = proc.resample_freq;
     raw = ft_resampledata(cfg, raw);
 end
 

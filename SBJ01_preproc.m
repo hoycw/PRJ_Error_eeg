@@ -18,7 +18,7 @@ ft_defaults
 %% Set up processing and SBJ variables
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_proc_vars.m'];
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' odd_proc_id '_vars.m'];
 eval(proc_vars_cmd);
 
 %% Load and preprocess the data
@@ -38,14 +38,14 @@ end
 % Load and preprocess
 cfg = [];
 cfg.continuous = 'yes'; 
-% cfg.lpfilter   = proc_vars.lp_yn;
-% cfg.hpfilter   = proc_vars.hp_yn;
-cfg.bpfilter   = proc_vars.bp_yn;
-cfg.bpfreq     = proc_vars.bp_freq;
-cfg.bpfiltord  = proc_vars.bp_order;
-cfg.demean     = proc_vars.demean_yn;
-cfg.reref      = proc_vars.reref_yn;
-cfg.refmethod  = proc_vars.ref_method;
+% cfg.lpfilter   = proc.lp_yn;
+% cfg.hpfilter   = proc.hp_yn;
+cfg.bpfilter   = proc.bp_yn;
+cfg.bpfreq     = proc.bp_freq;
+cfg.bpfiltord  = proc.bp_order;
+cfg.demean     = proc.demean_yn;
+cfg.reref      = proc.reref_yn;
+cfg.refmethod  = proc.ref_method;
 cfg.refchannel = {ear_lab1, ear_lab2};
 
 data = cell(size(SBJ_vars.block_name));
@@ -56,9 +56,9 @@ end
 data = fn_concat_blocks(data);
 
 %% Downsample
-if strcmp(proc_vars.resample_yn,'yes')
+if strcmp(proc.resample_yn,'yes')
     cfg = [];
-    cfg.resamplefs = proc_vars.resample_freq;
+    cfg.resamplefs = proc.resample_freq;
     data = ft_resampledata(cfg, data);
 end
 
@@ -134,9 +134,9 @@ data = ft_selectdata(cfg,data);
 % cfg = [];
 % cfg.dataset             = SBJ_vars.dirs.raw_filename;
 % cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
-% cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
-% cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
-% cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
+% cfg.trialdef.eventvalue = proc.event_code;        % feedback cocde
+% cfg.trialdef.prestim    = proc.trial_lim_s(1);
+% cfg.trialdef.poststim   = proc.trial_lim_s(2);
 % cfg.trialfun            = 'tt_trialfun';%'ft_trialfun_general';%
 % cfg_trl = ft_definetrial(cfg);
 % 
@@ -161,10 +161,10 @@ if ~isempty(bad_epochs)
     cfg.artfctdef.reject          = 'nan';
     data = ft_rejectartifact(cfg, data);
 end
-if strcmp(proc_vars.ICA_hp_yn,'yes')
+if strcmp(proc.ICA_hp_yn,'yes')
     cfg = [];
-    cfg.hpfilter = proc_vars.ICA_hp_yn;
-    cfg.hpfreq   = proc_vars.ICA_hp_freq;
+    cfg.hpfilter = proc.ICA_hp_yn;
+    cfg.hpfreq   = proc.ICA_hp_freq;
     data_ICA = ft_preprocessing(cfg, data);
 else
     data_ICA = data;

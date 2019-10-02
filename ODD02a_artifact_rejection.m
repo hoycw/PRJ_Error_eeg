@@ -20,7 +20,7 @@ ft_defaults
 %% Processing variables
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' odd_proc_id '_proc_vars.m'];
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' odd_proc_id '_vars.m'];
 eval(proc_vars_cmd);
 
 %% Load data
@@ -37,12 +37,12 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg = [];
     cfg.dataset             = SBJ_vars.dirs.raw_filename{b_ix};
     cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
-    cfg.trialdef.eventvalue = proc_vars.event_code;        % feedback cocde
-    cfg.trialdef.prestim    = proc_vars.trial_lim_s(1);
-    cfg.trialdef.poststim   = proc_vars.trial_lim_s(2);
+    cfg.trialdef.eventvalue = proc.event_code;        % feedback cocde
+    cfg.trialdef.prestim    = proc.trial_lim_s(1);
+    cfg.trialdef.poststim   = proc.trial_lim_s(2);
     cfg.trialfun            = 'oddball_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
-    cfg.resamp_freq         = proc_vars.resample_freq;
+    cfg.resamp_freq         = proc.resample_freq;
     cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
 end
 hdr = ft_read_header(SBJ_vars.dirs.raw_filename{1});
@@ -50,8 +50,8 @@ endsample = hdr.nSamples;
 origFs = hdr.Fs;
 if numel(SBJ_vars.block_name)>1
     for b_ix = 2:numel(SBJ_vars.block_name)
-       cfg_trl_unconcat{b_ix}.trl(:,1) = cfg_trl_unconcat{b_ix}.trl(:,1)+endsample/origFs*proc_vars.resample_freq;
-       cfg_trl_unconcat{b_ix}.trl(:,2) = cfg_trl_unconcat{b_ix}.trl(:,2)+endsample/origFs*proc_vars.resample_freq;
+       cfg_trl_unconcat{b_ix}.trl(:,1) = cfg_trl_unconcat{b_ix}.trl(:,1)+endsample/origFs*proc.resample_freq;
+       cfg_trl_unconcat{b_ix}.trl(:,2) = cfg_trl_unconcat{b_ix}.trl(:,2)+endsample/origFs*proc.resample_freq;
        cfg_trl_unconcat{1}.trl = vertcat(cfg_trl_unconcat{b_ix-1}.trl, cfg_trl_unconcat{b_ix}.trl);
     end
 end
@@ -77,15 +77,15 @@ end
 %load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
 if ~isempty(bad_epochs)
     bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
-        event_onsets,proc_vars.trial_lim_s*data.fsample);    
+        event_onsets,proc.trial_lim_s*data.fsample);    
 else
     bad_raw_trials = [];
 end
 
 % Identify training and bad behavioral trials
 training_ix = find(bhv.blk==-1);
-rt_low_ix   = find(bhv.rt <= proc_vars.rt_bounds(1) & bhv.rt>0);
-rt_high_ix  = find(bhv.rt >= proc_vars.rt_bounds(2));
+rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1) & bhv.rt>0);
+rt_high_ix  = find(bhv.rt >= proc.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
 
 % Exclude bad trials
@@ -107,11 +107,11 @@ cfg.topolabel = icatopolabel;
 ica           = ft_componentanalysis(cfg, trials);
 
 % Filter EOG
-if strcmp(proc_vars.eog_bp_yn,'yes')
+if strcmp(proc.eog_bp_yn,'yes')
     cfg           = [];
-    cfg.bpfilter  = proc_vars.eog_bp_yn;
-    cfg.bpfreq    = proc_vars.eog_bp_freq;
-    cfg.bpfiltord = proc_vars.eog_bp_filtord;
+    cfg.bpfilter  = proc.eog_bp_yn;
+    cfg.bpfreq    = proc.eog_bp_freq;
+    cfg.bpfiltord = proc.eog_bp_filtord;
     eog = ft_preprocessing(cfg,eog_trials);
 end
 
@@ -128,8 +128,8 @@ end
 
 % Identify most correlated components
 avg_eog_ic_corr = mean(eog_ic_corr,3);
-heog_ics = find(abs(avg_eog_ic_corr(1,:))>proc_vars.eog_ic_corr_cut);
-veog_ics = find(abs(avg_eog_ic_corr(2,:))>proc_vars.eog_ic_corr_cut);
+heog_ics = find(abs(avg_eog_ic_corr(1,:))>proc.eog_ic_corr_cut);
+veog_ics = find(abs(avg_eog_ic_corr(2,:))>proc.eog_ic_corr_cut);
 if all([isempty(heog_ics), isempty(veog_ics)])
     error('No EOG ICs found!');
 elseif isempty(heog_ics); warning('No HEOG IC found!');

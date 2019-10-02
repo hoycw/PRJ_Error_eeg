@@ -52,9 +52,9 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T7', 'FT7', 'FC2'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
-SBJ_vars.endsample = {}
-SBJ_vars.trial_reject_ix = []
-SBJ_vars.ica_reject = []
+SBJ_vars.endsample = {};
+SBJ_vars.trial_reject_ix = [];
+SBJ_vars.ica_reject = [];
 
 %--------------------------------------
 % Noise Notes

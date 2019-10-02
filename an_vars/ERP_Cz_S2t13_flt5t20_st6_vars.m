@@ -1,7 +1,6 @@
 an.ROI         = {'Cz'};             % Channel to be analyzed
 an.event_type  = 'S';           % event around which to cut trials
 an.trial_lim_s = [-0.2 1.3];       % window in SEC for cutting trials
-%an.plt_lim     = [-0.2 1];         % window for plotting these results
 an.demean_yn   = 'yes';
 an.bsln_lim    = [-0.2 -0.05];    % window in SEC for baseline correction
 an.stat_lim    = [0 0.6];            % window in SEC for stats
@@ -31,16 +30,19 @@ cfg_stat.neighbours       = [];%neighbors;
 cfg_stat.ivar             = 1;  %row of design matrix containing independent variable
 % cfg_stat.uvar             = 2;  %row containing dependent variable, not needed for indepsamp
 
-cfg_avg = [];
-cfg_avg.channel = {'all'};
-cfg_avg.latency = an.stat_lim;
-cfg_avg.keepindividual = 'no';
-cfg_avg.method = 'across';
-cfg_avg.parameter = 'avg';
+cfg_iavg = [];
+cfg_iavg.keeptrials = 'yes';
 
-cfg_tfr.method = 'wavelet';
-cfg_tfr.output = 'pow';
-cfg_tfr.taper = 'hanning';
-cfg_tfr.foi = [2:30]; 
-cfg_tfr.width = 2; %default
-cfg_tfr.toi  = 0:0.004:2.8; 
+cfg_gavg = [];
+cfg_gavg.channel        = {'all'};
+cfg_gavg.latency        = an.stat_lim;
+cfg_gavg.keepindividual = 'no';
+cfg_gavg.method         = 'across';
+cfg_gavg.parameter      = 'avg';
+
+% cfg_tfr.method = 'wavelet';
+% cfg_tfr.output = 'pow';
+% cfg_tfr.taper = 'hanning';
+% cfg_tfr.foi = [2:30]; 
+% cfg_tfr.width = 2; %default
+% cfg_tfr.toi  = 0:0.004:2.8; 

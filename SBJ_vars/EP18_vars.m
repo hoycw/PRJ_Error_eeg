@@ -51,7 +51,7 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T7'};
 SBJ_vars.ch_lab.null    = {'EXG7', 'EXG8'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
-SBJ_vars.endsample = {}
+SBJ_vars.endsample = {};
 SBJ_vars.trial_reject_ix = [1 222 336 322 294 267 307 310];
 SBJ_vars.ica_reject = [1 2 6 9 13 19 23 24 28 30 37 41 43 44 49 53 56 60 61 62 63];
 
