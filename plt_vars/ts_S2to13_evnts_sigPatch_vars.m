@@ -26,3 +26,4 @@ plt_vars.evnt_width = 2;
 plt_vars.evnt_color = 'k';
 plt_vars.evnt_style = '--';
 plt_vars.clim_perc = [5, 95];
+plt_vars.evnt_type = 

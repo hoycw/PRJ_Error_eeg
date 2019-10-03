@@ -85,7 +85,7 @@ for x = 1: numel(comp.label)
     fig_name = [SBJ comp.label(il,1)];
     fig_name = strcat(fig_name(1), fig_name(2), '_ICA_plots');
     fig_name = char(fig_name);
-    f = figure('units','normalized','outerposition', manpos, 'Name', fig_name, 'Visible', 0);
+    f = figure('units','normalized','outerposition', manpos, 'Name', fig_name, 'Visible', 'off');
     l = l + 1;
     
     

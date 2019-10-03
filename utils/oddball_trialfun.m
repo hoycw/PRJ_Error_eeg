@@ -27,12 +27,16 @@ trl = [];
 oddball_section = 1;    % indicator for whether these events are in the first oddball section
 for i=1:length(event)
   if strcmp(event(i).type, cfg.trialdef.eventtype)
-    if event(i).value == 255
+    if (event(i).value == 255 || event(i).value == 254) && i>400
         % This marks the end of the oddball section and the start of the TT
         oddball_section = 0;
     end
+    if (event(i).value == 255 || event(i).value == 254) && i<400
+        % This marks the end of the oddball section and the start of the TT
+        trl = [];
+    end
     % Add oddball stim onsets: real event codes (1,2,3) = (std,tar,odd)
-    if oddball_section && event(i).value~=254
+    if oddball_section && (event(i).value~=254 && event(i).value~=255)
       begsample     = event(i).sample*resamp_factor + round(cfg.trialdef.prestim*srate);
       endsample     = event(i).sample*resamp_factor + round(cfg.trialdef.poststim*srate)-1;
       offset        = cfg.trialdef.prestim*srate;  
