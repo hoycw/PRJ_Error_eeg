@@ -1,4 +1,4 @@
-%% EEG 10 Processing Variables
+%% EEG 12 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 elseif exist('/Users/aasthashah/','dir'); root_dir='/Users/aasthashah/Desktop/';ft_dir='/Users/aasthashah/Desktop/fieldtrip/';
@@ -11,10 +11,10 @@ ft_defaults
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = 'EEG10';
-SBJ_vars.raw_file = {'eeg10.bdf'};
-SBJ_vars.bhv_file = {'eeg10_response_log_20190815161826.txt','eeg10_response_log_20190815160817.txt'};
-SBJ_vars.oddball_file = {'eeg10_oddball_log_20190815155252.txt'};
+SBJ_vars.SBJ = 'EEG12';
+SBJ_vars.raw_file = {'eeg12.bdf'};
+SBJ_vars.bhv_file = {'eeg12(part 1)_response_log_2019081914'};
+SBJ_vars.oddball_file = {'eeg12_oddball_log_20190819141030.txt','eeg12_oddball_log_20190819141120.txt','eeg12_oddball_log_20190819142106.txt'}
 SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
@@ -46,20 +46,19 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
-SBJ_vars.ch_lab.null = {'EXG6', 'EXG7', 'EXG8'};
-SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
+SBJ_vars.ch_lab.null = {'EXG6', 'EXG7', 'EXG8'}
+SBJ_vars.ch_lab.replace = {{'P2','EXG6'},{'PO4','EXG7'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
-'Oz'
+'T7','TP7','P9','AF8'
     };
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_ix = [256 427 558 34 304 255 4 20 112];
-SBJ_vars.trial_reject_ix_oddball = [80 118 127 128 386];
-SBJ_vars.ica_reject = [1 2 3 5 7 9 10 12 13 14 17 24 25 27 36 37 40 42 43 45 47 51 52 56 58 62 63];
+SBJ_vars.trial_reject_ix = [];
+SBJ_vars.ica_reject = [1 3 4 5 6 7 9 10 11 13 14 17 19 21 25 32 33 41 42 43 5];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------

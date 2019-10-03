@@ -27,9 +27,12 @@ trl = [];
 oddball_section = 1;
 for i=1:length(event)
   if strcmp(event(i).type, cfg.trialdef.eventtype)
-    if event(i).value == 255
+    if event(i).value == 255 & i>4
        % This marks the end of the oddball section and the start of the TT
         oddball_section = 0;
+    end
+    if event(i).value == 254 || event(i).value == 255 && ~oddball_section
+         trl = [];
     end
     % Add TT events: event code (1, 2) = (stim, feedback)
     if ~oddball_section && ismember(event(i).value, cfg.trialdef.eventvalue)

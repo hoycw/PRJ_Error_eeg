@@ -65,7 +65,7 @@ for ch_ix = 1:numel(data.label)
     set(gca,'YDir','normal');
     
     % Plot events
-    for e_ix = 1:numel(plt_vars.evnt_type)
+    for e_ix = 1
         line([evnt_ix(e_ix) evnt_ix(e_ix)],ylim,...
             'LineWidth',plt_vars.evnt_width(e_ix),'Color',plt_vars.evnt_color{e_ix},'LineStyle',plt_vars.evnt_style{e_ix});
     end

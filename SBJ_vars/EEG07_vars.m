@@ -23,7 +23,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
-SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/ERP_stacks/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -57,8 +57,9 @@ SBJ_vars.ch_lab.bad     = {...
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 
 %SBJ_vars.trial_reject_ix = [19, 162, 190, 221, 241, 244, 249, 333, 343, 351, 410, 426, 436, 440, 485, 487, 501, 508, 509, 530, 559];
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.ica_reject = [];
+SBJ_vars.trial_reject_ix = [89 138 238 253 254 256 261 268 269 270 272 274 275 276 277 279 378];
+SBJ_vars.trial_reject_ix_oddball = [76 274:278 318 376];
+SBJ_vars.ica_reject = [1 3 6 8 15 19 21 23 31 33 35 37 42 51 52 54 55];
 %--------------------------------------
 % Noise Notes
 %--------------------------------------
