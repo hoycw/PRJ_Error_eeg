@@ -13,7 +13,7 @@ ft_defaults
 %--------------------------------------
 SBJ_vars.SBJ = 'EEG03';
 SBJ_vars.raw_file = {'eeg03.bdf'};
-SBJ_vars.bhv_file = '03_oddball_log_20190722150855.txt','EEG03_response_log_20190722152821.txt';
+SBJ_vars.bhv_file = {'03_oddball_log_20190722150855.txt','EEG03_response_log_20190722152821.txt'};
 SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];

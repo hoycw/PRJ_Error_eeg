@@ -54,9 +54,23 @@ if ~strcmp(proc.event_type,an.event_type)
     else
         error('unknown combination of proc and an event_types');
     end
+    % Convert time axis to new event:
+    %   basically: data.time{i} = data.time{i} + offset(i)/data.fsample;
+    %   therefore, negative offset will shift time axis "back"
     roi = ft_redefinetrial(cfg, clean_trials);
 else
     roi = clean_trials;
+end
+
+% Check window consistency
+%   Check trial_lim_s is within trial time (round to avoid annoying computer math)
+if round(an.trial_lim_s(1)+1/roi.fsample,3) < round(roi.time{1}(1),3) || ...
+        round(an.trial_lim_s(2)-1/roi.fsample,3) > round(roi.time{1}(end),3)
+    error('an.trial_lim_s is outside data time bounds!');
+end
+%   Check bsln_lim is within trial_lim_s
+if an.bsln_lim(1) < an.trial_lim_s(1) || an.bsln_lim(2) > an.trial_lim_s(2)
+    error('an.bsln_lim is outside an.trial_lim_s!');
 end
 
 % Select window and channels of interest
@@ -84,7 +98,7 @@ for cond_ix = 1:numel(cond_lab)
     cfg_iavg.trials = find(cond_idx==cond_ix);
     roi_erp{cond_ix} = ft_timelockanalysis(cfg_iavg,roi);
     % Grab n_trials for design matrix
-    n_trials(cond_ix) = size(roi_erp{cond_ix}.trial,1);
+    n_trials(cond_ix) = numel(cfg_iavg.trials);
 end
 
 %% Contrast conditions
@@ -144,7 +158,10 @@ end
 
 % Calculate statistics
 cfg_stat.design = design;
-[stat] = ft_timelockstatistics(cfg_stat, roi_erp{:});
+% [stat] = ft_timelockstatistics(cfg_stat, roi_erp{:});
+warning('HACK!!!! MEX file work around, just copying roi_erp instead of running real stats!!!');
+stat = roi_erp{1};
+stat.mask = zeros([numel(stat.label) numel(stat.time)]);
 
 %% Save Results
 data_out_fname = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',conditions,'_',an_id,'.mat');

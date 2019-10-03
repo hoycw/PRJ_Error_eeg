@@ -13,7 +13,7 @@ ft_defaults
 %--------------------------------------
 SBJ_vars.SBJ = 'EEG04';
 SBJ_vars.raw_file = {'eeg04.bdf'};
-SBJ_vars.bhv_file = 'eeg04targettime_response_log_20190723111122.txt','eeg04TT_response_log_20190723111922.txt';
+SBJ_vars.bhv_file = {'eeg04targettime_response_log_20190723111122.txt','eeg04TT_response_log_20190723111922.txt'};
 SBJ_vars.oddball_file = 'eeg04_oddball_log_20190723104701.txt';
 SBJ_vars.block_name = {''};
 

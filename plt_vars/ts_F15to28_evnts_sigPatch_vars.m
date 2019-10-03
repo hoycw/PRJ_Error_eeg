@@ -1,28 +1,28 @@
-plt_vars.plt_lim  = [-0.25 2.8];
-plt_vars.x_step_sz  = 0.25;
-plt_vars.legend     = 1;
-plt_vars.legend_loc_S = 'northwest';
-plt_vars.legend_loc_R = 'northeast';
-plt_vars.legend_loc = 'northeast';
-plt_vars.fsample = 250;
+plt.plt_lim  = [-0.25 2.8];
+plt.x_step_sz  = 0.25;
+plt.legend     = 1;
+plt.legend_loc_S = 'northwest';
+plt.legend_loc_R = 'northeast';
+plt.legend_loc = 'northeast';
+plt.fsample = 250;
 
-plt_vars.ylim_fudge = 0.1;
+plt.ylim_fudge = 0.1;
 
-plt_vars.errbar_alpha = 0.5;
-%plt_vars.main_style = '--';
+plt.errbar_alpha = 0.5;
+%plt.main_style = '--';
 
-plt_vars.plot_avg  = 0;
-plt_vars.sig_type  = 'patch';
-plt_vars.sig_color = [0.5 0.5 0.5 0.5];
-plt_vars.sig_alpha = 0.3;
-%plt_vars.sig_style = '-';
-%plt_vars.sig_width = 5;
-%plt_vars.sig_scat_size  = 70;
-%plt_vars.sig_scat_mrkr  = 'o';
-%plt_vars.sig_scat_size2 = 30;
-%plt_vars.sig_scat_mrkr2 = '+';
+plt.plot_avg  = 0;
+plt.sig_type  = 'patch';
+plt.sig_color = [0.5 0.5 0.5 0.5];
+plt.sig_alpha = 0.3;
+%plt.sig_style = '-';
+%plt.sig_width = 5;
+%plt.sig_scat_size  = 70;
+%plt.sig_scat_mrkr  = 'o';
+%plt.sig_scat_size2 = 30;
+%plt.sig_scat_mrkr2 = '+';
 
-plt_vars.evnt_width = 2;
-plt_vars.evnt_color = 'k';
-plt_vars.evnt_style = '--';
-plt_vars.clim_perc = [5, 95];
+plt.evnt_width = 2;
+plt.evnt_color = 'k';
+plt.evnt_style = '--';
+plt.clim_perc = [5, 95];

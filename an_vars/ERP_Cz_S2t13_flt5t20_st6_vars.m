@@ -31,7 +31,7 @@ cfg_stat.ivar             = 1;  %row of design matrix containing independent var
 % cfg_stat.uvar             = 2;  %row containing dependent variable, not needed for indepsamp
 
 cfg_iavg = [];
-cfg_iavg.keeptrials = 'yes';
+cfg_iavg.keeptrials = 'no';
 
 cfg_gavg = [];
 cfg_gavg.channel        = {'all'};
