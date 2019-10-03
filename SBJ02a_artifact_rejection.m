@@ -1,11 +1,10 @@
-function ODD02a_artifact_rejection(SBJ, proc_id, odd_proc_id, gen_figs, fig_vis, ignore_trials, plt_id)
+function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, ignore_trials)
 % This function generates figures for both the ERP stacks and the ICA Plots
-% INPUTS:
-%   SBJ = 'EEG#'
-%   proc_id = 'egg_full_ft'
-%   proc_id_odd = 'odd_full_ft'
-%   gen_figs = 0 (if no, don't generate), 1 (if yes)
-%   fig_vis = 1 if a data_browser view of the time course of the ICA components is desired
+%SBJ = 'EEG#'
+%Proc_id = 'egg_full_ft'
+%gen_figs = 0 (if no, don't generate), 1 (if yes)
+%fig_vis = 1 if a data_browser view of the time course of the ICA
+%components is desired
 
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
@@ -29,7 +28,11 @@ data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
-[bhv] = fn_load_behav_csv_oddball([SBJ_vars.dirs.events SBJ '_behav_oddball.csv'], []);
+if any(strcmp(SBJ, {'EP01','EP02','EP03','EP04','EP05'}))
+     [bhv] = fn_load_behav_csv_old([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
+else
+     [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
+end
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
@@ -40,7 +43,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.trialdef.eventvalue = proc.event_code;        % feedback cocde
     cfg.trialdef.prestim    = proc.trial_lim_s(1);
     cfg.trialdef.poststim   = proc.trial_lim_s(2);
-    cfg.trialfun            = 'oddball_trialfun';
+    cfg.trialfun            = 'tt_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc.resample_freq;
     cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
@@ -84,7 +87,7 @@ end
 
 % Identify training and bad behavioral trials
 training_ix = find(bhv.blk==-1);
-rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1) & bhv.rt>0);
+rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1));
 rt_high_ix  = find(bhv.rt >= proc.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
 
@@ -166,10 +169,10 @@ if gen_figs
     cfg.prefix   = 'ICA';
     cfg.viewmode = 'component';
     cfg.fig_vis  = fig_vis;
-    fn_icabrowser_modified_odd(SBJ, cfg, ica);
+    fn_icabrowser_modified(SBJ, cfg, ica);
     
     % Plot IC single trial stacks + ERPs
-    fn_plot_ERP_stack_odd(SBJ, odd_proc_id, plt_id, ica, 'off', 1);
+    fn_plot_ERP_stack(SBJ, proc_id, 'ERPstack_full_evnts', ica, 'off', 1);
 end    
 % Plot IC in ft_databrowser
 if fig_vis
@@ -180,12 +183,11 @@ if fig_vis
         ft_databrowser(cfg, ica);
 end
 
-
 %% Save Data
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' odd_proc_id '.mat'];
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' proc_id '.mat'];
 save(clean_data_fname, '-v7.3', 'trials', 'cfg_trl', 'ica', 'heog_ics', 'veog_ics', 'eog_trials');
 
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' odd_proc_id '_clean.mat'];
+clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' proc_id '_clean.mat'];
 save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
 end

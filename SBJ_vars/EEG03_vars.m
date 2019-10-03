@@ -51,7 +51,6 @@ SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
- ''
     };
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
 

@@ -51,9 +51,9 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T7', 'FT7', 'FC2'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 %SBJ_vars.ref_exclude = {}; %exclude from the CAR
-SBJ_vars.endsample = {}
+SBJ_vars.endsample = {};
 SBJ_vars.trial_reject_ix = [247 269 314 320 487];
-SBJ_vars.ica_reject = [3 10 12 13 16 21 22 23 24 28 29 35 37 38 40 42 45 48 52 53 51 54 55 56 58 59 60 61]
+SBJ_vars.ica_reject = [3 10 12 13 16 21 22 23 24 28 29 35 37 38 40 42 45 48 52 53 51 54 55 56 58 59 60 61];
 
 %--------------------------------------
 % Noise Notes

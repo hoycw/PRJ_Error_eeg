@@ -14,7 +14,7 @@ ft_defaults
 SBJ_vars.SBJ = 'EEG06';
 SBJ_vars.raw_file = {'eeg06.bdf'};
 SBJ_vars.bhv_file = 'eeg06_response_log_20190730111030.txt';
-SBJ_vars.oddball_file = {'eeg06_oddball_log_20190730105341.txt'}
+SBJ_vars.oddball_file = {'eeg06_oddball_log_20190730105341.txt'};
 SBJ_vars.block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
@@ -46,7 +46,7 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
-SBJ_vars.ch_lab.null = {'EXG6', 'EXG7', 'EXG8'}
+SBJ_vars.ch_lab.null = {'EXG6', 'EXG7', 'EXG8'};
 SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
