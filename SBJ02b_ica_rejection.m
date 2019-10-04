@@ -14,9 +14,9 @@ eval(SBJ_vars_cmd);
 
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id_ica '.mat'];
 load(data_fname);
-data_cleanname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' proc_id '.mat'];
+data_cleanname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'];
 load(data_cleanname)
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' proc_id '_clean.mat'];
+clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_02a.mat'];
 load(clean_bhv_fname);
 
 %% IC rejection
@@ -26,6 +26,7 @@ cfg.demean = 'no';
 clean_trials = ft_rejectcomponent(cfg, ica);
 
 %% Repair Bad Channels
+%   Adding them back in enables ft_databrowser to plot full cap correctly
 cfg = [];
 cfg.method         = 'average';
 cfg.missingchannel = SBJ_vars.ch_lab.bad(:); % not in data (excluded from ica)
@@ -61,10 +62,7 @@ else
 end
 
 %% Save outputs
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02b_' proc_id '.mat'];
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_02b.mat'];
 save(clean_data_fname, '-v7.3', 'clean_trials');
-
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02b_' proc_id '_clean.mat'];
-save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
 end
