@@ -51,55 +51,5 @@ SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'P2', 'P9', 'P1'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
-%SBJ_vars.ref_exclude = {}; %exclude from the CAR
-%SBJ_vars.endsample = {913408,1922048};
 SBJ_vars.trial_reject_ix = [27, 52, 61, 62, 69, 98, 128, 180, 210, 222, 230, 234, 254, 271, 272, 279, 311, 325, 326, 337, 339, 377, 379, 392, 393, 405, 440, 455, 457, 463, 508, 519, 521, 527, 528];
 SBJ_vars.ica_reject = [1 2 6 8 9 17 15 16 17 12 21 25 36 30 37 39 44 43 59 51 53 47 48 58 60];
-
-%--------------------------------------
-% Noise Notes
-%--------------------------------------
-% recording info sheet notes:
-    %'PO7','O1','Iz','Oz'... % noisy channels
-% PSD Notes:
-    %'AF3','CP2','Iz','Oz','O1','O2','PO3','PO7','PO8','POz' - PSD looks noisy
-    %'F1' - strange flat PSD
-    %'F6','P2','P8' empty
-% Raw View notes:
-    % POz has big ripples, PO3 at times too
-    % TP8 also has big fluctuations
-    % PO8 has big noise at times
-    % O2 breaks loose at some point
-    % AF3 becomes very onisy at some point
-% databrowser post-IC rejection:
-    % channels: Iz, Oz, PO8, PO3, T8 (trial 31), POz (esp. t 151), 216 starts O2 loose, F6 (t 351), AF3 (t 413), F4(t 417), TP7 (t 436)
-    % trials: 142 (EOG missed?), 228, 375, 376, 387, 398 (P5), 402, 409, 410, 420, 441, 462, 463, 479, 490, 497, 513, 533, 543, 548, 552:554, 559?, 570, 576?, 580
-% ft summary:
-    % Fp1, AF7, AF3, PO3, Iz, Oz, POz, Fpz, Fp2, AF8, F4, T8, PO8, O2, F6
-    % trials (n/582): 31, 32, 329
-
-% pre-ICA rejection:
-% ft summary notes:
-    % channels (n/64): Iz, Oz, PO8, O2
-    % trials (n/582): 151, 351, 386, 413, 419, 462, 463, 513, 554
-% ft summary EOG notes:
-    % trials (n/582): 139, 142, 325, 542, 554, 559, 576, 580bp
-
-%--------------------------------------
-% Time Parameters
-%--------------------------------------
-% SBJ_vars.analysis_time = {};
-
-%-------------------------s-------------
-% Trials and Channels to Reject
-%--------------------------------------
-% These should be indices AFTER SBJ05 has run!
-% original trial_reject_ix = [52 61 77 125 154 156 185 187 131 132 133 205 254 265 280 283 4303 311 318 319 320];
-%SBJ_vars.trial_reject_ix = [52 61 77 125 154 156 185 187 131 132 133 205 254 265 280 283 303 311 318 319 320];
-%SBJ_vars.channels_reject_ix = {'T7','T8'};
-
-%--------------------------------------
-% Component Paramaters
-%--------------------------------------
-% SBJ_vars.top_comp_cut = 0.1;
-%SBJ_vars.rejcomp = [1];
