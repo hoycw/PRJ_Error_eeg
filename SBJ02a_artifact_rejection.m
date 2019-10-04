@@ -184,10 +184,10 @@ if fig_vis
 end
 
 %% Save Data
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' proc_id '.mat'];
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'];
 save(clean_data_fname, '-v7.3', 'trials', 'cfg_trl', 'ica', 'heog_ics', 'veog_ics', 'eog_trials');
 
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' proc_id '_clean.mat'];
+clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_02a.mat'];
 save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
 end
