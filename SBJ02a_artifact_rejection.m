@@ -28,11 +28,7 @@ data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
-if any(strcmp(SBJ, {'EP01','EP02','EP03','EP04','EP05'}))
-     [bhv] = fn_load_behav_csv_old([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
-else
-     [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
-end
+[bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
