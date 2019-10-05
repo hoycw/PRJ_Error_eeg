@@ -1,5 +1,5 @@
-function ODD02a_artifact_rejection(SBJ, proc_id, odd_proc_id, gen_figs, fig_vis, ignore_trials, plt_id)
-% This function generates figures for both the ERP stacks and the ICA Plots
+function ODD02a_artifact_rejection(SBJ, proc_id, odd_proc_id, gen_figs, fig_vis, plt_id)
+% This function generates figures for both the ERP stacks and the ICA Plots for the oddball trials.  Also cuts out the bad trials (training, RT).
 % INPUTS:
 %   SBJ = 'EEG#'
 %   proc_id = 'egg_full_ft'
@@ -9,6 +9,7 @@ function ODD02a_artifact_rejection(SBJ, proc_id, odd_proc_id, gen_figs, fig_vis,
 
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -29,7 +30,7 @@ data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 load(data_fname);
 
 % Load Behavior
-[bhv] = fn_load_behav_csv_oddball([SBJ_vars.dirs.events SBJ '_behav_oddball.csv'], []);
+[bhv] = fn_load_behav_csv_oddball([SBJ_vars.dirs.events SBJ '_behav_oddball.csv']);
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
@@ -40,6 +41,8 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.trialdef.eventvalue = proc.event_code;        % feedback cocde
     cfg.trialdef.prestim    = proc.trial_lim_s(1);
     cfg.trialdef.poststim   = proc.trial_lim_s(2);
+    cfg.tt_trigger_ix = SBJ_vars.tt_trigger_ix;
+    cfg.odd_trigger_ix = SBJ_vars.odd_trigger_ix;
     cfg.trialfun            = 'oddball_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc.resample_freq;

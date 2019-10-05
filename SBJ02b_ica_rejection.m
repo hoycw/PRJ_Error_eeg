@@ -1,6 +1,14 @@
 function SBJ02b_ica_rejection(SBJ,proc_id, proc_id_ica, dorejectvisual)
+%This function does the ICA rejection and repairs the bad channels.  Do visual trial rejection and %record the bad trials in SBJ_vars.trial_reject_ix.
+%SBJ = 'EEG#'
+%Proc_id = 'egg_full_ft' or 'odd_full_ft' for oddball trials
+%gen_figs = 0 (if no, don't generate), 1 (if yes)
+%fig_vis = 1 if a data_browser view of the time course of the ICA
+%components is desired
+%dorejectvisual = 0 if don't want to do visual trial rejection, 1 if do
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);

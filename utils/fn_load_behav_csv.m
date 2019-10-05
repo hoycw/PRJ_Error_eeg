@@ -1,9 +1,8 @@
-function [bhv] = fn_load_behav_csv(csv_fname,ignore_trials)
+function [bhv] = fn_load_behav_csv(csv_fname)
 %% Load trial info csv exported from python
 %   Also converts from python 0-based to MATLAB 1-based indexing
 % INPUTS:
 %   csv_fname [str] - full file path to behavioral csv
-%   ignore_trials [int array] - list of trial numbers to be removed (MATLAB indexing)
 % OUTPUTS:
 %   bhv [struct] - contains many fields of info on the trials
 
@@ -51,12 +50,7 @@ fclose(bhv_file);
 % Get list of good trials
 n_trials = size(bhv_data{1},1);
 fprintf('\t\tFound %d trials in log file\n', n_trials);
-if ~isempty(ignore_trials)
-    fprintf('\t\tIgnoring %d trials\n', numel(ignore_trials));
-    good_trials = setdiff(1:n_trials,ignore_trials);
-else
-    good_trials = 1:n_trials;
-end
+good_trials = 1:n_trials;
 
 % Add data to struct, convert field names with spaces to underscore
 for f_ix = 1:numel(bhv_fields)

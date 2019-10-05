@@ -1,6 +1,7 @@
 %% EEG Pilot 08 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -50,5 +51,5 @@ SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T8', 'FT8'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
-SBJ_vars.trial_reject_ix = [39 109 171 339 353 427 501 526 465 558 573]; % NOTE: trial_reject_ix looks at the values in clean values in eeg02a and takes those indices (not the ones from the original) before the training etc.
+SBJ_vars.trial_reject_ix = [39 109 171 339 353 427 501 526 465 558 573];
 SBJ_vars.ica_reject = [1 5 9 12 17 18 19 23 26 28 29 30 32 34 36 37 40 42 47 50 51 52 55 56 58 59 60 61];

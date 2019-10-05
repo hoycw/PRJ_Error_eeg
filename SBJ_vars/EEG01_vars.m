@@ -1,6 +1,7 @@
 %% EEG Pilot 09 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -54,3 +55,4 @@ SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 SBJ_vars.trial_reject_ix = [373 167 228 227 380 445];
 SBJ_vars.ica_reject = [1 2 3 4 6 7 8 9 10 12 13 18 20 23 25 26 27 28 33 34 35 36 37 40 42 43 48 49 52 53 56 57 58 59];
 SBJ_vars.trial_reject_ix_oddball = [138 141 370 380];
+

@@ -1,5 +1,5 @@
-function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, ignore_trials)
-% This function generates figures for both the ERP stacks and the ICA Plots
+function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis)
+% This function generates figures for both the ERP stacks and the ICA Plots.  Also cut out the bad trials (training, RT).
 %SBJ = 'EEG#'
 %Proc_id = 'egg_full_ft'
 %gen_figs = 0 (if no, don't generate), 1 (if yes)
@@ -8,6 +8,7 @@ function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, ignore_trial
 
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -29,9 +30,9 @@ load(data_fname);
 
 % Load Behavior
 if any(strcmp(SBJ, {'EP01','EP02','EP03','EP04','EP05'}))
-     [bhv] = fn_load_behav_csv_old([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
+     [bhv] = fn_load_behav_csv_old([SBJ_vars.dirs.events SBJ '_behav.csv']);
 else
-     [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv'], ignore_trials);
+     [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
 end
 
 %% Cut into trials
@@ -43,6 +44,8 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.trialdef.eventvalue = proc.event_code;        % feedback cocde
     cfg.trialdef.prestim    = proc.trial_lim_s(1);
     cfg.trialdef.poststim   = proc.trial_lim_s(2);
+    cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
+    cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
     cfg.trialfun            = 'tt_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc.resample_freq;
