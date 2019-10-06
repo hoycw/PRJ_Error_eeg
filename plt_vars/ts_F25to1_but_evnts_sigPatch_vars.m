@@ -7,10 +7,10 @@ plt.legend_loc = 'northeast';
 
 plt.ylim_fudge = 0.1;
 
-plt.butterfly       = 0;
+plt.butterfly       = 1;
 plt.butterfly_width = 0.3;
 plt.mean_width      = 2.5;
-plt.errbar_alpha    = 0.5;
+plt.errbar_alpha    = 0;
 %plt.main_style = '--';
 
 plt.plot_avg  = 0;

@@ -111,23 +111,44 @@ for ch_ix = 1:numel(stat.label)
 %     subplot(plot_rc(1),plot_rc(2),ch_ix);
     ax = gca; hold on;
     
+    
     % Plot individual trials per condition
     if plt.butterfly
         for cond_ix = 1:numel(cond_lab)
-            plot(roi_erp{cond_ix}.time,trials{cond_ix}(ch_ix,:),...
+            plot(roi_erp{cond_ix}.time{1},trials{cond_ix}(ch_ix,:),...
                 'Color',cond_colors{cond_ix},'LineWidth',plt.butterfly_width);
+            imagesc(squeeze(trials(an_ix,ch_ix,RTs_sort_idx(cond_idx(cond_ix,:)),win_on:win_off)));
+            set(gca,'YDir','normal');
+            if strcmp(event,'stim')
+                scat = scatter(RTs_sort_cond{cond_ix}+plot_lim(1),1:sum(cond_idx(cond_ix,:)),...
+                    'MarkerFaceColor',[cond_colors{cond_ix}],...
+                    'MarkerEdgeColor','k');
+            end
+            ylim([1 sum(cond_idx(cond_ix,:))]);
+            event_line = line([plot_lim(1) plot_lim(1)],ylim,...
+                'LineWidth',event_ln_width,'Color','k');
+            % Axes and Labels
+            cbar = colorbar;
+            caxis(clims);
+            ax = gca;
+            ax.XLim = [0,win_off-win_on];
+            ax.XTick = 0:x_step:win_off;
+            ax.XTickLabel = x_lab;
+
+            title(strcat(header_ecog.channel_labels(ch_ix), ':', analysis_id{an_ix},...
+                ',',cond_lab{cond_ix},' (Single Trial, ',event,'-locked)'));
         end
     end
 
     % Plot Means (and variance)
-    ebars = cell(size(cond_lab));
-    main_lines = gobjects([numel(cond_lab)+numel(an.event_type) 1]);
+    ebars = {};
+    main_lines = gobject([numel(cond_lab)+numel(an.event_type) 1]);
     for cond_ix = 1:numel(cond_lab)
-        ebars{cond_ix} = shadedErrorBar(roi_erp{cond_ix}.time, roi_erp{cond_ix}.avg(ch_ix,:),...
+        ebars{cond_ix} = shadedErrorBar(roi_erp{cond_ix}.time{1}, roi_erp{cond_ix}.avg(ch_ix,:),...
             squeeze(sqrt(roi_erp{cond_ix}.var(ch_ix,:))./sqrt(numel(roi_erp{cond_ix}.cfg.previous.trials)))',...
-            {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
-            'LineStyle',cond_styles{cond_ix}},plt.errbar_alpha);
-        main_lines(cond_ix) = ebars{cond_ix}.mainLine;
+            {'Color',cond_colors{cond_ix},...
+            'LineStyle',cond_styles{cond_ix}},plt.errbr_alpha(cond_ix));
+        main_lines{cond_ix} = ebars{cond_ix}.mainLine;
     end
     ylims = ylim;
     
@@ -164,7 +185,7 @@ for ch_ix = 1:numel(stat.label)
     
     % Plot Extra Features (events, significance)
     for evnt_ix = 1:numel(an.event_type)
-        main_lines(numel(cond_lab)+evnt_ix) = line([0 0],ylim,...
+        main_lines{numel(cond_lab)+evnt_ix} = line([-plt.plt_lim(1) -plt.plt_lim(1)],ylim,...
             'LineWidth',plt.evnt_width(evnt_ix),'Color',plt.evnt_color{evnt_ix},'LineStyle',plt.evnt_style{evnt_ix});
     end
     
@@ -176,7 +197,7 @@ for ch_ix = 1:numel(stat.label)
     ax.XLabel.String = 'Time (s)';
     ax.Title.String  = stat.label{ch_ix};
     if plt.legend
-        legend(main_lines,cond_lab{:},an.event_type,'Location',plt.legend_loc);
+        legend(main_lines,cond.name{:},event.name{:},'Location',plt.legend_loc);
     end
     
     % Save figure

@@ -12,7 +12,6 @@ ft_defaults
 %% General parameters
 SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP19',...
            'EEG01','EEG02','EEG03','EEG04','EEG06','EEG08'};
-proc_id    = 'eeg_full_ft';
 
 %% Run preprocessing
 proc_id_ica = proc_id;
@@ -34,6 +33,7 @@ end
 
 %% Run TT ERPs
 conditions = 'DifOut';
+proc_id    = 'eeg_full_ft';
 an_id      = 'ERP_Cz_F25to1_flt05to20_st06';
 plt_id     = 'ts_F25to1_evnts_sigPatch';
 save_fig   = 0;
