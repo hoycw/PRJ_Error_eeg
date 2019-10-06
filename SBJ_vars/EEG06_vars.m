@@ -54,8 +54,8 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
 'FT7','FC5','F8'
     };
-SBJ_vars.trial_reject_ix = [];
+SBJ_vars.trial_reject_ix = [277 307 439 439 468 371 488];
 SBJ_vars.ica_reject = [1, 3, 4, 11, 12, 14, 15, 16, 17, 19, 20, 27, 28, 30, 32, 34, 51, 60];
-SBJ_vars.trial_reject_ix_oddball = [79, 80, 91, 366];
+SBJ_vars.trial_reject_ix_oddball = [69, 70, 81, 356];
 SBJ_vars.tt_trigger_ix = 404;
 SBJ_vars.odd_trigger_ix = 3;

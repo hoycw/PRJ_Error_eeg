@@ -53,7 +53,7 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
     };
 SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
+SBJ_vars.trial_reject_ix_oddball = [2];
 SBJ_vars.ica_reject = [1 3 4 7 8 10 11 12 16 19 26 27 28 29 33 37 41 44 46 47 50 51 52 53 56 58 59 60 61 62];
 SBJ_vars.tt_trigger_ix = 404;
 SBJ_vars.odd_trigger_ix = 3;

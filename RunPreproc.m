@@ -5,5 +5,5 @@ gen_figs = 1;
 fig_vis = 1;
 for ix = 1:numel(SBJs)
     SBJ02a_artifact_rejection(SBJs{ix}, proc_id, gen_figs, 'on');
-    ODD02a_artifact_rejection(SBJs{ix}, proc_id, odd_proc_id, 1, 'on', 'ts_S2to13_evnts_sigPatch'); 
+    ODD02a_artifact_rejection(SBJs{ix}, proc_id, odd_proc_id, 1, 'on', 'ERP_stack_full_events_odd'); 
 end

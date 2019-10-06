@@ -56,5 +56,5 @@ SBJ_vars.ch_lab.bad     = {...
     };
 SBJ_vars.trial_reject_ix = [9 94 110 163 351 5 6 371];
 SBJ_vars.ica_reject = [1 2 4 5 6 8 9 15 19 20 21 25 26 32 40 45 46 53 57 58];
-SBJ_vars.tt_trigger_ix = 407;
+SBJ_vars.tt_trigger_ix = 405;
 SBJ_vars.odd_trigger_ix = 3;
