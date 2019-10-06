@@ -1,6 +1,12 @@
 function ODD02c_trial_rejection(SBJ,proc_id, visual)
+% This function generates figures for both the ERP stacks and the ICA Plots for the oddball trials.  Also cut out the bad trials (training, RT).
+%SBJ = 'EEG#'
+%Proc_id = 'egg_full_ft'
+%visual = 0 or 1, whether or not to do a final databrowser check of the data
+
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);

@@ -1,5 +1,5 @@
 function SBJ01_preproc(SBJ, proc_id)
-%% Import and preprocess EEG data, then run ICA
+%% Import and preprocess EEG data. Null the bad channels and null the marked bad epochs from SBJ00.  Cut the data into trials and then run ICA.
 % INPUTS:
 %   SBJ [str] - name of the subject to load
 %   proc_id [str] - name of processing pipeline
@@ -7,7 +7,7 @@ function SBJ01_preproc(SBJ, proc_id)
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist ('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);

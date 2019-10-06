@@ -13,6 +13,13 @@ hdr   = ft_read_header(cfg.dataset);
 event = ft_read_event(cfg.dataset, 'header', hdr);
 fprintf('%i events found!\n',numel(event));
 
+%checks to see if starting with oddball or not, oddball_section = 1 means yes
+oddball_section = 0;
+for i = 1:400
+    if (event(i).value == 3)
+        oddball_section = 1;
+    end
+end
 % Compute resampling factor
 if isfield(cfg,'resamp_freq')
     resamp_factor = cfg.resamp_freq/hdr.Fs;
@@ -24,12 +31,17 @@ end
 
 % Find event cuts and built trl matrix
 trl = [];
-oddball_section = 1;
 for i=1:length(event)
   if strcmp(event(i).type, cfg.trialdef.eventtype)
+<<<<<<< HEAD
     if event(i).value == 255 && i>4
        % This marks the end of the oddball section and the start of the TT
         oddball_section = 0;
+=======
+    if (event(i).value == 255 || event(i).value == 254) && i == max(cfg.tt_trigger_ix, cfg.odd_trigger_ix)
+        % 255 and 254 seem to be interchangable.
+        oddball_section = abs(oddball_section - 1); %I think this is a cheat way to flip between 0 and 1
+>>>>>>> 3f44f4ffdb59fae486872f652fa2599d8a25ef3c
     end
     if event(i).value == 254 || event(i).value == 255 && ~oddball_section
          trl = [];

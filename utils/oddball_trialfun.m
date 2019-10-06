@@ -8,11 +8,9 @@ function trl = oddball_trialfun(cfg)
 %   cfg.trialdef.poststim [float] - latency in sec to cut post-event
 % Optional Fields:
 %   cfg.resamp_freq [int] - sampling rate if data was resampled (e.g., downsampling)
-
 hdr   = ft_read_header(cfg.dataset);
 event = ft_read_event(cfg.dataset, 'header', hdr);
 fprintf('%i events found!\n',numel(event));
-
 % Compute resampling factor
 if isfield(cfg,'resamp_freq')
     resamp_factor = cfg.resamp_freq/hdr.Fs;
@@ -21,24 +19,33 @@ else
     resamp_factor = 1;
     srate = hdr.Fs;
 end
+%checks to see if starting with oddball or not, oddball_section = 1 means yes
+oddball_section = 0;
+for i = 1:400
+    if (event(i).value == 3)
+        oddball_section = 1;
+    end
+end
 
 % Find event cuts and built trl matrix
 trl = [];
-oddball_section = 1;    % indicator for whether these events are in the first oddball section
 for i=1:length(event)
   if strcmp(event(i).type, cfg.trialdef.eventtype)
-    if (event(i).value == 255 || event(i).value == 254) && i>400
+    if (event(i).value == 255 || event(i).value == 254) && i == max(cfg.tt_trigger_ix, cfg.odd_trigger_ix) %the second paradigm's index
+        % 255 and 254 seem to be interchangable.
         % This marks the end of the oddball section and the start of the TT
-        oddball_section = 0;
+        oddball_section = abs(oddball_section - 1); % I think this is a cheat way to swithc between 0 and 1
     end
-    if (event(i).value == 255 || event(i).value == 254) && i<400
-        % This marks the end of the oddball section and the start of the TT
+    if (event(i).value == 255 || event(i).value == 254) && oddball_section
+        % This restarts the trl if you had to restart the paradigm and lsot
+        % the response log
         trl = [];
     end
-    % Add oddball stim onsets: real event codes (1,2,3) = (std,tar,odd)
-    if oddball_section && (event(i).value~=254 && event(i).value~=255)
-      begsample     = event(i).sample*resamp_factor + round(cfg.trialdef.prestim*srate);
-      endsample     = event(i).sample*resamp_factor + round(cfg.trialdef.poststim*srate)-1;
+     % Add trials in the oddball section with real event codes (1,2,3)
+     % Add oddball stim onsets: real event codes (1,2,3) = (std,tar,odd)
+     if oddball_section && (event(i).value~=254 && event(i).value~=255)
+       begsample     = event(i).sample*resamp_factor + round(cfg.trialdef.prestim*srate);
+       endsample     = event(i).sample*resamp_factor + round(cfg.trialdef.poststim*srate)-1;
       offset        = cfg.trialdef.prestim*srate;  
       trigger       = event(i).value; % remember the trigger (=condition) for each trial
       trl(end+1, :) = [round([begsample endsample offset])  trigger]; 
