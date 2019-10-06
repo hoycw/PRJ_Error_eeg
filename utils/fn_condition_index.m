@@ -1,13 +1,11 @@
-function condition_n = fn_condition_index(conditions, bhv)
+function condition_n = fn_condition_index(cond_lab, bhv)
 % Returns index of trial condition assignments based on requested conditions
 % INPUTS:
-%   conditions [str] - name of the set of conditions requested
+%   cond_lab [cell array] - strings with names of the set of conditions requested
 %   bhv [struct] - trial info structure containing info for logic sorting
 %       Total_Trial, Block, Feedback, RT, Timestamp, Tolerance, Trial, Hit, Score, bad_fb, Condition, ITI, ITI type
 % OUTPUTS:
 %   condition_n [int vector] - integer assignment of each trial based on conditions
-
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
 
 condition_n = zeros(size(bhv.trl_n));
 for cond_ix = 1:numel(cond_lab)
@@ -52,7 +50,7 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 if sum(condition_n==0)~=0
-    warning(['Not all trials accounted for by conditions: ' conditions]);
+    warning(['Not all trials accounted for by conditions: ' strjoin(cond_lab,',')]);
 end
 
 end

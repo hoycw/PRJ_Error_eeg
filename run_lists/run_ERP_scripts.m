@@ -23,25 +23,25 @@ plot_final_check = 0;
 SBJ_times = zeros(size(SBJs));
 tic;
 for s = 1:numel(SBJs)
-    SBJ02a_artifact_rejection(SBJs{s}, proc_id, gen_figs, fig_vis)
-    SBJ02b_ica_rejection(SBJs{s}, proc_id, proc_id_ica, reject_visual);
-    SBJ02c_trial_rejection(SBJs{s}, proc_id, plot_final_check)
+%     SBJ02a_artifact_rejection(SBJs{s}, proc_id, gen_figs, fig_vis)
+%     SBJ02b_ica_rejection(SBJs{s}, proc_id, proc_id_ica, reject_visual);
+%     SBJ02c_trial_rejection(SBJs{s}, proc_id, plot_final_check)
     SBJ_times(s) = toc;
     if s==1; elapsed = SBJ_times(s); else; elapsed = SBJ_times(s)-SBJ_times(s-1); end
     fprintf('%s preprocessed at %.1f s (SBJ time = %.1f)\n',SBJs{s},SBJ_times(s),elapsed);
 end
 
 %% Run TT ERPs
-conditions = 'DifOut';
-proc_id    = 'eeg_full_ft';
-an_id      = 'ERP_Cz_F25to1_flt05to20_st06';
-plt_id     = 'ts_F25to1_evnts_sigPatch';
-save_fig   = 0;
-fig_vis    = 'on';
-fig_ftype  = 'png';
+SBJs = {'EEG01','EEG02'};
+proc_id   = 'eeg_full_ft';
+an_id     = 'ERP_DifOut_Cz_F2to1_flt05to20_st06';
+plt_id    = 'ts_F2to1_evnts_sigLine';
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'png';
 for s = 1:numel(SBJs)
-%     SBJ03a_ERP_stats(SBJs{s},conditions,proc_id,an_id);
-    SBJ03b_ERP_plot_stats(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+%     SBJ03a_ERP_stats(SBJs{s},proc_id,an_id);
+    SBJ03b_ERP_plot_stats(SBJs{s},proc_id,an_id,plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

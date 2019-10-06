@@ -1,5 +1,5 @@
-plt.plt_lim  = [-0.25 1];
-plt.x_step_sz  = 0.25;
+plt.plt_lim  = [-0.2 1];
+plt.x_step_sz  = 0.2;
 plt.legend     = 1;
 plt.legend_loc_S = 'northwest';
 plt.legend_loc_R = 'northeast';
@@ -7,9 +7,9 @@ plt.legend_loc = 'northeast';
 
 plt.ylim_fudge = 0.1;
 
-plt.butterfly       = 0;
+plt.butterfly       = 1;
 plt.butterfly_width = 0.3;
-plt.mean_width      = 2.5;
+plt.mean_width      = 3.5;
 plt.errbar_alpha    = 0.5;
 %plt.main_style = '--';
 
