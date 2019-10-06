@@ -1,4 +1,4 @@
-function SBJ03a_ERP_stats(SBJ,conditions,proc_id,an_id)
+function SBJ03a_ERP_stats(SBJ,model_id,proc_id,an_id)
 % Compute ERPs from preprocessed data:
 %   Re-align data to event, select channels and epoch, filter, average, run stats, save
 % INPUTS:
@@ -13,7 +13,7 @@ function SBJ03a_ERP_stats(SBJ,conditions,proc_id,an_id)
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -30,14 +30,15 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 
 % Load Data
-load([SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat']);
-load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat']);
-% load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat']);
-% load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+% load([SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat']);
+% load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat']);
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat']);
+load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 % Select Conditions of Interest
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
-cond_idx = fn_condition_index(conditions, bhv);
+[grp_labels, ~, ~] = fn_group_label_styles(model_id);
+[cond_lab, ~, ~, ~] = fn_condition_label_styles(model_id);
+cond_idx = fn_condition_index(model_id, bhv);
 
 %% Prepare Data
 % Realign data to desired event
@@ -105,8 +106,8 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Contrast conditions
-if strcmp(conditions,'DifOut') || numel(cond_lab)>2
-    error(['Analysis not implemented for ' conditions ' yet, too many conditions: ' strjoin(cond_lab,',')]);
+if strcmp(model_id,'DifOut') || numel(cond_lab)>2
+    error(['Analysis not implemented for ' model_id ' yet, too many conditions: ' strjoin(cond_lab,',')]);
 %     % Compute Win - Loss
 %     cfgdif = [];
 %     cfgdif.operation = 'subtract';
@@ -147,6 +148,98 @@ for cond_ix = 1:numel(cond_lab)
         design(2,sum(n_trials(1:cond_ix-1))+1:sum(n_trials(1:cond_ix)))= 1:n_trials(cond_ix);
     end
 end
+design = cell([1 numel(st.groups)]);
+levels = cell([1 numel(st.groups)]);
+for grp_ix = 1:numel(st.groups)
+    [levels{grp_ix}, ~, ~] = fn_condition_label_styles(st.groups{grp_ix});
+    design{grp_ix} = nan([numel(trial_info.trial_n) 1]);
+    for level_ix = 1:numel(levels{grp_ix})
+        trl_idx = fn_condition_index(levels{grp_ix}{level_ix}, trial_info.condition_n, 'trial_info', trial_info);
+        design{grp_ix}(trl_idx) = level_ix;
+    end
+end
+
+% Select trial types of interest
+if ~strcmp(st.trial_cond,'all')
+    good_cond_idx = zeros(size(trial_info.trial_n));
+    for cond_ix = 1:numel(st.trial_cond)
+        cond_idx = fn_condition_index(st.trial_cond{cond_ix}, trial_info.condition_n, 'trial_info', trial_info);
+        good_cond_idx(cond_idx) = 1;
+    end
+else
+    good_cond_idx = true(size(trial_info.trial_n));
+end
+
+% Log combined bad trial types
+good_trl_idx = all([~bad_rt_idx good_cond_idx],2);
+st.bad_trials.all  = trial_info.trial_n(~good_trl_idx);
+st.bad_trials.rt   = trial_info.trial_n(bad_rt_idx);
+st.bad_trials.cond = trial_info.trial_n(~good_cond_idx);
+
+% Exclude bad trials
+for grp_ix = 1:numel(st.groups)
+    design{grp_ix} = design{grp_ix}(good_trl_idx);
+end
+ti_fields = fieldnames(trial_info);
+orig_n_trials = numel(trial_info.trial_n);
+for f_ix = 1:numel(ti_fields)
+    if numel(trial_info.(ti_fields{f_ix}))==orig_n_trials
+        trial_info.(ti_fields{f_ix}) = trial_info.(ti_fields{f_ix})(good_trl_idx);
+    end
+end
+
+%% Run ANOVA
+fprintf('================== Running ANOVA =======================\n');
+% Create structure for w2 in fieldtrip style
+w2.design    = design;
+w2.cond      = st.groups;
+w2.time      = hfa.time(win_center);
+w2.win_lim   = win_lim;
+w2.label     = hfa.label;
+w2.dimord    = 'rpt_chan_time';
+w2.max_hfa_z = max_z;
+% w2.trial     = zeros([numel(w2.cond) length(hfa.label) length(w2.time)]);
+w2.boot      = zeros([numel(w2.cond) length(hfa.label) length(w2.time) st.n_boots]);
+% w2.pval      = w2.trial;
+if st.cust_win
+    w2.win_lim_s = hfa.time([min(win_lim(:,1)) max(win_lim(:,2))]);
+else
+    w2.win_lim_s = hfa.time(win_lim);
+end
+
+% Compute ANOVA and Explained Variance for real model
+w2.trial = fn_mass_ANOVA(hfa_win,design);
+
+% Compute ANOVA for permuted data
+rand_design = design;
+% b = '';
+fprintf('boot #: ');
+for boot_ix = 1:st.n_boots
+%     m = sprintf(' permutation %d/%d', boot_ix, n_boots);
+%     fprintf([b m]); b = repmat('\b',[1 length(m)]);
+    fprintf('%i..',boot_ix);
+    for grp_ix = 1:numel(st.groups)
+        rand_design{grp_ix} = design{grp_ix}(randperm(size(design{grp_ix},1)));
+    end
+    w2.boot(:,:,:,boot_ix) = fn_mass_ANOVA(hfa_win,rand_design);
+    if mod(boot_ix,20)==0
+        fprintf('\n');
+    end
+end
+
+% Compute statistics
+w2.pval = sum(bsxfun(@ge,w2.boot,w2.trial),4)./st.n_boots; % sum(boots>real)/n_boots
+w2.zscore   = norminv(1-w2.pval,0,1);
+w2.bootmean = mean(w2.boot,4);
+w2.bootstd  = std(w2.boot,[],4);
+% w2 = rmfield(w2,'boot');
+w2.zscore(isinf(w2.zscore)) = norminv(1-1/st.n_boots/2,0,1);
+
+% Multiple Comparisons Correction within Channel
+w2.qval = nan(size(w2.pval));
+for ch_ix = 1:numel(w2.label)
+    [~, ~, ~, w2.qval(:,ch_ix,:)] = fdr_bh(squeeze(w2.pval(:,ch_ix,:)));
+end
 
 % Prepare neighbors layout
 % cfgn = [];
@@ -167,8 +260,8 @@ stat = roi_erp{1};
 stat.mask = zeros([numel(stat.label) numel(stat.time)]);
 
 %% Save Results
-data_out_fname = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',conditions,'_',an_id,'.mat');
+data_out_fname = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',model_id,'_',an_id,'.mat');
 fprintf('Saving %s\n',data_out_fname);
-save(data_out_fname,'-v7.3','roi_erp','stat');
+save(data_out_fname,'-v7.3','roi','roi_erp','stat');
 
 end

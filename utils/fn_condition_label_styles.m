@@ -28,8 +28,8 @@ switch factor_name
     case 'OutS'
         labels = {'Wn', 'Ls', 'Su'};
         colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        line_styles = {'-', '-'};    % colors for cond_lab plotting
-        markers = {'o', 'o'};
+        line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
+        markers = {'o', 'o', 'o'};
     case 'DifOut'
         labels = {'EzWn', 'EzLs', 'HdWn', 'HdLs'};
         colors = {[166 206 227]./256, [251 154 153]./256, [31 120 180]./256, [227 26 28]./256};
@@ -39,8 +39,8 @@ switch factor_name
         labels = {'EzWn', 'EzLs', 'EzSu', 'HdWn', 'HdLs', 'HdSu'};
         colors = {[166 206 227]./256, [251 154 153]./256, [178 223 138]./256, ...
                   [31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        line_styles = {'-', '-', '--', '--'};
-        markers = {'o', 'o', 'd', 'd'};
+        line_styles = {'-', '-','-', '--', '--','--'};
+        markers = {'o', 'o', 'o', 'd', 'd', 'd'};
     case 'Tim'
         labels = {'Er', 'Lt'};
         colors = {[247,104,161]./256, [122,1,119]./256};    % pink and purple
@@ -54,8 +54,8 @@ switch factor_name
     case 'EzOutS'
         labels = {'EzWn', 'EzLs', 'EzSu'};
         colors = {[166 206 227]./256, [251 154 153]./256, [178 223 138]./256};
-        line_styles = {'-', '-'};
-        markers = {'o', 'o'};
+        line_styles = {'-', '-', '-'};
+        markers = {'o', 'o', 'o'};
     case 'HdOut'
         labels = {'HdWn', 'HdLs'};
         colors = {[31 120 180]./256, [227 26 28]./256};
@@ -64,8 +64,8 @@ switch factor_name
     case 'HdOutS'
         labels = {'HdWn', 'HdLs', 'HdSu'};
         colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        line_styles = {'-', '-'};
-        markers = {'d', 'd'};
+        line_styles = {'-', '-', '-'};
+        markers = {'d', 'd', 'd'};
     otherwise
         error(strcat('Only one, unrecognized condition offered: ',factor_name));
 end
