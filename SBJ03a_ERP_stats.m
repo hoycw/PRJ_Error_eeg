@@ -31,6 +31,8 @@ eval(an_vars_cmd);
 % Load Data
 load([SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat']);
+% load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat']);
+% load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 % Select Conditions of Interest
 [cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);

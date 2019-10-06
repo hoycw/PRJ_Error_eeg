@@ -1,4 +1,4 @@
-function SBJ02c_trial_rejection(SBJ,proc_id, visual)
+function SBJ02c_trial_rejection(SBJ,proc_id, plot_final_check)
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -11,10 +11,9 @@ ft_defaults
 %% Load the data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-data_cleanname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_02b.mat'];
-load(data_cleanname)
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_02a.mat'];
-load(clean_bhv_fname);
+
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02b.mat']);
+load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_02a.mat']);
 
 %% Eliminate trials
 cfgs = [];
@@ -27,7 +26,7 @@ clean_trials = ft_selectdata(cfgs, clean_trials);
 
 %% FINAL CHECK
 % Load cfg with plotting parameters
-if visual
+if plot_final_check
     cfg_plot.ylim = [-15 15];  %this is different from initial but its in order to see anything unusual
     cfg_plot.viewmode = 'vertical';
     ft_databrowser(cfg_plot, clean_trials);

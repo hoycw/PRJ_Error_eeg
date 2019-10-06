@@ -2,6 +2,12 @@ function [labels, colors, line_styles, markers] = fn_condition_label_styles(fact
 %% Converts the name of a set of conditions into labels, plotting colors/styles
 % condition_name: [str] 'EH'
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
+%   light red: [251 154 153]
+%   dark red: [227 26 28]
+%   light blue: [166 206 227]
+%   dark blue: [31 120 180]
+%   light green: [178 223 138]
+%   dark green: [51 160 44]
 
 % if length(cond_lab) == 1
 switch factor_name
@@ -16,13 +22,24 @@ switch factor_name
         markers = {'o', 'd'};
     case 'Out'
         labels = {'Wn', 'Ls'};
-        colors = {[55,126,184]./256, [228,26,28]./256};
+        colors = {[31 120 180]./256, [227 26 28]./256};
+        line_styles = {'-', '-'};    % colors for cond_lab plotting
+        markers = {'o', 'o'};
+    case 'OutS'
+        labels = {'Wn', 'Ls', 'Su'};
+        colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
         line_styles = {'-', '-'};    % colors for cond_lab plotting
         markers = {'o', 'o'};
     case 'DifOut'
         labels = {'EzWn', 'EzLs', 'HdWn', 'HdLs'};
-        colors = {[55,126,184]./256, [228,26,28]./256, [55,126,184]./256, [228,26,28]./256};
-        line_styles = {'-', '-', '-', '-'};
+        colors = {[166 206 227]./256, [251 154 153]./256, [31 120 180]./256, [227 26 28]./256};
+        line_styles = {'-', '-', '--', '--'};
+        markers = {'o', 'o', 'd', 'd'};
+    case 'DifOutS'
+        labels = {'EzWn', 'EzLs', 'EzSu', 'HdWn', 'HdLs', 'HdSu'};
+        colors = {[166 206 227]./256, [251 154 153]./256, [178 223 138]./256, ...
+                  [31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
+        line_styles = {'-', '-', '--', '--'};
         markers = {'o', 'o', 'd', 'd'};
     case 'Tim'
         labels = {'Er', 'Lt'};
@@ -31,36 +48,26 @@ switch factor_name
         markers = {'o', 'o'};
     case 'EzOut'
         labels = {'EzWn', 'EzLs'};
-        colors = {[55,126,184]./256, [228,26,28]./256};
+        colors = {[166 206 227]./256, [251 154 153]./256};
+        line_styles = {'-', '-'};
+        markers = {'o', 'o'};
+    case 'EzOutS'
+        labels = {'EzWn', 'EzLs', 'EzSu'};
+        colors = {[166 206 227]./256, [251 154 153]./256, [178 223 138]./256};
         line_styles = {'-', '-'};
         markers = {'o', 'o'};
     case 'HdOut'
         labels = {'HdWn', 'HdLs'};
-        colors = {[55,126,184]./256, [228,26,28]./256};
+        colors = {[31 120 180]./256, [227 26 28]./256};
         line_styles = {'-', '-'};
         markers = {'d', 'd'};
-%    case 'pcon'
-%        labels = {'mcon', 'same', 'minc'};
-%        colors = {[55,126,184]./256, [0 0 0], [228,26,28]./256};
-%        line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
-%    case 'pcon_CI'
-%        labels = {'con_mcon', 'con_minc', 'inc_mcon', 'inc_minc'};
-%        colors = {[0 0 0], [0 0 0], [228,26,28]./256, [228,26,28]./256};    % colors for cond_lab plotting
-%        line_styles = {'-', '--', '-','--'};    % colors for cond_lab plotting
-%     case 'conseq'
-%         cond_id = 'conseq';
+    case 'HdOutS'
+        labels = {'HdWn', 'HdLs', 'HdSu'};
+        colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
+        line_styles = {'-', '-'};
+        markers = {'d', 'd'};
     otherwise
         error(strcat('Only one, unrecognized condition offered: ',factor_name));
 end
-% else
-%     cond_id = 'cst';
-%     for c_ix = 1:length(cond_lab)
-%         cond_id = [cond_id fn_convert_condition_lab2num(cond_lab{c_ix})];
-%     end
-%     cond_colors = manual_cond_colors;
-%     if length(cond_lab)~=length(cond_colors)
-%         error('Mismatched condition labels and colors');
-%     end
-% end
 
 end

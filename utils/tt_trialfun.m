@@ -27,7 +27,7 @@ trl = [];
 oddball_section = 1;
 for i=1:length(event)
   if strcmp(event(i).type, cfg.trialdef.eventtype)
-    if event(i).value == 255 & i>4
+    if event(i).value == 255 && i>4
        % This marks the end of the oddball section and the start of the TT
         oddball_section = 0;
     end
@@ -44,4 +44,6 @@ for i=1:length(event)
       trl(end+1, :) = [round([begsample endsample offset])  trigger]; 
     end
   end
+end
+
 end

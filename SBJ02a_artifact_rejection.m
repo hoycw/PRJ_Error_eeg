@@ -1,4 +1,4 @@
-function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, ignore_trials)
+function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis)
 % This function generates figures for both the ERP stacks and the ICA Plots
 %SBJ = 'EEG#'
 %Proc_id = 'egg_full_ft'
@@ -19,13 +19,12 @@ ft_defaults
 %% Processing variables
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' odd_proc_id '_vars.m'];
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
 
 %% Load data
 % Load EEG
-data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
-load(data_fname);
+load([SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat']);
 
 % Load Behavior
 [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
@@ -82,10 +81,12 @@ else
 end
 
 % Identify training and bad behavioral trials
-training_ix = find(bhv.blk==-1);
+training_ix = find(bhv.blk==-1);    % SHEILA!!! change this to 0, then rerun
 rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1));
 rt_high_ix  = find(bhv.rt >= proc.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
+fprintf(2,'\tWarning: Removing %i trials (%i bad_raw, %i training, %i rts)\n', numel(exclude_trials),...
+    numel(bad_raw_trials), numel(training_ix), numel(rt_low_ix)+numel(rt_high_ix));
 
 % Exclude bad trials
 cfgs = [];  
@@ -171,12 +172,12 @@ if gen_figs
     fn_plot_ERP_stack(SBJ, proc_id, 'ERPstack_full_evnts', ica, 'off', 1);
 end    
 % Plot IC in ft_databrowser
-if fig_vis
-        cfg = [];
-        cfg.viewmode = 'component';
-        cfg.channel = 'all';
-        cfg.layout   = 'biosemi64.lay';
-        ft_databrowser(cfg, ica);
+if strcmp(fig_vis,'on')
+    cfg = [];
+    cfg.viewmode = 'component';
+    cfg.channel = 'all';
+    cfg.layout   = 'biosemi64.lay';
+    ft_databrowser(cfg, ica);
 end
 
 %% Save Data
