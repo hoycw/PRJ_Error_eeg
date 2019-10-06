@@ -17,10 +17,9 @@ ft_defaults
 %% Load the data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-data_cleanname = [SBJ_vars.dirs.preproc SBJ '_clean02b_' proc_id '.mat'];
-load(data_cleanname)
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02b_' proc_id '_clean.mat'];
-load(clean_bhv_fname);
+
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02b.mat']);
+load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_02a.mat']);
 
 %% Eliminate trials
     cfgs = [];
@@ -43,10 +42,10 @@ for f_ix = 1:numel(bhv_fields)
 end
 
 %% Save outputs
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean_' proc_id '.mat'];
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat'];
 save(clean_data_fname, '-v7.3', 'clean_trials');
 
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_clean.mat'];
+clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat'];
 save(clean_bhv_fname, '-v7.3', 'bhv');
 
 

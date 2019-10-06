@@ -86,7 +86,7 @@ else
 end
 
 % Identify training and bad behavioral trials
-training_ix = find(bhv.blk==-1);
+training_ix = find(bhv.blk==0);
 rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1) & bhv.rt>0);
 rt_high_ix  = find(bhv.rt >= proc.rt_bounds(2));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
@@ -142,6 +142,7 @@ end
 %% Generate Figures
 if gen_figs 
     % Plot EOG-ICA Correlations
+    %{
     figure('Visible',1); hold on;
     scatter(avg_eog_ic_corr(1,:),avg_eog_ic_corr(2,:));
     scatter(avg_eog_ic_corr(1,heog_ics),avg_eog_ic_corr(2,heog_ics),'filled','r');
@@ -170,7 +171,7 @@ if gen_figs
     cfg.viewmode = 'component';
     cfg.fig_vis  = fig_vis;
     fn_icabrowser_modified_odd(SBJ, cfg, ica);
-    
+    %}
     % Plot IC single trial stacks + ERPs
     fn_plot_ERP_stack_odd(SBJ, odd_proc_id, plt_id, ica, 'off', 1);
 end    
@@ -185,10 +186,10 @@ end
 
 
 %% Save Data
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_clean02a_' odd_proc_id '.mat'];
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' odd_proc_id '_02a.mat'];
 save(clean_data_fname, '-v7.3', 'trials', 'cfg_trl', 'ica', 'heog_ics', 'veog_ics', 'eog_trials');
 
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav02a_' odd_proc_id '_clean.mat'];
+clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' odd_proc_id '_02a.mat'];
 save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
 end
