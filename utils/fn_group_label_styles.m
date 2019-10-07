@@ -3,10 +3,15 @@ function [grp_labels, colors, line_styles] = fn_group_label_styles(model_id)
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
 %% List of possible labels and their colors
-factors  = {'Dif','Out','Tim','Dif*Out','RT'};
-fact_colors = {[55 126 184]./256, [228 26 28]./256, [77 175 74]./256, [152 78  163]./256, [0.5 0.5 0.5]};
+factors  = {'Dif','Out','Tim','Dif*Out'};
+fact_colors = {[152 78 163]./255, [255 127 0]./255, [255 255 51]./255, [166 86 40]./255};
+% Newer (different than RGB for 3 feedback conditions:
+%   purple, orange, yellow, brown
+%   pink if needed: [247 129 191]
 % Taken from: colorbrewer2.org, qualitative, 5-class Set1
-%   currently: green, red, blue, purple, gray
+% OLD:
+%   fact_colors = {[55 126 184]./256, [228 26 28]./256, [77 175 74]./256, [152 78  163]./256, [0.5 0.5 0.5]};
+%       green, red, blue, purple, gray
 %   orange for later: [255 127 0]
 
 %% Convert model_id into set of conditions

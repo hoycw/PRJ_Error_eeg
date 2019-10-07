@@ -108,9 +108,12 @@ cfgpp.baselinewindow = an.bsln_lim;
 roi = ft_preprocessing(cfgpp, roi);
 
 % Create ANOVA data matrix
-st_data = nan([numel(bhv.trl_n) numel(roi.label) numel(roi.time{1})]);
+cfg = [];
+cfg.latency = an.stat_lim;
+st_roi = ft_selectdata(cfg, roi);
+st_data = nan([numel(bhv.trl_n) numel(st_roi.label) numel(st_roi.time{1})]);
 for trl_ix = 1:numel(bhv.trl_n)
-    st_data(trl_ix,:,:) = roi.trial{trl_ix};
+    st_data(trl_ix,:,:) = st_roi.trial{trl_ix};
 end
 if any(isnan(st_data(:))); error('NaN in ANOVA data!'); end
 
@@ -119,10 +122,10 @@ fprintf('================== Running ANOVA =======================\n');
 % Create structure for w2 in fieldtrip style
 w2.design    = design;
 w2.cond      = an.groups;
-w2.time      = roi.time{1};
-w2.label     = roi.label;
+w2.time      = st_roi.time{1};
+w2.label     = st_roi.label;
 w2.dimord    = 'rpt_chan_time';
-w2.boot      = zeros([numel(w2.cond) numel(roi.label) length(w2.time) an.n_boots]);
+w2.boot      = zeros([numel(w2.cond) numel(st_roi.label) length(w2.time) an.n_boots]);
 
 % Compute ANOVA and Explained Variance for real model
 w2.trial = fn_mass_ANOVA(st_data,design);
@@ -161,6 +164,6 @@ end
 %% Save Results
 data_out_fname = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat');
 fprintf('Saving %s\n',data_out_fname);
-save(data_out_fname,'-v7.3','st_data','w2','an');
+save(data_out_fname,'-v7.3','roi','w2','an');
 
 end

@@ -55,19 +55,17 @@ for f_ix = 1:numel(bhv_fields)
 end
 cond_idx = fn_condition_index(cond_lab, bhv);
 
-% % Get trials for butterfly plot
-% if plt.butterfly
-%     trials = cell(size(cond_lab));
-%     cond_idx = fn_condition_index(cond_lab, bhv);
-%     for cond_ix = 1:numel(cond_lab)
-%         trials{cond_ix} = nan([numel(roi.label) sum(cond_idx==cond_ix) numel(roi.time{1})]);
-%         cond_trial_ix = find(cond_idx==cond_ix);
-%         for t_ix = 1:numel(cond_trial_ix)
-%             trials{cond_ix}(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
-%         end
-%     end
-% end
-% 
+% Get trials for plotting
+trials = cell(size(cond_lab));
+cond_idx = fn_condition_index(cond_lab, bhv);
+for cond_ix = 1:numel(cond_lab)
+    cond_trial_ix = find(cond_idx==cond_ix);
+    trials{cond_ix} = nan([numel(roi.label) numel(cond_trial_ix) numel(roi.time{1})]);
+    for t_ix = 1:numel(cond_trial_ix)
+        trials{cond_ix}(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
+    end
+end
+
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' SBJ '/' an_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
@@ -79,17 +77,19 @@ sig_ch = zeros([numel(w2.label) numel(an.groups)]);
 for ch_ix = 1:numel(w2.label)
     %% Compute plotting data    
     % Compute means and variance
-    means = NaN([numel(cond_lab) numel(w2.time)]);
-    sems  = NaN([numel(cond_lab) numel(w2.time)]);
+    means = NaN([numel(cond_lab) numel(roi.time{1})]);
+    sems  = NaN([numel(cond_lab) numel(roi.time{1})]);
     for cond_ix = 1:numel(cond_lab)
-        means(cond_ix,:) = squeeze(mean(st_data(cond_idx==cond_ix,ch_ix,:),1));
-        sems(cond_ix,:) = squeeze(std(st_data(cond_idx==cond_ix,ch_ix,:),[],1))./sqrt(sum(cond_idx==cond_ix))';
+        means(cond_ix,:) = squeeze(mean(trials{cond_ix}(ch_ix,:,:),2));
+        sems(cond_ix,:) = squeeze(std(trials{cond_ix}(ch_ix,:,:),[],2))./sqrt(size(trials{cond_ix},2))';
     end
     
     % Find significant time periods
+    sig_grp = false(size(an.groups));
     sig_chunks = cell(size(an.groups));
     for grp_ix = 1:numel(an.groups)
         if any(w2.qval(grp_ix,ch_ix,:) <= an.alpha)
+            sig_grp(grp_ix) = true;
             sig_ch(ch_ix,grp_ix) = 1;
             sig_chunks{grp_ix} = fn_find_chunks(squeeze(w2.qval(grp_ix,ch_ix,:))<=an.alpha);
             sig_chunks{grp_ix}(squeeze(w2.qval(grp_ix,ch_ix,sig_chunks{grp_ix}(:,1))>an.alpha),:) = [];
@@ -108,7 +108,7 @@ for ch_ix = 1:numel(w2.label)
     % Plot individual trials per condition
     if plt.butterfly
         for cond_ix = 1:numel(cond_lab)
-            plot(w2.time,squeeze(st_data(cond_idx==cond_ix,ch_ix,:)),...
+            plot(roi.time{1},squeeze(trials{cond_ix}(ch_ix,:,:)),...
                 'Color',cond_colors{cond_ix},'LineWidth',plt.butterfly_width,...
                 'LineStyle',cond_styles{cond_ix});
         end
@@ -118,7 +118,7 @@ for ch_ix = 1:numel(w2.label)
     ebars = cell(size(cond_lab));
     main_lines = gobjects([numel(cond_lab)+numel(an.event_type) 1]);
     for cond_ix = 1:numel(cond_lab)
-        ebars{cond_ix} = shadedErrorBar(w2.time, means(cond_ix,:), sems(cond_ix,:),...
+        ebars{cond_ix} = shadedErrorBar(roi.time{1}, means(cond_ix,:), sems(cond_ix,:),...
             {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
             'LineStyle',cond_styles{cond_ix}},plt.errbar_alpha);
         main_lines(cond_ix) = ebars{cond_ix}.mainLine;
@@ -126,6 +126,12 @@ for ch_ix = 1:numel(w2.label)
     ylims = ylim;
     if strcmp(plt.sig_type,'line')
         data_lim = [min(min(means-sems)) max(max(means+sems))];
+    end
+    
+    % Plot Extra Features (events, significance)
+    for evnt_ix = 1:numel(an.event_type)
+        main_lines(numel(cond_lab)+evnt_ix) = line([0 0],ylim,...
+            'LineWidth',plt.evnt_width(evnt_ix),'Color',plt.evnt_color{evnt_ix},'LineStyle',plt.evnt_style{evnt_ix});
     end
     
     % Plot Significance
@@ -138,8 +144,11 @@ for ch_ix = 1:numel(w2.label)
                 elseif strcmp(plt.sig_loc,'above')
                     sig_y = ylims(2) + grp_ix*data_lim(2)*plt.sig_loc_factor;
                 end
-                line(sig_times,repmat(sig_y,size(sig_times)),...
+                sig_line = line(sig_times,repmat(sig_y,size(sig_times)),...
                     'LineWidth',plt.sig_width,'Color',grp_colors{grp_ix});
+                if sig_ix==1
+                    main_lines(end+1) = sig_line;
+                end
             elseif strcmp(plt.sig_type,'patch')
                 if grp_ix>1; warning('Why use patch sig with more than 1 group???'); end
                 patch(w2.time([sig_chunks{grp_ix}(sig_ix,1) sig_chunks{grp_ix}(sig_ix,1) ...
@@ -159,11 +168,10 @@ for ch_ix = 1:numel(w2.label)
             end
         end
     end
-    
-    % Plot Extra Features (events, significance)
-    for evnt_ix = 1:numel(an.event_type)
-        main_lines(numel(cond_lab)+evnt_ix) = line([0 0],ylim,...
-            'LineWidth',plt.evnt_width(evnt_ix),'Color',plt.evnt_color{evnt_ix},'LineStyle',plt.evnt_style{evnt_ix});
+    if strcmp(plt.sig_type,'line')
+        leg_lab = [cond_lab an.event_type grp_lab(sig_grp)];
+    else
+        leg_lab = [cond_lab an.event_type];
     end
     
     % Axes and Labels
@@ -174,7 +182,7 @@ for ch_ix = 1:numel(w2.label)
     ax.XLabel.String = 'Time (s)';
     ax.Title.String  = w2.label{ch_ix};
     if plt.legend
-        legend(main_lines,cond_lab{:},an.event_type,'Location',plt.legend_loc);
+        legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
     
     % Save figure
