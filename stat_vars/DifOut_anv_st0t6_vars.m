@@ -1,25 +1,12 @@
-% Data selection
-an.ROI         = {'Cz'};             % Channel to be analyzed
-an.event_type  = 'F';           % event around which to cut trials
-an.trial_lim_s = [-0.2 1];       % window in SEC for cutting trials
-
-% ERP Filtering
-an.demean_yn   = 'yes';
-an.bsln_lim    = [-0.2 0];    % window in SEC for baseline correction
-an.lp_yn       = 'yes';
-an.lp_freq     = 20;
-an.hp_yn       = 'yes';
-an.hp_freq     = 0.5;
-an.hp_filtord  = 4;
-
-% ANOVA Parameters
-an.model_lab   = 'Out';
-an.groups      = {'Out'};
-an.trial_cond  = {'all'};
-an.stat_lim    = [0 0.6];            % window in SEC for stats
-an.n_boots     = 1000;             % Repetitions for non-parametric stats
-an.alpha       = 0.05;
-% an.anova_terms = [1 0 0; 0 1 0; 0 0 1; 1 1 0];
+% Stat Parameters
+st.an_style    = 'anova';
+st.model_lab   = 'DifOut';
+st.groups      = {'Dif','Out'};
+st.trial_cond  = {'all'};
+st.stat_lim    = [0 0.6];            % window in SEC for stats
+st.n_boots     = 1000;             % Repetitions for non-parametric stats
+st.alpha       = 0.05;
+% st.anova_terms = [1 0 0; 0 1 0; 0 0 1; 1 1 0];
 
 % % Fieldtrip stats
 % cfg_stat = [];

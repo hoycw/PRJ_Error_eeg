@@ -32,16 +32,17 @@ for s = 1:numel(SBJs)
 end
 
 %% Run TT ERPs
-SBJs = {'EEG01','EEG02'};
+SBJs = {'EEG01','EEG02','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};
 proc_id   = 'eeg_full_ft';
-an_id     = 'ERP_DifOut_Cz_F2to1_flt05to20_st06';
+an_id     = 'ERP_Cz_F2t1_dm2t0_fl05t20';
+stat_id   = 'DifOutSur_glm_st0t6';
 plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'png';
 for s = 1:numel(SBJs)
-%     SBJ03a_ERP_stats(SBJs{s},proc_id,an_id);
-    SBJ03b_ERP_plot_stats(SBJs{s},proc_id,an_id,plt_id,save_fig,...
+    SBJ03a_ERP_stats_GLM(SBJs{s},proc_id,an_id,stat_id);
+    SBJ03b_ERP_plot_stats_GLM(SBJs{s},proc_id,an_id,stat_id,plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

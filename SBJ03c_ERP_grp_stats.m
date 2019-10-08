@@ -32,22 +32,29 @@ eval(an_vars_cmd);
 
 % Load Data
 SBJs_vars = cell(size(SBJs));
-roi_erps  = cell([numel(SBJs) numel(cond_lab)]);
+rois      = cell(size(SBJs));
+w2s       = cell(size(SBJs));
 for s = 1:length(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
     eval(SBJ_vars_cmd);
     SBJs_vars{s} = SBJ_vars;
     
-    tmp = load([SBJs_vars{s}.dirs.SBJ,'04_proc/',SBJs{s},'_',conditions,'_',an_id,'.mat']);
-    roi_erps(s,:) = tmp.roi_erp;
+    tmp = load([SBJs_vars{s}.dirs.SBJ,'04_proc/',SBJs{s},'_',an_id,'.mat']);
+    rois{s} = tmp.roi; w2s{s} = tmp.w2;
     clear SBJ_vars
 end
 
 %% Compute Grand Average Group ERPs
-grp_erp = cell(size(cond_lab));
-for cond_ix = 1:numel(cond_lab)
-    grp_erp{cond_ix} = ft_timelockgrandaverage(cfg_gavg,roi_erps{:,cond_ix});
+st_data = nan([numel(SBJs) numel(w2{1}.label) numel(w2{1}.time)]);
+for s = 1:numel(SBJs)
+    st_data(s,:,:) = w2{s}.zscore;
 end
+if any(isnan(st_data(:))); error('NaN in ANOVA data!'); end
+
+% grp_erp = cell(size(cond_lab));
+% for cond_ix = 1:numel(cond_lab)
+%     grp_erp{cond_ix} = ft_timelockgrandaverage(cfg_gavg,roi_erps{:,cond_ix});
+% end
 
 %% Contrast conditions
 if strcmp(conditions,'DifOut') || numel(cond_lab)>2
