@@ -35,7 +35,13 @@ switch factor_name
         colors = {[166 206 227]./256, [251 154 153]./256, [31 120 180]./256, [227 26 28]./256};
         line_styles = {'-', '-', '--', '--'};
         markers = {'o', 'o', 'd', 'd'};
-    case {'DifOutS','DifOutSur'}
+    case {'DifOutS', 'DifOutSx'}
+        labels = {'EzWn', 'EzLs', 'HdWn', 'HdLs', 'Su'};
+        colors = {[166 206 227]./256, [251 154 153]./256, ...
+                  [31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
+        line_styles = {'-', '-', '--', '--', ':'};
+        markers = {'o', 'o', 'd', 'd', '*'};
+    case 'DifOutSur'
         labels = {'EzWn', 'EzLs', 'EzSu', 'HdWn', 'HdLs', 'HdSu'};
         colors = {[166 206 227]./256, [251 154 153]./256, [178 223 138]./256, ...
                   [31 120 180]./256, [227 26 28]./256, [51 160 44]./256};

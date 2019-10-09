@@ -1,4 +1,5 @@
-function SBJ03c_ERP_grp_stats(SBJs,conditions,proc_id,an_id)
+function SBJ04c_ERP_grp_stats_ANOVA(SBJs,conditions,proc_id,an_id)
+error('adapt');
 % Compute grand average group ERP from SBJ ERPs:
 %   Re-align data to event, select channels and epoch, filter, average, run stats, save
 % INPUTS:

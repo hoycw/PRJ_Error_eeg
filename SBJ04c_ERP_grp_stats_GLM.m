@@ -1,4 +1,5 @@
-function SBJ03c_ERP_grp_stats_GLM(SBJs,proc_id,an_id,stat_id)
+function SBJ04c_ERP_grp_stats_GLM(SBJs,proc_id,an_id,stat_id)
+error('needs adaptation...');
 % Compute grand average group ERP from SBJ ERPs:
 %   Re-align data to event, select channels and epoch, filter, average, run stats, save
 % INPUTS:
@@ -48,9 +49,11 @@ for s = 1:length(SBJs)
 end
 
 %% Compute Grand Average Group ERPs
+cfg_trim = []; cfg_trim.latency = st.stat_lim;
 st_data = nan([numel(SBJs) numel(w2{1}.label) numel(w2{1}.time)]);
 for s = 1:numel(SBJs)
-    st_data(s,:,:) = w2{s}.zscore;
+    tmp = ft_selectdata(cfg, rois{s});
+    st_data(s,:,:) = mean(w2{s}.zscore;
 end
 if any(isnan(st_data(:))); error('NaN in ANOVA data!'); end
 

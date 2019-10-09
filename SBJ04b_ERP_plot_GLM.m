@@ -1,5 +1,5 @@
-function SBJ03b_ERP_plot_stats_GLM(SBJ,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
-
+function SBJ04b_ERP_plot_stats_GLM(SBJ,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+error('check this...');
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
