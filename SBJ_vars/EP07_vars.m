@@ -53,5 +53,7 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
  'AF8', 'Iz', 'T7', 'F8'
     };
-SBJ_vars.trial_reject_ix = [67, 17, 254, 499, 456, 486, 548, 599, 577, 418, 457, 536, 510, 609, 253, 254, 288, 296, 333, 110];
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 10000;
+SBJ_vars.trial_reject_ix = [33, 220, 465, 422, 452, 514, 565, 543, 384, 423, 502, 476, 575, 219, 220, 254, 262, 299, 76];
 SBJ_vars.ica_reject = [1, 2, 3, 4, 5, 9, 10, 11, 12, 13, 15, 19, 22, 26, 29, 31, 35, 38, 39, 44, 53, 60, 61];

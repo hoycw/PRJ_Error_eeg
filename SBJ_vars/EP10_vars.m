@@ -51,6 +51,7 @@ SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'Pz', 'POz', 'Oz'};
-
-SBJ_vars.trial_reject_ix = [7 8 10 110 139 142 155 156 406 471 41 120 170 259 408 619];
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 10000;
+SBJ_vars.trial_reject_ix = [77 106 109 123 373 375 438 8 586];
 SBJ_vars.ica_reject = [1 5 11 12 13 14 15 16 17 18 19 20 22 25 27 28 35 38 41 42 45 47 49 52 54 55 56 61];

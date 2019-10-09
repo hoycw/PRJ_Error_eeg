@@ -53,6 +53,7 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
  'T8', 'TP8', 'T7'
     };
-
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 10000;
 SBJ_vars.trial_reject_ix = [67, 252, 296, 333, 472, 510, 536, 548, 559, 577];
 SBJ_vars.ica_reject = [1, 2, 4, 6, 8, 9, 10, 15, 16, 19, 20, 25, 33, 34, 35, 36, 37, 38, 48, 59, 51, 53, 61];

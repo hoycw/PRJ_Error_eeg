@@ -12,7 +12,7 @@ ft_defaults
 % Basics
 %--------------------------------------
 SBJ_vars.SBJ = 'EP09';
-SBJ_vars.raw_file = {'pilot09.bdf', 'pilot09-2.bdf'};
+SBJ_vars.raw_file = {'pilot09-2.bdf'};
 SBJ_vars.bhv_file = 'pilot09_response_log_20180426140027.txt';
 SBJ_vars.block_name = {'r1'};
 %NOTE: I ended up ignoring the whole first set because in my notes it says
@@ -24,6 +24,7 @@ SBJ_vars.dirs.import  = [SBJ_vars.dirs.SBJ '01_import/'];
 SBJ_vars.dirs.preproc = [SBJ_vars.dirs.SBJ '02_preproc/'];
 SBJ_vars.dirs.events  = [SBJ_vars.dirs.SBJ '03_events/'];
 SBJ_vars.dirs.proc    = [SBJ_vars.dirs.SBJ '04_proc/'];
+SBJ_vars.dirs.proc_stack    = [SBJ_vars.dirs.SBJ '04_proc/plot/'];
 if ~exist(SBJ_vars.dirs.import,'dir')
    mkdir(SBJ_vars.dirs.import);
 end
@@ -52,5 +53,7 @@ SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'P2', 'P9', 'P1'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
-SBJ_vars.trial_reject_ix = [27, 52, 61, 62, 69, 98, 128, 180, 210, 222, 230, 234, 254, 271, 272, 279, 311, 325, 326, 337, 339, 377, 379, 392, 393, 405, 440, 455, 457, 463, 508, 519, 521, 527, 528];
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 10000;
+SBJ_vars.trial_reject_ix = [1:2, 6:8, 11, 17, 20, 24, 27, 35, 42, 45, 47, 50, 64, 74:76, 104, 135, 137, 139, 140, 171, 201, 238:243, 273, 282, 283, 286, 310, 311, 312, 313, 316, 317, 323, 324, 325, 335, 337, 349, 402:406, 408:409, 416];
 SBJ_vars.ica_reject = [1 2 6 8 9 17 15 16 17 12 21 25 36 30 37 39 44 43 59 51 53 47 48 58 60];
