@@ -143,7 +143,7 @@ end
 if gen_figs 
     % Plot EOG-ICA Correlations
     %{
-    figure('Visible',1); hold on;
+figure('Visible',1); hold on;
     scatter(avg_eog_ic_corr(1,:),avg_eog_ic_corr(2,:));
     scatter(avg_eog_ic_corr(1,heog_ics),avg_eog_ic_corr(2,heog_ics),'filled','r');
     scatter(avg_eog_ic_corr(1,veog_ics),avg_eog_ic_corr(2,veog_ics),'filled','r');
