@@ -1,5 +1,4 @@
 function SBJ04a_ERP_stats_ANOVA(SBJ,proc_id,an_id,stat_id)
-error('load roi dont compute');
 % Compute ERPs from preprocessed data:
 %   Re-align data to event, select channels and epoch, filter, average, run stats, save
 % INPUTS:
@@ -33,7 +32,7 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 
 % Load Data
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat']);
+load([SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 %% Create design matrix
@@ -55,59 +54,7 @@ for grp_ix = 1:numel(st.groups)
     design{grp_ix} = fn_condition_index(levels{grp_ix}, bhv);
 end
 
-%% Select Data
-% Realign data to desired event
-if ~strcmp(proc.event_type,an.event_type)
-    cfg = [];
-    % Match desired time to closest sample index
-    if strcmp(proc.event_type,'S') && strcmp(an.event_type,'F')
-        prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
-        cfg.offset = -(prdm_vars.target + prdm_vars.fb_delay)*clean_trials.fsample;
-    elseif strcmp(proc.event_type,'S') && strcmp(an.event_type,'R')
-        cfg.offset = -bhv.rt*clean_trials.fsample;
-    elseif strcmp(proc.event_type,'F')
-        error('F-locked preprocessing can only be used for F-locked analysis!');
-    elseif strcmp(proc.event_type,'R')% && strcmp(an.event_type,'S')
-        error('Why were you doing R-locked preprocessing?');
-        %error('cannot do S-locked analysis with R-locked data!');
-    else
-        error('unknown combination of proc and an event_types');
-    end
-    % Convert time axis to new event:
-    %   basically: data.time{i} = data.time{i} + offset(i)/data.fsample;
-    %   therefore, negative offset will shift time axis "back"
-    roi = ft_redefinetrial(cfg, clean_trials);
-else
-    roi = clean_trials;
-end
-
-% Check window consistency
-%   Check trial_lim_s is within trial time (round to avoid annoying computer math)
-if round(an.trial_lim_s(1)+1/roi.fsample,3) < round(roi.time{1}(1),3) || ...
-        round(an.trial_lim_s(2)-1/roi.fsample,3) > round(roi.time{1}(end),3)
-    error('an.trial_lim_s is outside data time bounds!');
-end
-
-% Select window and channels of interest
-cfgs = [];
-cfgs.channel = an.ROI;
-cfgs.latency = an.trial_lim_s;
-cfgs.trials  = find(full_cond_idx);
-roi = ft_selectdata(cfgs, roi);
-
-%% Prepare Data
-% Preprocess the data
-cfgpp = [];
-cfgpp.hpfilter       = an.hp_yn;
-cfgpp.hpfreq         = an.hp_freq;
-cfgpp.hpfiltord      = an.hp_filtord; % Leaving blank causes instability error, 1 or 2 works 
-cfgpp.lpfilter       = an.lp_yn;
-cfgpp.lpfreq         = an.lp_freq;
-cfgpp.demean         = an.demean_yn;
-cfgpp.baselinewindow = an.bsln_lim;
-roi = ft_preprocessing(cfgpp, roi);
-
-% Create ANOVA data matrix
+%% Create ANOVA data matrix
 cfg = [];
 cfg.latency = st.stat_lim;
 st_roi = ft_selectdata(cfg, roi);

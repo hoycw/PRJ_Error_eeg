@@ -10,8 +10,9 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EP06','EP07','EP08','EP09','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
+SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
            'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};
+%,'EP09' - shitty non-sense noise (something wrong)
 
 %% Run preprocessing
 proc_id_ica = proc_id;
@@ -33,8 +34,8 @@ plot_final_check = 0;
 
 %% View basic ERPs
 proc_id    = 'eeg_full_ft';
-an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t30';
-stat_conds = {'DifOut','DifOutS'};
+an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_conds = {'DifOut'};%,'DifOutS'};
 save_fig   = 1;
 fig_vis    = 'off';
 fig_ftype  = 'png';
@@ -75,22 +76,21 @@ plt_id = 'ts_F2to1_but_evnts_sigPatch';
 SBJ03c_ERP_plot_grp_diffwave_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
-%% Compute and Plot ERP Stats
-% proc_id   = 'eeg_full_ft';
-% an_id     = 'ERP_Cz_F2t1_dm2t0_fl05t20';
-% stat_id   = 'DifOutSur_glm_st0t6';
-% plt_id    = 'ts_F2to1_evnts_sigLine';
-% save_fig  = 1;
-% fig_vis   = 'on';
-% fig_ftype = 'png';
+%% ERP Stats: Window Mean
+proc_id    = 'eeg_full_ft';
+an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifOut_anv_mn2t3';%'DifOut_anv_mn3t4';
+save_fig   = 1;
+fig_vis    = 'on';
+fig_ftype  = 'png';
 % for s = 1:numel(SBJs)
 %     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
-%     SBJ03b_ERP_plot(SBJs{s},proc_id,an_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 % end
 
+SBJ04c_ERP_grp_stats_mean_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
-% 
+%% ODDBALL 
 % odd_plt_id = 'ts_S2to13_evnts_sigPatch';
 % an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06';
 % odd_an_id = 'ERP_Cz_S2t13_flt5t20_st6';
