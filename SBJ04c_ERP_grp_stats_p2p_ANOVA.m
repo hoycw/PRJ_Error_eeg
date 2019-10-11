@@ -1,6 +1,5 @@
-function SBJ04c_ERP_grp_stats_mean_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
-% Compute grand average group ERP from SBJ ERPs:
-%   Re-align data to event, select channels and epoch, filter, average, run stats, save
+function SBJ04c_ERP_grp_stats_p2p_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
+% Compute grand average peak-to-peak FRN via jackknife:
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
 %   conditions [str] - label of conditions to compute ERPs for

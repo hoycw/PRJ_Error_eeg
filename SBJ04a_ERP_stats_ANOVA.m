@@ -1,4 +1,5 @@
 function SBJ04a_ERP_stats_ANOVA(SBJ,proc_id,an_id,stat_id)
+error('not set up single SBJ stats!');
 % Compute ERPs from preprocessed data:
 %   Re-align data to event, select channels and epoch, filter, average, run stats, save
 % INPUTS:
