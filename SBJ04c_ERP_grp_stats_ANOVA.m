@@ -39,6 +39,10 @@ end
 if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' stat_id '/' an_id '/'];
+if ~exist(fig_dir,'dir') && save_fig
+    mkdir(fig_dir);
+end
 
 %% Load Data 
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
@@ -107,22 +111,6 @@ end
 % design(:,end) = repmat([1:numel(SBJs)]',numel(cond_lab),1);
 
 %% Prepare Data for Stats
-% Plot ERPs
-if st.plot_erps
-    for ch_ix = 1:numel(ch_list)
-        tmp = erps(:,:,ch_ix,:);
-        ylims = [min(tmp(:)) max(tmp(:))];
-        figure('Name',['ERPs_SBJ_' ch_list{ch_ix}]);
-        for cond_ix = 1:numel(cond_lab)
-            subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix); hold on;
-            title(cond_lab{cond_ix});
-            plot(time_vec,squeeze(erps(cond_ix,:,ch_ix,:)),...
-                'Color',cond_colors{cond_ix});%,'LineStyle',cond_styles{cond_ix});
-            ylim(ylims);
-        end
-    end
-end
-
 % Jackknife procedure
 if strcmp(st.grp_method,'jackknife')
     gavg = nan(size(erps));
@@ -130,22 +118,6 @@ if strcmp(st.grp_method,'jackknife')
     for s = 1:numel(SBJs)
         sbj_idx = setdiff(1:numel(SBJs),s);
         gavg(:,s,:,:) = mean(erps(:,sbj_idx,:,:),2);
-    end
-    
-    % Plot ERPs after subsampling
-    if st.plot_erps
-        for ch_ix = 1:numel(ch_list)
-            figure('Name',['ERPs_jackknife_' ch_list{ch_ix}]);
-            tmp = gavg(:,:,ch_ix,:);
-            ylims = [min(tmp(:)) max(tmp(:))];
-            for cond_ix = 1:numel(cond_lab)
-                subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix); hold on;
-                title(cond_lab{cond_ix});
-                plot(time_vec,squeeze(gavg(cond_ix,:,ch_ix,:)),...
-                    'Color',cond_colors{cond_ix});%,'LineStyle',cond_styles{cond_ix});
-                ylim(ylims);
-            end
-        end
     end
 else
     gavg = erps;
@@ -155,20 +127,30 @@ end
 if strcmp(st.measure,'mean')
     data = mean(gavg,4);
 elseif strcmp(st.measure,'p2p')
+    pk_amp = nan([numel(cond_lab) numel(SBJs) numel(ch_list) 2]);
+    pk_lat = nan([numel(cond_lab) numel(SBJs) numel(ch_list) 2]);
+    pk_rng = zeros([2 2]);
+    for pk = 1:2
+        [~, pk_rng(1,pk)] = min(abs(time_vec-st.pos_pk_lim(pk)));
+        [~, pk_rng(2,pk)] = min(abs(time_vec-st.neg_pk_lim(pk)));
+    end
     data = nan([numel(cond_lab) numel(SBJs) numel(ch_list)]);
     for cond_ix = 1:numel(cond_lab)
         for ch_ix = 1:numel(ch_list)
             for s = 1:numel(SBJs)
-                [~, pk_rng(1)] = min(abs(time_vec-st.pos_pk_lim(1)));
-                [~, pk_rng(2)] = min(abs(time_vec-st.pos_pk_lim(2)));
-                [pos_pk, ~] = findpeaks(squeeze(gavg(cond_ix,s,ch_ix,pk_rng(1):pk_rng(2))));
-                [~, pk_rng(1)] = min(abs(time_vec-st.neg_pk_lim(1)));
-                [~, pk_rng(2)] = min(abs(time_vec-st.neg_pk_lim(2)));
-                [neg_pk, ~] = findpeaks(-1*squeeze(gavg(cond_ix,s,ch_ix,pk_rng(1):pk_rng(2))));
-                data(cond_ix,s,ch_ix) = pos_pk + neg_pk;    % + because neg_pk needs to be flipped again
+                [pk_amp(cond_ix,s,ch_ix,1), pk_lat(cond_ix,s,ch_ix,1)] = ...
+                    findpeaks(squeeze(gavg(cond_ix,s,ch_ix,pk_rng(1,1):pk_rng(1,2))));
+                [pk_amp(cond_ix,s,ch_ix,2), pk_lat(cond_ix,s,ch_ix,2)] = ...
+                    findpeaks(-1*squeeze(gavg(cond_ix,s,ch_ix,pk_rng(2,1):pk_rng(2,2))));
+                pk_amp(cond_ix,s,ch_ix,2) = -1*pk_amp(cond_ix,s,ch_ix,2);
+                % Compute peak-to-peak difference
+                data(cond_ix,s,ch_ix) = pk_amp(cond_ix,s,ch_ix,1) - pk_amp(cond_ix,s,ch_ix,2);
             end
         end
     end
+    pk_times = zeros(size(pk_lat));
+    pk_times(:,:,:,1) = time_vec(pk_lat(:,:,:,1)+pk_rng(1,1));
+    pk_times(:,:,:,2) = time_vec(pk_lat(:,:,:,2)+pk_rng(2,1));
 else
     error(['unknown st method for ' stat_id]);
 end
@@ -176,6 +158,81 @@ end
 % Reshape means for ANOVA
 st_data = reshape(data,[numel(cond_lab)*numel(SBJs), numel(ch_list)]);
 if any(isnan(st_data(:))); error('NaN in ANOVA data!'); end
+
+%% Plot Data
+if st.plot_erps
+    % Plot original ERPs
+    ch_figs = gobjects(size(ch_list));
+    for ch_ix = 1:numel(ch_list)
+        tmp = erps(:,:,ch_ix,:);
+        ylims = [min(tmp(:)) max(tmp(:))];
+        fig_name = ['ERPs_SBJ_' ch_list{ch_ix}];
+        ch_figs(ch_ix) = figure('Name',fig_name);
+        for cond_ix = 1:numel(cond_lab)
+            subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix); hold on;
+            title([ch_list{ch_ix} ': ' cond_lab{cond_ix}]);
+            plot(time_vec,squeeze(erps(cond_ix,:,ch_ix,:)),...
+                'Color',cond_colors{cond_ix});%,'LineStyle',cond_styles{cond_ix});
+            ylim(ylims);
+        end
+        if save_fig
+            fig_fname = [fig_dir fig_name '.' fig_ftype];
+            fprintf('Saving %s\n',fig_fname);
+            saveas(gcf,fig_fname);
+        end
+    end
+    % Plot ERPs after subsampling
+    if strcmp(st.grp_method,'jackknife')
+        for ch_ix = 1:numel(ch_list)
+            fig_name = ['ERPs_jackknife_' ch_list{ch_ix}];
+            ch_figs(ch_ix) = figure('Name',fig_name);
+            tmp = gavg(:,:,ch_ix,:);
+            ylims = [min(tmp(:)) max(tmp(:))];
+            for cond_ix = 1:numel(cond_lab)
+                subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix); hold on;
+                title([ch_list{ch_ix} ': ' cond_lab{cond_ix}]);
+                plot(time_vec,squeeze(gavg(cond_ix,:,ch_ix,:)),...
+                    'Color',cond_colors{cond_ix});%,'LineStyle',cond_styles{cond_ix});
+                ylim(ylims);
+            end
+            if save_fig
+                fig_fname = [fig_dir fig_name '.' fig_ftype];
+                fprintf('Saving %s\n',fig_fname);
+                saveas(gcf,fig_fname);
+            end
+        end
+    end
+    % Plot peaks
+    if strcmp(st.measure,'p2p')
+        for ch_ix = 1:numel(ch_list)
+            % ch_figs(ch_ix) = figure('Name',['ERPs_jackknife_' ch_list{ch_ix}]);
+            fig_name = ['ERPs_peaks_' ch_list{ch_ix}];
+            figure('Name',fig_name);
+            tmp = pk_amp(:,:,ch_ix,:);
+            ylims = [min(tmp(:)) max(tmp(:))];
+            tmp = pk_times(:,:,ch_ix,:);
+            xlims = [min(tmp(:)) max(tmp(:))];
+            for cond_ix = 1:numel(cond_lab)
+                subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix); hold on;
+                title([ch_list{ch_ix} ': ' cond_lab{cond_ix}]);
+                scatter(pk_times(cond_ix,:,ch_ix,1), pk_amp(cond_ix,:,ch_ix,1), 'o', 'b');
+                scatter(pk_times(cond_ix,:,ch_ix,2), pk_amp(cond_ix,:,ch_ix,2), 'o', 'r');
+                for s = 1:numel(SBJs)
+                    line([pk_times(cond_ix,s,ch_ix,1) pk_times(cond_ix,s,ch_ix,2)],...
+                        [pk_amp(cond_ix,s,ch_ix,1) pk_amp(cond_ix,s,ch_ix,2)],...
+                        'Color','k');
+                end
+                ylim(ylims);
+                xlim(xlims);
+            end
+            if save_fig
+                fig_fname = [fig_dir fig_name '.' fig_ftype];
+                fprintf('Saving %s\n',fig_fname);
+                saveas(gcf,fig_fname);
+            end
+        end
+    end
+end
 
 %% Compute Statistics
 % Omega squared isn't appropriate for interaction terms
@@ -225,11 +282,6 @@ for ch_ix = 1:numel(ch_list)
 end
 
 %% Plot results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' stat_id '/' an_id '/'];
-if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
-end
-
 for ch_ix = 1:numel(ch_list)
     % Create and format the plot
     fig_name = ['GRP_violins_' stat_id '_' an_id '_' ch_list{ch_ix}];

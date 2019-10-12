@@ -34,18 +34,18 @@ plot_final_check = 0;
 %% View basic ERPs
 proc_id    = 'eeg_full_ft';
 an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
-stat_conds = {'DifFB'};%,'DifOutS'};
+stat_conds = {'EzOutS','HdOutS'};%'DifFB'};%,'DifOutS'};
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for st_ix = 1:numel(stat_conds)
     plt_id     = 'ts_F2to1_evnts_sigLine';
-    for s = 1:numel(SBJs)
-        SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
-        SBJ03b_ERP_plot(SBJs{s},stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    end
+%     for s = 1:numel(SBJs)
+%         SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+%         SBJ03b_ERP_plot(SBJs{s},stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     end
     SBJ03c_ERP_plot_grp(SBJs,stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
