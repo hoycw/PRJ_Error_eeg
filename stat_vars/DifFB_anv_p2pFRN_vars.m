@@ -1,7 +1,7 @@
 % Stat Parameters
 st.an_style    = 'anova';
-st.model_lab   = 'DifOut';
-st.groups      = {'Dif','Out'};
+st.model_lab   = 'DifFB';
+st.groups      = {'Dif','FB'};
 st.anova_terms = 'interaction';
 st.trial_cond  = {'all'};
 st.stat_lim    = [0 0.6];

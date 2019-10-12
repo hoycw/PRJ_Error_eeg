@@ -1,15 +1,13 @@
 % Stat Parameters
 st.an_style    = 'anova';
-st.model_lab   = 'DifOut';
-st.groups      = {'Dif','Out'};
+st.model_lab   = 'DifFB';
+st.groups      = {'Dif','FB'};
 st.anova_terms = 'interaction';
 st.trial_cond  = {'all'};
-st.stat_lim    = [0 0.6];
-st.pos_pk_lim  = [0.1 0.25];
-st.neg_pk_lim  = [0.18 0.3];            % window in SEC for stats
-st.measure     = 'p2p';             % {'p2p', 'mean'}
+st.stat_lim    = [0.2 0.3];            % window in SEC for stats
+st.measure     = 'mean';             % {'p2p', 'mean'}
 st.grp_method  = 'jackknife';       % {'jackknife', 'sbj'} method for generating distribution to test
-st.plot_erps   = 1;
+st.plot_erps   = 0;
 st.n_boots     = 1000;             % Repetitions for non-parametric stats
 st.alpha       = 0.05;
 % st.anova_terms = [1 0 0; 0 1 0; 0 0 1; 1 1 0];

@@ -12,7 +12,6 @@ ft_defaults
 %% General parameters
 SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
            'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};
-%,'EP09' - shitty non-sense noise (something wrong)
 
 %% Run preprocessing
 proc_id_ica = proc_id;
@@ -34,10 +33,10 @@ plot_final_check = 0;
 
 %% View basic ERPs
 proc_id    = 'eeg_full_ft';
-an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_conds = {'DifOut'};%,'DifOutS'};
+an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
+stat_conds = {'DifFB'};%,'DifOutS'};
 save_fig   = 1;
-fig_vis    = 'off';
+fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for st_ix = 1:numel(stat_conds)
@@ -78,8 +77,6 @@ SBJ03c_ERP_plot_grp_diffwave_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save
 
 %% ERP Stats: Window Mean
 proc_id    = 'eeg_full_ft';
-an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
-stat_id    = 'DifOut_anv_mn2t3';%'DifOut_anv_mn3t4';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
@@ -87,7 +84,40 @@ fig_ftype  = 'png';
 %     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
 % end
 
-SBJ04c_ERP_grp_stats_mean_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifOut_anv_mn2t3_jk';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifFB_anv_mn2t3_jk';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id      = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifOut_anv_mn3t4_jk';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id      = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifFB_anv_mn3t4_jk';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+%% ERP Stats: Peak-to-Peak
+proc_id    = 'eeg_full_ft';
+save_fig   = 1;
+fig_vis    = 'on';
+fig_ftype  = 'png';
+
+an_id   = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id = 'DifOut_anv_p2pFRN';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id   = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id = 'DifFB_anv_p2pFRN';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 %% ODDBALL 
