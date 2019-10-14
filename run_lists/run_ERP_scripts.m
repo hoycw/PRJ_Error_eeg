@@ -34,7 +34,7 @@ plot_final_check = 0;
 %% View basic ERPs
 proc_id    = 'eeg_full_ft';
 an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
-stat_conds = {'EzOutS','HdOutS'};%'DifFB'};%,'DifOutS'};
+stat_conds = {'DifOut'};%'EzOutS','HdOutS'};%'DifFB'};%,'DifOutS'};
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
@@ -58,8 +58,8 @@ end
 
 %% View difference wave ERPs
 proc_id    = 'eeg_full_ft';
-an_id      = 'ERP_Cz_F2t1_dm2t0_fl05t20';
-conditions = 'DifOutS';
+an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
+conditions = 'DifOutdO';
 plt_id     = 'ts_F2to1_evnts_sigLine';
 save_fig   = 1;
 fig_vis    = 'on';

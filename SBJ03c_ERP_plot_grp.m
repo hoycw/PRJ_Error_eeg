@@ -124,6 +124,7 @@ for ch_ix = 1:numel(ch_list)
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';
     ax.Title.String  = [ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')'];
+    set(ax,'FontSize',16');
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end

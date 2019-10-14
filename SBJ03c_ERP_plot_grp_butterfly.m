@@ -126,6 +126,7 @@ for ch_ix = 1:numel(ch_list)
     axes(1).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     axes(1).XLabel.String = 'Time (s)';
     axes(1).Title.String  = [ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')'];
+    set(axes(1),'FontSize',16');
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
@@ -155,6 +156,7 @@ for ch_ix = 1:numel(ch_list)
         axes(cond_ix+1).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
         axes(cond_ix+1).XLabel.String = 'Time (s)';
         axes(cond_ix+1).Title.String  = [ch_list{ch_ix} ': ' cond_lab{cond_ix}];
+        set(axes(cond_ix+1),'FontSize',16');
 %         if plt.legend
 %             legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
 %         end
