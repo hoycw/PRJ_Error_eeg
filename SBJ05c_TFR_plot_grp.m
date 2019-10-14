@@ -1,4 +1,4 @@
-function SBJ05c_TFR_plot_grp(SBJs,conditions, an_id, save_fig,varargin)
+function SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,save_fig,varargin)
 %% Plot ERPs for single SBJ
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -16,17 +16,17 @@ ft_defaults
 
 %% Handle Variable Inputs & Defaults
 if ~isempty(varargin)
-for v = 1:2:numel(varargin)
-if strcmp(varargin{v},'fig_vis') && ischar(varargin{v+1})
-fig_vis = varargin{v+1};
-elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
-fig_ftype = varargin{v+1};
-elseif strcmp(varargin{v},'write_report')
-write_report = varargin{v+1};
-else
-error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
-end
-end
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'fig_vis') && ischar(varargin{v+1})
+            fig_vis = varargin{v+1};
+        elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
+            fig_ftype = varargin{v+1};
+        elseif strcmp(varargin{v},'write_report')
+            write_report = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
 end
 
 % Define default options
@@ -35,61 +35,70 @@ if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Load Results
-for sbj_ix = 1:numel(SBJs)
-    SBJ_vars_cmd{sbj_ix} = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{sbj_ix} '_vars.m'];
-    eval(SBJ_vars_cmd{sbj_ix});
-    SBJ_vars_all{sbj_ix} = SBJ_vars;
-end
-
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+
+% Select conditions (and trials)
+[grp_lab, ~, ~] = fn_group_label_styles(conditions);
+[cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
+% if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
+grp_cond_lab = cell(size(grp_lab));
+for grp_ix = 1:numel(grp_lab)
+    [grp_cond_lab{grp_ix}, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
+end
 
 % Load data
-tfr_conds_all = cell(size(SBJs));
-for sbj_ix = 1:numel(SBJs)
-    tmp = load([SBJ_vars_all{sbj_ix}.dirs.SBJ,'04_proc/',SBJs{sbj_ix},'_',an_id,conditions, '_conds.mat']); tfr_conds_all{sbj_ix} = tmp.tfr_conds;
-end
-cfg_avg = [];
-for cond_ix = 1:numel(cond_lab)
-    for sbj_ix = 1: numel(SBJs)
-        averages{sbj_ix}= tfr_conds_all{sbj_ix}{cond_ix};
-        tmp_tfr{sbj_ix} = ft_freqdescriptives(cfg_avg, averages{sbj_ix});
+tfr_all = cell([numel(cond_lab) numel(SBJs)]);
+for s = 1:numel(SBJs)
+    fprintf('-------------------- Processing %s ------------------------\n',SBJs{s});
+    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
+    eval(SBJ_vars_cmd);
+    load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
+    tmp = load([SBJ_vars.dirs.proc,SBJs{s},'_',an_id,'.mat']);
+    for cond_ix = 1:numel(cond_lab)
+        cfgs = [];
+        cfgs.trials = find(fn_condition_index(cond_lab(cond_ix), bhv));
+        cfgs.avgovertrials = 'yes';
+        tfr_all{cond_ix, s} = ft_freqdescriptives(cfgs, tmp.tfr);
     end
-    tfr_avg{cond_ix} = ft_freqgrandaverage(cfg_avg, tmp_tfr{1:numel(SBJs)});
+    clear bhv tfr SBJ_vars
 end
+
+% Average across SBJs
+tfr_avg = cell(size(cond_lab));
+for cond_ix = 1:numel(cond_lab)
+    tfr_avg{cond_ix} = ft_freqgrandaverage([], tfr_all{cond_ix,:});
+end
+
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/GRP/' an_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' conditions '/' an_id '/'];
 if ~exist(fig_dir,'dir')
-mkdir(fig_dir);
+    mkdir(fig_dir);
 end
 
 % Create a figure for each channel
 for ch_ix = 1:numel(tfr_avg{1}.label)
     %% Create plot
-        fig_name = ['GRP_' conditions '_' an_id '_' ...
-            tfr_avg{1}.label{ch_ix}];
-        figure('Name',fig_name,'units','normalized',...
-       'outerposition',[0 0 1 0.5],'Visible',fig_vis);
-        % Get trials for plotting
-        cfg_s = [];
-        cfg_s.channel = tfr_avg{1}.label{ch_ix};
-        % Condition Plots
-        for cond_ix = 1:numel(cond_lab)
-            subplot(1,numel(cond_lab)+1,cond_ix);   %!!! assumes only 2 conditions
-            cfgraw = [];
-            cfgraw.baseline = an.bsln_lim; %should be in sec
-            cfgraw.xlim = an.trial_lim_s;
-            ft_singleplotTFR(cfgraw, tfr_avg{cond_ix});
-            ax = gca;
-            title(cond_lab{cond_ix});
-        end
-end
-% Save figure
-if save_fig
-fig_filename = [fig_dir fig_name '.png'];
-fprintf('Saving %s\n',fig_filename);
-saveas(gcf,fig_filename);
-%eval(['export_fig ' fig_filename]);
+    fig_name = ['GRP_' conditions '_' an_id '_' tfr_avg{1}.label{ch_ix}];
+    figure('Name',fig_name,'units','normalized',...
+        'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
+    
+    % Condition Plots
+    for cond_ix = 1:length(cond_lab)
+        subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
+        ft_singleplotTFR([], tfr_avg{cond_ix});
+        title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix}]);
+        xlabel('Time (s)');
+        ylabel('Frequenncy (Hz)');
+        set(gca,'FontSize',16);
+    end
+    
+    % Save figure
+    if save_fig
+        fig_filename = [fig_dir fig_name '.png'];
+        fprintf('Saving %s\n',fig_filename);
+        saveas(gcf,fig_filename);
+    end
 end
 
+end

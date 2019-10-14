@@ -120,6 +120,19 @@ stat_id = 'DifFB_anv_p2pFRN';
 SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
+%% Plot TFRs
+conditions = 'DifOut';
+proc_id  = 'eeg_full_ft';
+an_id    = 'TFR_Fz_F2t1_rc2t0_fl2t40';
+save_fig = 1;
+
+for s = 1:numel(SBJs)
+     SBJ05a_TFR_save(SBJs{s}, proc_id, an_id)
+%      SBJ05b_TFR_plot(SBJs{s}, 'DifOut', proc_id, an_id, save_fig);
+end
+
+SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,save_fig);
+
 %% ODDBALL 
 % odd_plt_id = 'ts_S2to13_evnts_sigPatch';
 % an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06';
