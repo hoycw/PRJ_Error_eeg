@@ -56,6 +56,5 @@ SBJ_vars.ch_lab.bad     = {...
     'T7', 'P9', 'FT7'};
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 10000;
-SBJ_vars.trial_reject_ix = [32, 223, ]
-SBJ_vars.trial_reject_ix = [32 223 427 428 478 101 238 569 585 585]
+SBJ_vars.trial_reject_ix = [32 223 427 428 478 101 238 569 585 585];
 SBJ_vars.ica_reject = [1, 2, 3, 4, 5, 7, 8, 11, 12, 13, 14, 15, 16, 18, 19, 28, 34, 35, 36, 37, 39, 43, 45, 46, 47, 49, 50, 51, 52, 53];
