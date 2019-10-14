@@ -36,7 +36,7 @@ for i=1:length(event)
     if (event(i).value == 255 || event(i).value == 254) && i == max(cfg.tt_trigger_ix, cfg.odd_trigger_ix)
         % 255 and 254 seem to be interchangable.
         oddball_section = abs(oddball_section - 1); %I think this is a cheat way to flip between 0 and 1
-    end
+    end 
     if event(i).value == 254 || event(i).value == 255 && ~oddball_section
          trl = [];
     end
