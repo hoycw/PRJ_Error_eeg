@@ -11,7 +11,8 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-
+SBJs = {'EP06','EP07','EP08','EP09','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
+'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};
 
 %% Run preprocessing
 proc_id = 'eeg_full_ft';
@@ -21,7 +22,7 @@ fig_vis     = 'off';
 
 
 for s = 1:numel(SBJs)
-     %SBJ05a_TFR_save(SBJs{s}, proc_id, an_id)
+     SBJ05a_TFR_save(SBJs{s}, proc_id, an_id)
      SBJ05b_TFR_plot(SBJs{s}, 'DifOut', proc_id, an_id, save_fig);
      SBJ05b_TFR_plot(SBJs{s}, 'Out', proc_id, an_id, save_fig);
 end
