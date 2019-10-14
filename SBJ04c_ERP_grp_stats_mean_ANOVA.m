@@ -1,5 +1,6 @@
-function SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
-% Compute grand average peak-to-peak FRN via jackknife:
+function SBJ04c_ERP_grp_stats_mean_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
+% Compute grand average group ERP from SBJ ERPs:
+%   Re-align data to event, select channels and epoch, filter, average, run stats, save
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
 %   conditions [str] - label of conditions to compute ERPs for
@@ -51,7 +52,7 @@ eval(stat_vars_cmd);
 % Select Conditions of Interest
 [grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
 [cond_lab, cond_colors, ~, ~] = fn_condition_label_styles(st.model_lab);
-% if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
+if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
@@ -62,12 +63,9 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{1} '_vars
 eval(SBJ_vars_cmd);
 tmp = load([root_dir 'PRJ_Error_eeg/data/',SBJs{1},'/04_proc/',SBJs{1},'_',an_id,'.mat'],'roi');
 ch_list  = tmp.roi.label;
-cfg = []; cfg.latency = st.stat_lim;
-st_roi = ft_selectdata(cfg, tmp.roi);
-time_vec = st_roi.time{1};
 
 % Load all data
-erps = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
+means = nan([numel(cond_lab) numel(SBJs) numel(ch_list)]);
 for s = 1:length(SBJs)
     fprintf('-------------------- Processing %s ------------------------\n',SBJs{s});
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
@@ -77,17 +75,20 @@ for s = 1:length(SBJs)
     load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
     
     % Average data in stat window
+    cfg = [];
+    cfg.latency     = st.stat_lim;
+    cfg.avgovertime = 'yes';
     st_roi = ft_selectdata(cfg, roi);
     
     % Average data across trials
     cond_idx = fn_condition_index(cond_lab, bhv);
     for cond_ix = 1:numel(cond_lab)
         cond_trial_ix = find(cond_idx==cond_ix);
-        trials = nan([numel(ch_list) numel(cond_trial_ix) numel(time_vec)]);
+        trial_means = nan([numel(ch_list) numel(cond_trial_ix)]);
         for trl_ix = 1:numel(cond_trial_ix)
-            trials(:,trl_ix,:) = st_roi.trial{cond_trial_ix(trl_ix)};
+            trial_means(:,trl_ix) = mean(st_roi.trial{cond_trial_ix(trl_ix)},2);
         end
-        erps(cond_ix,s,:,:) = mean(trials,2);
+        means(cond_ix,s,:) = mean(trial_means,2);
     end
     
     clear tmp SBJ_vars bhv roi trial_means st_roi cond_trial_ix cond_idx
@@ -106,75 +107,8 @@ for grp_ix = 1:numel(grp_lab)
 end
 % design(:,end) = repmat([1:numel(SBJs)]',numel(cond_lab),1);
 
-%% Prepare Data for Stats
-% Plot ERPs
-if st.plot_erps
-    for ch_ix = 1:numel(ch_list)
-        tmp = erps(:,:,ch_ix,:);
-        ylims = [min(tmp(:)) max(tmp(:))];
-        figure('Name',['ERPs_SBJ_' ch_list{ch_ix}]);
-        for cond_ix = 1:numel(cond_lab)
-            subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix); hold on;
-            title(cond_lab{cond_ix});
-            plot(time_vec,squeeze(erps(cond_ix,:,ch_ix,:)),...
-                'Color',cond_colors{cond_ix});%,'LineStyle',cond_styles{cond_ix});
-            ylim(ylims);
-        end
-    end
-end
-
-% Jackknife procedure
-if strcmp(st.grp_method,'jackknife')
-    gavg = nan(size(erps));
-    % Average data across sub-samples
-    for s = 1:numel(SBJs)
-        sbj_idx = setdiff(1:numel(SBJs),s);
-        gavg(:,s,:,:) = mean(erps(:,sbj_idx,:,:),2);
-    end
-    
-    % Plot ERPs after subsampling
-    if st.plot_erps
-        for ch_ix = 1:numel(ch_list)
-            figure('Name',['ERPs_jackknife_' ch_list{ch_ix}]);
-            tmp = gavg(:,:,ch_ix,:);
-            ylims = [min(tmp(:)) max(tmp(:))];
-            for cond_ix = 1:numel(cond_lab)
-                subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix); hold on;
-                title(cond_lab{cond_ix});
-                plot(time_vec,squeeze(gavg(cond_ix,:,ch_ix,:)),...
-                    'Color',cond_colors{cond_ix});%,'LineStyle',cond_styles{cond_ix});
-                ylim(ylims);
-            end
-        end
-    end
-else
-    gavg = erps;
-end
-
-% Compute data for statistics
-if strcmp(st.measure,'mean')
-    data = mean(gavg,4);
-elseif strcmp(st.measure,'p2p')
-    data = nan([numel(cond_lab) numel(SBJs) numel(ch_list)]);
-    for cond_ix = 1:numel(cond_lab)
-        for ch_ix = 1:numel(ch_list)
-            for s = 1:numel(SBJs)
-                [~, pk_rng(1)] = min(abs(time_vec-st.pos_pk_lim(1)));
-                [~, pk_rng(2)] = min(abs(time_vec-st.pos_pk_lim(2)));
-                [pos_pk, ~] = findpeaks(squeeze(gavg(cond_ix,s,ch_ix,pk_rng(1):pk_rng(2))));
-                [~, pk_rng(1)] = min(abs(time_vec-st.neg_pk_lim(1)));
-                [~, pk_rng(2)] = min(abs(time_vec-st.neg_pk_lim(2)));
-                [neg_pk, ~] = findpeaks(-1*squeeze(gavg(cond_ix,s,ch_ix,pk_rng(1):pk_rng(2))));
-                data(cond_ix,s,ch_ix) = pos_pk + neg_pk;    % + because neg_pk needs to be flipped again
-            end
-        end
-    end
-else
-    error(['unknown st method for ' stat_id]);
-end
-
 % Reshape means for ANOVA
-st_data = reshape(data,[numel(cond_lab)*numel(SBJs), numel(ch_list)]);
+st_data = reshape(means,[numel(cond_lab)*numel(SBJs), numel(ch_list)]);
 if any(isnan(st_data(:))); error('NaN in ANOVA data!'); end
 
 %% Compute Statistics
@@ -183,24 +117,9 @@ if any(isnan(st_data(:))); error('NaN in ANOVA data!'); end
 % pe2  = nan([numel(grp_lab)+1 numel(ch_list)]);
 pval = nan([numel(grp_lab)+1 numel(ch_list)]);
 for ch_ix = 1:numel(ch_list)
-    [tmp_p, table] = anovan(st_data(:,ch_ix), design, ...
+    [pval(:,ch_ix), table] = anovan(st_data(:,ch_ix), design, ...
         'model', 'interaction',...% 'sstype', 2, ...% 'continuous', strmatch('RT',w2.cond),
         'varnames', grp_lab, 'display', 'off');
-    
-    % Adjust p for jackknife
-    if strcmp(st.grp_method,'jackknife')
-        f_col = strcmp(table(1,:),'F');
-        df_col = strcmp(table(1,:),'d.f.');
-        for grp_ix = 1:numel(grp_lab)
-            grp_row = strcmp(grp_lab{grp_ix},table(:,1));
-            % Adjusted F = F / (n-1)^2;
-            pval(grp_ix,ch_ix) = 1-fcdf(table{grp_row,f_col}/(numel(SBJs)-1)^2, table{grp_row,df_col}, numel(SBJs)-1);
-        end
-        intr_row = strcmp([grp_lab{1} '*' grp_lab{2}],table(:,1));
-        pval(numel(grp_lab)+1,ch_ix) = 1-fcdf(table{intr_row,f_col}/(numel(SBJs)-1)^2, table{intr_row,df_col}, numel(SBJs)-1);
-    else
-        pval(:,ch_ix) = tmp_p;
-    end
     
     % Calculate w2 (debiased effect size; multiply with 100 to get PEV)
     %   table(:,2) = sum of squares
@@ -221,7 +140,7 @@ for ch_ix = 1:numel(ch_list)
 %     intr_row = strcmp([grp_lab{1} '*' grp_lab{2}],table(:,1));
 %     w2(end,ch_ix) = (table{intr_row,2} - (table{intr_row,3} * mse))/...
 %             (table{end,2} + mse);
-%     clear p table
+    clear p table
 end
 
 %% Plot results
@@ -236,13 +155,13 @@ for ch_ix = 1:numel(ch_list)
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
     
-    violins = violinplot(squeeze(data(:,:,ch_ix))', cond_lab, ...
+    violins = violinplot(squeeze(means(:,:,ch_ix))', cond_lab, ...
         'ShowMean', true, 'ViolinAlpha', 0.3);
     
     for cond_ix = 1:numel(cond_lab)
         % Fix Mean from population estimate to sample mean
-        violins(cond_ix).MeanPlot.YData = repmat(mean(data(cond_ix,:,ch_ix),2), [1 2]);
-        [~,mean_ix] = min(abs(violins(cond_ix).ViolinPlot.YData - mean(data(cond_ix,:,ch_ix),2)));
+        violins(cond_ix).MeanPlot.YData = repmat(mean(means(cond_ix,:,ch_ix),2), [1 2]);
+        [~,mean_ix] = min(abs(violins(cond_ix).ViolinPlot.YData - mean(means(cond_ix,:,ch_ix),2)));
         mean_len = violins(cond_ix).ViolinPlot.XData(mean_ix)-cond_ix;
         violins(cond_ix).MeanPlot.XData = [cond_ix-mean_len cond_ix+mean_len];
         violins(cond_ix).MeanPlot.LineWidth = 3;
@@ -265,11 +184,7 @@ for ch_ix = 1:numel(ch_list)
     
     % Add label and min RT for perspective
     ax = gca;
-    if strcmp(st.measure,'mean')
-        ax.YLabel.String = ['Mean ERP (' num2str(st.stat_lim(1)) '-' num2str(st.stat_lim(2)) ')'];
-    elseif strcmp(st.measure,'p2p')
-        ax.YLabel.String = 'Peak-to-Peak Amplitude';
-    end
+    ax.YLabel.String = ['Mean ERP (' num2str(st.stat_lim(1)) '-' num2str(st.stat_lim(2)) ')'];
     set(ax,'FontSize',16');
     title_str = [ch_list{ch_ix} ': '];
     for grp_ix = 1:numel(grp_lab)
