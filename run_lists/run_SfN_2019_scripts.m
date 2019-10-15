@@ -85,6 +85,11 @@ fig_ftype  = 'png';
 % end
 
 an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifOut_anv_mn2t3';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
 stat_id    = 'DifOut_anv_mn2t3_jk';
 SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
@@ -120,6 +125,17 @@ stat_id = 'DifFB_anv_p2pFRN';
 SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
+%% FRN Peak latencies
+proc_id    = 'eeg_full_ft';
+save_fig   = 1;
+fig_vis    = 'on';
+fig_ftype  = 'png';
+
+an_id   = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id = 'DifFB_anv_p2pFRN';
+SBJ04c_ERP_grp_stats_peak_times(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    
 %% Plot TFRs
 conditions = 'DifOut';
 proc_id  = 'eeg_full_ft';
@@ -166,5 +182,5 @@ save_fig  = 1;
 fig_ftype = 'png';
 
 for s = 4:numel(SBJs)
-    oddball_stats_plot(SBJs{s}, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+%     oddball_stats_plot(SBJs{s}, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
 end
