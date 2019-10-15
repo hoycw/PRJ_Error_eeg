@@ -45,7 +45,7 @@ for cond_ix = 1:numel(cond_lab)
             matches = logical(strcmp('hard',bhv.cond)) & strcmp(bhv.fb,'S');
             condition_n(matches) = cond_ix;
         otherwise
-            error(['Invalid condition label: ' conditions]);
+            error(['Invalid condition label: ' cond_lab]);
     end
 end
 

@@ -149,6 +149,18 @@ end
 
 SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,save_fig);
 
+%% Linear Mixed Effects Model
+stat_id  = 'DifOut_lme_st0t5';
+proc_id  = 'eeg_full_ft';
+an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20_ds50';
+
+% for s = 1:numel(SBJs)
+%     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+% end
+
+SBJ04c_ERP_grp_stats_LME(SBJs,proc_id,an_id,stat_id);
+
+
 %% ODDBALL 
 % odd_plt_id = 'ts_S2to13_evnts_sigPatch';
 % an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06';
@@ -172,15 +184,15 @@ SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,save_fig);
 % PLOT_DiffWave_Group(SBJs, plt_id, an_id, 'off', 1, '.png', 'DifEH');
 
 %% Run Oddball ERPs
-odd_SBJs = {'EEG01','EEG02','EEG03','EEG04','EEG06','EEG08'};
-
-proc_id   = 'odd_full_ft';
-an_id     = 'ERP_Cz_S2t13_flt5t20_st6';
-plt_id    = 'ts_S2to13_evnts_sigPatch';
-fig_vis   = 'on';
-save_fig  = 1;
-fig_ftype = 'png';
-
-for s = 4:numel(SBJs)
-%     oddball_stats_plot(SBJs{s}, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
-end
+% odd_SBJs = {'EEG01','EEG02','EEG03','EEG04','EEG06','EEG08'};
+% 
+% proc_id   = 'odd_full_ft';
+% an_id     = 'ERP_Cz_S2t13_flt5t20_st6';
+% plt_id    = 'ts_S2to13_evnts_sigPatch';
+% fig_vis   = 'on';
+% save_fig  = 1;
+% fig_ftype = 'png';
+% 
+% for s = 4:numel(SBJs)
+% %     oddball_stats_plot(SBJs{s}, proc_id, plt_id, an_id, fig_vis, save_fig, fig_ftype)
+% end

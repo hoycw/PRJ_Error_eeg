@@ -12,8 +12,8 @@ an.hp_yn       = 'yes';
 an.hp_freq     = 0.5;
 an.hp_filtord  = 4;
 
-an.dsamp_yn    = 0;
-an.dsamp_freq  = 0;
+an.dsamp_yn    = 1;
+an.dsamp_freq  = 50;
 
 % Window Logic Check: bsln_lim is within trial_lim_s
 if an.bsln_lim(1) < an.trial_lim_s(1) || an.bsln_lim(2) > an.trial_lim_s(2)

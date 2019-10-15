@@ -30,7 +30,7 @@ switch factor_name
         colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
         line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
         markers = {'o', 'o', 'o'};
-    case {'DifOut','DifOutUE','DifOutWL','DifOutdO','Holroyd'}
+    case {'DifOut','DifOutUE','DifOutWL','DifOutdO','DifOutDO','Holroyd'}
         labels = {'EzWn', 'EzLs', 'HdWn', 'HdLs'};
         colors = {[166 206 227]./256, [251 154 153]./256, [31 120 180]./256, [227 26 28]./256};
         line_styles = {'-', '-', '--', '--'};

@@ -25,6 +25,8 @@ switch model_id
         grp_labels = {'Dif','Out','Tim','Dif*Out'};
     case 'DifOut'
         grp_labels = {'Dif','Out'};
+    case 'DifOutDO'
+        grp_labels = {'Dif','Out','Dif*Out'};
     case 'DifOutSur'
         grp_labels = {'Dif','Out','Sur'};
     case 'DifOutS'
