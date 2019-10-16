@@ -57,7 +57,7 @@ for s = 1:numel(SBJs)
         if numel(bhvs{s}.(bhv_fields{f_ix}))==orig_n_trials
             bhvs{s}.(bhv_fields{f_ix}) = bhvs{s}.(bhv_fields{f_ix})(full_cond_idx{s}~=0);
         end
-    end    
+    end
     
     n_trials(s) = numel(bhvs{s}.trl_n);
     clear tmp
@@ -69,6 +69,7 @@ cfgs = []; cfgs.latency = st.stat_lim;
 model = nan([sum(n_trials) numel(st.factors)+1]);
 for s = 1:numel(SBJs)
     % Load data
+    fprintf('========================== Processing %s ==========================\n',SBJs{s});
     load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',an_id,'.mat'],'roi');
     if numel(roi.label)>1; error('assuming single channel for now!'); end
     
@@ -84,13 +85,13 @@ for s = 1:numel(SBJs)
         % Create model
         for fct_ix = 1:numel(fact_cond_lab)
             % 1 for first condition, leave 0 for second
-            model(1:n_trials(s),fct_ix) = fn_condition_index(fact_cond_lab{fct_ix}(1), bhvs{s});
+            model(1:n_trials(s),fct_ix) = fn_condition_index(fact_cond_lab{fct_ix}, bhvs{s});
         end
         model(1:n_trials(s),end) = s*ones([n_trials(s) 1]);
     else
         % Create model
         for fct_ix = 1:numel(fact_cond_lab)
-            model(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),fct_ix) = fn_condition_index(fact_cond_lab{fct_ix}(1), bhvs{s});
+            model(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),fct_ix) = fn_condition_index(fact_cond_lab{fct_ix}, bhvs{s});
         end
         model(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),end) = s*ones([n_trials(s) 1]);
     end
@@ -105,6 +106,7 @@ for s = 1:numel(SBJs)
 end
 
 %% Build table
+fprintf('========================== Running Stats ==========================\n');
 tic
 lme = cell(size(time_vec));
 pvals = nan([numel(grp_lab) numel(time_vec)]);
@@ -116,37 +118,8 @@ for t_ix = 1:numel(time_vec)
         pvals(grp_ix,t_ix) = lme{t_ix}.Coefficients.pValue(label_ix);
     end
 end
+fprintf('\t\t Stats Complete:');
 toc
-
-% Adjust p values
-qvals = nan(size(pvals));
-for grp_ix = 1:numel(grp_lab)
-    [~, ~, ~, qvals(grp_ix,:)] = fdr_bh(pvals(grp_ix,:));
-end
-
-% %% Plot Results
-% erps = nan([numel(cond_lab) numel(time_vec)]);
-% for cond_ix = 1:numel(cond_lab)
-%     grp_cond1 = contains(cond_lab{cond_ix},fact_cond_lab{1}{1});
-%     grp_cond2 = contains(cond_lab{cond_ix},fact_cond_lab{2}{1});
-%     erps(cond_ix,:) = mean(data(model(:,1)==grp_cond1 & model(:,2)==grp_cond2,:),1);
-% end
-% 
-% figure;
-% subplot(2,1,1); hold on;
-% cond_lines = gobjects(size(cond_lab));
-% for cond_ix = 1:numel(cond_lab)
-%     cond_lines(cond_ix) = plot(time_vec,erps(cond_ix,:),'Color',cond_colors{cond_ix},...
-%         'LineStyle',cond_styles{cond_ix});
-% end
-% legend(cond_lines,cond_lab);
-% 
-% subplot(2,1,2); hold on;
-% grp_lines = gobjects(size(grp_lab));
-% for grp_ix = 1:numel(grp_lab)
-%     grp_lines(grp_ix) = plot(time_vec,pvals(grp_ix,:),'Color',grp_colors{grp_ix});
-% end
-% legend(grp_lines,grp_lab);
 
 %% Save Results
 stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];

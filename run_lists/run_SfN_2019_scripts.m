@@ -150,16 +150,21 @@ end
 SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,save_fig);
 
 %% Linear Mixed Effects Model
-stat_id  = 'DifOut_lme_st0t5';
+stat_id  = 'DifOut_lme_st1t5';
 proc_id  = 'eeg_full_ft';
-an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20_ds50';
+an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+plt_id   = 'ts_F2to1_evnts_sigLine';
+save_fig = 1;
+fig_vis = 'on';
+fig_ftype = 'png';
 
 % for s = 1:numel(SBJs)
 %     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
 % end
 
 SBJ04c_ERP_grp_stats_LME(SBJs,proc_id,an_id,stat_id);
-
+SBJ04d_ERP_plot_stats_LME(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 %% ODDBALL 
 % odd_plt_id = 'ts_S2to13_evnts_sigPatch';
