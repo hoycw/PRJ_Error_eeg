@@ -17,6 +17,8 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
+        elseif strcmp(varargin{v},'plot_median')
+            plot_median = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -26,6 +28,7 @@ end
 % Define default options
 if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
+if ~exist('plot_median','var'); plot_median = 0; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
@@ -102,7 +105,11 @@ for ch_ix = 1:numel(ch_list)
     plot_means = NaN([numel(cond_lab) numel(time_vec)]);
     sems  = NaN([numel(cond_lab) numel(time_vec)]);
     for cond_ix = 1:numel(cond_lab)
-        plot_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
+        if plot_median
+            plot_means(cond_ix,:) = squeeze(median(means(cond_ix,:,ch_ix,:),2));
+        else
+            plot_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
+        end
         sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
     end
     
@@ -118,7 +125,8 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' stat_id '_' ch_list{ch_ix}];    
+    fig_name = ['GRP_' stat_id '_' ch_list{ch_ix}];
+    if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
 %     [plot_rc,~] = fn_num_subplots(numel(w2.label));
