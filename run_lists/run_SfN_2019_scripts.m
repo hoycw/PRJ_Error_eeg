@@ -33,48 +33,50 @@ plot_final_check = 0;
 
 %% View basic ERPs
 proc_id    = 'eeg_full_ft';
-an_id      = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 stat_conds = {'DifOut','EzOutS','HdOutS'};%'DifFB'};%,'DifOutS'};
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'svg';
 
-for st_ix = 1:numel(stat_conds)
-    plt_id     = 'ts_F2to1_evnts_sigLine';
-%     for s = 1:numel(SBJs)
-%         SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
-%         SBJ03b_ERP_plot(SBJs{s},stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     end
-    SBJ03c_ERP_plot_grp(SBJs,stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    
-%     plt_id = 'ts_F2to1_but_evnts_sigPatch';
-%     SBJ03c_ERP_plot_grp_butterfly(SBJs,stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     
-%     close all;
+for an_ix = 1:numel(an_ids)
+    for st_ix = 1:numel(stat_conds)
+        plt_id     = 'ts_F2to1_evnts_sigLine';
+        %     for s = 1:numel(SBJs)
+        %         SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+        %         SBJ03b_ERP_plot(SBJs{s},stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
+        %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        %     end
+        SBJ03c_ERP_plot_grp(SBJs,stat_conds{st_ix},proc_id,an_ids{an_ix},plt_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        
+        %     plt_id = 'ts_F2to1_but_evnts_sigPatch';
+        %     SBJ03c_ERP_plot_grp_butterfly(SBJs,stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
+        %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        %
+        %     close all;
+    end
 end
 
 %% View difference wave ERPs
-proc_id    = 'eeg_full_ft';
-an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_conds = {'DifOutdO','DifOutWL','DifOutUE'};
-plt_id     = 'ts_F2to1_evnts_sigLine';
-save_fig   = 1;
-fig_vis    = 'on';
-fig_ftype  = 'svg';
-% for s = 1:numel(SBJs)
-%     SBJ03b_ERP_plot_diffwave(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+% proc_id    = 'eeg_full_ft';
+% an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+% stat_conds = {'DifOutdO','DifOutWL','DifOutUE'};
+% plt_id     = 'ts_F2to1_evnts_sigLine';
+% save_fig   = 1;
+% fig_vis    = 'on';
+% fig_ftype  = 'svg';
+% % for s = 1:numel(SBJs)
+% %     SBJ03b_ERP_plot_diffwave(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+% %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+% % end
+% for st_ix = 1:numel(stat_conds)
+%     SBJ03c_ERP_plot_grp_diffwave(SBJs,stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 % end
-for st_ix = 1:numel(stat_conds)
-    SBJ03c_ERP_plot_grp_diffwave(SBJs,stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-end
-% plt_id = 'ts_F2to1_but_evnts_sigPatch';
-% SBJ03c_ERP_plot_grp_diffwave_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+% % plt_id = 'ts_F2to1_but_evnts_sigPatch';
+% % SBJ03c_ERP_plot_grp_diffwave_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+% %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 %% ERP Stats: FRN Window Mean
 proc_id    = 'eeg_full_ft';
@@ -160,6 +162,7 @@ for an_ix = 1:numel(an_ids)
     % SBJ04d_ERP_plot_stats_LME(SBJs,proc_id,an_ids{an_ix},stat_id,plt_id,save_fig,...
     %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_median',1);
 end
+
 %% ODDBALL 
 % odd_plt_id = 'ts_S2to13_evnts_sigPatch';
 % an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06';

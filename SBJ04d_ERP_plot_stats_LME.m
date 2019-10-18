@@ -155,9 +155,9 @@ for ch_ix = 1:numel(ch_list)
                 [~, stat_start] = min(abs(time_vec-st.stat_lim(1)));
                 sig_times = time_vec([sig_chunks{grp_ix}(sig_ix,1):sig_chunks{grp_ix}(sig_ix,2)]+stat_start);
                 if strcmp(plt.sig_loc,'below')
-                    sig_y = ylims(1) + grp_ix*data_lim(1)*plt.sig_loc_factor;
+                    sig_y = data_lim(1) + grp_ix*data_lim(1)*plt.sig_loc_factor;
                 elseif strcmp(plt.sig_loc,'above')
-                    sig_y = ylims(2) + grp_ix*data_lim(2)*plt.sig_loc_factor;
+                    sig_y = data_lim(2) + grp_ix*data_lim(2)*plt.sig_loc_factor;
                 end
                 sig_line = line(sig_times,repmat(sig_y,size(sig_times)),...
                     'LineWidth',plt.sig_width,'Color',grp_colors{grp_ix});
