@@ -44,6 +44,15 @@ for cond_ix = 1:numel(cond_lab)
         case 'HdSu'
             matches = logical(strcmp('hard',bhv.cond)) & strcmp(bhv.fb,'S');
             condition_n(matches) = cond_ix;
+        case 'odd'
+            matches = logical(strcmp('odd',bhv.cond));
+            condition_n(matches) = cond_ix;
+        case 'std'
+            matches = logical(strcmp('std',bhv.cond));
+            condition_n(matches) = cond_ix;
+        case 'tar'
+            matches = logical(strcmp('tar',bhv.cond));
+            condition_n(matches) = cond_ix;
         otherwise
             error(['Invalid condition label: ' conditions]);
     end

@@ -25,6 +25,12 @@ switch factor_name
             {find(strcmp(cond_lab,'Su')) {[find(strcmp(cond_lab,'EzWn')) find(strcmp(cond_lab,'HdLs'))]}}};
         colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
         line_styles = {'-', '-', '-'};
+    case 'DiffOutStdTar'
+        labels  = {'Tar-Std'}
+        [cond_lab,~,~,~] = fn_condition_label_styles('Odd')
+        diff_pairs= {[find(strcmp(cond_lab,'tar')) find(strcmp(cond_lab,'std'))]};
+        colors = {[31 120 180]./256};
+        line_styles = {'-'};
     otherwise
         error(['Difference wave not defined for factor ' factor_name]);
 end
