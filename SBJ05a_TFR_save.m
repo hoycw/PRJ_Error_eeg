@@ -68,16 +68,34 @@ if round(trial_lim_s_pad(1)+1/roi.fsample,3) < round(roi.time{1}(1),3) || ...
     warning('trial_lim_s_pad is outside data time bounds!');
 end
 
-%% Compute TFR
-
-% Select Channel(s)
+%% Select Channel(s)
 cfgs = [];
 cfgs.channel = an.ROI;
+cfgs.latency = trial_lim_s_pad;
 roi = ft_selectdata(cfgs, roi);
+
 %% Compute TFRs
 % all cfg_tfr options are specified in the an_vars
-tfr      = {};
 tfr  = ft_freqanalysis(cfg_tfr, roi);
+
+% Trim padding off
+cfgs = [];
+cfgs.latency = an.trial_lim_s;
+tfr = ft_selectdata(cfgs, tfr);
+
+%% Baseline Correction
+switch an.bsln_type
+    case {'zscore', 'demean', 'my_relchange'}
+        tfr = fn_bsln_ft_tfr(tfr,an.bsln_lim,an.bsln_type,an.bsln_boots);
+    case 'relchange'
+        cfgbsln = [];
+        cfgbsln.baseline     = an.bsln_lim;
+        cfgbsln.baselinetype = an.bsln_type;
+        cfgbsln.parameter    = 'powspctrm';
+        tfr = ft_freqbaseline(cfgbsln,tfr);
+    otherwise
+        error(['No baseline implemented for an.bsln_type: ' an.bsln_type]);
+end
 
 %% Save Results
 data_out_fname = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat');

@@ -81,6 +81,14 @@ cfgpp.demean         = an.demean_yn;
 cfgpp.baselinewindow = an.bsln_lim;
 roi = ft_preprocessing(cfgpp, roi);
 
+%% Downsample
+if an.dsamp_yn
+    cfgds = [];
+    cfgds.resamplefs = an.dsamp_freq;
+    cfgds.detrend    = 'no';
+    roi = ft_resampledata(cfgds, roi);
+end
+
 %% Save Results
 data_out_fname = strcat(SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat');
 fprintf('Saving %s\n',data_out_fname);

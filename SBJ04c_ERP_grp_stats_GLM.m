@@ -1,5 +1,4 @@
-function SBJ04c_ERP_grp_stats_GLM(SBJs,proc_id,an_id,stat_id)
-error('needs adaptation...');
+function SBJ04c_ERP_grp_stats_GLM(SBJs,proc_id,an_id,stat_id,varargin)
 % Compute grand average group ERP from SBJ ERPs:
 %   Re-align data to event, select channels and epoch, filter, average, run stats, save
 % INPUTS:
@@ -22,6 +21,30 @@ addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
+%% Handle Variable Inputs & Defaults
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'fig_vis') && ischar(varargin{v+1})
+            fig_vis = varargin{v+1};
+        elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
+            fig_ftype = varargin{v+1};
+%         elseif strcmp(varargin{v},'write_report')
+%             write_report = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Define default options
+if ~exist('fig_vis','var'); fig_vis = 'on'; end
+if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
+if ischar(save_fig); save_fig = str2num(save_fig); end
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' stat_id '/' an_id '/'];
+if ~exist(fig_dir,'dir') && save_fig
+    mkdir(fig_dir);
+end
+
 %% Load Data 
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
@@ -29,21 +52,30 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
+if ~strcmp(st.measure,'p2p')
+    error('peak latencies need jackknife and p2p!');
+end
 
 % Select Conditions of Interest
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
+[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+
+% Load example data
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{1} '_vars.m'];
+eval(SBJ_vars_cmd);
+tmp = load([root_dir 'PRJ_Error_eeg/data/',SBJs{1},'/04_proc/',SBJs{1},'_',an_id,'.mat'],'roi');
+ch_list  = tmp.roi.label;
+cfg = []; cfg.latency = st.stat_lim;
+st_roi = ft_selectdata(cfg, tmp.roi);
+time_vec = st_roi.time{1};
 
 % Load Data
-SBJs_vars = cell(size(SBJs));
-bhvs      = cell(size(SBJs));
-rois      = cell(size(SBJs));
-w2s       = cell(size(SBJs));
+erps = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
 for s = 1:length(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
     eval(SBJ_vars_cmd);
-    SBJs_vars{s} = SBJ_vars;
     
-    tmp = load([SBJs_vars{s}.dirs.SBJ,'04_proc/',SBJs{s},'_',an_id,'.mat']);
+    tmp = load([SBJ_vars.dirs.proc,SBJs{s},'_',an_id,'.mat']);
+    load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
     bhvs{s} = tmp.bhv; rois{s} = tmp.roi; w2s{s} = tmp.w2;
     clear SBJ_vars tmp
 end

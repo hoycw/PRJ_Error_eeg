@@ -1,4 +1,4 @@
-function SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
+function SBJ04c_ERP_grp_stats_peak_times(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
 % Compute grand average peak-to-peak FRN via jackknife:
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
@@ -51,6 +51,9 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
+if ~strcmp(st.measure,'p2p') || ~strcmp(st.grp_method,'jackknife')
+    error('peak latencies need jackknife and p2p!');
+end
 
 % Select Conditions of Interest
 [grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
@@ -144,7 +147,7 @@ elseif strcmp(st.measure,'p2p')
                     findpeaks(-1*squeeze(gavg(cond_ix,s,ch_ix,pk_rng(2,1):pk_rng(2,2))));
                 pk_amp(cond_ix,s,ch_ix,2) = -1*pk_amp(cond_ix,s,ch_ix,2);
                 % Compute peak-to-peak difference
-                data(cond_ix,s,ch_ix) = pk_amp(cond_ix,s,ch_ix,1) - pk_amp(cond_ix,s,ch_ix,2);
+                data(cond_ix,s,ch_ix) = time_vec(pk_lat(cond_ix,s,ch_ix,2)+pk_rng(2,1));
             end
         end
     end
@@ -284,7 +287,7 @@ end
 %% Plot results
 for ch_ix = 1:numel(ch_list)
     % Create and format the plot
-    fig_name = ['GRP_violins_' stat_id '_' an_id '_' ch_list{ch_ix}];
+    fig_name = ['GRP_violins_pk_lat_' stat_id '_' an_id '_' ch_list{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
     
@@ -320,7 +323,7 @@ for ch_ix = 1:numel(ch_list)
     if strcmp(st.measure,'mean')
         ax.YLabel.String = ['Mean ERP (' num2str(st.stat_lim(1)) '-' num2str(st.stat_lim(2)) ')'];
     elseif strcmp(st.measure,'p2p')
-        ax.YLabel.String = 'Peak-to-Peak Amplitude';
+        ax.YLabel.String = 'FRN Peak Latency';
     end
     set(ax,'FontSize',16');
     title_str = [ch_list{ch_ix} ': '];

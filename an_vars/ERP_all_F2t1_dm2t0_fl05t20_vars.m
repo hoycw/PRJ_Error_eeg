@@ -1,5 +1,5 @@
 % Data Selection
-an.ROI         = {'Fz'};             % Channel to be analyzed
+an.ROI         = {'all'};             % Channel to be analyzed
 an.event_type  = 'F';           % event around which to cut trials
 an.trial_lim_s = [-0.2 1];       % window in SEC for cutting trials
 

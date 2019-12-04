@@ -1,5 +1,5 @@
-function SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save_fig,varargin)
-%% Plot ERPs for group, with butterfly plots for SBJ means per condition
+function SBJ04c_ERP_grp_stats_diffwave(SBJs,conditions,proc_id,an_id,plt_id,save_fig,varargin)
+%% Plot ERPs for single SBJ
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
 
@@ -43,6 +43,8 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+% Create contrast: (Unexpected - Expected) for each outcome
+[diff_lab, diff_pairs, diff_colors, diff_styles] = fn_condition_diff_label_styles(conditions);
 
 % Load example data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{1} '_vars.m'];
@@ -53,6 +55,7 @@ ch_list  = tmp.roi.label;
 
 % Load all data
 means = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
+diff_means = nan([numel(diff_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
 for s = 1:length(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
     eval(SBJ_vars_cmd);
@@ -71,11 +74,25 @@ for s = 1:length(SBJs)
         means(cond_ix,s,:,:) = mean(trials,2);
     end
     
-    clear tmp SBJ_vars bhv roi
+    % Compute Difference Waves
+    for diff_ix = 1:numel(diff_lab)
+        if iscell(diff_pairs{diff_ix})
+            contrast_pair = diff_pairs{diff_ix}{2};
+            contrast_mean = squeeze(mean(means(contrast_pair{:},s,:,:),1));
+            diff_means(diff_ix,s,:,:) = means(cond_ix,s,:,:)-contrast_mean;
+        elseif any(diff_pairs{diff_ix}==0)
+            cond_ix = diff_pairs{diff_ix}(diff_pairs{diff_ix}~=0);
+            diff_means(diff_ix,s,:,:) = means(cond_ix,s,:,:);
+        else
+            diff_means(diff_ix,s,:,:) = means(diff_pairs{diff_ix}(1),s,:,:)-means(diff_pairs{diff_ix}(2),s,:,:);
+        end
+    end
+    
+    clear tmp SBJ_vars bhv roi trials cond_idx
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' conditions '/' an_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' conditions '_dw/' an_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -83,30 +100,37 @@ end
 % Create a figure for each channel
 for ch_ix = 1:numel(ch_list)
     %% Compute plotting data    
-    % Compute means and variance
-    plt_means = NaN([numel(cond_lab) numel(time_vec)]);
-    sems  = NaN([numel(cond_lab) numel(time_vec)]);
-    for cond_ix = 1:numel(cond_lab)
-        plt_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
-        sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
+    % Compute mean difference waves and variance
+    plt_means = NaN([numel(diff_lab) numel(time_vec)]);
+    sems  = NaN([numel(diff_lab) numel(time_vec)]);
+    for diff_ix = 1:numel(diff_lab)
+        plt_means(diff_ix,:) = squeeze(mean(diff_means(diff_ix,:,ch_ix,:),2));
+        sems(diff_ix,:) = squeeze(std(diff_means(diff_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
     end
     
-    %% Create plot
-    fig_name = ['GRP_' conditions '_' an_id '_' ch_list{ch_ix} '_but'];    
+    % Compute grand average ERPs and variance
+    cond_means = NaN([numel(cond_lab) numel(time_vec)]);
+    cond_sems  = NaN([numel(cond_lab) numel(time_vec)]);
+    for cond_ix = 1:numel(cond_lab)
+        cond_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
+        cond_sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
+    end
+    
+    %% Create Condition ERPs
+    fig_name = ['GRP_' conditions '_dw_' an_id '_' ch_list{ch_ix}];    
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
+        'outerposition',[0 0 0.5 0.8],'Visible',fig_vis);   %this size is for single plots
 %     [plot_rc,~] = fn_num_subplots(numel(w2.label));
 %     if plot_rc(1)>1; fig_height=1; else fig_height=0.33; end;
 %     subplot(plot_rc(1),plot_rc(2),ch_ix);
-    axes = gobjects([numel(cond_lab)+1 1]);
-    subplot(numel(cond_lab)+1,1,1);
-    axes(1) = gca; hold on;
+    subplot(2,1,1);
+    ax = gca; hold on;
     
     % Plot Means (and variance)
     ebars = cell(size(cond_lab));
     main_lines = gobjects([numel(cond_lab)+numel(an.event_type) 1]);
     for cond_ix = 1:numel(cond_lab)
-        ebars{cond_ix} = shadedErrorBar(time_vec, plt_means(cond_ix,:), sems(cond_ix,:),...
+        ebars{cond_ix} = shadedErrorBar(time_vec, cond_means(cond_ix,:), cond_sems(cond_ix,:),...
             {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
             'LineStyle',cond_styles{cond_ix}},plt.errbar_alpha);
         main_lines(cond_ix) = ebars{cond_ix}.mainLine;
@@ -121,45 +145,47 @@ for ch_ix = 1:numel(ch_list)
     leg_lab = [cond_lab an.event_type];
     
     % Axes and Labels
-    axes(1).YLabel.String = 'uV';
-    axes(1).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
-    axes(1).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
-    axes(1).XLabel.String = 'Time (s)';
-    axes(1).Title.String  = [ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')'];
-    set(axes(1),'FontSize',16');
+    ax.YLabel.String = 'uV';
+    ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
+    ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
+    ax.XLabel.String = 'Time (s)';
+    ax.Title.String  = [ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) '): All conditions'];
+    set(ax,'FontSize',16');
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
     
-    %% Plot Butterfly for Each Condition
-    for cond_ix = 1:numel(cond_lab)
-        subplot(numel(cond_lab)+1,1,cond_ix+1);
-        axes(cond_ix+1) = gca; hold on;
-        
-        % Plot SBJ Means
-        plot(time_vec, squeeze(means(cond_ix,:,ch_ix,:)),'Color',cond_colors{cond_ix},...
-            'LineWidth',plt.butterfly_width);
-        
-        % Plots GRP Mean
-        plot(time_vec, plt_means(cond_ix,:), 'Color', 'k', 'LineWidth', plt.mean_width);
-        
-        % Plot Extra Features (events, significance)
-        for evnt_ix = 1:numel(an.event_type)
-            line([0 0],ylim,'LineWidth',plt.evnt_width(evnt_ix),...
-                'Color',plt.evnt_color{evnt_ix},'LineStyle',plt.evnt_style{evnt_ix});
-        end
-        % leg_lab = [cond_lab an.event_type];
-        
-        % Axes and Labels
-        axes(cond_ix+1).YLabel.String = 'uV';
-        axes(cond_ix+1).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
-        axes(cond_ix+1).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
-        axes(cond_ix+1).XLabel.String = 'Time (s)';
-        axes(cond_ix+1).Title.String  = [ch_list{ch_ix} ': ' cond_lab{cond_ix}];
-        set(axes(cond_ix+1),'FontSize',16');
-%         if plt.legend
-%             legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
-%         end
+    %% Plot Difference Waves
+    subplot(2,1,2);
+    ax = gca; hold on;
+    
+    % Plot Means (and variance)
+    ebars = cell(size(diff_lab));
+    main_lines = gobjects([numel(diff_lab)+numel(an.event_type) 1]);
+    for diff_ix = 1:numel(diff_lab)
+        ebars{diff_ix} = shadedErrorBar(time_vec, plt_means(diff_ix,:), sems(diff_ix,:),...
+            {'Color',diff_colors{diff_ix},'LineWidth',plt.mean_width,...
+            'LineStyle',diff_styles{diff_ix}},plt.errbar_alpha);
+        main_lines(diff_ix) = ebars{diff_ix}.mainLine;
+    end
+    
+    % Plot Extra Features (events, significance)
+    for evnt_ix = 1:numel(an.event_type)
+        main_lines(numel(diff_lab)+evnt_ix) = line([0 0],ylim,...
+            'LineWidth',plt.evnt_width(evnt_ix),'Color',plt.evnt_color{evnt_ix},...
+            'LineStyle',plt.evnt_style{evnt_ix});
+    end
+    leg_lab = [diff_lab an.event_type];
+    
+    % Axes and Labels
+    ax.YLabel.String = 'uV';
+    ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
+    ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
+    ax.XLabel.String = 'Time (s)';
+    ax.Title.String  = [ch_list{ch_ix} ' Difference Wave (n=' num2str(numel(SBJs)) ')'];
+    set(ax,'FontSize',16');
+    if plt.legend
+        legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
     
     % Save figure
