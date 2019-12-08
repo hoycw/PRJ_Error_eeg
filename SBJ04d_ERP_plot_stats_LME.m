@@ -206,11 +206,16 @@ for ch_ix = 1:numel(ch_list)
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
+    set(gca,'FontSize',16);
     
     % Save figure
     if save_fig
         fig_fname = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_fname);
+        % Ensure vector graphics if saving
+        if any(strcmp(fig_ftype,{'svg','eps'}))
+            set(gcf, 'Renderer', 'painters');
+        end
         saveas(gcf,fig_fname);
     end
 end

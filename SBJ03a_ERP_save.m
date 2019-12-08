@@ -40,7 +40,7 @@ if ~strcmp(proc.event_type,an.event_type)
         prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
         cfg.offset = -(prdm_vars.target + prdm_vars.fb_delay)*clean_trials.fsample;
     elseif strcmp(proc.event_type,'S') && strcmp(an.event_type,'R')
-        cfg.offset = -bhv.rt*clean_trials.fsample;
+        cfg.offset = round(-bhv.rt*clean_trials.fsample);
     elseif strcmp(proc.event_type,'F')
         error('F-locked preprocessing can only be used for F-locked analysis!');
     elseif strcmp(proc.event_type,'R')% && strcmp(an.event_type,'S')

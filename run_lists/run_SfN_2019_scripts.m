@@ -13,6 +13,20 @@ ft_defaults
 SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
            'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};
 
+%% Plot Accuracy
+cond_lab = {'easy','hard'};
+acc_cond = zeros([numel(SBJs) 2]);
+for s = 1:numel(SBJs)
+    [bhv] = fn_load_behav_csv([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' SBJs{s} '_behav.csv']);
+    for cond_ix = 1:2
+        acc_cond(s,cond_ix) = mean(bhv.hit(strcmp(bhv.cond,cond_lab{cond_ix})));
+    end
+end
+fprintf('Accuracy (n=%i):\n',numel(SBJs));
+for cond_ix = 1:2
+    fprintf('\t%s = %f +/- %f\n',cond_lab{cond_ix},mean(acc_cond(:,cond_ix)),std(acc_cond(:,cond_ix)));
+end
+
 %% Run preprocessing
 proc_id_ica = proc_id;
 gen_figs    = 0;
@@ -33,8 +47,8 @@ plot_final_check = 0;
 
 %% View basic ERPs
 proc_id    = 'eeg_full_ft';
-an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_conds = {'DifOut','EzOutS','HdOutS'};%'DifFB'};%,'DifOutS'};
+an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'
+stat_conds = {'EzOutS','HdOutS'};%'DifOut','DifFB'};%,'DifOutS'};
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'svg';
