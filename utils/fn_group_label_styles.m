@@ -43,6 +43,9 @@ switch model_id
         grp_labels = {'Dif'};
     case 'RT'
         grp_labels = {'RT'};
+    case 'DiffOddOS'
+        grp_labels = {'OddOS'};
+    
     otherwise
         error(strcat('Unknown model_id: ',model_id));
 end

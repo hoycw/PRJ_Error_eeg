@@ -15,6 +15,26 @@ switch factor_name
 %        labels = {'con', 'neu', 'inc'};
 %        colors = {[55,126,184]./256, [0 0 0], [228,26,28]./256};
 %        line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
+    case 'Odd'
+         labels = {'std','tar','odd'};
+         colors = {[144 205 229]./256, [168 180 165]./256, [142 82 126]./256};
+         line_styles = {'-', '-', '-'}; 
+         markers = {'o', 'o', 'o'};
+    case 'DifOdd_OS'
+         labels = {'odd', 'std'};
+         colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
+         line_styles = {'-', '-'}; 
+         markers = {'o', 'o'};
+    case 'DifOdd_TS'
+         labels = {'tar','std'};
+         colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
+         line_styles = {'-', '-'}; 
+         markers = {'o', 'o'};
+    case 'DifOdd_OT'
+         labels = {'odd', 'tar'};
+         colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
+         line_styles = {'-', '-'}; 
+         markers = {'o', 'o'};
     case 'Dif'
         labels = {'Ez', 'Hd'};
         colors = {[228,26,28]./256, [55,126,184]./256};
