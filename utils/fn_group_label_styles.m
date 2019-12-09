@@ -3,9 +3,9 @@ function [grp_labels, colors, line_styles] = fn_group_label_styles(model_id)
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
 %% List of possible labels and their colors
-factors  = {'Dif','Out','OutS','FB','Tim','Dif*Out','Sur'};
-fact_colors = {[152 78 163]./255, [255 127 0]./255, [255 127 0]./255, [255 127 0]./255,...
-    [255 255 51]./255, [166 86 40]./255, [166 86 40]./255};
+factors  = {'Dif','Tol','Out','OutS','FB','Tim','Dif*Out','Tol*Out','Sur'};
+fact_colors = {[152 78 163]./255, [152 78 163]./255, [255 127 0]./255, [255 127 0]./255, [255 127 0]./255,...
+    [255 255 51]./255, [166 86 40]./255, [166 86 40]./255, [166 86 40]./255};
 % Newer (different than RGB for 3 feedback conditions:
 %   purple, orange, yellow, brown (brown again for Sur/DO repeat)
 %   pink if needed: [247 129 191]
@@ -27,6 +27,10 @@ switch model_id
         grp_labels = {'Dif','Out'};
     case 'DifOutDO'
         grp_labels = {'Dif','Out','Dif*Out'};
+    case 'TolOut'
+        grp_labels = {'Tol','Out'};
+    case 'TolOutDO'
+        grp_labels = {'Tol','Out','Tol*Out'};
     case 'DifOutSur'
         grp_labels = {'Dif','Out','Sur'};
     case 'DifOutS'
