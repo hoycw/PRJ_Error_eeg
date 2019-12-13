@@ -58,8 +58,12 @@ for grp_ix = 1:numel(grp_lab)
     end
 end
 
-[~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2) 1]));
-qvals = reshape(qvals,[size(pvals,1) size(pvals,2)]);
+if strcmp(st.measure,'ts')
+    [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2) 1]));
+    qvals = reshape(qvals,[size(pvals,1) size(pvals,2)]);
+else
+    qvals = pvals;
+end
 
 %% Load ERPs
 for s = 1:length(SBJs)
@@ -116,8 +120,15 @@ for ch_ix = 1:numel(ch_list)
     for grp_ix = 1:numel(grp_lab)
         if any(qvals(grp_ix,:) <= st.alpha)
             sig_grp(grp_ix) = true;
-            sig_chunks{grp_ix} = fn_find_chunks(squeeze(qvals(grp_ix,:))<=st.alpha);
-            sig_chunks{grp_ix}(squeeze(qvals(grp_ix,sig_chunks{grp_ix}(:,1))>st.alpha),:) = [];
+            if strcmp(st.measure,'ts')
+                sig_chunks{grp_ix} = fn_find_chunks(squeeze(qvals(grp_ix,:))<=st.alpha);
+                sig_chunks{grp_ix}(squeeze(qvals(grp_ix,sig_chunks{grp_ix}(:,1))>st.alpha),:) = [];
+            elseif strcmp(st.measure,'mean')
+                win_lim = zeros([1 2]);
+                [~, win_lim(1)] = min(abs(time_vec - st.stat_lim(1)));
+                [~, win_lim(2)] = min(abs(time_vec - st.stat_lim(2)));
+                sig_chunks{grp_ix} = win_lim;
+            end
         end
     end
     
@@ -149,7 +160,11 @@ for ch_ix = 1:numel(ch_list)
     for grp_ix = 1:numel(grp_lab)
         for sig_ix = 1:size(sig_chunks{grp_ix},1)
             if strcmp(plt.sig_type,'line')
-                [~, stat_start] = min(abs(time_vec-st.stat_lim(1)));
+                if strcmp(st.measure,'ts')
+                    [~, stat_start] = min(abs(time_vec-st.stat_lim(1)));
+                elseif strcmp(st.measure,'mean')
+                    stat_start = 0;
+                end
                 sig_times = time_vec([sig_chunks{grp_ix}(sig_ix,1):sig_chunks{grp_ix}(sig_ix,2)]+stat_start);
                 if strcmp(plt.sig_loc,'below')
                     sig_y = data_lim(1) + grp_ix*data_lim(1)*plt.sig_loc_factor;

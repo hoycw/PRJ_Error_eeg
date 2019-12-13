@@ -1,11 +1,12 @@
 % Stat Parameters
 st.an_style    = 'lme';
-st.model_lab   = 'DifOutDO';
-st.factors     = {'Dif','Out'};
-st.formula     = 'ERP ~ Dif + Out + Dif*Out + (1|SBJ)';
-st.trial_cond  = {'all'};
-st.stat_lim    = [0.1 0.5];            % window in SEC for stats
-st.measure     = 'ts';             % {'ts', 'p2p', 'mean'}
+st.model_lab   = 'pWinPEus';
+st.factors     = {'pWin','sPE','uPE'};
+st.categorical = [0, 0, 0];
+st.formula     = 'ERP ~ pWin + sPE + uPE + (1|SBJ)';
+st.trial_cond  = {'DifOut'};
+st.stat_lim    = [0.3 0.4];            % window in SEC for stats
+st.measure     = 'mean';             % {'p2p', 'mean'}
 st.n_boots     = 1000;             % Repetitions for non-parametric stats
 st.alpha       = 0.05;
 st.mcp_method  = 'FDR';

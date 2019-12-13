@@ -16,7 +16,7 @@ SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','E
 %% Linear Mixed Effects Model
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_id   = 'RL_all_lme_st0t5';
+stat_id   = 'RL_DO_lme_mn3t4';%'RL_all_lme_st0t5';
 plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig  = 1;
 fig_vis   = 'on';
@@ -33,6 +33,21 @@ for an_ix = 1:numel(an_ids)
     % SBJ04d_ERP_plot_stats_LME(SBJs,proc_id,an_ids{an_ix},stat_id,plt_id,save_fig,...
     %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_median',1);
 end
+
+%% TFR Low Frequency Plotting
+conditions = 'DifFB';
+proc_id   = 'eeg_full_ft';
+an_id     = 'TFR_Pz_F2t1_z2t0_fl2t14';
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'png';
+
+for s = 1:numel(SBJs)
+    SBJ05a_TFR_save(SBJs{s}, proc_id, an_id);
+    SBJ05b_TFR_plot(SBJs{s}, conditions, proc_id, an_id, save_fig);
+end
+
+SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,save_fig);
 
 %% Compare p values across analyses
 proc_id = 'eeg_full_ft';
