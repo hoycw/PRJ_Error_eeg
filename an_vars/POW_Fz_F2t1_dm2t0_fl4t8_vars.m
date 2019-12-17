@@ -1,16 +1,21 @@
 % Data Selection
 an.ROI         = {'Fz'};             % Channel to be analyzed
 an.event_type  = 'F';           % event around which to cut trials
-an.trial_lim_s = [-0.2 1];       % window in SEC for cutting trials
+an.trial_lim_s = [-0.25 1];       % window in SEC for cutting trials
 
-% ERP Filtering
-an.demean_yn   = 'yes';
-an.bsln_lim    = [-0.2 0];    % window in SEC for baseline correction
+% Baseline Correction
+an.bsln_lim    = [-0.25 0.05];    % window in SEC for baseline correction
+an.bsln_type   = 'zboot';
+an.bsln_boots  = 500;
+
+% POW Filtering
+an.demean_yn   = 'no';
 an.lp_yn       = 'yes';
-an.lp_freq     = 20;
+an.lp_freq     = 8;
 an.hp_yn       = 'yes';
-an.hp_freq     = 0.5;
-an.hp_filtord  = 4;
+an.hp_freq     = 4;
+an.hp_filtord  = 1;
+an.hilbert     = 'abs';
 
 an.dsamp_yn    = 0;
 an.dsamp_freq  = 0;
