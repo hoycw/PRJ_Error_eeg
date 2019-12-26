@@ -32,7 +32,7 @@ eval(stat_vars_cmd);
 %% Load Behavior, Compute Model
 bhvs          = cell(size(SBJs));
 full_cond_idx = cell(size(SBJs));
-n_trials      = zeros(size(SBJs));
+n_trials      = zeros([numel(SBJs) 1]);
 pWin          = cell(size(SBJs));
 sPE           = cell(size(SBJs));
 uPE           = cell(size(SBJs));
@@ -91,7 +91,12 @@ for s = 1:numel(SBJs)
     if s==1
         % Initialize matrices now that we know time axis
         time_vec = st_roi.time{1};
-        data  = nan([sum(n_trials) numel(time_vec)]);
+        if strcmp(st.measure,'ts')
+            data  = nan([sum(n_trials) numel(time_vec)]);
+        elseif strcmp(st.measure,'mean')
+            data  = nan(size(n_trials));
+        else; error(['unknown st.measure: ' st.measure]);
+        end
         
         % Track SBJ
         sbj_factor(1:n_trials(s),end) = s*ones([n_trials(s) 1]);
@@ -103,7 +108,12 @@ for s = 1:numel(SBJs)
     % Add data and model
     for trl_ix = 1:numel(st_roi.trial)
         full_trl_ix = full_trl_ix + 1;
-        data(full_trl_ix,:) = st_roi.trial{trl_ix};
+        if strcmp(st.measure,'ts')
+            data(full_trl_ix,:) = st_roi.trial{trl_ix};
+        elseif strcmp(st.measure,'mean')
+            data(full_trl_ix) = mean(st_roi.trial{trl_ix});
+        else; error(['unknown st.measure: ' st.measure]);
+        end
     end
     
     clear roi st_roi
@@ -112,19 +122,32 @@ end
 %% Build table
 fprintf('========================== Running Stats ==========================\n');
 tic
-lme = cell(size(time_vec));
-pvals = nan([numel(st.factors) numel(time_vec)]);
-for t_ix = 1:numel(time_vec)
-    tbl = table(data(:,t_ix),vertcat(pWin{:}),vertcat(sPE{:}),vertcat(uPE{:}),sbj_factor,'VariableNames',{'ERP',st.factors{:},'SBJ'});
-%     for grp_ix = 1:numel(st.factors)
-%         if st.categorical(grp_ix)
-%             tbl.(st.factors{grp_ix}) = categorical(tbl.(st.factors{grp_ix}));
-%         end 
-%     end
+if strcmp(st.measure,'ts')
+    lme = cell(size(time_vec));
+    pvals = nan([numel(st.factors) numel(time_vec)]);
+    for t_ix = 1:numel(time_vec)
+        tbl = table(data(:,t_ix),vertcat(pWin{:}),vertcat(sPE{:}),vertcat(uPE{:}),sbj_factor,...
+            'VariableNames',{'ERP',st.factors{:},'SBJ'});
+        %     for grp_ix = 1:numel(st.factors)
+        %         if st.categorical(grp_ix)
+        %             tbl.(st.factors{grp_ix}) = categorical(tbl.(st.factors{grp_ix}));
+        %         end
+        %     end
+        tbl.SBJ = categorical(tbl.SBJ);
+        lme{t_ix} = fitlme(tbl,st.formula);
+        for fct_ix = 1:numel(st.factors)
+            pvals(fct_ix,t_ix) = lme{t_ix}.Coefficients.pValue(fct_ix+1);
+        end
+    end
+elseif strcmp(st.measure,'mean')
+    lme = {};
+    pvals = nan([numel(st.factors) 1]);
+    tbl = table(data,vertcat(pWin{:}),vertcat(sPE{:}),vertcat(uPE{:}),sbj_factor,...
+        'VariableNames',{'ERP',st.factors{:},'SBJ'});
     tbl.SBJ = categorical(tbl.SBJ);
-    lme{t_ix} = fitlme(tbl,st.formula);
+    lme{1} = fitlme(tbl,st.formula);
     for fct_ix = 1:numel(st.factors)
-        pvals(fct_ix,t_ix) = lme{t_ix}.Coefficients.pValue(fct_ix+1);
+        pvals(fct_ix) = lme{1}.Coefficients.pValue(fct_ix+1);
     end
 end
 fprintf('\t\t Stats Complete:');

@@ -83,13 +83,30 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
+    % Get color lims per condition
+    clim = zeros([numel(cond_lab) 2]);
+    for cond_ix = 1:numel(cond_lab)
+        clim(cond_ix,:) = [min(tfr_all{cond_ix}.powspctrm(:)) max(tfr_all{cond_ix}.powspctrm(:))];
+    end
+    tick_ix = 1:3:numel(tfr_all{1}.freq);
+    yticklab = cell(size(tick_ix));
+    for f = 1:numel(tick_ix)
+        yticklab{f} = num2str(tfr_all{1}.freq(tick_ix(f)),'%.1f');
+    end
+    
     % Condition Plots
+    %cfgplt = []; cfgplt.zlim = clim;
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
-        ft_singleplotTFR([], tfr_avg{cond_ix});
+        imagesc(tfr_all{cond_ix}.time, 1:numel(tfr_all{cond_ix}.freq), squeeze(tfr_all{cond_ix}.powspctrm(ch_ix,:,:)),[min(clim(:,1)) max(clim(:,2))]);
+        set(gca,'YDir','normal');
+        set(gca,'YTick',1:3:numel(tfr_all{cond_ix}.freq));
+        set(gca,'YTickLabels',yticklab);
+        %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
         title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix}]);
         xlabel('Time (s)');
-        ylabel('Frequenncy (Hz)');
+        ylabel('Frequency (Hz)');
+        colorbar;
         set(gca,'FontSize',16);
     end
     

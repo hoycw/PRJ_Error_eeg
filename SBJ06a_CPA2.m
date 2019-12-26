@@ -2,7 +2,7 @@ function SBJ06a_CPA2(SBJ, proc_id, plt_id, electrodes, time_win)
 
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -88,11 +88,12 @@ for cond_ix = 1:numel(cond_lab)
         trials{cond_ix}(:,t_ix,:) = data.trial{cond_trial_ix(t_ix)};
     end
 end
+
+%% Compute plotting data
 diff_waves = zeros(numel(data.label), numel(diff_lab), numel(data.time{1}));
 [~, min_ix] = min(abs(clean_ica.time{1,1}(:) - time_win(1)));
 [~, max_ix] = min(abs(clean_ica.time{1,1}(:) - time_win(2)));
 for comp_ix = 1:numel(data.label)
-    %% Compute plotting data    
     % Compute means and variance
     means = NaN([numel(cond_lab) numel(data.time{1})]);
     sems  = NaN([numel(cond_lab) numel(data.time{1})]);
@@ -109,11 +110,11 @@ for comp_ix = 1:numel(data.label)
         end
         sig_time_win(comp_ix,:) = sig(comp_ix, min_ix: max_ix);
         total_num_sig(comp_ix) = length(find(sig_time_win(comp_ix,:) == 1));
-        fraction_sig(comp_ix) = total_num_sig(comp_ix)/(max_ix - min_ix);
+        fraction_sig(comp_ix) = total_num_sig(comp_ix)/(max_ix - min_ix + 1);
         lenmax = 1;
         len = 1;
         for n = 2:numel(sig_time_win(comp_ix,:))
-            if sig_time_win(comp_ix, n) == sig_time_win(comp_ix, n-1) && sig_time_win(comp_ix, n) == 1;
+            if sig_time_win(comp_ix, n) == sig_time_win(comp_ix, n-1) && sig_time_win(comp_ix, n) == 1
                 len = len+1;
             else
                 if len > lenmax
@@ -128,11 +129,13 @@ for comp_ix = 1:numel(data.label)
         plot_means(diff_ix,:) = means(diff_pairs{diff_ix}(1),:)-means(diff_pairs{diff_ix}(2),:);
         %end
     end
-diff_waves(comp_ix, diff_ix,:) = plot_means(diff_ix,:); % whole time period
-%avg_time_win(ch_ix) = mean(abs(diff_waves(ch_ix, min_ix: max_ix))); %not necessary anymore -- calculates average amplitude of dfifference wave in given time window
+    diff_waves(comp_ix, diff_ix,:) = plot_means(diff_ix,:); % whole time period
+    %avg_time_win(ch_ix) = mean(abs(diff_waves(ch_ix, min_ix: max_ix))); %not necessary anymore -- calculates average amplitude of dfifference wave in given time window
 end
-[~, erp_components] = find(sig_length_max > 3);
-disp(erp_components);
+
+% Select components with consecutive significance
+[~, erp_components] = find(sig_length_max > 4);
+
 %% compute ERP for each Electrode
 cfg = [];
 cfg.channel = 'all';
@@ -223,9 +226,14 @@ for comp_ix = 1: numel(data.label)
      fig_fname = [fig_dir fig_name '.png'];
      fprintf('Saving %s\n',fig_fname);
      % Ensure vector graphics if saving
+<<<<<<< HEAD
      saveas(gcf,fig_fname);
         %}
 end   
+=======
+     % saveas(gcf,fig_fname);
+end    
+>>>>>>> 13fe14677ed1e4623f1ff34be024750a4dffdbda
 %% Plot oddball erps
 
 %% Save Data

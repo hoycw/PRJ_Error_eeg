@@ -67,11 +67,19 @@ for ch_ix = 1:numel(tfr.label)
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
+    % Get color lims per condition
+    clim = zeros([numel(cond_lab) 2]);
+    for cond_ix = 1:numel(cond_lab)
+        vals = mean(tfr.powspctrm(cond_idx==cond_ix,1,:,:),1);
+        clim(cond_ix,:) = [min(vals(:)) max(vals(:))];
+    end
+    
     % Condition Plots
+    cfgplt = [];
+    cfgplt.zlim = [min(clim(:,1)) max(clim(:,2))];
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
-        cfgplt = [];
-        cfgplt.trials       = find(cond_idx==cond_ix);
+        cfgplt.trials = find(cond_idx==cond_ix);
         ft_singleplotTFR(cfgplt, tfr);
         title([tfr.label{ch_ix} ': ' cond_lab{cond_ix}]);
         xlabel('Time (s)');
