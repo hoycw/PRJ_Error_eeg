@@ -131,8 +131,8 @@ for comp_ix = 1:numel(data.label)
 diff_waves(comp_ix, diff_ix,:) = plot_means(diff_ix,:); % whole time period
 %avg_time_win(ch_ix) = mean(abs(diff_waves(ch_ix, min_ix: max_ix))); %not necessary anymore -- calculates average amplitude of dfifference wave in given time window
 end
-[~, erp_components] = find(sig_length_max > 4);
-
+[~, erp_components] = find(sig_length_max > 3);
+disp(erp_components);
 %% compute ERP for each Electrode
 cfg = [];
 cfg.channel = 'all';
@@ -164,6 +164,7 @@ topo_components = topo_components';
 components = intersect(topo_components, erp_components);
 ica_reject = intersect(unique([SBJ_vars.ica_reject, heog_ics, veog_ics]), components);
 components_final_no_ica = setdiff(components, ica_reject);
+disp(components_final_no_ica);
 %% PLOT AND SAVE
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/Dec_11_Graphs/' SBJ '/'] ;
 if ~exist(fig_dir,'dir')
@@ -192,7 +193,8 @@ for comp_ix = 1: numel(data.label)
         sig_chunks{comp_ix}(squeeze(sig_time_win(comp_ix,sig_chunks{comp_ix}(:,1))==0),:) = [];
         data_lim = [min(min(means_all(comp_ix,:,:)-sems_all(comp_ix,:,:))) max(max(means_all(comp_ix,:,:)+sems_all(comp_ix,:,:)))];
         % Plot Significance
-        for sig_ix = 1:size(sig_chunks{comp_ix},1)
+  %{
+      for sig_ix = 1:size(sig_chunks{comp_ix},1)
             time_vec = clean_ica.time{1,1};
             sig_times = time_vec([sig_chunks{comp_ix}(sig_ix,1):sig_chunks{comp_ix}(sig_ix,2)]+min_ix-1);
             sig_y = data_lim(1) + cond_ix*data_lim(1)*plt.sig_loc_factor;
@@ -222,7 +224,8 @@ for comp_ix = 1: numel(data.label)
      fprintf('Saving %s\n',fig_fname);
      % Ensure vector graphics if saving
      saveas(gcf,fig_fname);
-end    
+        %}
+end   
 %% Plot oddball erps
 
 %% Save Data
