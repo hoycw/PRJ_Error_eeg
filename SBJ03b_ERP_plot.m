@@ -50,6 +50,7 @@ load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 cond_idx = fn_condition_index(cond_lab, bhv);
 
+
 % Get trials for plotting
 trials = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
