@@ -20,7 +20,7 @@ eval(plt_vars_cmd);
 %% Load the data
 %loaded data from after SBJ02a --> already cleaned and trial segmented
 load([SBJ_vars.dirs.preproc SBJ '_preproc_eeg_full_ft.mat']);
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat']); %chose 02a - ica before rejection!
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a_odd.mat']); %chose 02a - ica before rejection!
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 clean_ica = ica;
@@ -79,7 +79,7 @@ for comp_ix = 1:numel(data.label)
             end
         end
         if len > lenmax
-                lenmax = len
+                lenmax = len;
         end
         sig_length_max(comp_ix) = lenmax;
         means_all1_time_win(comp_ix, :) = means(diff_pairs{diff_ix}(1),min_ix:max_ix);
@@ -135,7 +135,7 @@ ica_reject = intersect(unique([SBJ_vars.ica_reject, heog_ics, veog_ics]), compon
 components_final_no_ica = setdiff(components, ica_reject);
 disp(components_final_no_ica);
 %% PLOT AND SAVE
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/CPA_Graphs/' SBJ '/'] ;
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/CPA_Graphs/' SBJ '/plot/'] ;
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -194,21 +194,13 @@ for comp_ix = 1: numel(data.label)
      saveas(gcf,fig_fname);
      comp_label = clean_ica.label(comp_ix,1);
      comp_label = comp_label{1};
-     fig_dir_odd = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ICA_plots_odd.png'];
      stack_dir_odd = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ERP_stack_odd.png'];
-     fig_dir_tt = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ICA_plots.png'];
      stack_dir_tt = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ERP_stack.png'];
-     if exist(fig_dir_odd, 'file')
-        copyfile(fig_dir_odd, fig_dir);
-     end
      if exist(stack_dir_odd, 'file')
         copyfile(stack_dir_odd, fig_dir);
      end
      if exist(stack_dir_tt, 'file')
         copyfile(stack_dir_tt, fig_dir);
-     end
-     if exist(fig_dir_tt, 'file')
-        copyfile(fig_dir_tt, fig_dir);
      end
 end   
 

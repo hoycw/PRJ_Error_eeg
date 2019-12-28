@@ -185,42 +185,35 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     % Add downsample frequency since triggers are loaded from raw file
     cfg_temp.resamp_freq         = proc.resample_freq;
     output_samples = tt_trialsamples(cfg_temp);
+    output_samples.tt_sample =
     %cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg_temp);
 end
 % if starts with target_time
 if output_samples.tt_sample == 1
-    output_samples.oddball_sample = floor(output_samples.oddball_sample*cfg_temp.resamp_freq/output_samples.orig_sample);
     data_ICA_tt = data_ICA;
-    data_ICA_tt.trial{1,1} = data_ICA_tt.trial{1,1}(:, 1:output_sample.oddball_samples-1);
-    data_ICA_tt.time{1,1} = data_ICA_tt.time{1,1}(:, 1:output_sample.oddball_samples-1);
+    data_ICA_tt.trial = data_ICA_tt.trial(:, 1:output_sample.oddball_samples-1);
+    data_ICA_tt.time = data_ICA_tt.time(:, 1:output_sample.oddball_samples-1);
     data_ICA_oddball = data_ICA;
-    data_ICA_oddball.trial{1,1}= data_ICA_oddball.trial{1,1}(:, output_samples.oddball_sample:end);
-    data_ICA_oddball.time{1,1} = data_ICA_oddball.time{1,1}(:, output_samples.oddball_sample:end);
+    data_ICA_oddball.trial = data_ICA_oddball.trial(:, output_samples.oddball_sample,end);
+    data_ICA_oddball.time = data_ICA_oddball.time(:, output_samples.oddball_sample,end);
 elseif output_samples.oddball_sample == 1
-    output_samples.tt_sample = floor(output_samples.tt_sample*cfg_temp.resamp_freq/output_samples.orig_sample);
     data_ICA_oddball = data_ICA;
-    data_ICA_oddball.trial{1,1} = data_ICA_oddball.trial{1,1}(:, 1:output_samples.tt_sample-1);
-    data_ICA_oddball.time{1,1} = data_ICA_oddball.time{1,1}(:, 1:output_samples.tt_sample-1);
+    data_ICA_oddball.trial = data_ICA_oddball.trial{1,1}(:, 1:output_samples.tt_sample-1);
+    data_ICA_oddball.time = data_ICA_oddball.time(:, 1:output_samples.tt_sample-1);
     data_ICA_tt = data_ICA;
-    data_ICA_tt.trial{1,1} = data_ICA_tt.trial{1,1}(:, output_samples.tt_sample:end);
-    data_ICA_tt.time{1,1}= data_ICA_tt.time{1,1}(:, output_samples.tt_sample:end);
+    data_ICA_tt.trial = data_ICA_tt.trial(:, output_samples.tt_sample,end);
+    data_ICA_oddball.time = data_ICA_tt.time(:, output_samples.tt_sample,end);
 end
 % Run ICA
 cfg = [];
 cfg.method = 'runica'; % default, uses the implementation from EEGLAB
-icomp_tt = ft_componentanalysis(cfg, data_ICA_tt);
-icomp_oddball = ft_componentanalysis(cfg, data_ICA_oddball);
 icomp = ft_componentanalysis(cfg, data_ICA);
 
 %% Save ICA unmixing and topolabel, data, eog, and bad_epochs
 icaunmixing  = icomp.unmixing;
 icatopolabel = icomp.topolabel;
-icaunmixing_tt  = icomp_tt.unmixing;
-icatopolabel_tt = icomp_tt.topolabel;
-icaunmixing_oddball  = icomp_oddball.unmixing;
-icatopolabel_oddball = icomp_oddball.topolabel;
 
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
-save(data_fname, 'icaunmixing', 'icaunmixing_tt', 'icaunmixing_oddball', 'icatopolabel', 'icatopolabel_tt', 'icatopolabel_oddball','data', 'eog','bad_epochs');
+save(data_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog','bad_epochs');
 
 
