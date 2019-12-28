@@ -194,21 +194,12 @@ for comp_ix = 1: numel(data.label)
      saveas(gcf,fig_fname);
      comp_label = clean_ica.label(comp_ix,1);
      comp_label = comp_label{1};
-     fig_dir_odd = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ICA_plots_odd.png'];
-     stack_dir_odd = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ERP_stack_odd.png'];
-     fig_dir_tt = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ICA_plots.png'];
-     stack_dir_tt = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ERP_stack.png'];
+     fig_dir_odd = [SBJ_vars.dirs.proc '/plot/' SBJ comp_label '_ICA_plots_odd.png'];
+     stack_dir_odd = [SBJ_vars.dirs.proc SBJ comp_label '_ERP_stack_odd.png'];
+     fig_dir_tt = [SBJ_vars.dirs.proc SBJ comp_label '_ICA_plots.png'];
+     stack_dir_tt = [SBJ_vars.dirs.proc SBJ comp_label '_ERP_stack.png'];
      if exist(fig_dir_odd, 'file')
-        copyfile(fig_dir_odd, fig_dir);
-     end
-     if exist(stack_dir_odd, 'file')
-        copyfile(stack_dir_odd, fig_dir);
-     end
-     if exist(stack_dir_tt, 'file')
-        copyfile(stack_dir_tt, fig_dir);
-     end
-     if exist(fig_dir_tt, 'file')
-        copyfile(fig_dir_tt, fig_dir);
+        copyfile fig_dir_odd fig_dir
      end
 end   
 

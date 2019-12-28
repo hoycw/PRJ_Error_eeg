@@ -126,13 +126,13 @@ for x = 1: numel(comp.label)
     % ------------------------------------------------
     subcomp{1}{il} = subplot('Position', [0.1, 0.1, 0.4, 0.4]);
     if logar
-        plot(log10(freq(strt:stp)),log10(smoothed(strt:stp)));
+        plot(log10(freq(strt:stp),log10(smoothed(strt:stp)));
         ylabel('(dB/Hz)');
     else
         plot(freq(strt:stp),smoothed(strt:stp));
         ylabel('T^2/Hz');
     end
-    %set(gca,'TickDir','out','XTick',0:25:5)
+    set(gca,'TickDir','out','XTick',0:25:200)
     xlabel('Frequency (Hz)'); grid on;
     axis tight;
     
