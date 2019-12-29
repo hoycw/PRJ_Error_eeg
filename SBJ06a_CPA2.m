@@ -20,7 +20,7 @@ eval(plt_vars_cmd);
 %% Load the data
 %loaded data from after SBJ02a --> already cleaned and trial segmented
 load([SBJ_vars.dirs.preproc SBJ '_preproc_eeg_full_ft.mat']);
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a_odd.mat']); %chose 02a - ica before rejection!
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat']); %chose 02a - ica before rejection!
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 clean_ica = ica;
@@ -66,8 +66,8 @@ for comp_ix = 1:numel(data.label)
         sig_time_win(comp_ix,:) = sig(comp_ix, min_ix: max_ix);
         total_num_sig(comp_ix) = length(find(sig_time_win(comp_ix,:) == 1));
         fraction_sig(comp_ix) = total_num_sig(comp_ix)/(max_ix - min_ix + 1);
-        lenmax = 0;
-        len = 0;
+        lenmax = 1;
+        len = 1;
         for n = 2:numel(sig_time_win(comp_ix,:))
             if sig_time_win(comp_ix, n) == sig_time_win(comp_ix, n-1) && sig_time_win(comp_ix, n) == 1
                 len = len+1;
@@ -75,7 +75,7 @@ for comp_ix = 1:numel(data.label)
                 if len > lenmax
                     lenmax = len;
                 end
-                len = 0;
+                len = 1;
             end
         end
         if len > lenmax
@@ -131,9 +131,9 @@ end
 topo_components = find(temp_array > 1);
 topo_components = topo_components';
 components = intersect(topo_components, erp_components);
-ica_reject = intersect(unique([SBJ_vars.ica_reject, heog_ics, veog_ics]), components);
-components_final_no_ica = setdiff(components, ica_reject);
-disp(components_final_no_ica);
+components_final_ix = find(components<11); %%WARNING: I did this by relative explanation of variance.  Does not use significance -- can't find a way to find the relative explanation of variance with the ICA data without recomputing ICA.  Works okay with out this but pulls extra components.
+components_final = components(components_final_ix);
+disp(components_final);
 %% PLOT AND SAVE
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/CPA_Graphs/' SBJ '/plot/'] ;
 if ~exist(fig_dir,'dir')
@@ -183,7 +183,7 @@ for comp_ix = 1: numel(data.label)
     for elec_ix = 1:3
         a = [a max_names{comp_ix,elec_ix} ' '];
     end
-    title(['Electrodes: ' a ' Time Window: ' num2str(sig_length_max(comp_ix)*10) 'ms Percent Significant: ' num2str(fraction_sig(comp_ix)*100)]);
+    title(['Electrodes: ' a ' Time Window: ' num2str(sig_length_max(comp_ix)*4) 'ms Percent Significant: ' num2str(fraction_sig(comp_ix)*100)]); %4 is used because thats the number of miliseconds in 1 sample
     leg_lab = [cond_lab 'F' cond_lab(cond_ix)];
     %if plt.legend
        % legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
@@ -192,20 +192,31 @@ for comp_ix = 1: numel(data.label)
      fprintf('Saving %s\n',fig_fname);
      % Ensure vector graphics if saving
      saveas(gcf,fig_fname);
+     
+     %This copies the files over to the correct folder so it can be compared (this figures are generated in 02a -- I'm keeping it until I decide what to do about the ICA Issue
      comp_label = clean_ica.label(comp_ix,1);
      comp_label = comp_label{1};
+     fig_dir_odd = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ICA_plots_odd.png'];
      stack_dir_odd = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ERP_stack_odd.png'];
+     fig_dir_tt = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ICA_plots.png'];
      stack_dir_tt = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ERP_stack.png'];
+     if exist(fig_dir_odd, 'file')
+         copyfile(fig_dir_odd, fig_dir);
+     end
      if exist(stack_dir_odd, 'file')
-        copyfile(stack_dir_odd, fig_dir);
+         copyfile(stack_dir_odd, fig_dir);
      end
      if exist(stack_dir_tt, 'file')
-        copyfile(stack_dir_tt, fig_dir);
+         copyfile(stack_dir_tt, fig_dir);
      end
+     if exist(fig_dir_tt, 'file')
+         copyfile(fig_dir_tt, fig_dir);
+     end
+    
 end   
 
 
 %% Save Data
 clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_06a.mat'];
-save(clean_data_fname, '-v7.3', 'components_final_no_ica', 'components');
+save(clean_data_fname, '-v7.3', 'components', 'components_final');
 end
