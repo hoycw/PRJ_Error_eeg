@@ -26,8 +26,6 @@ load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 clean_ica = ica;
 %% trim data to plotting time -- is this required?
 cfg = [];
-%cfg.latency = plt.plt_lim; i dont think this is necessary? (already -.2 to
-%1.3)
 data = ft_selectdata(cfg,clean_ica);
 time_vec = data.time{1};
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles('Odd'); % maybe change this so not hardcoded
@@ -59,6 +57,7 @@ for comp_ix = 1:numel(data.label)
         sems_all(comp_ix, cond_ix, :) = sems(cond_ix,:);
     end
     plot_means = NaN([numel(diff_lab) numel(data.time{1})]);
+    %Compute significant time windows
     for diff_ix = 1:numel(diff_lab)
         for time_ix = 1: numel(data.time{1})
             [sig(comp_ix, time_ix), p(comp_ix, time_ix)] = ttest2(trials{diff_pairs{diff_ix}(1)}(comp_ix, :, time_ix), trials{diff_pairs{diff_ix}(2)}(comp_ix, :, time_ix));
@@ -68,6 +67,7 @@ for comp_ix = 1:numel(data.label)
         fraction_sig(comp_ix) = total_num_sig(comp_ix)/(max_ix - min_ix + 1);
         lenmax = 1;
         len = 1;
+        %find longest stretch of significance
         for n = 2:numel(sig_time_win(comp_ix,:))
             if sig_time_win(comp_ix, n) == sig_time_win(comp_ix, n-1) && sig_time_win(comp_ix, n) == 1
                 len = len+1;
@@ -82,13 +82,10 @@ for comp_ix = 1:numel(data.label)
                 lenmax = len;
         end
         sig_length_max(comp_ix) = lenmax;
-        means_all1_time_win(comp_ix, :) = means(diff_pairs{diff_ix}(1),min_ix:max_ix);
-        means_all2_time_win(comp_ix,:) = means(diff_pairs{diff_ix}(2),min_ix:max_ix);
+        %Difference Wave (for debugging)
         plot_means(diff_ix,:) = means(diff_pairs{diff_ix}(1),:)-means(diff_pairs{diff_ix}(2),:);
-        %end
     end
     diff_waves(comp_ix, diff_ix,:) = plot_means(diff_ix,:); % whole time period
-    %avg_time_win(ch_ix) = mean(abs(diff_waves(ch_ix, min_ix: max_ix))); %not necessary anymore -- calculates average amplitude of dfifference wave in given time window
 end
 
 % Select components with consecutive significance
@@ -99,14 +96,16 @@ cfg = [];
 cfg.channel = 'all';
 erps = ft_timelockanalysis(cfg, data);
 num_elec = floor(numel(clean_ica.topo(1,:))/12);
-%num_elec = 1;
 max_elecs = zeros(numel(clean_ica.topo(1,:)), num_elec);
+%Find max elecs for each component
 for comp_ix = 1:numel(clean_ica.topo(1,:))
     [~, max_elecs(comp_ix,:)] = maxk(abs(clean_ica.topo(:,comp_ix)), num_elec);
     for max_elecs_ix = 1:num_elec
         max_names(comp_ix,max_elecs_ix) = clean_ica.topolabel(max_elecs(comp_ix,max_elecs_ix));
     end
 end
+% Find the index of the target electrodes
+
 for elec_ix = 1:numel(electrodes)
     temp_elec = electrodes{elec_ix};
     for topo_elec_ix = 1:numel(clean_ica.topolabel)
@@ -117,21 +116,17 @@ for elec_ix = 1:numel(electrodes)
     end
 end
 topo_components = [];
-%{
-for elec_ix = 1:numel(index_electrodes)
-    [temp, ~] = find(max_elecs == index_electrodes(elec_ix));
-    topo_components = union(topo_components, temp);
-end
-%}
+%Find components which have 2+ of the target electrodes in their max
+%electrodes
 temp_array = zeros(1, numel(data.label));
 for elec_ix = 1:numel(index_electrodes)
     [temp,~] = find(max_elecs == index_electrodes(elec_ix));
     temp_array(temp) = temp_array(temp) + 1;
 end
-topo_components = find(temp_array > 1);
+topo_components = find(temp_array > 1); 
 topo_components = topo_components';
 components = intersect(topo_components, erp_components);
-components_final_ix = find(components<11); %%WARNING: I did this by relative explanation of variance.  Does not use significance -- can't find a way to find the relative explanation of variance with the ICA data without recomputing ICA.  Works okay with out this but pulls extra components.
+components_final_ix = find(components<11); %%WARNING: I did this by relative explanation of variance.  Does not use significance -- can't find a way to find the relative explanation of variance with the ICA data.  Works okay with out this but pulls extra components.
 components_final = components(components_final_ix);
 disp(components_final);
 %% PLOT AND SAVE
@@ -171,9 +166,7 @@ for comp_ix = 1: numel(data.label)
             if sig_ix==1
                 main_lines(end+1) = sig_line;
             end
-        end
-    %main_lines(numel(cond_lab)+1) = line([0 0],ylim,...
-            %'LineWidth',2,'Color','k','LineStyle','--');
+      end
         % Axes and Labels
     ax.YLabel.String = 'uV';
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
@@ -183,7 +176,7 @@ for comp_ix = 1: numel(data.label)
     for elec_ix = 1:3
         a = [a max_names{comp_ix,elec_ix} ' '];
     end
-    title(['Electrodes: ' a ' Time Window: ' num2str(sig_length_max(comp_ix)*4) 'ms Percent Significant: ' num2str(fraction_sig(comp_ix)*100)]); %4 is used because thats the number of miliseconds in 1 sample
+    title(['Electrodes: ' a ' Time Window: ' num2str((sig_length_max(comp_ix)-1)*4) 'ms Percent Significant: ' num2str(fraction_sig(comp_ix)*100)]); %4 is used because thats the number of miliseconds in 1 sample
     leg_lab = [cond_lab 'F' cond_lab(cond_ix)];
     %if plt.legend
        % legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
@@ -193,7 +186,8 @@ for comp_ix = 1: numel(data.label)
      % Ensure vector graphics if saving
      saveas(gcf,fig_fname);
      
-     %This copies the files over to the correct folder so it can be compared (this figures are generated in 02a -- I'm keeping it until I decide what to do about the ICA Issue
+     %This copies the files over to the correct folder so it can be
+     %compared (these figures are generated in 02a)
      comp_label = clean_ica.label(comp_ix,1);
      comp_label = comp_label{1};
      fig_dir_odd = [SBJ_vars.dirs.proc_stack SBJ comp_label '_ICA_plots_odd.png'];

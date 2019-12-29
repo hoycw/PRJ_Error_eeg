@@ -173,7 +173,7 @@ if gen_figs
     fn_icabrowser_modified_odd(SBJ, cfg, ica);
 
     % Plot IC single trial stacks + ERPs
-    %fn_plot_ERP_stack_odd(SBJ, odd_proc_id, plt_id, ica, 'off', 1);
+    fn_plot_ERP_stack_odd(SBJ, odd_proc_id, 'ERP_stack_full_events_odd', ica, 'off', 1, cfg.path);
 end    
 % Plot IC in ft_databrowser
 if fig_vis
