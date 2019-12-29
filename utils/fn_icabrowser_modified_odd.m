@@ -132,7 +132,7 @@ for x = 1: numel(comp.label)
         plot(freq(strt:stp),smoothed(strt:stp));
         ylabel('T^2/Hz');s
     end
-    set(gca,'TickDir','out','XTick',0:25:5)
+    %set(gca,'TickDir','out','XTick',0:25:5)
     xlabel('Frequency (Hz)'); grid on;
     axis tight;
     

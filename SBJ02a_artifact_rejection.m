@@ -171,7 +171,7 @@ cfg.path     = SBJ_vars.dirs.proc;
 cfg.prefix   = 'ICA';
 cfg.viewmode = 'component';
 cfg.fig_vis  = fig_vis;
-%fn_icabrowser_modified(SBJ, cfg, ica);
+fn_icabrowser_modified(SBJ, cfg, ica);
 
 % Plot IC single trial stacks + ERPs
 fn_plot_ERP_stack(SBJ, proc_id, 'ERPstack_full_evnts', ica, 'off', 1, cfg.path);
