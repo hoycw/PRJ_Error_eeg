@@ -116,7 +116,7 @@ if strcmp(st.measure,'ts')
     pvals = nan([numel(st.factors) numel(time_vec)]);
     for t_ix = 1:numel(time_vec)
         tbl = table(data(:,t_ix),vertcat(models{:}),sbj_factor,...
-            'VariableNames',[{'ERP'},reg_lab,{'SBJ'}]);
+            'VariableNames',{'ERP',reg_lab,'SBJ'});
         %     for grp_ix = 1:numel(st.factors)
         %         if st.categorical(grp_ix)
         %             tbl.(st.factors{grp_ix}) = categorical(tbl.(st.factors{grp_ix}));
@@ -131,8 +131,8 @@ if strcmp(st.measure,'ts')
 elseif strcmp(st.measure,'mean')
     lme = {};
     pvals = nan([numel(st.factors) 1]);
-    tbl = table(data,vertcat(models{:}),sbj_factor,...
-        'VariableNames',[{'ERP'},reg_lab,{'SBJ'}]);
+    tbl = table(data,vertcat(pWin{:}),vertcat(sPE{:}),vertcat(uPE{:}),sbj_factor,...
+        'VariableNames',{'ERP',st.factors{:},'SBJ'});
     tbl.SBJ = categorical(tbl.SBJ);
     lme{1} = fitlme(tbl,st.formula);
     for fct_ix = 1:numel(st.factors)

@@ -36,27 +36,27 @@ end
 
 
 %% ERP: Linear Mixed Effects Model
-% proc_id   = 'eeg_full_ft';
-% an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-% stat_id   = 'RL_DO_lme_mn3t4';%'RL_all_lme_st0t5';
-% plt_id    = 'ts_F2to1_evnts_sigLine';
-% save_fig  = 1;
-% fig_vis   = 'on';
-% fig_ftype = 'png';
-% 
-% % for s = 1:numel(SBJs)
-% %     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
-% % end
-% 
-% for an_ix = 1:numel(an_ids)
-%     SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
-%     SBJ04d_ERP_plot_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     % SBJ04d_ERP_plot_stats_LME(SBJs,proc_id,an_ids{an_ix},stat_id,plt_id,save_fig,...
-%     %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_median',1);
+proc_id   = 'eeg_full_ft';
+an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+stat_id   = 'RLpRTlD_all_lme_st0t5';
+plt_id    = 'ts_F2to1_evnts_sigLine';
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'png';
+
+% for s = 1:numel(SBJs)
+%     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
 % end
-% 
-% %% Power: Linear Mixed Effects Model
+
+for an_ix = 1:numel(an_ids)
+    SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
+    SBJ04d_ERP_plot_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    % SBJ04d_ERP_plot_stats_LME(SBJs,proc_id,an_ids{an_ix},stat_id,plt_id,save_fig,...
+    %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_median',1);
+end
+
+%% Power: Linear Mixed Effects Model
 % conditions = 'DifFB';
 % proc_id   = 'eeg_full_ft';
 % an_ids    = {'POW_Fz_F2t1_dm2t0_fl4t8','POW_Fz_F2t1_dm2t0_fl1t3','POW_Pz_F2t1_dm2t0_fl1t3'};
