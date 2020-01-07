@@ -1,8 +1,8 @@
 % Stat Parameters
 st.an_style    = 'lme';
 st.model_lab   = 'pWinPEus';
-st.factors     = {'pWin','sPE','uPE'};
 st.categorical = [0, 0, 0];
+st.z_reg       = 1;                 % 0/1: zscore regressors?
 st.formula     = 'ERP ~ pWin + sPE + uPE + (1|SBJ)';
 st.trial_cond  = {'DifFB'};
 st.stat_lim    = [0.3 0.4];            % window in SEC for stats

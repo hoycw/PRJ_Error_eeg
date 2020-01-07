@@ -1,5 +1,7 @@
-function SBJ03b_POW_plot(SBJ,conditions,proc_id,an_id,plt_id,save_fig,varargin)
-%% Plot ERPs for single SBJ
+function SBJ03b_ERP_stack_plot(SBJ,conditions,proc_id,an_id,plt_id,save_fig,varargin)
+error('not written, no different than SBJ03b_ERP_plot');
+why do I need this? decide on a good plan first!
+%% Plot ERP and POW stack for single SBJ
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
 
