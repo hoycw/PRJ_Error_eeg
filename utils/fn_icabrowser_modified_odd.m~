@@ -1,4 +1,4 @@
-function [rej_comp] = fn_icabrowser_modified(SBJ, cfg, comp)
+function [rej_comp] = fn_icabrowser_modified_odd(SBJ, cfg, comp)
 
 % ICA component viewer and GUI
 %
@@ -85,7 +85,7 @@ for x = 1: numel(comp.label)
     fig_name = [SBJ comp.label(il,1)];
     fig_name = strcat(fig_name(1), fig_name(2), '_ICA_plots');
     fig_name = char(fig_name);
-    f = figure('units','normalized','outerposition', manpos, 'Name', fig_name, 'Visible', 'off');
+    f = figure('units','normalized','outerposition', manpos, 'Name', fig_name, 'Visible', 0);
     l = l + 1;
     
     
@@ -126,13 +126,13 @@ for x = 1: numel(comp.label)
     % ------------------------------------------------
     subcomp{1}{il} = subplot('Position', [0.1, 0.1, 0.4, 0.4]);
     if logar
-        plot(log10(freq(strt:stp)),log10(smoothed(strt:stp)));
+        plot(log10(freq(strt:stp),log10(smoothed(strt:stp)));
         ylabel('(dB/Hz)');
     else
         plot(freq(strt:stp),smoothed(strt:stp));
         ylabel('T^2/Hz');
     end
-    %set(gca,'TickDir','out','XTick',0:25:5)
+    set(gca,'TickDir','out','XTick',0:25:200)
     xlabel('Frequency (Hz)'); grid on;
     axis tight;
     
@@ -157,7 +157,7 @@ for x = 1: numel(comp.label)
             0.76 0.29 0.075 0.035; ...
             0.76 0.07 0.075 0.035];
     end
-    fig_path = [path fig_name '.png'];
+    fig_path = [path fig_name '_odd.png'];
     saveas(f, fig_path);
 end
 end

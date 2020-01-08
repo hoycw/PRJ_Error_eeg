@@ -10,25 +10,28 @@ addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};
+SBJs = {'EEG10','EEG12'};
 
 %% Run preprocessing
+proc_id = 'odd_full_ft';
 proc_id_ica = 'odd_full_ft';
 gen_figs    = 0;
 fig_vis     = 'off';
 reject_visual = 0;
 plot_final_check = 0;
 
-% SBJ_times = zeros(size(SBJs));
-% tic;
-% for s = 1:numel(SBJs)
-%     SBJ02a_artifact_rejection(SBJs{s}, proc_id, gen_figs, fig_vis)
-%     SBJ02b_ica_rejection(SBJs{s}, proc_id, proc_id_ica, reject_visual);
-%     SBJ02c_trial_rejection(SBJs{s}, proc_id, plot_final_check)
-%     SBJ_times(s) = toc;
-%     if s==1; elapsed = SBJ_times(s); else; elapsed = SBJ_times(s)-SBJ_times(s-1); end
-%     fprintf('%s preprocessed at %.1f s (SBJ time = %.1f)\n',SBJs{s},SBJ_times(s),elapsed);
-% end
+SBJ_times = zeros(size(SBJs));
+tic;
+for s = 1:numel(SBJs)
+    SBJ00_raw_view(SBJs{s}, 1, proc_id, 1)
+    ODD01_preproc(SBJs{s}, proc_id)
+    ODD02a_artifact_rejection(SBJs{s}, proc_id, gen_figs, fig_vis)
+    SBJ02b_ica_rejection(SBJs{s}, proc_id, proc_id_ica, reject_visual);
+    SBJ02c_trial_rejection(SBJs{s}, proc_id, plot_final_check)
+    SBJ_times(s) = toc;
+    if s==1; elapsed = SBJ_times(s); else; elapsed = SBJ_times(s)-SBJ_times(s-1); end
+    fprintf('%s preprocessed at %.1f s (SBJ time = %.1f)\n',SBJs{s},SBJ_times(s),elapsed);
+end
 
 
 %% View basic ERPs
@@ -79,6 +82,7 @@ SBJ03c_ERP_plot_grp_diffwave_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save
 
 conditions = 'DifOddOS';
 %}
+%{
 %% ERP Stats: Window Mean
 proc_id    = 'odd_full_ft';
 save_fig   = 1;
@@ -154,7 +158,7 @@ stat_id = 'DifOddOT_anv_p2pFRN';
 SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
-
+    %}
 %% ODDBALL 
 % odd_plt_id = 'ts_S2to13_evnts_sigPatch';
 % an_id = 'ERP_Cz_F_trl15t28_flt05t20_stat06';

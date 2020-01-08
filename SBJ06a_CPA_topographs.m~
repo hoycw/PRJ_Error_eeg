@@ -1,4 +1,4 @@
-function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis)
+function SBJ06a_CPA_topographs(SBJ, proc_id, gen_figs, fig_vis)
 % This function generates figures for both the ERP stacks and the ICA Plots.  Also cut out the bad trials (training, RT).
 %SBJ = 'EEG#'
 %Proc_id = 'egg_full_ft'
@@ -107,8 +107,8 @@ end
 %% EOG vs. ICA Correlation
 % Rebuild the components
 cfg           = [];
-cfg.unmixing  = icaunmixing;
-cfg.topolabel = icatopolabel;
+cfg.unmixing  = icaunmixing_tt;
+cfg.topolabel = icatopolabel_tt;
 ica           = ft_componentanalysis(cfg, trials);
 
 % Filter EOG
@@ -167,7 +167,7 @@ fprintf('=======================================================================
 cfg = [];
 cfg.layout   = 'biosemi64.lay';
 cfg.channel  = 'all';
-cfg.path     = SBJ_vars.dirs.proc;
+cfg.path     = [root_dir 'PRJ_Error_eeg/results/ERP/CPA_Graphs/' SBJ '/'];
 cfg.prefix   = 'ICA';
 cfg.viewmode = 'component';
 cfg.fig_vis  = fig_vis;
@@ -186,10 +186,10 @@ ft_databrowser(cfg, ica);
 end
 
 %% Save Data
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'];
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a_tt.mat'];
 save(clean_data_fname, '-v7.3', 'trials', 'cfg_trl', 'ica', 'heog_ics', 'veog_ics', 'eog_trials');
 
-clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_02a.mat'];
-save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
+%clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_02a.mat'];
+%save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
 end

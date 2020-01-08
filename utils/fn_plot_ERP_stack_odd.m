@@ -1,4 +1,4 @@
-function fn_plot_ERP_stack_odd(SBJ, proc_id, plt_id, data, fig_vis, save_fig)
+function fn_plot_ERP_stack_odd(SBJ, proc_id, plt_id, data, fig_vis, save_fig, path)
 %% Plot ERP with stacked single trials for ICA components
 
 %% Data Preparation
@@ -17,7 +17,7 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m']
 eval(SBJ_vars_cmd);
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
-plt_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt/' plt_id '_vars.m'];
+plt_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_cmd);
 
 %% Trim data to plotting time
@@ -90,7 +90,7 @@ for ch_ix = 1:numel(data.label)
     
     % Save figure
     if save_fig
-        comp_stack_fname = [SBJ_vars.dirs.proc_stack SBJ data.label{ch_ix} '_ERP_stack_odd.png'];
+        comp_stack_fname = [path 'plot/' SBJ data.label{ch_ix} '_ERP_stack_odd.png'];
         saveas(gcf,comp_stack_fname);
     end
 end

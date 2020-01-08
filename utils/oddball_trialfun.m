@@ -35,6 +35,14 @@ for i=1:length(event)
         % 255 and 254 seem to be interchangable.
         % This marks the end of the oddball section and the start of the TT
         oddball_section = abs(oddball_section - 1); % I think this is a cheat way to swithc between 0 and 1
+        if oddball_section == 1
+            oddball_sample = event(i).sample;
+            tt_sample = 1;
+        end
+        if oddball_section == 0
+            tt_sample = event(i).sample;
+            oddball_sample = 1;
+        end
     end
     if (event(i).value == 255 || event(i).value == 254) && oddball_section
         % This restarts the trl if you had to restart the paradigm and lsot

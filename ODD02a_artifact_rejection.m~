@@ -171,9 +171,9 @@ if gen_figs
     cfg.viewmode = 'component';
     cfg.fig_vis  = fig_vis;
     fn_icabrowser_modified_odd(SBJ, cfg, ica);
-
+    %}
     % Plot IC single trial stacks + ERPs
-    fn_plot_ERP_stack_odd(SBJ, odd_proc_id, plt_id, ica, 'off', 1, cfg.path);
+    fn_plot_ERP_stack_odd(SBJ, odd_proc_id, plt_id, ica, 'off', 1);
 end    
 % Plot IC in ft_databrowser
 if fig_vis
