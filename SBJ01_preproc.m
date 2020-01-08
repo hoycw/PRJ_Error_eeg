@@ -159,15 +159,15 @@ if ~isempty(bad_epochs)
     cfg = [];
     cfg.artfctdef.visual.artifact = bad_epochs;
     cfg.artfctdef.reject          = 'nan';
-    data = ft_rejectartifact(cfg, data);
+    data_ICA = ft_rejectartifact(cfg, data);
+else
+    data_ICA = data;
 end
 if strcmp(proc.ICA_hp_yn,'yes')
     cfg = [];
     cfg.hpfilter = proc.ICA_hp_yn;
     cfg.hpfreq   = proc.ICA_hp_freq;
-    data_ICA = ft_preprocessing(cfg, data);
-else
-    data_ICA = data;
+    data_ICA = ft_preprocessing(cfg, data_ICA);
 end
 
 % Run ICA

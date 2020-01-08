@@ -19,8 +19,16 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 
 % Load Data
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat']);
+%!!! load SBJ01 uncut output
+%load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+
+%% Re-clean uncut data
+%!!! Sheila function to project to ICA space, bring it back without bad
+%components
+
+%% Re-cut into trials
+%!!!Colin will decide whether to write this new or modify realignment below
 
 %% Realign data to desired event
 if ~strcmp(proc.event_type,an.event_type)
