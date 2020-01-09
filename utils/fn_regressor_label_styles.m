@@ -45,9 +45,9 @@ line_styles = cell(size(reg_labels));
 for reg_ix = 1:numel(reg_labels)
     colors{reg_ix} = reg_colors{strcmp(reg_labels{reg_ix},regressors)};
     if strcmp(reg_labels{reg_ix},'ptRT')
-        line_styles{reg_ix} = '--';
-    elseif strcmp(reg_labels{reg_ix},'p2tRT')
         line_styles{reg_ix} = ':';
+    elseif strcmp(reg_labels{reg_ix},'p2tRT')
+        line_styles{reg_ix} = '-.';
     else
         line_styles{reg_ix} = '-';
     end

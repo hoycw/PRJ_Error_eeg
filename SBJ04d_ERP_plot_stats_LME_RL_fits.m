@@ -1,4 +1,6 @@
-function SBJ04d_ERP_plot_stats_LME_RL(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+% Plots group ERPs with significance, also beta weights per regressor
+%   Only for single channel right now...
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
@@ -58,6 +60,12 @@ for s = 1:length(SBJs)
         time_vec = roi.time{1};
         ch_list  = roi.label;
         means = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
+        
+        % Select time and trials of interest
+        cfgs = [];
+        cfgs.latency = st.stat_lim;
+        st_roi = ft_selectdata(cfgs, roi);
+        st_time_vec = st_roi.time{1};
     end
     
     % Select Conditions of Interest
@@ -95,6 +103,14 @@ for ch_ix = 1:numel(ch_list)
         sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
     end
     
+    % Obtain Model Parameters
+    r2 = NaN(size(st_time_vec));
+    plot_betas = NaN([numel(reg_lab) numel(st_time_vec)]);
+    for t_ix = 1:numel(st_time_vec)
+        plot_betas(:,t_ix) = lme{t_ix}.Coefficients.Estimate(2:end);
+        r2(t_ix) = lme{t_ix}.Rsquared.Adjusted;
+    end
+    
     % Find significant time periods
     sig_reg    = false(size(reg_lab));
     sig_chunks = cell(size(reg_lab));
@@ -117,20 +133,21 @@ for ch_ix = 1:numel(ch_list)
     fig_name = ['GRP_' stat_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
-%     [plot_rc,~] = fn_num_subplots(numel(w2.label));
-%     if plot_rc(1)>1; fig_height=1; else fig_height=0.33; end;
-%     subplot(plot_rc(1),plot_rc(2),ch_ix);
-    ax = gca; hold on;
+        'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
+    
+    %% Plot ERPs with significance
+    axes = gobjects([3 1]);
+    subplot(3,1,1);
+    axes(1) = gca; hold on;
     
     % Plot Means (and variance)
-    ebars = cell(size(cond_lab));
-    main_lines = gobjects([numel(cond_lab)+numel(an.event_type) 1]);
+    cond_lines = cell(size(cond_lab));
+    main_lines = gobjects([numel(cond_lab)+sum(sig_reg)+numel(an.event_type) 1]);
     for cond_ix = 1:numel(cond_lab)
-        ebars{cond_ix} = shadedErrorBar(time_vec, plot_means(cond_ix,:), sems(cond_ix,:),...
+        cond_lines{cond_ix} = shadedErrorBar(time_vec, plot_means(cond_ix,:), sems(cond_ix,:),...
             {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
             'LineStyle',cond_styles{cond_ix}},plt.errbar_alpha);
-        main_lines(cond_ix) = ebars{cond_ix}.mainLine;
+        main_lines(cond_ix) = cond_lines{cond_ix}.mainLine;
     end
     ylims = ylim;
     if strcmp(plt.sig_type,'line')
@@ -141,12 +158,7 @@ for ch_ix = 1:numel(ch_list)
     for reg_ix = 1:numel(reg_lab)
         for sig_ix = 1:size(sig_chunks{reg_ix},1)
             if strcmp(plt.sig_type,'line')
-                if strcmp(st.measure,'ts')
-                    [~, stat_start] = min(abs(time_vec-st.stat_lim(1)));
-                elseif strcmp(st.measure,'mean')
-                    stat_start = 0;
-                end
-                sig_times = time_vec([sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2)]+stat_start);
+                sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
                 if strcmp(plt.sig_loc,'below')
                     sig_y = data_lim(1) + reg_ix*data_lim(1)*plt.sig_loc_factor;
                 elseif strcmp(plt.sig_loc,'above')
@@ -156,7 +168,7 @@ for ch_ix = 1:numel(ch_list)
                     'LineWidth',plt.sig_width,'Color',reg_colors{reg_ix},...
                     'LineStyle',reg_styles{reg_ix});
                 if sig_ix==1
-                    main_lines(end+1) = sig_line;
+                    main_lines(numel(cond_lab)+reg_ix) = sig_line;
                 end
             elseif strcmp(plt.sig_type,'patch')
                 if reg_ix>1; warning('Why use patch sig with more than 1 group???'); end
@@ -179,30 +191,88 @@ for ch_ix = 1:numel(ch_list)
     end
     
     % Plot Events
-    for evnt_ix = 1:numel(an.event_type)
-        main_lines(numel(cond_lab)+evnt_ix) = line([0 0],ylim,...
-            'LineWidth',plt.evnt_width(evnt_ix),'Color',plt.evnt_color{evnt_ix},'LineStyle',plt.evnt_style{evnt_ix});
-    end
+    %	Assume only one event at 0; ... evnt_ix = 1:numel(an.event_type)
+    main_lines(end) = line([0 0],ylim,...
+        'LineWidth',plt.evnt_width,'Color',plt.evnt_color{1},'LineStyle',plt.evnt_style{1});
     
     if strcmp(plt.sig_type,'line')
-        leg_lab = [cond_lab an.event_type reg_lab(sig_reg)];
+        leg_lab = [cond_lab reg_lab(sig_reg) an.event_type];
     else
         leg_lab = [cond_lab an.event_type];
     end
     
     % Axes and Labels
-%     ax.YLim          = ylims; %!!! change for plt.sigType=line
-    ax.YLabel.String = 'uV';
-    ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
-    ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
-    ax.XLabel.String = 'Time (s)';
-    ax.Title.String  = ch_list{ch_ix};
+    axes(1).YLabel.String = 'uV';
+    axes(1).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
+    axes(1).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
+    axes(1).XLabel.String = 'Time (s)';
+    axes(1).Title.String  = ch_list{ch_ix};
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
+    ylims = ylim;
     set(gca,'FontSize',16);
+    axes(1).YLim = ylims;
     
-    % Save figure
+    %% Plot Betas and R2
+    subplot(3,1,2);
+    axes(2) = gca; hold on;
+    
+    % Plot Model Betas
+    beta_lines = gobjects([numel(reg_lab)+numel(an.event_type) 1]);
+    for reg_ix = 1:numel(reg_lab)
+        beta_lines(reg_ix) = line(st_time_vec, plot_betas(reg_ix,:),...
+            'Color',reg_colors{reg_ix},'LineWidth',plt.mean_width,...
+            'LineStyle',reg_styles{reg_ix});
+    
+        % Plot Significance
+        for sig_ix = 1:size(sig_chunks{reg_ix},1)
+            % Assume: strcmp(plt.sig_type,'bold')
+            sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
+            line(sig_times,plot_betas(reg_ix,sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2)),...
+                'Color',reg_colors{reg_ix},'LineStyle',reg_styles{reg_ix},...
+                'LineWidth',plt.sig_width);
+        end
+    end
+    
+    % Plot Events
+    %	Assume only one event at 0; ... evnt_ix = 1:numel(an.event_type)
+    beta_lines(numel(reg_lab)+1) = line([0 0],ylim,...
+        'LineWidth',plt.evnt_width,'Color',plt.evnt_color{1},'LineStyle',plt.evnt_style{1});
+        
+    % Axes and Labels
+%     ax.YLim          = ylims; %!!! change for plt.sigType=line
+    axes(2).YLabel.String = 'Beta Weight';
+    axes(2).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
+    axes(2).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
+    axes(2).XLabel.String = 'Time (s)';
+    axes(2).Title.String  = 'Model Weights';
+    if plt.legend
+        legend(beta_lines,[reg_lab an.event_type],'Location',plt.legend_loc);
+    end
+    ylims = ylim;
+    set(gca,'FontSize',16);
+    axes(2).YLim = ylims;
+    
+    %% Plot R2
+    subplot(3,1,3);
+    axes(3) = gca; hold on;
+    
+    line(st_time_vec, r2, 'Color','k', 'LineWidth',2);
+    line([0 0],ylim, 'LineWidth',plt.evnt_width, 'Color',plt.evnt_color{1},...
+        'LineStyle',plt.evnt_style{1});
+    ylims = ylim;
+    
+    % Axes and Labels
+    axes(3).YLabel.String = 'Adjusted R2';
+    axes(3).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
+    axes(3).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
+    axes(3).XLabel.String = 'Time (s)';
+    axes(3).Title.String  = 'Model Fit';
+    set(gca,'FontSize',16);
+    axes(3).YLim = ylims;
+    
+    %% Save figure
     if save_fig
         fig_fname = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_fname);

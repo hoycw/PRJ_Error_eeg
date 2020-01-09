@@ -1,5 +1,6 @@
 function SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_id,stat_id)
 % Run Mixed-Effects Linear model on all SBJ and trials
+%   Only for one channel now...
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
 %   proc_id [str] - ID of preprocessing pipeline
@@ -36,9 +37,6 @@ full_cond_idx = cell(size(SBJs));
 n_trials      = zeros([numel(SBJs) 1]);
 models        = cell(size(SBJs));
 for s = 1:numel(SBJs)
-    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{1} '_vars.m'];
-    eval(SBJ_vars_cmd);
-    
     % Load data
     tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
         SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
@@ -55,18 +53,14 @@ for s = 1:numel(SBJs)
     end
     n_trials(s) = numel(bhvs{s}.trl_n);
     
-    % Load RL Model
-    tmp = load([SBJ_vars.dirs.proc SBJ '_model_' stat_id '.mat']);
-    models{s} = tmp.model;
-    
     clear tmp
 end
 
 %% Load Data and Build Model
+cfgs  = []; cfgs.latency = st.stat_lim;
+model = zeros([sum(n_trials) numel(reg_lab)]);
+sbj_factor  = zeros([sum(n_trials) 1]);
 full_trl_ix = 0;
-cfgs = []; cfgs.latency = st.stat_lim;
-%model = nan([sum(n_trials) numel(st.factors)+1]);
-sbj_factor = zeros([sum(n_trials) 1]);
 for s = 1:numel(SBJs)
     % Load data
     fprintf('========================== Processing %s ==========================\n',SBJs{s});
@@ -87,14 +81,22 @@ for s = 1:numel(SBJs)
         else; error(['unknown st.measure: ' st.measure]);
         end
         
+        % Load RL Model
+        tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' stat_id '.mat']);
+        model(1:n_trials(s),:) = tmp.model;
+        
         % Track SBJ
         sbj_factor(1:n_trials(s),end) = s*ones([n_trials(s) 1]);
     else
+        % Load RL Model
+        tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' stat_id '.mat']);
+        model(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),:) = tmp.model;
+        
         % Track SBJ
         sbj_factor(sum(n_trials(1:s-1))+1:sum(n_trials(1:s))) = s*ones([n_trials(s) 1]);
     end
     
-    % Add data and model
+    % Load and add data
     for trl_ix = 1:numel(st_roi.trial)
         full_trl_ix = full_trl_ix + 1;
         if strcmp(st.measure,'ts')
@@ -111,34 +113,48 @@ end
 %% Build table
 fprintf('========================== Running Stats ==========================\n');
 tic
+% Build Model Table
+tbl = table;
+for reg_ix = 1:numel(reg_lab)
+    tbl.(reg_lab{reg_ix}) = model(:,reg_ix);
+end
+tbl.SBJ = categorical(sbj_factor);
+
+% Create Model Formula
+reg_form = strjoin(reg_lab,' + ');
+formula = ['ERP ~ ' reg_form ' + (1|SBJ)'];
+
+% Run Model
 if strcmp(st.measure,'ts')
     lme = cell(size(time_vec));
-    pvals = nan([numel(st.factors) numel(time_vec)]);
+    pvals = nan([numel(reg_lab) numel(time_vec)]);
     for t_ix = 1:numel(time_vec)
-        tbl = table(data(:,t_ix),vertcat(models{:}),sbj_factor,...
-            'VariableNames',[{'ERP'},reg_lab,{'SBJ'}]);
+        tbl.ERP = data(:,t_ix);
         %     for grp_ix = 1:numel(st.factors)
         %         if st.categorical(grp_ix)
         %             tbl.(st.factors{grp_ix}) = categorical(tbl.(st.factors{grp_ix}));
         %         end
         %     end
-        tbl.SBJ = categorical(tbl.SBJ);
-        lme{t_ix} = fitlme(tbl,st.formula);
-        for fct_ix = 1:numel(st.factors)
-            pvals(fct_ix,t_ix) = lme{t_ix}.Coefficients.pValue(fct_ix+1);
-        end
+        
+        lme{t_ix} = fitlme(tbl,formula);
+        pvals(:,t_ix) = lme{t_ix}.Coefficients.pValue(2:end);
+    end
+    
+    % Correct for Multiple Comparisons
+    if strcmp(st.mcp_method,'FDR')
+        [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2) 1]));
+        qvals = reshape(qvals,[size(pvals,1) size(pvals,2)]);
+    else
+        error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
     end
 elseif strcmp(st.measure,'mean')
     lme = {};
-    pvals = nan([numel(st.factors) 1]);
-    tbl = table(data,vertcat(models{:}),sbj_factor,...
-        'VariableNames',[{'ERP'},reg_lab,{'SBJ'}]);
-    tbl.SBJ = categorical(tbl.SBJ);
-    lme{1} = fitlme(tbl,st.formula);
-    for fct_ix = 1:numel(st.factors)
-        pvals(fct_ix) = lme{1}.Coefficients.pValue(fct_ix+1);
-    end
+    tbl.ERP = data;
+    lme{1} = fitlme(tbl,formula);
+    % No correction for multiple comparisons
+    qvals = lme{1}.Coefficients.pValue(2:end);
 end
+
 fprintf('\t\t Stats Complete:');
 toc
 
@@ -149,6 +165,6 @@ if ~exist(stat_out_dir,'dir')
 end
 stat_out_fname = [stat_out_dir 'GRP_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','lme','SBJs');
+save(stat_out_fname,'-v7.3','lme','qvals','SBJs');
 
 end
