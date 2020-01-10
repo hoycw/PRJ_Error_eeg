@@ -28,7 +28,7 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 
 [reg_lab, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, cond_colors, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load and Select Behavior
 % Load data
@@ -138,6 +138,42 @@ imagesc(reg_corr);
 xticklabels(reg_lab);
 yticklabels(reg_lab);
 colorbar;
+saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
+
+%% Plot Regressors by Condition
+cond_idx = fn_condition_index(cond_lab, bhv);
+
+fig_name = [SBJ '_' st.model_lab '_reg_cond'];
+figure('Name',fig_name,'units','normalized','outerposition',[0 0 1 1]);
+[n_rc,~] = fn_num_subplots(numel(reg_lab));
+
+for reg_ix = 1:numel(reg_lab)
+    subplot(n_rc(1),n_rc(2),reg_ix); hold on;
+    violin_data = struct;
+    for cond_ix = 1:numel(cond_lab)
+        violin_data.(cond_lab{cond_ix}) = model(cond_idx==cond_ix,reg_ix);
+    end
+    violins = violinplot(violin_data);
+    
+    % Plot properties
+    legend_obj = cell(size(cond_lab));
+    for cond_ix = 1:numel(cond_lab)
+        % Change scatter colors to mark condition
+        violins(cond_ix).ViolinColor = cond_colors{cond_ix};
+        violins(cond_ix).BoxPlot.FaceColor = cond_colors{cond_ix};
+        violins(cond_ix).EdgeColor = cond_colors{cond_ix};
+        % Grab violin for legend
+        legend_obj{cond_ix} = violins(cond_ix).ViolinPlot;
+    end
+    if st.z_reg
+        title_str = ['z(' reg_lab{reg_ix} ')'];
+    else
+        title_str = reg_lab{reg_ix};
+    end
+    title(title_str);
+    if strcmp(reg_lab{reg_ix},'pWin'); legend([legend_obj{:}],cond_lab); end
+    set(gca,'FontSize',16);
+end
 saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
 
 %% Save Results

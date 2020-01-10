@@ -13,6 +13,41 @@ ft_defaults
 SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
            'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};
 
+%% Compute ERPs
+proc_id   = 'eeg_full_ft';
+an_id     = 'ERP_all_F2t1_dm2t0_fl05t20';
+for s = 1:numel(SBJs)
+    SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+%     SBJ03b_ERP_plot(SBJs{s},stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+end
+
+%% Plot ERP Topos
+proc_id    = 'eeg_full_ft';
+conditions = 'DifFB';
+an_id      = 'ERP_all_F2t1_dm2t0_fl05t20';
+save_fig   = 1;
+fig_vis    = 'on';
+fig_ftype  = 'png';
+
+for s = 19:numel(SBJs)
+    % FRN by condition
+    plt_id    = 'topo_F18t25';
+    SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    
+    % P3 by condition
+    plt_id    = 'topo_F3t45';
+    SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    close all;
+end
+
+
+
+% Full time series by condition
+
+
 %% Single SBJ RL Model
 proc_id   = 'eeg_full_ft';
 stat_ids  = {'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5','RLpRTlD_all_lme_st0t5'};
@@ -27,9 +62,8 @@ for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
     end
+    close all;
 end
-
-
 
 %% ERP: Linear Mixed Effects Model
 proc_id   = 'eeg_full_ft';
