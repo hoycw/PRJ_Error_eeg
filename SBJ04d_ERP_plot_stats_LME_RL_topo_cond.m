@@ -1,5 +1,5 @@
 function SBJ04d_ERP_plot_stats_LME_RL_topo_cond(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
-% Plots group ERPs with significance, also beta weights per regressor
+% Plots group RL beta topographies with significance for ERPs
 %   Only for single channel right now...
 
 %% Set up paths
@@ -47,46 +47,23 @@ eval(plt_vars_cmd);
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 % Check for window compatibility
-if ~strcmp(st.measure,'mean')
+if strcmp(st.measure,'ts')
     error('Single topo plot must have single metric within window!');
 end
 
 %% Load Stats
 load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat']);
 
-%% Load ERPs
-for s = 1:length(SBJs)
-    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
-    eval(SBJ_vars_cmd);
-    
-    load([SBJ_vars.dirs.proc,SBJs{s},'_',an_id,'.mat']);
-    load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
-    
-    if s==1
-        time_vec = roi.time{1};
-        ch_list  = roi.label;
-        means = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
-        
-        % Select time and trials of interest
-        cfgs = [];
-        cfgs.latency = st.stat_lim;
-        st_roi = ft_selectdata(cfgs, roi);
-        st_time_vec = st_roi.time{1};
-    end
-    
-    % Select Conditions of Interest
-    cond_idx = fn_condition_index(cond_lab, bhv);
-    for cond_ix = 1:numel(cond_lab)
-        cond_trial_ix = find(cond_idx==cond_ix);
-        trials = nan([numel(ch_list) numel(cond_trial_ix) numel(time_vec)]);
-        for t_ix = 1:numel(cond_trial_ix)
-            trials(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
-        end
-        means(cond_ix,s,:,:) = mean(trials,2);
-    end
-    
-    clear tmp SBJ_vars bhv roi
+% Get color limits
+cfgat = [];
+cfgat.latency = plt.plt_lim;
+cfgat.avgovertime = 'yes';
+clim = [0 0];
+for cond_ix = 1:numel(cond_lab)
+    tmp = ft_selectdata(cfgat,er_grp{cond_ix});
+    clim = [min([clim(1) min(tmp.avg)]) max([clim(2) max(tmp.avg)])];
 end
+
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' stat_id '/' an_id '/' plt_id '/'];
