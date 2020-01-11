@@ -27,6 +27,7 @@ eval(proc_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
 
+model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~]     = fn_regressor_label_styles(st.model_lab);
 [cond_lab, cond_colors, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
@@ -112,19 +113,14 @@ end
 %% Load Data and Build Model
 model = nan([sum(n_trials) numel(reg_lab)]);
 for r_ix = 1:numel(reg_lab)
-    if st.z_reg
-        model(:,r_ix) = eval(['(' reg_lab{r_ix} '-nanmean(' reg_lab{r_ix} ...
-            '))./nanstd(' reg_lab{r_ix} ');']);
-    else
-        model(:,r_ix) = eval(reg_lab{r_ix});
-    end
+    model(:,r_ix) = eval(reg_lab{r_ix});
 end
 
 %% Compute and plot correlations between regressors
 reg_corr = corr(model,'rows','complete');
 
 % Plot design matrix
-fig_name = [SBJ '_' st.model_lab '_design'];
+fig_name = [SBJ '_' model_id '_design'];
 figure('Name',fig_name);
 imagesc(model);
 xticklabels(reg_lab);
@@ -132,7 +128,7 @@ colorbar;
 saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
 
 % Plot regressor correlation matrix
-fig_name = [SBJ '_' st.model_lab '_design_corr'];
+fig_name = [SBJ '_' model_id '_design_corr'];
 figure('Name',fig_name);
 imagesc(reg_corr);
 xticklabels(reg_lab);
@@ -143,7 +139,7 @@ saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
 %% Plot Regressors by Condition
 cond_idx = fn_condition_index(cond_lab, bhv);
 
-fig_name = [SBJ '_' st.model_lab '_reg_cond'];
+fig_name = [SBJ '_' model_id '_reg_cond'];
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 1 1]);
 [n_rc,~] = fn_num_subplots(numel(reg_lab));
 
@@ -165,19 +161,14 @@ for reg_ix = 1:numel(reg_lab)
         % Grab violin for legend
         legend_obj{cond_ix} = violins(cond_ix).ViolinPlot;
     end
-    if st.z_reg
-        title_str = ['z(' reg_lab{reg_ix} ')'];
-    else
-        title_str = reg_lab{reg_ix};
-    end
-    title(title_str);
+    title(reg_lab{reg_ix});
     if strcmp(reg_lab{reg_ix},'pWin'); legend([legend_obj{:}],cond_lab); end
     set(gca,'FontSize',16);
 end
 saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
 
 %% Save Results
-stat_out_fname = [SBJ_vars.dirs.proc SBJ '_model_' stat_id '.mat'];
+stat_out_fname = [SBJ_vars.dirs.proc SBJ '_model_' model_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
 save(stat_out_fname,'-v7.3','model');
 

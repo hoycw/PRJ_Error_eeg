@@ -1,5 +1,5 @@
 function SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,varargin)
-%% Plot ERP topography per condition for single SBJ, single window
+%% Plot ERP topography per condition for single window across group
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
 
@@ -40,31 +40,40 @@ eval(plt_vars_cmd);
 
 % Select conditions (and trials)
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
-cond_idx = fn_condition_index(cond_lab, bhv);
 
 %% Load data
+er_avg = cell([numel(cond_lab) numel(SBJs)]);
 for s = 1:numel(SBJs)
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
+    % Load data
+    fprintf('========================== Processing %s ==========================\n',SBJs{s});
+    load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',an_id,'.mat'],'roi');
+    load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/03_events/',SBJs{s},'_behav_',proc_id,'_final.mat'],'bhv');
+    
+    % Separate out each condition
+    cfg_er = [];
+    for cond_ix = 1:numel(cond_lab)
+        cond_idx = fn_condition_index(cond_lab(cond_ix),bhv);
+        cfg_er.trials = find(cond_idx);
+        er_avg{cond_ix,s} = ft_timelockanalysis(cfg_er,roi);
+    end
+    clear roi bhv
+end
 
-load([SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat']);
-load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+%% Average ERPs for plotting
+cfg_gavg = [];
+er_grp = cell(size(cond_lab));
+for cond_ix = 1:numel(cond_lab)
+    er_grp{cond_ix} = ft_timelockgrandaverage(cfg_gavg, er_avg{cond_ix,:});
+end
 
-% Get trials for plotting
+% Get color limits
 cfgat = [];
 cfgat.latency = plt.plt_lim;
 cfgat.avgovertime = 'yes';
 clim = [0 0];
-cfga = [];
-er_avg = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
-    cfga.trials = find(cond_idx==cond_ix);
-    er_avg{cond_ix} = ft_timelockanalysis(cfga, roi);
-    
-    % Get color limits
-    tmp = ft_selectdata(cfgat,er_avg{cond_ix});
+    tmp = ft_selectdata(cfgat,er_grp{cond_ix});
     clim = [min([clim(1) min(tmp.avg)]) max([clim(2) max(tmp.avg)])];
-end
 end
 
 %% Plot Results
@@ -74,7 +83,7 @@ if ~exist(fig_dir,'dir')
 end
 
 % Create plot
-fig_name = [SBJ '_' conditions '_' an_id '_' plt_id];
+fig_name = ['GRP_' conditions '_' an_id '_' plt_id];
 [num_rc,~] = fn_num_subplots(numel(cond_lab));
 if num_rc(1)>1; fig_height = 0.5; else, fig_height = 0.3; end
 figure('Name',fig_name,'units','normalized',...
@@ -92,7 +101,7 @@ for cond_ix = 1:numel(cond_lab)
     cfgp.layout   = 'biosemi64.lay';
     cfgp.colorbar = 'yes';
     cfgp.comment  = 'no';
-    tmp = ft_topoplotER(cfgp, er_avg{cond_ix});
+    tmp = ft_topoplotER(cfgp, er_grp{cond_ix});
     title(cond_lab{cond_ix});
     tmp = caxis;
     clim = [min([clim(1) tmp(1)]) max([clim(2) tmp(2)])]; 

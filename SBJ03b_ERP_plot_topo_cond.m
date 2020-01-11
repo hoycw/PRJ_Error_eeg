@@ -85,10 +85,10 @@ for cond_ix = 1:numel(cond_lab)
     
     cfgp = [];
     cfgp.xlim     = plt.plt_lim;
-    cfgp.zlim     = clim;
+    %cfgp.zlim     = clim;
     cfgp.layout   = 'biosemi64.lay';
     cfgp.colorbar = 'yes';
-    cfgp.comment  = 'no';
+    %cfgp.comment  = 'no';
     tmp = ft_topoplotER(cfgp, er_avg{cond_ix});
     title(cond_lab{cond_ix});
     tmp = caxis;

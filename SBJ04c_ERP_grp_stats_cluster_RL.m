@@ -1,4 +1,4 @@
-function SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_id,stat_id)
+function SBJ04c_ERP_grp_stats_cluster_RL(SBJs,proc_id,an_id,stat_id)
 % Run Mixed-Effects Linear model on all SBJ and trials
 %   Only for one channel now...
 % INPUTS:

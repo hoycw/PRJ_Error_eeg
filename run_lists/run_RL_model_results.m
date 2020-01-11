@@ -15,7 +15,7 @@ SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','E
 
 %% Compute ERPs
 proc_id   = 'eeg_full_ft';
-an_id     = 'ERP_all_F2t1_dm2t0_fl05t20';
+an_id     = 'POW_FCz_F2t1_dm2t0_fl4t8';%'ERP_FCz_F2t1_dm2t0_fl05t20';%'POW_all_F2t1_dm2t0_fl4t8';%'ERP_all_F2t1_dm2t0_fl05t20';
 for s = 1:numel(SBJs)
     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
 %     SBJ03b_ERP_plot(SBJs{s},stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
@@ -30,7 +30,7 @@ save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for s = 19:numel(SBJs)
+for s = 1:numel(SBJs)
     % FRN by condition
     plt_id    = 'topo_F18t25';
     SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
@@ -42,6 +42,47 @@ for s = 19:numel(SBJs)
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     close all;
 end
+
+% FRN Group plot
+plt_id    = 'topo_F18t25';
+SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+% P3 Group Plot
+plt_id    = 'topo_F3t45';
+SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+%% Plot POW Topos
+proc_id    = 'eeg_full_ft';
+conditions = 'DifFB';
+an_id      = 'POW_all_F2t1_dm2t0_fl4t8';
+save_fig   = 1;
+fig_vis    = 'on';
+fig_ftype  = 'png';
+
+for s = 1:numel(SBJs)
+    % FRN by condition
+    plt_id    = 'topo_F18t25';
+    SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    
+    % P3 by condition
+    plt_id    = 'topo_F3t45';
+    SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    close all;
+end
+
+% FRN Group plot
+plt_id    = 'topo_F18t25';
+SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+% P3 Group Plot
+plt_id    = 'topo_F3t45';
+SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 
 
@@ -65,17 +106,44 @@ for s = 1:numel(SBJs)
     close all;
 end
 
-%% ERP: Linear Mixed Effects Model
+%% ERP: Linear Mixed Effects Model (Over Time)
 proc_id   = 'eeg_full_ft';
-an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5','RLpRTlD_all_lme_st0t5'};
+an_ids    = {'ERP_FCz_F2t1_dm2t0_fl05t20'};%,'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+stat_ids  = {'RLpRTlD_all_lme_st0t5'};%'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
 plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'png';
 
-% for s = 1:numel(SBJs)
-%     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+for an_ix = 1:numel(an_ids)
+    for st_ix = 1:numel(stat_ids)
+        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    end
+    
+    % Model Comparison Plots (Adjusted R-Squared)
+%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+end
+
+
+%% Power: Linear Mixed Effects Model (Over Time)
+% conditions = 'DifFB';
+proc_id   = 'eeg_full_ft';
+an_ids    = {'POW_FCz_F2t1_dm2t0_fl4t8'};%'POW_Fz_F2t1_dm2t0_fl4t8','POW_Fz_F2t1_dm2t0_fl1t3','POW_Pz_F2t1_dm2t0_fl1t3'};
+stat_ids  = {'RLpRTlD_all_lme_st0t5'};%'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
+plt_id    = 'ts_F2to1_evnts_sigLine';
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'png';
+
+% for an_ix = 1:numel(an_ids)
+%     for s = 1:numel(SBJs)
+%         SBJ03a_POW_save(SBJs{s},proc_id,an_ids{an_ix});
+%         % SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids,plt_id,save_fig);
+%     end
+%     SBJ03c_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig);
 % end
 
 for an_ix = 1:numel(an_ids)
@@ -90,24 +158,14 @@ for an_ix = 1:numel(an_ids)
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
-
-%% Power: Linear Mixed Effects Model
-% conditions = 'DifFB';
+%% ERP: Linear Mixed Effects Model (Mean Windows)
 proc_id   = 'eeg_full_ft';
-an_ids    = {'POW_Fz_F2t1_dm2t0_fl4t8','POW_Fz_F2t1_dm2t0_fl1t3','POW_Pz_F2t1_dm2t0_fl1t3'};
-stat_ids  = {'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5','RLpRTlD_all_lme_st0t5'};
+an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+stat_ids  = {'RLpRTlD_all_lme_mn2t3','RLpRTlD_all_lme_mn3t4'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'png';
-
-% for an_ix = 1:numel(an_ids)
-%     for s = 1:numel(SBJs)
-%         SBJ03a_POW_save(SBJs{s},proc_id,an_ids{an_ix});
-%         % SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids,plt_id,save_fig);
-%     end
-%     SBJ03c_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig);
-% end
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
