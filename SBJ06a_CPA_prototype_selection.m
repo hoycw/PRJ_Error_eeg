@@ -1,4 +1,4 @@
-function SBJ06a_CPA_prototype_selection(SBJ, proc_id, stat_id, plt_id)
+function SBJ06a_CPA_prototype_selection(SBJ, proc_id, stat_id, plt_id,save_fig,varargin)
 %% Candidate-Prototype Analysis (CPA): Prototype Selection
 %   Selects top IC based on spatial (elec_list) and temporal (time_win)
 
@@ -12,6 +12,24 @@ addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath(ft_dir);
 ft_defaults
+
+%% Handle Variable Inputs & Defaults
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'fig_vis') && ischar(varargin{v+1})
+            fig_vis = varargin{v+1};
+        elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
+            fig_ftype = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Define default options
+if ~exist('fig_vis','var'); fig_vis = 'on'; end
+if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
+if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Load processing variables
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
@@ -139,7 +157,7 @@ for f_ix = 1:numel(final_ics)
     comp_ix = final_ics(f_ix);
     fig_name = [SBJ '_' proc_id '_' stat_id '_IC' num2str(comp_ix)];
     figure('Name', fig_name, 'units','normalized',...
-        'outerposition',[0 0 0.6 0.5], 'Visible', 'on');
+        'outerposition',[0 0 0.6 0.5], 'Visible', fig_vis);
     axes = subplot(1,3,[1 2]); hold on;
     
     ebars = cell(size(cond_lab));
@@ -177,7 +195,7 @@ for f_ix = 1:numel(final_ics)
         num2str(sig_len(comp_ix)/ica.fsample) ' (' num2str(100*sig_len(comp_ix)/numel(st_ica.time{1}),'%.1f') '%)']);
     leg_lab = [cond_lab diff_lab(1)];%'F' 
     if plt.legend
-%        legend(main_lines,leg_lab,'Location',plt.legend_loc);
+       legend(main_lines,leg_lab,'Location',plt.legend_loc);
     end
     set(gca,'FontSize',16);
     
@@ -194,9 +212,11 @@ for f_ix = 1:numel(final_ics)
     set(gca,'FontSize',16);
 
     % Save Figure
-    fig_fname = [fig_dir fig_name '.png'];
-    fprintf('Saving %s\n',fig_fname);
-    %saveas(gcf,fig_fname);
+    if save_fig
+        fig_fname = [fig_dir fig_name '.' fig_ftype];
+        fprintf('Saving %s\n',fig_fname);
+        saveas(gcf,fig_fname);
+    end
 end
 
 
