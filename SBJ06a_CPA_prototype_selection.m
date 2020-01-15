@@ -1,4 +1,5 @@
-function SBJ06a_CPA_prototype_selection(SBJ, proc_id, stat_id, plt_id,save_fig,varargin)
+
+function SBJ06a_CPA_prototype_selection(SBJ, proc_id, cpa_id, plt_id,save_fig,varargin)
 %% Candidate-Prototype Analysis (CPA): Prototype Selection
 %   Selects top IC based on spatial (elec_list) and temporal (time_win)
 
@@ -36,8 +37,8 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m']
 eval(SBJ_vars_cmd);
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
-stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
-eval(stat_vars_cmd);
+cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars.m'];
+eval(cpa_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
@@ -51,7 +52,7 @@ load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 % Create contrast: (Unexpected - Expected) for each outcome
-[diff_lab, diff_pairs, diff_colors, diff_styles] = fn_condition_diff_label_styles(st.diff_id);
+[diff_lab, diff_pairs, diff_colors, diff_styles] = fn_condition_diff_label_styles(cpa.diff_id);
 if numel(diff_lab)>1; error('Too many condition contrasts!'); end
 
 %% Compute plotting data
@@ -74,7 +75,7 @@ end
 %% Temporal Criteria: Condition Stats
 % Select stats epoch
 cfg = [];
-cfg.latency = st.time_win;
+cfg.latency = cpa.time_win;
 st_ica = ft_selectdata(cfg,ica);
 
 st_trials = cell([2 1]);
@@ -98,7 +99,7 @@ for comp_ix = 1:numel(st_ica.label)
             ttest2(st_trials{diff_pairs{1}(1)}(comp_ix, :, time_ix), ...
                    st_trials{diff_pairs{1}(2)}(comp_ix, :, time_ix));
     end
-    if st.alpha~=0.05; error('re-compute significance with non 0.05 threshold'); end
+    if cpa.alpha~=0.05; error('re-compute significance with non 0.05 threshold'); end
     
     % Compute summary metrics (% sig, min_sig_len)
     sig_perc(comp_ix) = sum(sig_wins(comp_ix,:)) / size(sig_wins,2);
@@ -113,7 +114,7 @@ for comp_ix = 1:numel(st_ica.label)
 end
 
 % Select components with consecutive significance
-time_ic_idx = sig_len./st_ica.fsample >= st.min_sig_len;
+time_ic_idx = sig_len./st_ica.fsample >= cpa.min_sig_len;
 fprintf('%s: %d / %d components meet temporal criteria!\n',SBJ,sum(time_ic_idx),numel(ica.label));
 
 %% Spatial Criteria: Topo Matching
@@ -122,12 +123,12 @@ fprintf('%s: %d / %d components meet temporal criteria!\n',SBJ,sum(time_ic_idx),
 % !!!Implement grubbs' test???
 %   can use isoutlier(data,'method','grubbs');
 space_ic_idx = false(size(ica.label));
-if strcmp(st.elec_method,'peak')
-    top_elecs = cell([numel(ica.label) st.n_max_elec]);
+if strcmp(cpa.elec_method,'peak')
+    top_elecs = cell([numel(ica.label) cpa.n_max_elec]);
     for comp_ix = 1:numel(ica.label)
-        [~, top_ix] = maxk(abs(ica.topo(:,comp_ix)), st.n_max_elec);
+        [~, top_ix] = maxk(abs(ica.topo(:,comp_ix)), cpa.n_max_elec);
         top_elecs(comp_ix,:) = ica.topolabel(top_ix);
-        if numel(intersect(top_elecs(comp_ix,:),st.elec_list)) >= st.min_elec_match
+        if numel(intersect(top_elecs(comp_ix,:),cpa.elec_list)) >= cpa.min_elec_match
             space_ic_idx(comp_ix) = true;
         end
     end
@@ -138,7 +139,7 @@ fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),
 var_ic_idx = true(size(ica.label));
 if isfield(st,'ic_rank_max')
     % Select components ranked highest when ordered by variance
-    var_ic_idx(st.ic_rank_max+1:end) = false;
+    var_ic_idx(cpa.ic_rank_max+1:end) = false;
 end
 
 final_ics = find(all([time_ic_idx, space_ic_idx, var_ic_idx],2));
@@ -155,7 +156,7 @@ end
 
 for f_ix = 1:numel(final_ics)
     comp_ix = final_ics(f_ix);
-    fig_name = [SBJ '_' proc_id '_' stat_id '_IC' num2str(comp_ix)];
+    fig_name = [SBJ '_' proc_id '_' cpa_id '_IC' num2str(comp_ix)];
     figure('Name', fig_name, 'units','normalized',...
         'outerposition',[0 0 0.6 0.5], 'Visible', fig_vis);
     axes = subplot(1,3,[1 2]); hold on;
@@ -221,7 +222,7 @@ end
 
 
 %% Save Data
-clean_data_fname = [SBJ_vars.dirs.proc SBJ '_' stat_id '_' proc_id '_prototype.mat'];
+clean_data_fname = [SBJ_vars.dirs.proc SBJ '_' cpa_id '_' proc_id '_prototype.mat'];
 save(clean_data_fname, '-v7.3', 'final_ics');
 
 end
