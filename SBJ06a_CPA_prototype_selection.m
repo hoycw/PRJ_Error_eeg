@@ -1,4 +1,3 @@
-
 function SBJ06a_CPA_prototype_selection(SBJ, proc_id, cpa_id, plt_id,save_fig,varargin)
 %% Candidate-Prototype Analysis (CPA): Prototype Selection
 %   Selects top IC based on spatial (elec_list) and temporal (time_win)
