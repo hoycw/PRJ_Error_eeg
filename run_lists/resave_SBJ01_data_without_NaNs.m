@@ -118,7 +118,7 @@ for s = 1:numel(SBJs)
     icatopolabel = tmp.icatopolabel;
     
     % Check for differences
-    if max(max(data.trial{1}-tmp.data.trial{1})) > 0.0001
+    if max(max(data.trial{1}(:, 2:end)-tmp.data.trial{1})) > 0.0001 %%Fixed bug with Size difference!
         error('data is not close enough, double check!');
     end
     
@@ -129,7 +129,7 @@ for s = 1:numel(SBJs)
         error('copy file already exists, dont overwrite it!');
     end
     copy_cmd = ['cp ' orig_fname ' ' copy_fname];
-    %system(copy_cmd);
+    system(copy_cmd);
     
     %% Save it out again
     %save(orig_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog','bad_epochs');
