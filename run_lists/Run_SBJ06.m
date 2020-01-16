@@ -10,10 +10,11 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};%,
+SBJs = {'EEG03','EEG04','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};%,
 % Bad SBJs:
 %   'EEG01' (needs to pull new data after redoing cleaning)
 %   'EEG02' (no prototype)
+%   ,'EEG05' (no RLpRTlD model built!)
 
 %% Prototype Selection
 proc_id   = 'odd_full_ft';

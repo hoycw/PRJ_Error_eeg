@@ -1,5 +1,4 @@
 function SBJ06e_CPA_candidate_ERP_plot_RL_fits(SBJ,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
-error('start again here!');
 % Plots group ERPs with significance, also beta weights per regressor
 %   Only for single channel right now...
 %% Set up paths
