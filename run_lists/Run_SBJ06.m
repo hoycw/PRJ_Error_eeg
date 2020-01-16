@@ -38,6 +38,7 @@ odd_proc_id = 'odd_full_ft';
 conditions  = 'DifFB';
 cpa_id      = 'CPA';
 an_ids      = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%{'ERP_Fz_S15t28_dm2t0_fl05t20','ERP_Pz_S15t28_dm2t0_fl05t20'};
+%an_ids      = {'POW_Fz_F2t1_dm2t0_fl4t8','POW_Pz_F2t1_dm2t0_fl1t3'};
 stat_id     = 'RLpRTlD_all_glm_st0t5';
 save_fig    = 1;
 fig_vis     = 'on';
@@ -45,8 +46,8 @@ fig_ftype   = 'png';
 
 for an_ix = 1%:numel(an_ids)
     for s = 1:numel(SBJs)
-%         % Compute ERP for Candidate
-%         SBJ06b_CPA_candidate_ERP_save(SBJs{s},eeg_proc_id,odd_proc_id,an_ids{an_ix},cpa_id);
+        % Compute ERP for Candidate
+        SBJ06b_CPA_candidate_ERP_save(SBJs{s},eeg_proc_id,odd_proc_id,an_ids{an_ix},cpa_id);
 %         
 %         % Plot full TT epoch with trial stack
 %         plt_id    = 'stack_F2t1_evnt_c5';%'stack_S15to28_evnt_c5';
@@ -59,7 +60,7 @@ for an_ix = 1%:numel(an_ids)
 %             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
         % Run RL stats on single subject condidates
-        % SBJ06d_CPA_candidate_stats_RL_SBJ(SBJs{s},eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
+        SBJ06d_CPA_candidate_stats_RL_SBJ(SBJs{s},eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
         
         % Plot RL Model Results
         plt_id    = 'ts_F2to1_evnts_sigLine';

@@ -1,4 +1,5 @@
 #!/bin/bash
+# Colin ran this script in his local directories on Jan 16 2020
 
 # Sheila comments when writing this script (Jan 14 2020):
 # List of Commands to Run:
@@ -8,24 +9,26 @@
 
 cd /data/
 # Old Files - all SBJ have
-ls -lh */03_events/*_behav_eeg_full_ft_clean.mat
-ls -lh */03_events/*_behav02a_eeg_full_ft_clean.mat
-ls -lh */03_events/*_behav02b_eeg_full_ft_clean.mat
+rm */03_events/*_behav_eeg_full_ft_clean.mat
+rm */03_events/*_behav02a_eeg_full_ft_clean.mat
+rm */03_events/*_behav02b_eeg_full_ft_clean.mat
 
 # Old Files - all EEG SBJ have
-ls -lh */03_events/*_behav_odd_full_ft_clean.mat
-ls -lh */03_events/*_behav02a_odd_full_ft_clean.mat
-ls -lh */03_events/*_behav02b_odd_full_ft_clean.mat
+rm */03_events/*_behav_odd_full_ft_clean.mat
+rm */03_events/*_behav02a_odd_full_ft_clean.mat
+rm */03_events/*_behav02b_odd_full_ft_clean.mat
 
 # Old Files - only some SBJs have
-ls -lh */03_events/*_behav_oddball_eeg_full_ft_clean.mat
-ls -lh */02_preproc/*_clean_odd_full_ft.mat
+rm */03_events/*_behav_oddball_eeg_full_ft_clean.mat
+rm */02_preproc/*_clean_odd_full_ft.mat
 
 # Dangerous - still part of pipeline?
-rm */03_events/*_behav_eeg_full_ft_02a.mat
+#   SOLUTION: This was only for EEG12 because Sheila was in the process of re-cleaning.
+#   These files will be overwritten once she's done anyways.
+# ls -lh */03_events/*_behav_eeg_full_ft_02a.mat
 #   SBJ02a saves SBJ_behav_eeg_full_ft_02a.mat
 #   SBJ02c then loads that and converts to SBJ_behav_eeg_full_ft_final.mat
-rm */03_events/*_behav_odd_full_ft_02a.mat
+# ls -lh */03_events/*_behav_odd_full_ft_02a.mat
 #   ODD02a saves SBJ_behav_odd_full_ft_02a.mat
 #   ODD02c then loads that and converts to SBJ_behav_odd_full_ft_final.mat
 
