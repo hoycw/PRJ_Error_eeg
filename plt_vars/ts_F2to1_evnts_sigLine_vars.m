@@ -1,3 +1,6 @@
+plt.evnt_lab    = {'F'};
+plt.evnt_styles = {'-'};
+
 plt.plt_lim  = [-0.2 1];
 plt.x_step_sz  = 0.2;
 plt.legend     = 1;
@@ -27,6 +30,6 @@ plt.sig_width = 5;
 %plt.sig_scat_mrkr2 = '+';
 
 plt.evnt_width = 2;
-plt.evnt_color = {'k'};
-plt.evnt_style = {'--'};
+plt.evnt_color = 'k';
+plt.evnt_style = '--';
 plt.clim_perc = [5, 95];
