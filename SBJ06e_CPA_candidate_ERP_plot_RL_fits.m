@@ -1,4 +1,4 @@
-function SBJ06e_CPA_candidate_ERP_plot_RL_fits(SBJ,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ06e_CPA_candidate_ERP_plot_RL_fits(SBJ,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots group ERPs with significance, also beta weights per regressor
 %   Only for single channel right now...
 %% Set up paths
@@ -34,6 +34,8 @@ if ~exist('plot_median','var'); plot_median = 0; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
+SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
+eval(SBJ_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
@@ -41,49 +43,37 @@ eval(stat_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
+%% Load Stats
+load([SBJ_vars.dirs.proc SBJ '_' stat_id '_' cpa_id '_' an_id '.mat']);
+load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' an_id '.mat']);
+load([SBJ_vars.dirs.events SBJ '_behav_' eeg_proc_id '_final.mat']);
+
 % Select Conditions of Interest
 [reg_lab, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
+cond_idx = fn_condition_index(cond_lab, bhv);
 
-%% Load Stats
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat']);
+%% Select Plotting Data
+% Select time and trials of interest
+time_vec = roi.time{1};
+ch_list  = roi.label;
+cfgs = [];
+cfgs.latency = st.stat_lim;
+st_roi = ft_selectdata(cfgs, roi);
+st_time_vec = st_roi.time{1};
 
-%% Load ERPs
-for s = 1:length(SBJs)
-    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
-    eval(SBJ_vars_cmd);
-    
-    load([SBJ_vars.dirs.proc,SBJs{s},'_',an_id,'.mat']);
-    load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
-    
-    if s==1
-        time_vec = roi.time{1};
-        ch_list  = roi.label;
-        means = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
-        
-        % Select time and trials of interest
-        cfgs = [];
-        cfgs.latency = st.stat_lim;
-        st_roi = ft_selectdata(cfgs, roi);
-        st_time_vec = st_roi.time{1};
+% Select Trials
+trials = cell(size(cond_lab));
+for cond_ix = 1:numel(cond_lab)
+    cond_trial_ix = find(cond_idx==cond_ix);
+    trials{cond_ix} = nan([numel(roi.label) numel(cond_trial_ix) numel(time_vec)]);
+    for t_ix = 1:numel(cond_trial_ix)
+        trials{cond_ix}(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
     end
-    
-    % Select Conditions of Interest
-    cond_idx = fn_condition_index(cond_lab, bhv);
-    for cond_ix = 1:numel(cond_lab)
-        cond_trial_ix = find(cond_idx==cond_ix);
-        trials = nan([numel(ch_list) numel(cond_trial_ix) numel(time_vec)]);
-        for t_ix = 1:numel(cond_trial_ix)
-            trials(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
-        end
-        means(cond_ix,s,:,:) = mean(trials,2);
-    end
-    
-    clear tmp SBJ_vars bhv roi
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' stat_id '/' an_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/candidate/' cpa_id '_' an_id '/' stat_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -92,15 +82,15 @@ end
 for ch_ix = 1:numel(ch_list)
     %% Compute plotting data    
     % Compute means and variance
-    plot_means = NaN([numel(cond_lab) numel(time_vec)]);
-    sems  = NaN([numel(cond_lab) numel(time_vec)]);
+    means = NaN([numel(cond_lab) numel(roi.time{1})]);
+    sems  = NaN([numel(cond_lab) numel(roi.time{1})]);
     for cond_ix = 1:numel(cond_lab)
         if plot_median
-            plot_means(cond_ix,:) = squeeze(median(means(cond_ix,:,ch_ix,:),2));
+            means(cond_ix,:) = squeeze(median(trials{cond_ix}(ch_ix,:,:),2));
         else
-            plot_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
+            means(cond_ix,:) = squeeze(mean(trials{cond_ix}(ch_ix,:,:),2));
         end
-        sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
+        sems(cond_ix,:) = squeeze(std(trials{cond_ix}(ch_ix,:,:),[],2))./sqrt(size(trials{cond_ix},2))';
     end
     
     % Obtain Model Parameters
@@ -130,7 +120,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' stat_id '_' ch_list{ch_ix}];
+    fig_name = [SBJ '_' stat_id '_' cpa_id '_' an_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
@@ -144,31 +134,33 @@ for ch_ix = 1:numel(ch_list)
     cond_lines = cell(size(cond_lab));
     main_lines = gobjects([numel(cond_lab)+sum(sig_reg)+numel(an.event_type) 1]);
     for cond_ix = 1:numel(cond_lab)
-        cond_lines{cond_ix} = shadedErrorBar(time_vec, plot_means(cond_ix,:), sems(cond_ix,:),...
+        cond_lines{cond_ix} = shadedErrorBar(time_vec, means(cond_ix,:), sems(cond_ix,:),...
             {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
             'LineStyle',cond_styles{cond_ix}},plt.errbar_alpha);
         main_lines(cond_ix) = cond_lines{cond_ix}.mainLine;
     end
     ylims = ylim;
     if strcmp(plt.sig_type,'line')
-        data_lim = [min(min(plot_means-sems)) max(max(plot_means+sems))];
+        data_lim = [min(min(means-sems)) max(max(means+sems))];
     end
     
     % Plot Significance
-    for reg_ix = 1:numel(reg_lab)
+    sig_reg_ix = find(sig_reg);
+    for r = 1:numel(sig_reg_ix)
+        reg_ix = sig_reg_ix(r);
         for sig_ix = 1:size(sig_chunks{reg_ix},1)
             if strcmp(plt.sig_type,'line')
                 sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
                 if strcmp(plt.sig_loc,'below')
-                    sig_y = data_lim(1) + reg_ix*data_lim(1)*plt.sig_loc_factor;
+                    sig_y = data_lim(1) + r*data_lim(1)*plt.sig_loc_factor;
                 elseif strcmp(plt.sig_loc,'above')
-                    sig_y = data_lim(2) + reg_ix*data_lim(2)*plt.sig_loc_factor;
+                    sig_y = data_lim(2) + r*data_lim(2)*plt.sig_loc_factor;
                 end
                 sig_line = line(sig_times,repmat(sig_y,size(sig_times)),...
                     'LineWidth',plt.sig_width,'Color',reg_colors{reg_ix},...
                     'LineStyle',reg_styles{reg_ix});
                 if sig_ix==1
-                    main_lines(numel(cond_lab)+reg_ix) = sig_line;
+                    main_lines(numel(cond_lab)+r) = sig_line;
                 end
             elseif strcmp(plt.sig_type,'patch')
                 if reg_ix>1; warning('Why use patch sig with more than 1 group???'); end
@@ -193,7 +185,7 @@ for ch_ix = 1:numel(ch_list)
     % Plot Events
     %	Assume only one event at 0; ... evnt_ix = 1:numel(an.event_type)
     main_lines(end) = line([0 0],ylim,...
-        'LineWidth',plt.evnt_width,'Color',plt.evnt_color{1},'LineStyle',plt.evnt_style{1});
+        'LineWidth',plt.evnt_width,'Color',plt.evnt_color,'LineStyle',plt.evnt_style);
     
     if strcmp(plt.sig_type,'line')
         leg_lab = [cond_lab reg_lab(sig_reg) an.event_type];
@@ -238,7 +230,7 @@ for ch_ix = 1:numel(ch_list)
     % Plot Events
     %	Assume only one event at 0; ... evnt_ix = 1:numel(an.event_type)
     beta_lines(numel(reg_lab)+1) = line([0 0],ylim,...
-        'LineWidth',plt.evnt_width,'Color',plt.evnt_color{1},'LineStyle',plt.evnt_style{1});
+        'LineWidth',plt.evnt_width,'Color',plt.evnt_color,'LineStyle',plt.evnt_style);
         
     % Axes and Labels
 %     ax.YLim          = ylims; %!!! change for plt.sigType=line
@@ -259,8 +251,8 @@ for ch_ix = 1:numel(ch_list)
     axes(3) = gca; hold on;
     
     line(st_time_vec, r2, 'Color','k', 'LineWidth',2);
-    line([0 0],ylim, 'LineWidth',plt.evnt_width, 'Color',plt.evnt_color{1},...
-        'LineStyle',plt.evnt_style{1});
+    line([0 0],ylim, 'LineWidth',plt.evnt_width, 'Color',plt.evnt_color,...
+        'LineStyle',plt.evnt_style);
     ylims = ylim;
     
     % Axes and Labels
