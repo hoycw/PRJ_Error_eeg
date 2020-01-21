@@ -36,8 +36,8 @@ eeg_proc_id = 'eeg_full_ft';
 odd_proc_id = 'odd_full_ft';
 conditions  = 'DifFB';
 cpa_id      = 'CPA';
-%an_ids      = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%{'ERP_Fz_S15t28_dm2t0_fl05t20','ERP_Pz_S15t28_dm2t0_fl05t20'};
-an_ids      = {'POW_Fz_F2t1_dm2t0_fl4t8','POW_Pz_F2t1_dm2t0_fl1t3'};
+an_ids      = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%{'ERP_Fz_S15t28_dm2t0_fl05t20','ERP_Pz_S15t28_dm2t0_fl05t20'};
+%an_ids      = {'POW_Fz_F2t1_dm2t0_fl4t8','POW_Pz_F2t1_dm2t0_fl1t3'};
 stat_id     = 'RLpRTlD_all_glm_st0t5';
 save_fig    = 1;
 fig_vis     = 'on';
@@ -60,12 +60,19 @@ for an_ix = 1:numel(an_ids)
 %         
 %         % Run RL stats on single subject condidates
 %         SBJ06d_CPA_candidate_stats_RL_SBJ(SBJs{s},eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
-        
-        % Plot RL Model Results
-        plt_id    = 'ts_F2to1_evnts_sigLine';
-        SBJ06e_CPA_candidate_ERP_plot_RL_fits(SBJs{s},eeg_proc_id,cpa_id,an_ids{an_ix},stat_id,...
-            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         
+%         % Plot RL Model Results
+%         plt_id    = 'ts_F2to1_evnts_sigLine';
+%         SBJ06e_CPA_candidate_ERP_plot_RL_fits(SBJs{s},eeg_proc_id,cpa_id,an_ids{an_ix},stat_id,...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-    close all
+    
+    % Group stats and plotting
+    plt_id    = 'ts_F0t5_but_evnts_sigPatch';
+    SBJ06f_CPA_candidate_ERP_plot_GRP_betas(SBJs,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id,...
+        plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    
+    %close all
 end
+
 
