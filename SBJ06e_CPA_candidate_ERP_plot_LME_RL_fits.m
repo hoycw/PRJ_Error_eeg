@@ -1,6 +1,5 @@
-function SBJ06e_CPA_candidate_ERP_plot_RL_fits(SBJ,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
-error('use LME_RL_fits!');
-% Plots group ERPs with significance, also beta weights per regressor
+function SBJ06e_CPA_candidate_ERP_plot_LME_RL_fits(SBJs,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
+% Plots group-averaged CPA candidates with significance, also beta weights per regressor
 %   Only for single channel right now...
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -35,8 +34,6 @@ if ~exist('plot_median','var'); plot_median = 0; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
@@ -44,33 +41,46 @@ eval(stat_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
-%% Load Stats
-load([SBJ_vars.dirs.proc SBJ '_' stat_id '_' cpa_id '_' an_id '.mat']);
-load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' an_id '.mat']);
-load([SBJ_vars.dirs.events SBJ '_behav_' eeg_proc_id '_final.mat']);
-
 % Select Conditions of Interest
 [reg_lab, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
-cond_idx = fn_condition_index(cond_lab, bhv);
 
-%% Select Plotting Data
-% Select time and trials of interest
-time_vec = roi.time{1};
-ch_list  = roi.label;
-cfgs = [];
-cfgs.latency = st.stat_lim;
-st_roi = ft_selectdata(cfgs, roi);
-st_time_vec = st_roi.time{1};
+%% Load Stats
+load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' cpa_id '_' an_id '.mat'],'lme','qvals');
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' cpa_id '_' an_id '.mat'],'SBJs');
+if ~all(strcmp(SBJs,tmp.SBJs)); error('Mismatch in SBJs input and stats loaded'); end
 
-% Select Trials
-trials = cell(size(cond_lab));
-for cond_ix = 1:numel(cond_lab)
-    cond_trial_ix = find(cond_idx==cond_ix);
-    trials{cond_ix} = nan([numel(roi.label) numel(cond_trial_ix) numel(time_vec)]);
-    for t_ix = 1:numel(cond_trial_ix)
-        trials{cond_ix}(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
+%% Load ERPs
+cfgs = []; cfgs.latency = st.stat_lim;
+for s = 1:length(SBJs)
+    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
+    eval(SBJ_vars_cmd);
+    
+    load([SBJ_vars.dirs.proc,SBJs{s},'_',cpa_id,'_',an_id,'.mat']);
+    load([SBJ_vars.dirs.events SBJs{s} '_behav_' eeg_proc_id '_final.mat']);
+    
+    if s==1
+        time_vec = roi.time{1};
+        ch_list  = roi.label;
+        means = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
+        
+        % Select time and trials of interest
+        st_roi = ft_selectdata(cfgs, roi);
+        st_time_vec = st_roi.time{1};
     end
+    
+    % Select Conditions of Interest
+    cond_idx = fn_condition_index(cond_lab, bhv);
+    for cond_ix = 1:numel(cond_lab)
+        cond_trial_ix = find(cond_idx==cond_ix);
+        trials = nan([numel(ch_list) numel(cond_trial_ix) numel(time_vec)]);
+        for t_ix = 1:numel(cond_trial_ix)
+            trials(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
+        end
+        means(cond_ix,s,:,:) = mean(trials,2);
+    end
+    
+    clear tmp SBJ_vars bhv roi
 end
 
 %% Get event timing for plotting
@@ -106,15 +116,15 @@ end
 for ch_ix = 1:numel(ch_list)
     %% Compute plotting data    
     % Compute means and variance
-    means = NaN([numel(cond_lab) numel(roi.time{1})]);
-    sems  = NaN([numel(cond_lab) numel(roi.time{1})]);
+    plot_means = NaN([numel(cond_lab) numel(time_vec)]);
+    sems  = NaN([numel(cond_lab) numel(time_vec)]);
     for cond_ix = 1:numel(cond_lab)
         if plot_median
-            means(cond_ix,:) = squeeze(median(trials{cond_ix}(ch_ix,:,:),2));
+            plot_means(cond_ix,:) = squeeze(median(means(cond_ix,:,ch_ix,:),2));
         else
-            means(cond_ix,:) = squeeze(mean(trials{cond_ix}(ch_ix,:,:),2));
+            plot_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
         end
-        sems(cond_ix,:) = squeeze(std(trials{cond_ix}(ch_ix,:,:),[],2))./sqrt(size(trials{cond_ix},2))';
+        sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
     end
     
     % Obtain Model Parameters
@@ -144,7 +154,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = [SBJ '_' stat_id '_' cpa_id '_' an_id '_' ch_list{ch_ix}];
+    fig_name = ['GRP_' stat_id '_' cpa_id '_' an_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
@@ -158,14 +168,14 @@ for ch_ix = 1:numel(ch_list)
     cond_lines = cell(size(cond_lab));
     main_lines = gobjects([numel(cond_lab)+sum(sig_reg)+numel(plt.evnt_lab) 1]);
     for cond_ix = 1:numel(cond_lab)
-        cond_lines{cond_ix} = shadedErrorBar(time_vec, means(cond_ix,:), sems(cond_ix,:),...
+        cond_lines{cond_ix} = shadedErrorBar(time_vec, plot_means(cond_ix,:), sems(cond_ix,:),...
             {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
             'LineStyle',cond_styles{cond_ix}},plt.errbar_alpha);
         main_lines(cond_ix) = cond_lines{cond_ix}.mainLine;
     end
     ylims = ylim;
     if strcmp(plt.sig_type,'line')
-        data_lim = [min(min(means-sems)) max(max(means+sems))];
+        data_lim = [min(min(plot_means-sems)) max(max(plot_means+sems))];
     end
     
     % Plot Significance
@@ -176,9 +186,9 @@ for ch_ix = 1:numel(ch_list)
             if strcmp(plt.sig_type,'line')
                 sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
                 if strcmp(plt.sig_loc,'below')
-                    sig_y = data_lim(1) + r*data_lim(1)*plt.sig_loc_factor;
+                    sig_y = data_lim(1) + reg_ix*data_lim(1)*plt.sig_loc_factor;
                 elseif strcmp(plt.sig_loc,'above')
-                    sig_y = data_lim(2) + r*data_lim(2)*plt.sig_loc_factor;
+                    sig_y = data_lim(2) + reg_ix*data_lim(2)*plt.sig_loc_factor;
                 end
                 sig_line = line(sig_times,repmat(sig_y,size(sig_times)),...
                     'LineWidth',plt.sig_width,'Color',reg_colors{reg_ix},...

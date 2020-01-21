@@ -61,6 +61,29 @@ for cond_ix = 1:numel(cond_lab)
     end
 end
 
+%% Get event timing for plotting
+evnt_times = zeros(size(plt.evnt_lab));
+if strcmp(an.event_type,'S')
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        switch plt.evnt_lab{evnt_ix}
+            case 'S'
+                evnt_times(evnt_ix) = 0;
+            case 'R'
+                evnt_times(evnt_ix) = prdm_vars.target;
+            case {'F','Fon'}
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
+            case 'Foff'
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
+            otherwise
+                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
+        end
+    end
+elseif strcmp(an.event_type,'F')
+    evnt_times(1) = 0;
+else
+    error('Unknown an.event_type');
+end
+
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' conditions '/' an_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
@@ -106,13 +129,14 @@ for ch_ix = 1:numel(roi.label)
         main_lines(cond_ix) = ebars{cond_ix}.mainLine;
     end
     
-    % Plot Extra Features (events, significance)
-    for evnt_ix = 1:numel(an.event_type)
-        main_lines(numel(cond_lab)+evnt_ix) = line([0 0],ylim,...
-            'LineWidth',plt.evnt_width(evnt_ix),'Color',plt.evnt_color{evnt_ix},...
-            'LineStyle',plt.evnt_style{evnt_ix});
+    % Plot Events
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        main_lines(numel(cond_lab)+evnt_ix) = line(...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
+            'LineStyle',plt.evnt_styles{evnt_ix});
     end
-    leg_lab = [cond_lab an.event_type];
+    leg_lab = [cond_lab plt.evnt_lab];
     
     % Axes and Labels
     ax.YLabel.String = 'uV';

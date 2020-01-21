@@ -52,6 +52,12 @@ switch factor_name
         diff_pairs= {[find(strcmp(cond_lab,'tar')) find(strcmp(cond_lab,'std'))]};
         colors = {[31 120 180]./256};
         line_styles = {'-'};
+    case 'OddStd'
+        labels  = {'Odd-Std'};
+        [cond_lab,~,~,~] = fn_condition_label_styles('Odd');
+        diff_pairs= {[find(strcmp(cond_lab,'odd')) find(strcmp(cond_lab,'std'))]};
+        colors = {[31 120 180]./256};
+        line_styles = {'-'};
     otherwise
         error(['Difference wave not defined for factor ' factor_name]);
 end
