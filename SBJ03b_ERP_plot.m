@@ -21,8 +21,6 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-        elseif strcmp(varargin{v},'write_report')
-            write_report = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -45,11 +43,11 @@ eval(plt_vars_cmd);
 % Load data
 load([SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
 
 % Select conditions (and trials)
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 cond_idx = fn_condition_index(cond_lab, bhv);
-
 
 % Get trials for plotting
 trials = cell(size(cond_lab));
@@ -59,6 +57,29 @@ for cond_ix = 1:numel(cond_lab)
     for t_ix = 1:numel(cond_trial_ix)
         trials{cond_ix}(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
     end
+end
+
+%% Get event timing for plotting
+evnt_times = zeros(size(plt.evnt_lab));
+if strcmp(an.event_type,'S')
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        switch plt.evnt_lab{evnt_ix}
+            case 'S'
+                evnt_times(evnt_ix) = 0;
+            case 'R'
+                evnt_times(evnt_ix) = prdm_vars.target;
+            case {'F','Fon'}
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
+            case 'Foff'
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
+            otherwise
+                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
+        end
+    end
+elseif strcmp(an.event_type,'F')
+    evnt_times(1) = 0;
+else
+    error('Unknown an.event_type');
 end
 
 %% Plot Results
@@ -98,7 +119,7 @@ for ch_ix = 1:numel(roi.label)
     
     % Plot Means (and variance)
     ebars = cell(size(cond_lab));
-    main_lines = gobjects([numel(cond_lab)+numel(an.event_type) 1]);
+    main_lines = gobjects([numel(cond_lab)+numel(plt.evnt_lab) 1]);
     for cond_ix = 1:numel(cond_lab)
         ebars{cond_ix} = shadedErrorBar(roi.time{1}, means(cond_ix,:), sems(cond_ix,:),...
             {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
@@ -106,13 +127,14 @@ for ch_ix = 1:numel(roi.label)
         main_lines(cond_ix) = ebars{cond_ix}.mainLine;
     end
     
-    % Plot Extra Features (events, significance)
-    for evnt_ix = 1:numel(an.event_type)
-        main_lines(numel(cond_lab)+evnt_ix) = line([0 0],ylim,...
-            'LineWidth',plt.evnt_width(evnt_ix),'Color',plt.evnt_color{evnt_ix},...
-            'LineStyle',plt.evnt_style{evnt_ix});
+    % Plot Events
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        main_lines(numel(cond_lab)+evnt_ix) = line(...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
+            'LineStyle',plt.evnt_styles{evnt_ix});
     end
-    leg_lab = [cond_lab an.event_type];
+    leg_lab = [cond_lab plt.evnt_lab];
     
     % Axes and Labels
     ax.YLabel.String = 'uV';

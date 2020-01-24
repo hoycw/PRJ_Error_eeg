@@ -1,4 +1,3 @@
-
 function SBJ06a_CPA_prototype_selection(SBJ, proc_id, cpa_id, plt_id,save_fig,varargin)
 %% Candidate-Prototype Analysis (CPA): Prototype Selection
 %   Selects top IC based on spatial (elec_list) and temporal (time_win)
@@ -96,8 +95,8 @@ for comp_ix = 1:numel(st_ica.label)
     % Compute stats between conditions in contrast within time windows
     for time_ix = 1:numel(st_ica.time{1})
         [sig_wins(comp_ix, time_ix), p_vals(comp_ix, time_ix)] = ...
-            ttest2(st_trials{diff_pairs{1}(1)}(comp_ix, :, time_ix), ...
-                   st_trials{diff_pairs{1}(2)}(comp_ix, :, time_ix));
+            ttest2(st_trials{1}(comp_ix, :, time_ix), ...
+                   st_trials{2}(comp_ix, :, time_ix));
     end
     if cpa.alpha~=0.05; error('re-compute significance with non 0.05 threshold'); end
     
@@ -137,7 +136,7 @@ fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),
 
 %% Combine Criteria
 var_ic_idx = true(size(ica.label));
-if isfield(st,'ic_rank_max')
+if isfield(cpa,'ic_rank_max')
     % Select components ranked highest when ordered by variance
     var_ic_idx(cpa.ic_rank_max+1:end) = false;
 end
@@ -149,7 +148,7 @@ if sum(final_ics)<1
 end
 
 %% PLOT AND SAVE
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/CPA/prototype/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -219,7 +218,6 @@ for f_ix = 1:numel(final_ics)
         saveas(gcf,fig_fname);
     end
 end
-
 
 %% Save Data
 clean_data_fname = [SBJ_vars.dirs.proc SBJ '_' cpa_id '_' proc_id '_prototype.mat'];

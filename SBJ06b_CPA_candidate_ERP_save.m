@@ -103,6 +103,9 @@ cfgpp.lpfilter       = an.lp_yn;
 cfgpp.lpfreq         = an.lp_freq;
 cfgpp.demean         = an.demean_yn;
 cfgpp.baselinewindow = an.bsln_lim;
+if isfield(an,'hilbert')
+    cfgpp.hilbert = an.hilbert;
+end
 roi = ft_preprocessing(cfgpp, roi);
 
 %% Downsample

@@ -1,5 +1,5 @@
-function SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
-% Plots group ERPs with significance, also beta weights per regressor
+function SBJ06e_CPA_candidate_ERP_plot_LME_RL_fits(SBJs,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
+% Plots group-averaged CPA candidates with significance, also beta weights per regressor
 %   Only for single channel right now...
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -46,17 +46,18 @@ eval(plt_vars_cmd);
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Stats
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat']);
-warning('WARNING: Assuming same prdm_vars for all SBJ to get event timing!');
-prdm_vars = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/03_events/' SBJs{1} '_prdm_vars.mat']);
+load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' cpa_id '_' an_id '.mat'],'lme','qvals');
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' cpa_id '_' an_id '.mat'],'SBJs');
+if ~all(strcmp(SBJs,tmp.SBJs)); error('Mismatch in SBJs input and stats loaded'); end
 
 %% Load ERPs
+cfgs = []; cfgs.latency = st.stat_lim;
 for s = 1:length(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
     eval(SBJ_vars_cmd);
     
-    load([SBJ_vars.dirs.proc,SBJs{s},'_',an_id,'.mat']);
-    load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
+    load([SBJ_vars.dirs.proc,SBJs{s},'_',cpa_id,'_',an_id,'.mat']);
+    load([SBJ_vars.dirs.events SBJs{s} '_behav_' eeg_proc_id '_final.mat']);
     
     if s==1
         time_vec = roi.time{1};
@@ -64,8 +65,6 @@ for s = 1:length(SBJs)
         means = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
         
         % Select time and trials of interest
-        cfgs = [];
-        cfgs.latency = st.stat_lim;
         st_roi = ft_selectdata(cfgs, roi);
         st_time_vec = st_roi.time{1};
     end
@@ -108,7 +107,7 @@ else
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' stat_id '/' an_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/candidate/' cpa_id '_' an_id '/' stat_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -155,7 +154,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' stat_id '_' ch_list{ch_ix}];
+    fig_name = ['GRP_' stat_id '_' cpa_id '_' an_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
@@ -217,13 +216,14 @@ for ch_ix = 1:numel(ch_list)
         end
     end
     
-    % Plot Extra Features (events, significance)
+    % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
         main_lines(numel(cond_lab)+sum(sig_reg)+evnt_ix) = line(...
             [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
-    end    
+    end
+    
     if strcmp(plt.sig_type,'line')
         leg_lab = [cond_lab reg_lab(sig_reg) plt.evnt_lab];
     else
@@ -264,13 +264,13 @@ for ch_ix = 1:numel(ch_list)
         end
     end
     
-    % Plot Extra Features (events, significance)
+    % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
         beta_lines(numel(reg_lab)+evnt_ix) = line(...
             [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
-    end    
+    end
         
     % Axes and Labels
 %     ax.YLim          = ylims; %!!! change for plt.sigType=line
@@ -295,7 +295,7 @@ for ch_ix = 1:numel(ch_list)
         line([evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
-    end    
+    end
     ylims = ylim;
     
     % Axes and Labels
