@@ -19,7 +19,7 @@ import pickle
 
 # In[2]:
 
-SBJ = 'EEG01'
+SBJ = 'EEG23'
 
 
 # In[3]:
@@ -33,8 +33,29 @@ sbj_dir  = data_dir+SBJ+'/'
 # paths = {'Rana': '/Users/colinhoy/Code/PRJ_Error/data/logs/',
 #          'Adi': '/Users/colinhoy/Code/PRJ_Error/data/logs/',
 #          'IR57': '/Users/colinhoy/Code/PRJ_Error/data/logs/'}
-logs = {'EEG01': 'eeg01_oddball_log_20190712145416.txt'
-       }
+logs = {'EEG01': 'eeg01_oddball_log_20190712145416.txt',
+    'EEG02': 'eeg02oddball_oddball_log_20190715151729.txt',
+    'EEG03': '03_oddball_log_20190722150855.txt',
+    'EEG04': 'eeg04_oddball_log_20190723104701.txt',
+    'EEG05': 'eeg05_oddball_log_20190724150834.txt',
+    'EEG06': 'eeg06_oddball_log_20190730105341.txt',
+    'EEG07': 'eeg07_oddball_log_20190802163013.txt',
+    'EEG08': 'eeg08_oddball_log_20190809150851.txt',
+    'EEG09': 'EEG09_oddball_log_20190812163809.txt',
+    'EEG10': 'eeg10_oddball_log_20190815155252.txt',
+    'EEG12': 'eeg12_oddball_log_20190819142106.txt',
+    'EEG13': 'eeg13_oddball_log_20191001173937.txt',
+    'EEG14': 'eeg14_oddball_log_20191008164516.txt',
+    'EEG15': 'eeg15_oddball_log_20191024164553.txt',
+    'EEG16': 'eeg16_oddball_log_20191031172502.txt',
+    'EEG17': 'eeg17_oddball_log_20191106171454.txt',
+    'EEG18': 'eeg18_oddball_log_20191114153643.txt',
+    'EEG19': 'eeg19_oddball_log_20191117155315.txt',
+    'EEG20': 'eeg20_oddball_log_20191118084638.txt',
+    'EEG21': 'eeg21_oddball_log_20191122180427.txt',
+    'EEG22': 'eeg22_oddball_log_20191126170958.txt',
+    'EEG23': 'eeg23_oddball_log_20191206162710.txt'
+}
 
 
 # ### Load SBJ Data

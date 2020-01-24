@@ -48,13 +48,15 @@ SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null = {'EXG6', 'EXG7'};
 SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
-SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
+SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {
-    };
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [];
-SBJ_vars.tt_trigger_ix = 1;
-SBJ_vars.odd_trigger_ix = 1;
+SBJ_vars.ch_lab.bad     = {'Iz', 'AF4' 
+    }; % maybe AF7 and Fp2 but not set right now
+SBJ_vars.trial_reject_ix = [37, 65, 88, 96, 95, 141, 150, 208, 235, 236, 244, 272, 285, 289, 391, 392, 407, 442, 446, 505, 578, 596];
+SBJ_vars.trial_reject_ix_oddball = [3, 15, 117, 118, 134, 217, 261, 268, 269, 324];
+SBJ_vars.ica_reject = [1, 6,7, 8, 9, 10, 11, 13, 16, 18, 25, 27, 28, 29, 35, 36, 38, 41, 42, 44, 48, 49, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63];
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 404;
+% 100 - 400 variance
+%Messy-ish

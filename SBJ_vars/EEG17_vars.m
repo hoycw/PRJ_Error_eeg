@@ -48,13 +48,16 @@ SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null = {'EXG6', 'EXG7'};
 SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
-SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
+SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {
+SBJ_vars.ch_lab.bad     = {'T7', 'Iz'
     };
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [];
-SBJ_vars.tt_trigger_ix = 1;
-SBJ_vars.odd_trigger_ix = 1;
+%Maybe get rid of AF7
+SBJ_vars.trial_reject_ix = [22, 33, 40, 99, 144, 190, 233, 234, 275, 276, 284, 285, 315, 316, 335, 336, 470, 485, 491, 518, 521, 524, 582];
+SBJ_vars.trial_reject_ix_oddball = [121, 207, 208,  324, 325];
+SBJ_vars.ica_reject = [1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 14, 16, 17, 19, 20, 21, 22, 28, 29, 34, 32, 35, 36, 38, 41, 44, 45, 49, 50, 51, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63];
+% Maybe too many components!!
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 404;
+%Varience = 200 - 600, higher end

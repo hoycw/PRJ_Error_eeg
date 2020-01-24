@@ -52,8 +52,13 @@ SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'POz', 'FC5'}; % Note: CP5, CP3, P1, P3, P5 seem to be dead?
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [];
+SBJ_vars.trial_reject_ix = [357, 296, 297, 298, 299, 320, 380];
+SBJ_vars.trial_reject_ix_oddball = [232, 354, 356, 184, 199, 332, 357, 358];
+%Maybe 47
+SBJ_vars.ica_reject = [1, 5, 6, 7, 11, 12, 14, 16, 17, 18, 20, 22, 25, 26, 27, 32, 35, 36, 37, 39, 40, 41, 47, 49, 55, 56, 57, 58, 59, 60, 61, 62];
+%Considered: 2, 29, 36 (added but iffy)
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 404;
+%Variance: max around 500, most in 100 - 200 range
+%Diff Max: max  13, most in 4 - 8 range
+

@@ -48,13 +48,18 @@ SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null = {'EXG6', 'EXG7'};
 SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
-SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
+SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {
+SBJ_vars.ch_lab.bad     = {'T8', 'P2', 'AF8'
     };
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [];
-SBJ_vars.tt_trigger_ix = 1;
-SBJ_vars.odd_trigger_ix = 1;
+SBJ_vars.trial_reject_ix = [80, 154, 399, 400, 407, 456, 429];
+SBJ_vars.trial_reject_ix_oddball = [14, 23, 43, 100, 114, 162, 175, 24, 62, 71, 169, 204, 205, 283, 342];
+SBJ_vars.ica_reject = [1, 7, 8, 11, 13, 15, 17, 18, 20, 26, 29, 30, 31, 34, 37, 38, 41, 42, 43, 49, 50, 51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62];
+% Maybe 19, 39, 47, 53
+% Maybe just get rid of Oz
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 404;
+% Low variance all around 100 - 200
+% Max is around 14, most 6 - 10
+% Messy-ish data set may be worth redoing

@@ -47,7 +47,7 @@ cfg.trialfun            = 'tt_trialfun';
 % Add downsample frequency since triggers are loaded from raw file
 cfg.resamp_freq         = proc.resample_freq;
 cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
-end
+%end
 hdr = ft_read_header(SBJ_vars.dirs.raw_filename{1});
 endsample = hdr.nSamples;
 origFs = hdr.Fs;

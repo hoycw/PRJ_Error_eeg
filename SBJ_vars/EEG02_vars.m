@@ -53,7 +53,8 @@ SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'Iz'};
 SBJ_vars.trial_reject_ix = [125, 117, 160, 197, 226, 269, 297, 311, 399, 439, 445, 532];
-SBJ_vars.ica_reject = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 20, 24, 29, 31, 35, 38, 39, 51, 54, 56, 57, 58, 61, 62, 63];
+SBJ_vars.ica_reject = [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 15, 20, 24, 29, 31, 35, 38, 39, 51, 54, 56, 57, 58, 61, 62, 63];
+%Maybe 6
 SBJ_vars.trial_reject_ix_oddball = [50, 160, 370, 149, 25, 37, 43, 50, 51, 86, 99, 102, 149, 160, 312, 309, 326, 381, 344]; 
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 403;

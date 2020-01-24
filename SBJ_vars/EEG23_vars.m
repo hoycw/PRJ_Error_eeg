@@ -48,13 +48,14 @@ SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null = {'EXG6', 'EXG7'};
 SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
-SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
+SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {
+SBJ_vars.ch_lab.bad     = {'AF7', 'FC6', 'C4'
     };
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [];
-SBJ_vars.tt_trigger_ix = 1;
-SBJ_vars.odd_trigger_ix = 1;
+SBJ_vars.trial_reject_ix = [110, 112, 149, 225, 298, 374, 511];
+%Maybe not 298
+SBJ_vars.trial_reject_ix_oddball = [46, 201];
+SBJ_vars.ica_reject = [1, 2, 4, 7, 8, 12, 14, 16, 18, 19, 24, 26, 33, 35, 34, 36, 40, 41, 42, 44, 45, 46, 49, 52, 53, 57, 61, 62];
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 404;

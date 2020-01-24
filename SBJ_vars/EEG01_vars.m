@@ -53,8 +53,8 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'AF8', 'PO4', 'AF7'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 SBJ_vars.trial_reject_ix = [57 125 171 156 197 410 446 171 190 299];
-SBJ_vars.ica_reject = [1 2 3 4 6 7 8 9 10 12 13 18 20 23 25 26 27 28 33 34 35 36 37 40 42 43 48 49 52 53 56 57 58 59];
-SBJ_vars.trial_reject_ix_oddball = [191 131 370];
+SBJ_vars.ica_reject = [1 3 6 7 8 10 11 12 13 16 17 19 20 21 25 28 29 31 33 34 36 39 40 41 42 46 48 50 52 55 56 57 58 59 60 61];
+SBJ_vars.trial_reject_ix_oddball = [191 131 132 137 355 370 373 372];
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 404;
 

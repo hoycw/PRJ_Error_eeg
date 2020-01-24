@@ -52,8 +52,13 @@ SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'POz', 'P2'}
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [];
+SBJ_vars.trial_reject_ix = [129, 154, 181, 241, 242, 297, 305, 316, 317, 318, 319, 331, 338, 339, 340, 363, 364, 375, 379, 428, 429, 430, 448, 467, 469];
+SBJ_vars.trial_reject_ix_oddball = [133, 169, 198, 292, 323, 330, 359, 361, 362, 380, 381];
+SBJ_vars.ica_reject = [1, 4, 9, 11, 11, 14, 16, 19, 20, 21, 23, 24, 26, 28, 30, 31, 32, 33, 36, 37, 42, 43, 46, 48, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62];
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 404;
+% Max Variance: 800, most below 200 (after rejected) -- pretty messy got
+% rid of a lot of trials
+% Max is around 40
+%Messy data set!!!
+%Variance is 100 - 600

@@ -11,8 +11,7 @@ ft_defaults
 
 %% General parameters
 proc_id = 'eeg_full_ft';
-SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
-           'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};
+SBJs = {'EEG09'};
 
 %% REDO SBJ01 SAVING
 for s = 1:numel(SBJs)
@@ -118,7 +117,7 @@ for s = 1:numel(SBJs)
     icatopolabel = tmp.icatopolabel;
     
     % Check for differences
-    if max(max(data.trial{1}(:, 2:end)-tmp.data.trial{1})) > 0.0001 %%Fixed bug with Size difference!
+    if max(max(data.trial{1}(:, 1:end)-tmp.data.trial{1})) > 0.0001 %%Fixed bug with Size difference!
         error('data is not close enough, double check!');
     end
     

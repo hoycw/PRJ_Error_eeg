@@ -89,6 +89,7 @@ end
 training_ix = find(bhv.blk==0);
 rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1) & bhv.rt>0);
 rt_high_ix  = find(bhv.rt >= proc.rt_bounds(2));
+%exclude_trials = unique(vertcat(bad_raw_trials, training_ix));
 exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
 
 % Exclude bad trials

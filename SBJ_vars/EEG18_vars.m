@@ -48,13 +48,17 @@ SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null = {'EXG6', 'EXG7'};
 SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
-SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
+SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {
+SBJ_vars.ch_lab.bad     = {'P2'
     };
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [];
-SBJ_vars.tt_trigger_ix = 1;
-SBJ_vars.odd_trigger_ix = 1;
+SBJ_vars.trial_reject_ix = [113, 294, 315, 333, 436, 437];
+% 76-115 has really high variance in the diff thing, but doesn't look too terrible try it without %first
+SBJ_vars.trial_reject_ix_oddball = [7, 15, 16, 29, 30, 96, 99, 257, 228, 258, 260, 317, 328, 383, 386];
+SBJ_vars.ica_reject = [2, 5, 6, 7, 10, 11, 12, 14, 16, 18, 19, 24, 26, 28, 37, 39, 41, 42, 43, 48, 50, 51, 52, 54, 58, 59, 60, 61, 62, 63, 64];
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 404;
+% Variance -- most below 200, around 800 max
+%Max Diff = 10-12 ish
+% perhaps a messy dataset, may be worth recleaning

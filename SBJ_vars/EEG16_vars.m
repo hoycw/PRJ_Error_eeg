@@ -47,14 +47,18 @@ SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null = {'EXG6', 'EXG7'};
-SBJ_vars.ch_lab.replace = {'Iz', 'EXG8'}; % {{'final','EXG#'},{'final2','EXG#2'}}
-SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
+SBJ_vars.ch_lab.replace = {{'Iz', 'EXG8'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
+SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {
+SBJ_vars.ch_lab.bad     = {'P2', 'PO4'
     };
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [];
-SBJ_vars.tt_trigger_ix = 1;
-SBJ_vars.odd_trigger_ix = 1;
+SBJ_vars.trial_reject_ix = [131, 198, 273, 309, 366, 390, 408, 430, 431, 436, 492, 495, 496, 497, 512, 520, 521, 595, 596];
+SBJ_vars.trial_reject_ix_oddball = [87, 91, 118, 207, 242, 279, 296];
+SBJ_vars.ica_reject = [ 1, 2, 8, 9, 10, 12, 18, 19, 20, 23, 26, 29, 30, 32, 40, 43, 47, 48, 51, 53, 54, 55, 58, 59, 60, 61, 62];
+%Maybe: 40, 48
+SBJ_vars.tt_trigger_ix = 3;
+SBJ_vars.odd_trigger_ix = 404;
+% Variance: 100 - 300, some 400, mostly under 200 for oddball
+% Max: 10ish
+%WEIRD DATASET
