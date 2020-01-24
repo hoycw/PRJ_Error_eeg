@@ -6,10 +6,10 @@ function [reg_labels, colors, line_styles] = fn_regressor_label_styles(model_id)
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
 %% List of possible regressors and their colors
-regressors  = {'pWin','sPE','uPE','tRT','ptRT','p2tRT','lDist','iDist'};
+regressors  = {'pWin','sPE','uPE','tRT','ptRT','p2tRT','lDist','ulDist','iDist'};
 reg_colors = {[152 78 163]./255, [255 127 0]./255, [166 86 40]./255,...
     [247 129 191]./255, [247 129 191]./255, [247 129 191]./255, ...
-    [0.5 0.5 0.5], [0.5 0.5 0.5]};
+    [0.5 0.5 0.5], [0.5 0.5 0.5], [0.5 0.5 0.5]};
 % Color options:
 %   purple: [152 78 163]
 %   orange: [255 127 0]
@@ -33,6 +33,8 @@ switch model_id
         reg_labels = {'pWin','sPE','uPE','tRT','ptRT'};
     case 'RLpRTlD'
         reg_labels = {'pWin','sPE','uPE','tRT','ptRT','lDist'};
+    case 'RLpRTulD'
+        reg_labels = {'pWin','sPE','uPE','tRT','ptRT','lDist','ulDist'};
     case 'RLpRTiD'
         reg_labels = {'pWin','sPE','uPE','tRT','ptRT','iDist'};
     otherwise
@@ -44,7 +46,7 @@ colors = cell(size(reg_labels));
 line_styles = cell(size(reg_labels));
 for reg_ix = 1:numel(reg_labels)
     colors{reg_ix} = reg_colors{strcmp(reg_labels{reg_ix},regressors)};
-    if strcmp(reg_labels{reg_ix},'ptRT')
+    if any(strcmp(reg_labels{reg_ix},{'ptRT','ulDist'}))
         line_styles{reg_ix} = ':';
     elseif strcmp(reg_labels{reg_ix},'p2tRT')
         line_styles{reg_ix} = '-.';

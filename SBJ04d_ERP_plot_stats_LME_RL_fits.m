@@ -47,6 +47,8 @@ eval(plt_vars_cmd);
 
 %% Load Stats
 load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat']);
+warning('WARNING: Assuming same prdm_vars for all SBJ to get event timing!');
+prdm_vars = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/03_events/' SBJs{1} '_prdm_vars.mat']);
 
 %% Load ERPs
 for s = 1:length(SBJs)
@@ -80,6 +82,29 @@ for s = 1:length(SBJs)
     end
     
     clear tmp SBJ_vars bhv roi
+end
+
+%% Get event timing for plotting
+evnt_times = zeros(size(plt.evnt_lab));
+if strcmp(an.event_type,'S')
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        switch plt.evnt_lab{evnt_ix}
+            case 'S'
+                evnt_times(evnt_ix) = 0;
+            case 'R'
+                evnt_times(evnt_ix) = prdm_vars.target;
+            case {'F','Fon'}
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
+            case 'Foff'
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
+            otherwise
+                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
+        end
+    end
+elseif strcmp(an.event_type,'F')
+    evnt_times(1) = 0;
+else
+    error('Unknown an.event_type');
 end
 
 %% Plot Results
@@ -142,7 +167,7 @@ for ch_ix = 1:numel(ch_list)
     
     % Plot Means (and variance)
     cond_lines = cell(size(cond_lab));
-    main_lines = gobjects([numel(cond_lab)+sum(sig_reg)+numel(an.event_type) 1]);
+    main_lines = gobjects([numel(cond_lab)+sum(sig_reg)+numel(plt.evnt_lab) 1]);
     for cond_ix = 1:numel(cond_lab)
         cond_lines{cond_ix} = shadedErrorBar(time_vec, plot_means(cond_ix,:), sems(cond_ix,:),...
             {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
@@ -155,7 +180,9 @@ for ch_ix = 1:numel(ch_list)
     end
     
     % Plot Significance
-    for reg_ix = 1:numel(reg_lab)
+    sig_reg_ix = find(sig_reg);
+    for r = 1:numel(sig_reg_ix)
+        reg_ix = sig_reg_ix(r);
         for sig_ix = 1:size(sig_chunks{reg_ix},1)
             if strcmp(plt.sig_type,'line')
                 sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
@@ -168,7 +195,7 @@ for ch_ix = 1:numel(ch_list)
                     'LineWidth',plt.sig_width,'Color',reg_colors{reg_ix},...
                     'LineStyle',reg_styles{reg_ix});
                 if sig_ix==1
-                    main_lines(numel(cond_lab)+reg_ix) = sig_line;
+                    main_lines(numel(cond_lab)+r) = sig_line;
                 end
             elseif strcmp(plt.sig_type,'patch')
                 if reg_ix>1; warning('Why use patch sig with more than 1 group???'); end
@@ -190,15 +217,17 @@ for ch_ix = 1:numel(ch_list)
         end
     end
     
-    % Plot Events
-    %	Assume only one event at 0; ... evnt_ix = 1:numel(an.event_type)
-    main_lines(end) = line([0 0],ylim,...
-        'LineWidth',plt.evnt_width,'Color',plt.evnt_color{1},'LineStyle',plt.evnt_style{1});
-    
+    % Plot Extra Features (events, significance)
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        main_lines(numel(cond_lab)+sum(sig_reg)+evnt_ix) = line(...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
+            'LineStyle',plt.evnt_styles{evnt_ix});
+    end    
     if strcmp(plt.sig_type,'line')
-        leg_lab = [cond_lab reg_lab(sig_reg) an.event_type];
+        leg_lab = [cond_lab reg_lab(sig_reg) plt.evnt_lab];
     else
-        leg_lab = [cond_lab an.event_type];
+        leg_lab = [cond_lab plt.evnt_lab];
     end
     
     % Axes and Labels
@@ -219,7 +248,7 @@ for ch_ix = 1:numel(ch_list)
     axes(2) = gca; hold on;
     
     % Plot Model Betas
-    beta_lines = gobjects([numel(reg_lab)+numel(an.event_type) 1]);
+    beta_lines = gobjects([numel(reg_lab)+numel(plt.evnt_lab) 1]);
     for reg_ix = 1:numel(reg_lab)
         beta_lines(reg_ix) = line(st_time_vec, plot_betas(reg_ix,:),...
             'Color',reg_colors{reg_ix},'LineWidth',plt.mean_width,...
@@ -235,10 +264,13 @@ for ch_ix = 1:numel(ch_list)
         end
     end
     
-    % Plot Events
-    %	Assume only one event at 0; ... evnt_ix = 1:numel(an.event_type)
-    beta_lines(numel(reg_lab)+1) = line([0 0],ylim,...
-        'LineWidth',plt.evnt_width,'Color',plt.evnt_color{1},'LineStyle',plt.evnt_style{1});
+    % Plot Extra Features (events, significance)
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        beta_lines(numel(reg_lab)+evnt_ix) = line(...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
+            'LineStyle',plt.evnt_styles{evnt_ix});
+    end    
         
     % Axes and Labels
 %     ax.YLim          = ylims; %!!! change for plt.sigType=line
@@ -248,7 +280,7 @@ for ch_ix = 1:numel(ch_list)
     axes(2).XLabel.String = 'Time (s)';
     axes(2).Title.String  = 'Model Weights';
     if plt.legend
-        legend(beta_lines,[reg_lab an.event_type],'Location',plt.legend_loc);
+        legend(beta_lines,[reg_lab plt.evnt_lab],'Location',plt.legend_loc);
     end
     ylims = ylim;
     set(gca,'FontSize',16);
@@ -259,8 +291,11 @@ for ch_ix = 1:numel(ch_list)
     axes(3) = gca; hold on;
     
     line(st_time_vec, r2, 'Color','k', 'LineWidth',2);
-    line([0 0],ylim, 'LineWidth',plt.evnt_width, 'Color',plt.evnt_color{1},...
-        'LineStyle',plt.evnt_style{1});
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        line([evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
+            'LineStyle',plt.evnt_styles{evnt_ix});
+    end    
     ylims = ylim;
     
     % Axes and Labels

@@ -21,8 +21,6 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-        elseif strcmp(varargin{v},'write_report')
-            write_report = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -45,11 +43,11 @@ eval(plt_vars_cmd);
 % Load data
 load([SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
 
 % Select conditions (and trials)
 [cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 cond_idx = fn_condition_index(cond_lab, bhv);
-
 
 % Get trials for plotting
 trials = cell(size(cond_lab));
@@ -121,7 +119,7 @@ for ch_ix = 1:numel(roi.label)
     
     % Plot Means (and variance)
     ebars = cell(size(cond_lab));
-    main_lines = gobjects([numel(cond_lab)+numel(an.event_type) 1]);
+    main_lines = gobjects([numel(cond_lab)+numel(plt.evnt_lab) 1]);
     for cond_ix = 1:numel(cond_lab)
         ebars{cond_ix} = shadedErrorBar(roi.time{1}, means(cond_ix,:), sems(cond_ix,:),...
             {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
