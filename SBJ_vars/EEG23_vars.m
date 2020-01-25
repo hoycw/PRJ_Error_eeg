@@ -59,3 +59,4 @@ SBJ_vars.trial_reject_ix_oddball = [46, 201];
 SBJ_vars.ica_reject = [1, 2, 4, 7, 8, 12, 14, 16, 18, 19, 24, 26, 33, 35, 34, 36, 40, 41, 42, 44, 45, 46, 49, 52, 53, 57, 61, 62];
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 404;
+%Looks pretty clean

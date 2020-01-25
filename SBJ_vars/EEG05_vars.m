@@ -51,11 +51,11 @@ SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {...
- 'T8'
-    };
-SBJ_vars.trial_reject_ix = [290:295, 247, 320];
-SBJ_vars.trial_reject_ix_oddball = [27:30, 370, 385]; 
-SBJ_vars.ica_reject = [1 3 7 11 17 18 25 37 38 41 43 48 59 62 63];
+SBJ_vars.ch_lab.bad     = {'O1', 'T8'};
+SBJ_vars.trial_reject_ix = [247, 320, 434];
+SBJ_vars.trial_reject_ix_oddball = [27:30 96 130 262];
+SBJ_vars.ica_reject = [1 3 5 9 11 17 19 23 30 32 34 37 38 44 45 49 52 54 57 59 61 62 63];
 SBJ_vars.tt_trigger_ix = 404;
 SBJ_vars.odd_trigger_ix = 1;
+% Lots of Horiz Eye Movements
+% High Variance around 800

@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 proc_id = 'eeg_full_ft';
-SBJs = {'EEG09'};
+SBJs = {'EEG04','EEG06','EEG07','EEG08','EEG10','EEG12','EEG09'};
 
 %% REDO SBJ01 SAVING
 for s = 1:numel(SBJs)
@@ -131,7 +131,7 @@ for s = 1:numel(SBJs)
     system(copy_cmd);
     
     %% Save it out again
-    %save(orig_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog','bad_epochs');
+    save(orig_fname, 'icaunmixing', 'icatopolabel', 'data', 'eog','bad_epochs');
     
     clear SBJ_vars SBJ icaunmixing icatopolabel data eog bad_epochs
     clear b_ix bad_ix bad_neg cfg ch_ix copy_fname ear_lab1 ear_lab2 ears_neg

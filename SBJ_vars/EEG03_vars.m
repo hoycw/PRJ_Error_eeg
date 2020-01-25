@@ -51,9 +51,12 @@ SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
-    };
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [2];
-SBJ_vars.ica_reject = [1 3 4 7 8 10 11 12 16 19 26 27 28 29 33 37 41 44 46 47 50 51 52 53 56 58 59 60 61 62];
+    }; % Maybe T7
+SBJ_vars.trial_reject_ix = [53, 187, 374];
+SBJ_vars.trial_reject_ix_oddball = [1, 2, 144, 183, 235, 321, 388, 389, 390];
+SBJ_vars.ica_reject = [1 4 10 11 12 19 20 26 32 33 34 41 43 44 47 50 51 52 54 55 61 62 63 64];
 SBJ_vars.tt_trigger_ix = 404;
 SBJ_vars.odd_trigger_ix = 3;
+% Most 100 - 200 range for variance
+% Max = 7
+% Just O2 is a little drift-y

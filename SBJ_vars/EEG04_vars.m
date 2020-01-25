@@ -54,8 +54,10 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
  'Iz','POz','T8'
     };
-SBJ_vars.trial_reject_ix = [46 47];
-SBJ_vars.trial_reject_ix_oddball = [4 5 6 7 12 13 32];
-SBJ_vars.ica_reject = [1, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 19, 20, 22, 28, 29, 32, 33, 34, 40, 41, 45, 47, 50, 53, 61];
+SBJ_vars.trial_reject_ix = [44 46 47 429];
+SBJ_vars.trial_reject_ix_oddball = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 19 20:32 34 39:42 45:48 53 61:69 81 226 384];
+%A lot of oddball trials!!
+SBJ_vars.ica_reject = [1, 4, 6, 7, 9, 10, 11, 13, 15, 18, 21, 27, 28, 32, 36, 37, 41, 50, 55, 60, 61];
 SBJ_vars.tt_trigger_ix = 404;
 SBJ_vars.odd_trigger_ix = 3;
+%variance 100 - 300
