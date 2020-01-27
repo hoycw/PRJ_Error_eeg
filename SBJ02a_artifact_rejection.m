@@ -199,4 +199,8 @@ save(clean_data_fname, '-v7.3', 'trials', 'cfg_trl', 'ica', 'heog_ics', 'veog_ic
 clean_bhv_fname = [SBJ_vars.dirs.events SBJ '_behav_' proc_id '_02a.mat'];
 save(clean_bhv_fname, '-v7.3', 'bhv', 'bhv_fields');
 
+% Save excluded trial indices
+excluded_fname = [SBJ_vars.dirs.events SBJ '_' proc_id '_02a_orig_exclude_trial_ix.mat'];
+save(excluded_fname,'-v7.3','bad_raw_trials','training_ix','rt_low_ix','rt_high_ix','exclude_trials');
+
 end

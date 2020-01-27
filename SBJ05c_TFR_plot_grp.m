@@ -1,5 +1,5 @@
 function SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,save_fig,varargin)
-%% Plot ERPs for single SBJ
+%% Plot TFRs averaged across the group
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
 
@@ -21,8 +21,6 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-        elseif strcmp(varargin{v},'write_report')
-            write_report = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -54,7 +52,7 @@ for s = 1:numel(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
     eval(SBJ_vars_cmd);
     load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
-    tmp = load([SBJ_vars.dirs.proc,SBJs{s},'_',an_id,'.mat']);
+    tmp = load([SBJ_vars.dirs.proc SBJs{s} '_' proc_id '_' an_id '.mat']);
     for cond_ix = 1:numel(cond_lab)
         cfgs = [];
         cfgs.trials = find(fn_condition_index(cond_lab(cond_ix), bhv));
@@ -71,7 +69,7 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' conditions '/' an_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' an_id '/' conditions '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end

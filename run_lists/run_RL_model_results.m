@@ -24,7 +24,7 @@ SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','E
 
 %% Single SBJ RL Model
 proc_id   = 'eeg_full_ft';
-stat_ids  = {'RLpRTulD_all_lme_st0t5'};%'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5','RLpRTlD_all_lme_st0t5'};
+stat_ids  = {'RLpRTulD_all_lme_st0t5','RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5','RLpRTlD_all_lme_st0t5'};
 % RL models:
 %   RL/pWinPEus (original) = pWin, sPE, uPE
 %   RLRT = RL + tRT
@@ -86,7 +86,8 @@ end
 %% Power: Linear Mixed Effects Model (Over Time)
 % conditions = 'DifFB';
 proc_id   = 'eeg_full_ft';
-an_ids    = {'POW_FCz_F2t1_dm2t0_fl4t8'};%'POW_Fz_F2t1_dm2t0_fl4t8','POW_Fz_F2t1_dm2t0_fl1t3','POW_Pz_F2t1_dm2t0_fl1t3'};
+an_ids     = {'TFR_Fz_F2t1_z2t0_fl1t14','TFR_Pz_F2t1_z2t0_fl1t14'};
+% an_ids    = {'POW_FCz_F2t1_dm2t0_fl4t8'};%'POW_Fz_F2t1_dm2t0_fl4t8','POW_Fz_F2t1_dm2t0_fl1t3','POW_Pz_F2t1_dm2t0_fl1t3'};
 stat_ids  = {'RLpRTlD_all_lme_st0t5'};%'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
 plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig  = 1;

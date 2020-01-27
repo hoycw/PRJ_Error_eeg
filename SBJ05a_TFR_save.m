@@ -1,5 +1,5 @@
 function SBJ05a_TFR_save(SBJ, proc_id, an_id)
-% Filter data to create time-frequency representation (TFR):
+% Filter SBJ data to create time-frequency representation (TFR):
 %   Reconstruct and clean raw data, filter, cut trials to event, select channels, save
 % INPUTS:
 %   SBJ [str] - ID of subject to run
@@ -106,7 +106,6 @@ end
 if any(cfg_trl.trl(:,1)<1)
     cfg_trl.trl(cfg_trl.trl(:,1)<1,:) = [];
 end
-event_onsets = cfg_trl.trl(:,1)-cfg_trl.trl(:,3);
 
 % Cut trials
 trials = ft_redefinetrial(cfg_trl, clean_data);
@@ -118,56 +117,41 @@ if round(trial_lim_s_pad(1)+1/trials.fsample,3) < round(trials.time{1}(1),3) || 
 end
 
 %% Remove bad trials
-% NOTE: exclude_trials from SBJ01 was not saved, so must be re-computed...
-% Find trials that overlap with bad_epochs from raw visual inspection
-load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
-if ~isempty(bad_epochs)
-    bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(clean_data.trial{1},2),...
-        event_onsets,proc.trial_lim_s*clean_data.fsample);
-else
-    bad_raw_trials = [];
-end
-
-% Identify training and bad behavioral trials
-%!!! error: the bhv fields don't match, so I somehow have old bhv files!
 [bhv_orig] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
-training_ix = find(bhv_orig.blk==0);
-rt_low_ix   = find(bhv_orig.rt <= proc.rt_bounds(1));
-rt_high_ix  = find(bhv_orig.rt >= proc.rt_bounds(2));
-exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
-fprintf(2,'\tWarning: Removing %i trials (%i bad_raw, %i training, %i rts)\n', numel(exclude_trials),...
+load([SBJ_vars.dirs.events SBJ '_' proc_id '_02a_orig_exclude_trial_ix.mat']);
+fprintf(2,'\tWarning: Removing %d trials (%d bad_raw, %d training, %d rts)\n', numel(exclude_trials),...
     numel(bad_raw_trials), numel(training_ix), numel(rt_low_ix)+numel(rt_high_ix));
 
-% Exclude original bad trials from SBJ02a (bad_epochs, training, RT outliers
+% Exclude original bad trials from SBJ02a (bad_epochs, training, RT outliers)
 %   Also select only channels in an.ROI!
 cfgs = [];
 cfgs.trials = setdiff([1:numel(trials.trial)], exclude_trials');
+cfgs.channel = an.ROI;
 trials = ft_selectdata(cfgs, trials);
 
-bhv_fields = fieldnames(bhv);
+bhv_fields = fieldnames(bhv_orig);
 for f_ix = 1:numel(bhv_fields)
-    bhv.(bhv_fields{f_ix})(exclude_trials) = [];
+    bhv_orig.(bhv_fields{f_ix})(exclude_trials) = [];
 end
 
 % Exclude variance-based outlier trials from SBJ02b/c
 cfgs = [];
-cfgs.trials  = setdiff([1:numel(clean_trials.trial)], SBJ_vars.trial_reject_ix);
-cfgs.channel = an.ROI;
-clean_trials = ft_selectdata(cfgs, clean_trials);
+cfgs.trials  = setdiff([1:numel(trials.trial)], SBJ_vars.trial_reject_ix);
+clean_trials = ft_selectdata(cfgs, trials);
 
 for f_ix = 1:numel(bhv_fields)
-    bhv.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix) = [];
+    bhv_orig.(bhv_fields{f_ix})(SBJ_vars.trial_reject_ix) = [];
 end
 
 % Check that behavioral and EEG event triggers line up
-if (numel(bhv.trl_n))~=numel(event_onsets)
-    error(['Mismatch in behavioral and neural trial counts: ' num2str((numel(bhv.trl_n)))...
-        ' behavioral; ' num2str(numel(event_onsets)) ' neural']);
+if numel(bhv_orig.trl_n)~=numel(bhv.trl_n)
+    error(['Mismatch in loaded and reconstructed final behavioral trial counts: ' ...
+        num2str(numel(bhv.trl_n)) ' loaded; ' num2str(numel(bhv_orig.trl_n)) ' reconstructed']);
 end
 
 %% Filter data
 % all cfg_tfr options are specified in the an_vars
-tfr_full = ft_freqanalysis(cfg_tfr, clean_data);
+tfr_full = ft_freqanalysis(cfg_tfr, clean_trials);
 
 % Trim padding off
 cfgs = [];
@@ -190,9 +174,9 @@ switch an.bsln_type
 end
 
 %% Save Results
-data_out_fname = [SBJ_vars.dirs.proc SBJ '_' an_id '.mat'];
+data_out_fname = [SBJ_vars.dirs.proc SBJ '_' proc_id '_' an_id '.mat'];
 fprintf('Saving %s\n',data_out_fname);
-save(data_out_fname,'tfr');
+save(data_out_fname,'-v7.3','tfr');
 
 end
 

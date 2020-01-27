@@ -1,5 +1,5 @@
 function SBJ05b_TFR_plot(SBJ,conditions,proc_id,an_id,save_fig,varargin)
-%% Plot ERPs for single SBJ
+%% Plot TFRs for single SBJ
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
 
@@ -41,7 +41,7 @@ eval(an_vars_cmd);
 %eval(plt_vars_cmd);
 
 % Load data
-load([SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat']);
+load([SBJ_vars.dirs.proc SBJ '_' proc_id '_' an_id '.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 % Select conditions (and trials)
@@ -55,7 +55,7 @@ end
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' conditions '/' an_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' an_id '/' conditions '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -83,7 +83,7 @@ for ch_ix = 1:numel(tfr.label)
         ft_singleplotTFR(cfgplt, tfr);
         title([tfr.label{ch_ix} ': ' cond_lab{cond_ix}]);
         xlabel('Time (s)');
-        ylabel('Frequenncy (Hz)');
+        ylabel('Frequency (Hz)');
         set(gca,'FontSize',16);
     end
     
