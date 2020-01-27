@@ -56,9 +56,9 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ05d_TFR_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-%         SBJ05e_TFR_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        %SBJ05d_TFR_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ05e_TFR_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Model Comparison Plots (Adjusted R-Squared)
