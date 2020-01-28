@@ -25,14 +25,15 @@ SBJs = {'EEG01','EEG03','EEG04','EEG05','EEG06'};
 
 %% Compute TFRs
 proc_id    = 'eeg_full_ft';
-an_ids     = {'TFR_Fz_F2t1_z2t0_fl1t14','TFR_Pz_F2t1_z2t0_fl1t14'};
+an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12b05'};%'TFR_Fz_F2t1_z2t05_fl1t14','TFR_Fz_F2t1_rc2t0_fl1t14','TFR_Fz_F2t1_db2t0_fl1t14'};
+%an_ids = {'TFR_Fz_F2t1_z2t0_fl1t14','TFR_Pz_F2t1_z2t0_fl1t14'};
 conditions = 'DifFB';
 % plt_id    = 'ts_F4t1_evnts_sigLine';%'ts_F2to1_evnts_sigLine';
 save_fig    = 1;
 fig_vis     = 'on';
 fig_ftype  = 'png';
 
-for an_ix = 2:numel(an_ids)
+for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
         SBJ05b_TFR_plot(SBJs{s}, conditions, proc_id, an_ids{an_ix}, save_fig,...
@@ -46,7 +47,8 @@ end
 %% Power: Linear Mixed Effects Model (Over Time)
 % conditions = 'DifFB';
 proc_id   = 'eeg_full_ft';
-an_ids     = {'TFR_Fz_F2t1_z2t0_fl1t14','TFR_Pz_F2t1_z2t0_fl1t14'};
+an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12b05'};%{'TFR_Fz_F2t1_z2t05_fl1t14','TFR_Fz_F2t1_rc2t0_fl1t14','TFR_Fz_F2t1_db2t0_fl1t14'};
+%an_ids     = {'TFR_Fz_F2t1_z2t0_fl1t14','TFR_Pz_F2t1_z2t0_fl1t14'};
 % an_ids    = {'POW_FCz_F2t1_dm2t0_fl4t8'};%'POW_Fz_F2t1_dm2t0_fl4t8','POW_Fz_F2t1_dm2t0_fl1t3','POW_Pz_F2t1_dm2t0_fl1t3'};
 stat_ids  = {'RLpRTulD_all_lme_st0t5'};%'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
 plt_id    = 'ts_F2to1_evnts_sigLine';
@@ -56,7 +58,7 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        %SBJ05d_TFR_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ05d_TFR_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
         SBJ05e_TFR_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end

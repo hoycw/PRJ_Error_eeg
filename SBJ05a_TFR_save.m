@@ -173,6 +173,14 @@ switch an.bsln_type
         error(['No baseline implemented for an.bsln_type: ' an.bsln_type]);
 end
 
+%% Merge multiple bands
+if an.avgoverfreq
+    cfg_avg = [];
+    cfg_avg.freq = 'all';
+    cfg_avg.avgoverfreq = 'yes';
+    tfr = ft_selectdata(cfg_avg,tfr);
+end
+
 %% Save Results
 data_out_fname = [SBJ_vars.dirs.proc SBJ '_' proc_id '_' an_id '.mat'];
 fprintf('Saving %s\n',data_out_fname);
