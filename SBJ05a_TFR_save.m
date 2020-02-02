@@ -1,6 +1,7 @@
 function SBJ05a_TFR_save(SBJ, proc_id, an_id)
 % Filter SBJ data to create time-frequency representation (TFR):
 %   Reconstruct and clean raw data, filter, cut trials to event, select channels, save
+%   If POW (an_avgoverfreq == 1), average across frequencies
 % INPUTS:
 %   SBJ [str] - ID of subject to run
 %   proc_id [str] - ID of preprocessing pipeline

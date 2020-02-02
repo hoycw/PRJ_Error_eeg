@@ -1,4 +1,4 @@
-function SBJ04d_ERP_plot_stats_LME_RL_topo_cond(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots group RL beta topographies with significance for ERPs
 %   Only for single channel right now...
 
