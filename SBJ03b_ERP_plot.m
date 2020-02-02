@@ -41,7 +41,7 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 % Load data
-load([SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat']);
+load([SBJ_vars.dirs.proc SBJ '_' an_id '.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
 

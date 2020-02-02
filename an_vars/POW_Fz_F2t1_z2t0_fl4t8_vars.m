@@ -6,7 +6,7 @@ an.bsln_type   = 'zscore';
 an.bsln_lim    = [-0.2 0];
 an.bsln_boots  = 0;
 % an.demean_yn   = 'no';    % don't need this for TFRs?
-an.avgoverfreq = 0;
+an.avgoverfreq = 1;
 an.itpc        = 0;
 
 % TFR Parameters
@@ -14,8 +14,8 @@ cfg_tfr = [];
 cfg_tfr.method     = 'wavelet';
 cfg_tfr.output     = 'pow';
 cfg_tfr.taper      = 'hanning';
-cfg_tfr.foi        = [2:0.5:14];
-cfg_tfr.width      = 2; %default
+cfg_tfr.foi        = [4:8];
+cfg_tfr.width      = 3; %default
 cfg_tfr.toi        = 'all'; %-0.2:0.004:1.0;
 cfg_tfr.keeptrials = 'yes'; % need trials for stats, can average later
 cfg_tfr.keeptapers = 'no';

@@ -7,6 +7,7 @@ an.bsln_lim    = [-0.2 0];
 an.bsln_boots  = 0;
 % an.demean_yn   = 'no';    % don't need this for TFRs?
 an.avgoverfreq = 1;
+an.itpc        = 0;
 
 % TFR Parameters
 cfg_tfr = [];
