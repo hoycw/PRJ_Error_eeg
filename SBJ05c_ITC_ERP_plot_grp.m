@@ -1,4 +1,4 @@
-function SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,itc_an_id,erp_an_id,save_fig,varargin)
+function SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,itc_an_id,erp_an_id,plt_id,save_fig,varargin)
 %% Compute and plot ITPC matrix for group with ERP on top
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -42,6 +42,8 @@ if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
 if ~an.itpc; error('why run this without ITPC an_vars?'); end
 if ~strcmp(an.event_type,erp_an.event_type); error('itc and erp event mismatch!'); end
 if ~all(an.trial_lim_s==erp_an.trial_lim_s); error('itc and erp trial_lim_s mismatch!'); end
+plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
 
 % Select conditions (and trials)
 [grp_lab, ~, ~] = fn_group_label_styles(conditions);
@@ -95,8 +97,31 @@ end
 itpc_avg = nan([numel(cond_lab) numel(ch_list) numel(fois) numel(time_vec)]);
 itpc_avg(:,:,:,:) = nanmean(itpc_all,2);    % squeeze will take out ch dimension
 
+%% Get event timing for plotting
+evnt_times = zeros(size(plt.evnt_lab));
+if strcmp(an.event_type,'S')
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        switch plt.evnt_lab{evnt_ix}
+            case 'S'
+                evnt_times(evnt_ix) = 0;
+            case 'R'
+                evnt_times(evnt_ix) = prdm_vars.target;
+            case {'F','Fon'}
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
+            case 'Foff'
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
+            otherwise
+                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
+        end
+    end
+elseif strcmp(an.event_type,'F')
+    evnt_times(1) = 0;
+else
+    error('Unknown an.event_type');
+end
+
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' itc_an_id '/' conditions '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' itc_an_id '/' conditions '/' erp_an_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -134,12 +159,21 @@ for ch_ix = 1:numel(ch_list)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
         % Plot ITC Matrix
         yyaxis left
-        imagesc(time_vec, 1:numel(fois), squeeze(itpc_avg(cond_ix,ch_ix,:,:)),[min(clim(:,1)) max(clim(:,2))]);
+        %contourf(time_vec, fois, squeeze(itpc_avg(cond_ix,ch_ix,:,:)));
+        imagesc(time_vec, fois, squeeze(itpc_avg(cond_ix,ch_ix,:,:)));% 1:numel(fois)
         set(gca,'YDir','normal');
-        set(gca,'YTick',1:3:numel(fois));
-        set(gca,'YTickLabels',yticklab);
+%         set(gca,'YTick',1:3:numel(fois));
+%         set(gca,'YTickLabels',yticklab);
         ylabel('Frequency (Hz)');
+        caxis([min(clim(:,1)) max(clim(:,2))]);
         colorbar('northoutside');
+        
+        % Plot Events
+        for evnt_ix = 1:numel(plt.evnt_lab)
+            line([evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+                'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
+                'LineStyle',plt.evnt_styles{evnt_ix});
+        end
         
         % Plot Means (and variance)
         yyaxis right
@@ -150,6 +184,8 @@ for ch_ix = 1:numel(ch_list)
         
         % Axis Parameters
         title([ch_list{ch_ix} ': ' cond_lab{cond_ix}]);
+        set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
+        set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');
         set(gca,'FontSize',16);
     end

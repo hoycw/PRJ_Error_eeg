@@ -1,5 +1,5 @@
-function SBJ05b_ITC_ERP_plot(SBJ,conditions,proc_id,itc_an_id,erp_an_id,plt_id,save_fig,varargin)
-%% Compute and plot ITPC matrix for single SBJ; plot ERP on top
+function SBJ05c_TFR_ERP_plot_grp(SBJs,conditions,proc_id,tfr_an_id,erp_an_id,plt_id,save_fig,varargin)
+%% Plot TFRs averaged across the group
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
 
@@ -33,23 +33,16 @@ if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Load Results
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' erp_an_id '_vars.m'];
 eval(an_vars_cmd);
 erp_an = an;
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' itc_an_id '_vars.m'];
+an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' tfr_an_id '_vars.m'];
 eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
-if ~an.itpc; error('why run this without ITPC an_vars?'); end
 if ~strcmp(an.event_type,erp_an.event_type); error('itc and erp event mismatch!'); end
+if ~all(an.trial_lim_s==erp_an.trial_lim_s); error('itc and erp trial_lim_s mismatch!'); end
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
-
-% Load data
-load([SBJ_vars.dirs.proc SBJ '_' erp_an_id '.mat']);
-load([SBJ_vars.dirs.proc SBJ '_' proc_id '_' itc_an_id '.mat']);
-load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 % Select conditions (and trials)
 [grp_lab, ~, ~] = fn_group_label_styles(conditions);
@@ -59,26 +52,42 @@ grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
-cond_idx = fn_condition_index(cond_lab, bhv);
 
-% Get trials for plotting
-trials = cell(size(cond_lab));
-for cond_ix = 1:numel(cond_lab)
-    cond_trial_ix = find(cond_idx==cond_ix);
-    trials{cond_ix} = nan([numel(roi.label) numel(cond_trial_ix) numel(roi.time{1})]);
-    for t_ix = 1:numel(cond_trial_ix)
-        trials{cond_ix}(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
+% Load data
+tfr_all = cell([numel(cond_lab) numel(SBJs)]);
+for s = 1:numel(SBJs)
+    fprintf('-------------------- Processing %s ------------------------\n',SBJs{s});
+    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
+    eval(SBJ_vars_cmd);
+    load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
+    load([SBJ_vars.dirs.proc SBJs{s} '_' erp_an_id '.mat'],'roi');
+    load([SBJ_vars.dirs.proc SBJs{s} '_' proc_id '_' tfr_an_id '.mat'],'tfr');
+    
+    if s==1
+        roi_time_vec = roi.time{1};
+        means    = nan([numel(cond_lab) numel(SBJs) numel(tfr.label) numel(roi_time_vec)]);
     end
+    
+    cfgs = []; cfgs.avgovertrials = 'yes';
+    for cond_ix = 1:numel(cond_lab)
+        cond_trial_ix = find(fn_condition_index(cond_lab(cond_ix), bhv));
+        cfgs.trials = cond_trial_ix;
+        tfr_all{cond_ix, s} = ft_freqdescriptives(cfgs, tfr);
+        
+        % ERP Computation
+        trials = nan([numel(tfr.label) numel(cond_trial_ix) numel(roi_time_vec)]);
+        for t_ix = 1:numel(cond_trial_ix)
+            trials(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
+        end
+        means(cond_ix,s,:,:) = mean(trials,2);
+    end
+    clear bhv tfr SBJ_vars
 end
 
-%% Inter-Trial Phase Coherence
-itpc = cell(size(cond_lab));
+% Average across SBJs
+tfr_avg = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
-    % Compute ITPC
-    F = tfr.fourierspctrm(cond_idx==cond_ix,:,:,:);
-    itpc{cond_ix} = F./abs(F);       % Normalize to unit circle
-    itpc{cond_ix} = sum(itpc{cond_ix},1);     % Sum phase angles
-    itpc{cond_ix} = abs(itpc{cond_ix})/sum(cond_idx==cond_ix);     % Get mean of angles for consistency
+    tfr_avg{cond_ix} = ft_freqgrandaverage([], tfr_all{cond_ix,:});
 end
 
 %% Get event timing for plotting
@@ -105,53 +114,51 @@ else
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' itc_an_id '/' conditions '/' erp_an_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' tfr_an_id '/' conditions '/' erp_an_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 % Create a figure for each channel
-for ch_ix = 1:numel(tfr.label)
+for ch_ix = 1:numel(tfr_avg{1}.label)
     %% Compute plotting data    
     % Compute means and variance
-    means = NaN([numel(cond_lab) numel(roi.time{1})]);
-    sems  = NaN([numel(cond_lab) numel(roi.time{1})]);
+    plt_means = NaN([numel(cond_lab) numel(roi_time_vec)]);
+    sems  = NaN([numel(cond_lab) numel(roi_time_vec)]);
     for cond_ix = 1:numel(cond_lab)
-        means(cond_ix,:) = squeeze(mean(trials{cond_ix}(ch_ix,:,:),2));
-        sems(cond_ix,:) = squeeze(std(trials{cond_ix}(ch_ix,:,:),[],2))./sqrt(size(trials{cond_ix},2))';
+        plt_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
+        sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
     end
     
     %% Create plot
-    fig_name = [SBJ '_' conditions '_' itc_an_id '_' erp_an_id '_' tfr.label{ch_ix}];
+    fig_name = ['GRP_' conditions '_' tfr_an_id '_' erp_an_id '_' tfr_avg{1}.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
     % Get color lims per condition
     clim = zeros([numel(cond_lab) 2]);
     for cond_ix = 1:numel(cond_lab)
-        vals = itpc{cond_ix}(1,ch_ix,:,:);
-        clim(cond_ix,:) = [min(vals(:)) max(vals(:))];
+        clim(cond_ix,:) = [min(tfr_all{cond_ix}.powspctrm(:)) max(tfr_all{cond_ix}.powspctrm(:))];
     end
-    tick_ix = 1:3:numel(tfr.freq);
+    tick_ix = 1:3:numel(tfr_all{1}.freq);
     yticklab = cell(size(tick_ix));
     for f = 1:numel(tick_ix)
-        yticklab{f} = num2str(tfr.freq(tick_ix(f)),'%.1f');
+        yticklab{f} = num2str(tfr_all{1}.freq(tick_ix(f)),'%.1f');
     end
     
     % Condition Plots
+    %cfgplt = []; cfgplt.zlim = clim;
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
-        % Plot ITC Matrix
         yyaxis left
-        %contourf(tfr.time, tfr.freq, squeeze(itpc{cond_ix}(1,ch_ix,:,:)));
-        imagesc(tfr.time, tfr.freq, squeeze(itpc{cond_ix}(1,ch_ix,:,:)));% 1:numel(tfr.freq)
+        imagesc(tfr_all{cond_ix}.time, tfr_all{cond_ix}.freq, squeeze(tfr_all{cond_ix}.powspctrm(ch_ix,:,:)));%1:numel(tfr_all{cond_ix}.freq)
         set(gca,'YDir','normal');
-%         set(gca,'YTick',1:3:numel(tfr.freq));
+%         set(gca,'YTick',1:3:numel(tfr_all{cond_ix}.freq));
 %         set(gca,'YTickLabels',yticklab);
-        ylabel('Frequency (Hz)');
         caxis([min(clim(:,1)) max(clim(:,2))]);
         colorbar('northoutside');
-        
+        ylabel('Frequency (Hz)');
+
         % Plot Events
         for evnt_ix = 1:numel(plt.evnt_lab)
             line([evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
@@ -161,23 +168,23 @@ for ch_ix = 1:numel(tfr.label)
         
         % Plot Means (and variance)
         yyaxis right
-        shadedErrorBar(roi.time{1}, means(cond_ix,:), sems(cond_ix,:),...
+        shadedErrorBar(roi_time_vec, plt_means(cond_ix,:), sems(cond_ix,:),...
                 'lineProps',{'Color','k','LineWidth',2,...
                 'LineStyle','-'},'patchSaturation',0.3);
         ylabel('Amplitude (uV)');
         
-        title([tfr.label{ch_ix} ': ' cond_lab{cond_ix}]);
+        title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix}]);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');
         set(gca,'FontSize',16);
     end
     
-    % Save Figure
+    % Save figure
     if save_fig
-        fig_fname = [fig_dir fig_name '.' fig_ftype];
-        fprintf('Saving %s\n',fig_fname);
-        saveas(gcf,fig_fname);
+        fig_filename = [fig_dir fig_name '.png'];
+        fprintf('Saving %s\n',fig_filename);
+        saveas(gcf,fig_filename);
     end
 end
 

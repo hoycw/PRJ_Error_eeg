@@ -115,11 +115,12 @@ for ch_ix = 1:numel(st_tfr.label)
 %         set(axes(reg_ix),'YTickLabels',yticklab);
         set(axes(reg_ix),'YLim',[min(fois) max(fois)]);
         set(axes(reg_ix),'XLim',[min(st_time_vec) max(st_time_vec)]);
+        set(axes(reg_ix),'XTick',[min(st_time_vec):0.1:max(st_time_vec)]);
         %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
         title([st_tfr.label{ch_ix} ': ' reg_lab{reg_ix} ' Beta']);
         xlabel('Time (s)');
         ylabel('Frequency (Hz)');
-        colorbar;
+        colorbar('northoutside');
         set(axes(reg_ix),'FontSize',16);
     end
     
@@ -132,11 +133,12 @@ for ch_ix = 1:numel(st_tfr.label)
 %     set(axes(numel(reg_lab)+1),'YTickLabels',yticklab);
     set(axes(numel(reg_lab)+1),'YLim',[min(fois) max(fois)]);
     set(axes(numel(reg_lab)+1),'XLim',[min(st_time_vec) max(st_time_vec)]);
+    set(axes(numel(reg_lab)+1),'XTick',[min(st_time_vec):0.1:max(st_time_vec)]);
     %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
     title([st_tfr.label{ch_ix} ': R2']);
     xlabel('Time (s)');
     ylabel('Frequency (Hz)');
-    colorbar;
+    colorbar('northoutside');
     set(gca,'FontSize',16);
     
     % Save figure

@@ -1,4 +1,4 @@
-function SBJ05b_TFR_plot(SBJ,conditions,proc_id,an_id,save_fig,varargin)
+function SBJ05b_TFR_plot(SBJ,conditions,proc_id,an_id,plt_id,save_fig,varargin)
 %% Plot TFRs for single SBJ
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -37,8 +37,8 @@ SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m']
 eval(SBJ_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
-%plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
-%eval(plt_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
 
 % Load data
 load([SBJ_vars.dirs.proc SBJ '_' proc_id '_' an_id '.mat']);
@@ -53,6 +53,38 @@ for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 cond_idx = fn_condition_index(cond_lab, bhv);
+
+% Get trials for plotting
+plt_tfr = cell(size(cond_lab));
+cfgs = []; cfgs.avgoverrpt = 'yes';
+for cond_ix = 1:numel(cond_lab)
+    cond_trial_ix = find(cond_idx==cond_ix);
+    cfgs.trials = cond_trial_ix;
+    plt_tfr{cond_ix} = ft_selectdata(cfgs, tfr);
+end
+
+%% Get event timing for plotting
+evnt_times = zeros(size(plt.evnt_lab));
+if strcmp(an.event_type,'S')
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        switch plt.evnt_lab{evnt_ix}
+            case 'S'
+                evnt_times(evnt_ix) = 0;
+            case 'R'
+                evnt_times(evnt_ix) = prdm_vars.target;
+            case {'F','Fon'}
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
+            case 'Foff'
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
+            otherwise
+                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
+        end
+    end
+elseif strcmp(an.event_type,'F')
+    evnt_times(1) = 0;
+else
+    error('Unknown an.event_type');
+end
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' an_id '/' conditions '/'];
@@ -75,13 +107,28 @@ for ch_ix = 1:numel(tfr.label)
     end
     
     % Condition Plots
-    cfgplt = [];
-    cfgplt.zlim = [min(clim(:,1)) max(clim(:,2))];
+%     cfgplt = [];
+%     cfgplt.zlim = [min(clim(:,1)) max(clim(:,2))];
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
-        cfgplt.trials = find(cond_idx==cond_ix);
-        ft_singleplotTFR(cfgplt, tfr);
+        % Plot TFR
+        imagesc(tfr.time, tfr.freq, squeeze(plt_tfr{cond_ix}.powspctrm(ch_ix,:,:)));% 1:numel(tfr.freq)
+        set(gca,'YDir','normal');
+        caxis([min(clim(:,1)) max(clim(:,2))]);
+        colorbar;
+%         cfgplt.trials = find(cond_idx==cond_ix);
+%         ft_singleplotTFR(cfgplt, tfr);
+        
+        % Plot Events
+        for evnt_ix = 1:numel(plt.evnt_lab)
+            line([evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+                'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
+                'LineStyle',plt.evnt_styles{evnt_ix});
+        end
+        
         title([tfr.label{ch_ix} ': ' cond_lab{cond_ix}]);
+        set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
+        set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');
         ylabel('Frequency (Hz)');
         set(gca,'FontSize',16);
