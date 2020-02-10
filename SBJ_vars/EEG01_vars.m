@@ -53,9 +53,9 @@ SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'AF8', 'PO4', 'AF7'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
-SBJ_vars.trial_reject_ix = [57 125 171 156 197 410 446 171 190 299];
+SBJ_vars.trial_reject_ix = [1 88 89 156 171 189 190 194 197 198 200 211 250 272 299 300 323 331 336 337 360 410 434 438 446 462 522 534];
 SBJ_vars.ica_reject = [1 3 6 7 8 10 11 12 13 16 17 19 20 21 25 28 29 31 33 34 36 39 40 41 42 46 48 50 52 55 56 57 58 59 60 61];
-SBJ_vars.trial_reject_ix_oddball = [191 131 132 137 355 370 373 372];
+SBJ_vars.trial_reject_ix_oddball = [76 138 345 191 131 132 137 355 356 370 373 372];
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 404;
-
+% Messy!

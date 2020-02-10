@@ -46,16 +46,21 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
-SBJ_vars.ch_lab.null = {'EXG6', 'EXG7', 'EXG8'};
-SBJ_vars.ch_lab.replace = {{'P2','EXG6'},{'PO4','EXG7'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
+SBJ_vars.ch_lab.null = {'EXG8'};
+SBJ_vars.ch_lab.replace = {}
+% {{'P2','EXG6'},{'PO4','EXG7'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
+% THESE ARE BAD
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
-'T7','TP7','P9','AF8'
+'T7','P9','AF8', 'EXG6', 'EXG7'
     };
-SBJ_vars.trial_reject_ix = [103 130 151 185 215 211 222 246 257 295];
-SBJ_vars.trial_reject_ix_oddball = [278 290 307 343 344 186];
-SBJ_vars.ica_reject = [1 3 4 5 6 7 9 10 11 13 14 17 19 21 25 32 33 41 42 43 50 51 57 58];
+SBJ_vars.trial_reject_ix = [21 42 71 100 101 128 129 183 209 212 213 214 215 219 149 220 221 242 252];
+SBJ_vars.trial_reject_ix_oddball = [25 91 115 116 121 158 276 279 280 281 292 293 297 308 309 311 344 345 346 347 363 375 376 377 390];
+SBJ_vars.ica_reject = [1 3 6 8 9 10 11 12 13 17 18 20 23 27 29 36 38 41:42 46:49 52:61];
 SBJ_vars.tt_trigger_ix = 472;
 SBJ_vars.odd_trigger_ix = 3;
+% Variance highish -- around 700
+%Max around 14
+

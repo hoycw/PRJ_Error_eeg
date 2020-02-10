@@ -53,7 +53,7 @@ SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T7','FT7','FC5','F8', 'AF8'};
 SBJ_vars.trial_reject_ix = [145 277 307 439 440 468 371 488];
-SBJ_vars.ica_reject = [1, 6, 7, 9, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 27, 28, 30, 31, 33, 34, 35, 36, 37, 38, 46:60];
+SBJ_vars.ica_reject = [1, 6, 7, 9, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 27, 28, 30, 31, 33, 34, 35, 36, 37, 38, 46:59];
 %This is a lot of rejected components
 SBJ_vars.trial_reject_ix_oddball = [69, 70, 81, 356];
 SBJ_vars.tt_trigger_ix = 404;

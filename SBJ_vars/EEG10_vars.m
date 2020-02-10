@@ -51,11 +51,13 @@ SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {...
-'Oz'
-    };
-SBJ_vars.trial_reject_ix = [220 269 392 77 194 469 ];
-SBJ_vars.trial_reject_ix_oddball = [70 108 117 118 376];
-SBJ_vars.ica_reject = [1 2 3 5 7 9 10 12 13 14 17 24 25 27 36 37 40 42 43 45 47 51 52 56 58 62 63];
+SBJ_vars.ch_lab.bad     = {'O1', 'Oz', 'Iz', 'T8'}
+SBJ_vars.trial_reject_ix = [151 194 195 217 220 221 356 392 435 524 539 269];
+SBJ_vars.trial_reject_ix_oddball = [32 51 128 168 184 70 118 179 380 108 253 290 303 339 382 304];
+SBJ_vars.ica_reject = [1 2 3 5 9 10 13 15 17 18 19 20 22 23 24 30 33 34 35 37 41 44 46 49 51:60];
 SBJ_vars.tt_trigger_ix = 404;
 SBJ_vars.odd_trigger_ix = 3;
+%Variance: most around 150 - 300, some around 400
+%Max around 10
+%Some oscillatory stuff
+

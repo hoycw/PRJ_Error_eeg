@@ -54,7 +54,7 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'O1', 'T8'};
 SBJ_vars.trial_reject_ix = [247, 320, 434];
 SBJ_vars.trial_reject_ix_oddball = [27:30 96 130 262];
-SBJ_vars.ica_reject = [1 3 5 9 11 17 19 23 30 32 34 37 38 44 45 49 52 54 57 59 61 62 63];
+SBJ_vars.ica_reject = [1 3 5 9 11 17 19 23 30 32 34 37 38 44 45 49 52 54 57 59 61 62];
 SBJ_vars.tt_trigger_ix = 404;
 SBJ_vars.odd_trigger_ix = 1;
 % Lots of Horiz Eye Movements

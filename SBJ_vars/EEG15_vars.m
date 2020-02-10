@@ -53,9 +53,9 @@ SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T7', 'T8'
     };
-SBJ_vars.trial_reject_ix = [];
-SBJ_vars.trial_reject_ix_oddball = [];
-SBJ_vars.ica_reject = [1, 6, 9, 10, 23, 24, 31, 37, 39, 40, 49, 50, 54, 56, 61, 60, 59, 58, 57];
+SBJ_vars.trial_reject_ix = [89 120 199 200 232 327 331 359 398 406 441 479 487 510 532 539];
+SBJ_vars.trial_reject_ix_oddball = [131 177 262 263 284 350];
+SBJ_vars.ica_reject = [1, 4, 6, 10, 15, 19, 23, 24, 31, 37, 39, 40, 49, 50, 54, 56, 61, 60, 59, 58, 57];
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 404;
 %HIGH VARIANCE 200 - 800, pretty thoroughly all over

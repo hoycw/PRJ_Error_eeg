@@ -50,8 +50,10 @@ SBJ_vars.ch_lab.replace = {{'POz', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'Pz', 'POz', 'Oz'};
+SBJ_vars.ch_lab.bad     = {'Pz', 'POz', 'Oz', 'P3', 'P9', 'Iz'};
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 10000;
-SBJ_vars.trial_reject_ix = [77 106 109 123 373 375 438 8 586];
-SBJ_vars.ica_reject = [1 5 11 12 13 14 15 16 17 18 19 20 22 25 27 28 35 38 41 42 45 47 49 52 54 55 56 61];
+SBJ_vars.trial_reject_ix = [8 14 76 77 81 106 109 117 122 123 138 368 371 373 379 436 529 549 570 571 584 585];
+SBJ_vars.ica_reject = [1 5 9 11 12 13 14 15 17 19 21 24 25 26 27 31 33 36 40 41 42 44 52 54 61];
+%MAx around 500 for Variance
+%Max around 20

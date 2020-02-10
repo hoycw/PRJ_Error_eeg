@@ -42,6 +42,8 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.trialdef.eventvalue = proc.event_code;        % feedback cocde
     cfg.trialdef.prestim    = proc.trial_lim_s(1);
     cfg.trialdef.poststim   = proc.trial_lim_s(2);
+    cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
+    cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
     if startsWith(SBJ, 'EEG')
         cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
         cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;

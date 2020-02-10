@@ -49,9 +49,11 @@ SBJ_vars.ch_lab.replace = {{'F1', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'T7', 'FT7', 'FC2'};
-SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
+SBJ_vars.ch_lab.bad     = {'T7', 'FT7', 'FC2', 'P9'};
+SBJ_vars.ch_lab.null    = {'EXG7', 'EXG8'};
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 10000;
-SBJ_vars.trial_reject_ix = [213 235 280 286 453];
-SBJ_vars.ica_reject = [3 10 12 13 16 21 22 23 24 28 29 35 37 38 40 42 45 48 52 53 51 54 55 56 58 59 60 61];
+SBJ_vars.trial_reject_ix = [84 162 194 211 212 213 258 285 294 452];
+SBJ_vars.ica_reject = [3 8 10 11 16 18 20 23 24 25 28 30 33 38 39 47 48 49 55 57 58 59 60]; %8???
+%MAx variance is 600
+%Max under 25

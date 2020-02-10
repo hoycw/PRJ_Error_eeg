@@ -45,13 +45,16 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
-SBJ_vars.ch_lab.replace = {{'F1', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
+SBJ_vars.ch_lab.replace = {{'Fp1', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'T7'};
+SBJ_vars.ch_lab.bad     = {'T7', 'T8', 'TP8'};
 SBJ_vars.ch_lab.null    = {'EXG7', 'EXG8'};
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 10000;
-SBJ_vars.trial_reject_ix = [189 303 289 261 234 274 277];
-SBJ_vars.ica_reject = [1 2 6 9 13 19 23 24 28 30 37 41 43 44 49 53 56 60 61 62 63];
+SBJ_vars.trial_reject_ix = [2 39 45 60 73 78 79 81 95 102 107 113 124 125 136 154 183 187 188 195 223 234 239 254 261 274 289 302 303 309 326 335 338 345 346 350 354 355];
+SBJ_vars.ica_reject = [1 2 7 9 16 18 19 23 28 30 31 32 33 35 38 40 41 47 52 56 58 57 60 61];
+%High Variance, max around 800
+%Max around 20
+%Messy data set DO OVER?

@@ -49,9 +49,10 @@ SBJ_vars.ch_lab.replace = {{'O2', 'EXG6'}}; % {{'final','EXG#'},{'final2','EXG#2
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'T8', 'FT8'};
+SBJ_vars.ch_lab.bad     = {'T8', 'FT8', 'Iz', 'O2'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 10000;
-SBJ_vars.trial_reject_ix = [19 89 151 319 333 407 481 506 445 538 553];
-SBJ_vars.ica_reject = [1 5 9 12 17 18 19 23 26 28 29 30 32 34 36 37 40 42 47 50 51 52 55 56 58 59 60 61];
+SBJ_vars.trial_reject_ix = [19 89 151 282 285 292 313 319 333 348 445 469 493 502 506 538 553];
+SBJ_vars.ica_reject = [1 3 5 11 13 17 18 19 26 29 30 33 35 39 47 48 50 51 52 55 57 58 60];
+%Max around 10 on diff

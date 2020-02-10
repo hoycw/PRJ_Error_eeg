@@ -51,9 +51,13 @@ SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {};
-SBJ_vars.trial_reject_ix = [434, 492, 133, 19, 25, 219, 253, 276, 311, 349, 357, 362, 427, 430, 451, 568];
-SBJ_vars.trial_reject_ix_oddball = [177, 374, 131];
-SBJ_vars.ica_reject = [1, 5, 6, 7, 9, 11, 12, 15, 19, 20, 22, 24, 30, 35, 42, 50, 51, 53, 54, 58, 59, 60, 62, 63, 64];
+SBJ_vars.ch_lab.bad     = {'P9', 'Iz', 'Oz', 'P1', 'PO3'}; %P1 and PO3 seem to be dead so I got rid of them
+SBJ_vars.trial_reject_ix =[25 48 35 52 71 90 134 135 277 303 307 363 367 425 429 430 432 436 453 494 506 528 544 548 569 571];
+%74, 82?
+SBJ_vars.trial_reject_ix_oddball = [118 131 168 177 274 279 290 311 328 348 374 384];
+SBJ_vars.ica_reject = [1 5 7 11 14 15 19 22 23  28 29 30 32 33 36 39 41 44 45 46 52:59 50];
 SBJ_vars.tt_trigger_ix = 404;
 SBJ_vars.odd_trigger_ix = 3;
+%High Variance = around 600 max?
+%Max around 17
+%Messy!

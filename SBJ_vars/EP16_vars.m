@@ -49,10 +49,12 @@ SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
-SBJ_vars.ch_lab.bad     = {'T8', 'FT7', 'T7', 'TP8', 'Iz'};
+SBJ_vars.ch_lab.bad     = {'FC5', 'FC3', 'Iz', 'T7'};
 SBJ_vars.ch_lab.null    = {'EXG6', 'EXG7', 'EXG8'};
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 10000;
-SBJ_vars.trial_reject_ix = [189 195 223 350 397 398 516 157 200 202 279 314 360 364 514 566];
-SBJ_vars.ica_reject = [1 4 8 15 18 22 29 34 35 37 38 40 41 42 45 47 50 52 53 54 55 58 59];
-
+SBJ_vars.trial_reject_ix = [1 5 18 24 29 41 45 76 86 87 100 109 118 119 135 145 148 141 157 159 164 175 189 195 200 202 203 223 251 252 253 256 260 269 279 297 298 314 316 318 322 350 352 360 364 388 397 398 400:405 419 422 424 451 452 456 472 516 445 446 475 484 514 566];
+SBJ_vars.ica_reject = [1 4 13 16 19 22 23 27 34 35 36 40 41 43 46 47 48 49 50 54 55 56 57 58 59 60];
+%VERY MESSY HIGH VARIANCE - Max = 1200
+%Max = 50
+%Got rid of T7, REDO
