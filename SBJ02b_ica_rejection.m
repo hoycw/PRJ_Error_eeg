@@ -26,6 +26,11 @@ load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat']);
 %% IC rejection
 cfg = [];
 cfg.component = unique([SBJ_vars.ica_reject, heog_ics, veog_ics]);
+for ix = 1:numel(cfg.component)
+    if cfg.component(ix) > numel(ica.topolabel)
+        warning('Component index is greater than number of components!');
+    end
+end
 cfg.demean = 'no';
 clean_trials = ft_rejectcomponent(cfg, ica);
 

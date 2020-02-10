@@ -1,4 +1,4 @@
-function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis)
+function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, clear_plot)
 % This function generates figures for both the ERP stacks and the ICA Plots.  Also cut out the bad trials (training, RT).
 %SBJ = 'EEG#'
 %Proc_id = 'egg_full_ft'
@@ -152,6 +152,10 @@ end
 
 %% Generate Figures
 if gen_figs
+    if clear_plot
+       dir_name = [SBJ_vars.dirs.proc 'plot/*'];
+       delete(dir_name);
+    end
     % Plot EOG-ICA Correlations
     figure('Visible',1); hold on;
     scatter(avg_eog_ic_corr(1,:),avg_eog_ic_corr(2,:));
