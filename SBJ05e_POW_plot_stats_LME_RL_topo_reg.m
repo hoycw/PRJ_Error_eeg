@@ -1,4 +1,5 @@
 function SBJ05e_POW_plot_stats_LME_RL_topo_reg(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+error('need to write spatial RL model stats first!');
 % Plots group RL beta topographies with significance for ERPs
 %   Only for single channel right now...
 

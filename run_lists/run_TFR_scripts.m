@@ -10,16 +10,16 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EEG01','EEG03','EEG04','EEG05','EEG06'};
-% SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
-%            'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG10','EEG12'};
+SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};%'EEG02',
 % Bad SBJ:
 %   EP01, EP02, EP05- recording errors
 %   EP03- low quality
-%   EP09- ???
-%   EP12- ???
-%   EP13- ???
-%   EEG05- ???
+%   EP04- weird behavior?
+%   EP09- 2 BDFs, unknown quality?
+%   EP12, 13- don't exist
+%   EP15- low quality?
+%   EEG02- low quality
 %   EEG09- multiple blocks, needs redo???
 %   EEG11- recording failure
 
