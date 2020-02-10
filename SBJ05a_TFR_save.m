@@ -1,6 +1,7 @@
 function SBJ05a_TFR_save(SBJ, proc_id, an_id)
 % Filter SBJ data to create time-frequency representation (TFR):
 %   Reconstruct and clean raw data, filter, cut trials to event, select channels, save
+%   If POW (an_avgoverfreq == 1), average across frequencies
 % INPUTS:
 %   SBJ [str] - ID of subject to run
 %   proc_id [str] - ID of preprocessing pipeline
@@ -169,8 +170,22 @@ switch an.bsln_type
         cfgbsln.baselinetype = an.bsln_type;
         cfgbsln.parameter    = 'powspctrm';
         tfr = ft_freqbaseline(cfgbsln,tfr);
+    case 'none'
+        if an.itpc
+            fprintf('\tNo baseline correction for ITPC data...\n');
+        else
+            error('Why no baseline correction if not ITPC?');
+        end
     otherwise
         error(['No baseline implemented for an.bsln_type: ' an.bsln_type]);
+end
+
+%% Merge multiple bands
+if an.avgoverfreq
+    cfg_avg = [];
+    cfg_avg.freq = 'all';
+    cfg_avg.avgoverfreq = 'yes';
+    tfr = ft_selectdata(cfg_avg,tfr);
 end
 
 %% Save Results

@@ -107,8 +107,8 @@ for ch_ix = 1:numel(ch_list)
     main_lines = gobjects([numel(cond_lab)+numel(an.event_type) 1]);
     for cond_ix = 1:numel(cond_lab)
         ebars{cond_ix} = shadedErrorBar(time_vec, plt_means(cond_ix,:), sems(cond_ix,:),...
-            {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
-            'LineStyle',cond_styles{cond_ix}},plt.errbar_alpha);
+            'lineProps',{'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
+            'LineStyle',cond_styles{cond_ix}},'patchSaturation',plt.errbar_alpha);
         main_lines(cond_ix) = ebars{cond_ix}.mainLine;
     end
     

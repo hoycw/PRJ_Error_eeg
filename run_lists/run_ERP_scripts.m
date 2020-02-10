@@ -11,14 +11,15 @@ ft_defaults
 
 %% General parameters
 SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
-           'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG10','EEG12'};
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};%'EEG02',
 % Bad SBJ:
 %   EP01, EP02, EP05- recording errors
 %   EP03- low quality
-%   EP09- ???
-%   EP12- ???
-%   EP13- ???
-%   EEG05- ???
+%   EP04- weird behavior?
+%   EP09- 2 BDFs, unknown quality?
+%   EP12, 13- don't exist
+%   EP15- low quality?
+%   EEG02- low quality
 %   EEG09- multiple blocks, needs redo???
 %   EEG11- recording failure
 
@@ -41,27 +42,34 @@ plot_final_check = 0;
 % end
 
 %% View basic ERPs
-proc_id    = 'eeg_full_ft';
-an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
+%   RL Model Analysis:
+an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 conditions = 'DifFB';
+% %   Pre-Feedback RL Model Analysis:
+% an_ids     = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
+% conditions = 'DifFB';
+%   QA Plotting:
+% an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
+% conditions = 'Dif';%FB
+
+proc_id    = 'eeg_full_ft';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for st_ix = 1:numel(conditions)
+for an_ix = 1:numel(an_ids)
     plt_id     = 'ts_F2to1_evnts_sigLine';
     for s = 1:numel(SBJs)
-        SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
-        SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+        SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
+        SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-    SBJ03c_ERP_plot_grp(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+    SBJ03c_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
-    plt_id = 'ts_F2to1_but_evnts_sigPatch';
-    SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    
+%     plt_id = 'ts_F2to1_but_evnts_sigPatch';
+%     SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     close all;
 end
 

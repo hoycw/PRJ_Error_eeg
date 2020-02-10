@@ -135,13 +135,16 @@ end
 fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),numel(ica.label));
 
 %% Combine Criteria
-var_ic_idx = true(size(ica.label));
-if isfield(cpa,'ic_rank_max')
-    % Select components ranked highest when ordered by variance
-    var_ic_idx(cpa.ic_rank_max+1:end) = false;
-end
+% var_ic_idx = true(size(ica.label));
+% if isfield(cpa,'ic_rank_max')
+%     % Select components ranked highest when ordered by variance
+%     var_ic_idx(cpa.ic_rank_max+1:end) = false;
+% end
+good_ic_idx = true(size(ica.label));
+good_ic_idx(SBJ_vars.ica_reject) = false;
+fprintf('%s: %d / %d components were kept in cleaning!\n',SBJ,sum(good_ic_idx),numel(ica.label));
 
-final_ics = find(all([time_ic_idx, space_ic_idx, var_ic_idx],2));
+final_ics = find(all([time_ic_idx, space_ic_idx, good_ic_idx],2));
 fprintf('%s: %d / %d components selected!\n',SBJ,numel(final_ics),numel(ica.label));
 if sum(final_ics)<1
     error('No ICs found that match all criteria!');
@@ -164,8 +167,8 @@ for f_ix = 1:numel(final_ics)
     main_lines = gobjects([numel(cond_lab)+1 1]);
     for cond_ix = 1:numel(cond_lab)
         ebars{cond_ix} = shadedErrorBar(ica.time{1}, means(cond_ix, comp_ix, :), sems(cond_ix, comp_ix, :),...
-            {'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
-            'LineStyle',cond_styles{cond_ix}},plt.errbar_alpha);
+            'lineProps',{'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
+            'LineStyle',cond_styles{cond_ix}},'patchSaturation',plt.errbar_alpha);
         hold on
         main_lines(cond_ix) = ebars{cond_ix}.mainLine;
     end

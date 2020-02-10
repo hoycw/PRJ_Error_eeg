@@ -1,4 +1,4 @@
-function SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,save_fig,varargin)
+function SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,plt_id,save_fig,varargin)
 %% Plot TFRs averaged across the group
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -35,6 +35,8 @@ if ischar(save_fig); save_fig = str2num(save_fig); end
 %% Load Results
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
 
 % Select conditions (and trials)
 [grp_lab, ~, ~] = fn_group_label_styles(conditions);
@@ -68,6 +70,29 @@ for cond_ix = 1:numel(cond_lab)
     tfr_avg{cond_ix} = ft_freqgrandaverage([], tfr_all{cond_ix,:});
 end
 
+%% Get event timing for plotting
+evnt_times = zeros(size(plt.evnt_lab));
+if strcmp(an.event_type,'S')
+    for evnt_ix = 1:numel(plt.evnt_lab)
+        switch plt.evnt_lab{evnt_ix}
+            case 'S'
+                evnt_times(evnt_ix) = 0;
+            case 'R'
+                evnt_times(evnt_ix) = prdm_vars.target;
+            case {'F','Fon'}
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
+            case 'Foff'
+                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
+            otherwise
+                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
+        end
+    end
+elseif strcmp(an.event_type,'F')
+    evnt_times(1) = 0;
+else
+    error('Unknown an.event_type');
+end
+
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' an_id '/' conditions '/'];
 if ~exist(fig_dir,'dir')
@@ -96,12 +121,23 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
     %cfgplt = []; cfgplt.zlim = clim;
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
+        % Plot TFR
         imagesc(tfr_all{cond_ix}.time, 1:numel(tfr_all{cond_ix}.freq), squeeze(tfr_all{cond_ix}.powspctrm(ch_ix,:,:)),[min(clim(:,1)) max(clim(:,2))]);
         set(gca,'YDir','normal');
         set(gca,'YTick',1:3:numel(tfr_all{cond_ix}.freq));
         set(gca,'YTickLabels',yticklab);
         %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
+        
+        % Plot Events
+        for evnt_ix = 1:numel(plt.evnt_lab)
+            line([evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+                'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
+                'LineStyle',plt.evnt_styles{evnt_ix});
+        end
+        
         title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix}]);
+        set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
+        set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');
         ylabel('Frequency (Hz)');
         colorbar;

@@ -1,4 +1,5 @@
-function SBJ04d_ERP_plot_stats_LME_RL_topo_cond(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ05e_POW_plot_stats_LME_RL_topo_reg(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+error('need to write spatial RL model stats first!');
 % Plots group RL beta topographies with significance for ERPs
 %   Only for single channel right now...
 
@@ -20,8 +21,6 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-        elseif strcmp(varargin{v},'plot_median')
-            plot_median = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -31,7 +30,6 @@ end
 % Define default options
 if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
-if ~exist('plot_median','var'); plot_median = 0; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
@@ -64,9 +62,8 @@ for cond_ix = 1:numel(cond_lab)
     clim = [min([clim(1) min(tmp.avg)]) max([clim(2) max(tmp.avg)])];
 end
 
-
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' stat_id '/' an_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' an_id '/' stat_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end

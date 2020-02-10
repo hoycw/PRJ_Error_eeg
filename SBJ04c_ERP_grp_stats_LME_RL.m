@@ -77,7 +77,7 @@ for s = 1:numel(SBJs)
         if strcmp(st.measure,'ts')
             data  = nan([sum(n_trials) numel(time_vec)]);
         elseif strcmp(st.measure,'mean')
-            data  = nan(sum(n_trials));
+            data  = nan([sum(n_trials) 1]);
         else; error(['unknown st.measure: ' st.measure]);
         end
         
