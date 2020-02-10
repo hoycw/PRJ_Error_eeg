@@ -10,9 +10,10 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};%,
+SBJs = {'EEG01','EEG03','EEG04','EEG07','EEG08','EEG09','EEG10','EEG12'};%,'EEG05','EEG06'
 % Bad SBJs:
-%   'EEG02' (no prototype)
+%   EPs: no oddball
+%   'EEG02': bad quality
 
 %% Prototype Selection
 proc_id   = 'odd_full_ft';
@@ -22,34 +23,36 @@ save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for s = 1:numel(SBJs)
+for s = 4:numel(SBJs)
     %ODD02a_artifact_rejection(SBJs{x}, 'eeg_full_ft', 'odd_full_ft', 1, 'on', 'ERP_stack_full_events_odd')
     %SBJ02a_artifact_rejection(SBJs{x}, 'eeg_full_ft', 1, 'on')
     %SBJ01_preproc(SBJs{x}, 'eeg_full_ft');
-    SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, cpa_id, plt_id,...
+    SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
+        save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd', plt_id,...
         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
-% for s = 1:numel(SBJs)
-%     load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_' proc_id '_prototype.mat']);
-%     orig_ics = final_ics;
-%     try
-%         load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_odd_' proc_id '_prototype.mat']);
-%     catch
-%         final_ics = [];
-%     end
-%     fprintf('%s: n_origs = %d; n_odd = %d; overlap = %d\n',SBJs{s},numel(orig_ics),numel(final_ics),numel(intersect(orig_ics,final_ics)));
-% end
+for s = 1:numel(SBJs)
+    load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_' proc_id '_prototype.mat']);
+    orig_ics = final_ics;
+    try
+        load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_odd_' proc_id '_prototype.mat']);
+    catch
+        final_ics = [];
+    end
+    fprintf('%s: n_origs = %d; n_odd = %d; overlap = %d\n',SBJs{s},numel(orig_ics),numel(final_ics),numel(intersect(orig_ics,final_ics)));
+end
 % COMPARISON OUTPUT:
 % EEG01: n_origs = 1; n_odd = 0; overlap = 0
-% EEG03: n_origs = 1; n_odd = 1; overlap = 1
-% EEG04: n_origs = 1; n_odd = 1; overlap = 1
+% EEG03: n_origs = 1; n_odd = 1 (but #42); overlap = 1
+% EEG04: n_origs = 1 (but #25); n_odd = 1 (but same #25); overlap = 1
 % EEG05: n_origs = 1; n_odd = 0; overlap = 0
 % EEG06: n_origs = 1; n_odd = 1; overlap = 1
 % EEG07: n_origs = 1; n_odd = 0; overlap = 0
 % EEG08: n_origs = 1; n_odd = 2; overlap = 1
 % EEG09: n_origs = 1; n_odd = 1; overlap = 1
-% EEG10: n_origs = 1; n_odd = 1; overlap = 1
+% EEG10: n_origs = 1; n_odd = 1 (but #40); overlap = 1
 % EEG12: n_origs = 1; n_odd = 1; overlap = 1
 
 %% Test Candidate
@@ -89,12 +92,12 @@ for an_ix = 1:numel(an_ids)
         close all;
     end
     
-    % Group LME Stats
-    SBJ06d_CPA_candidate_ERP_GRP_stats_LME_RL(SBJs,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
-    
-    plt_id    = 'ts_F2to1_evnts_sigLine';
-    SBJ06e_CPA_candidate_ERP_plot_LME_RL_fits(SBJs,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id,...
-        plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     % Group LME Stats
+%     SBJ06d_CPA_candidate_ERP_GRP_stats_LME_RL(SBJs,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
+%     
+%     plt_id    = 'ts_F2to1_evnts_sigLine';
+%     SBJ06e_CPA_candidate_ERP_plot_LME_RL_fits(SBJs,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id,...
+%         plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
 %     % Group plotting of single SBJ stats
 %     plt_id    = 'ts_F0t5_but_evnts_sigPatch';

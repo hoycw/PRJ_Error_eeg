@@ -170,6 +170,6 @@ saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
 %% Save Results
 stat_out_fname = [SBJ_vars.dirs.proc SBJ '_model_' model_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','model');
+save(stat_out_fname,'-v7.3','model','betas');
 
 end
