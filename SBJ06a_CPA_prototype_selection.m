@@ -135,16 +135,16 @@ end
 fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),numel(ica.label));
 
 %% Combine Criteria
-% var_ic_idx = true(size(ica.label));
-% if isfield(cpa,'ic_rank_max')
-%     % Select components ranked highest when ordered by variance
-%     var_ic_idx(cpa.ic_rank_max+1:end) = false;
-% end
+var_ic_idx = true(size(ica.label));
+if isfield(cpa,'ic_rank_max')
+    % Select components ranked highest when ordered by variance
+    var_ic_idx(cpa.ic_rank_max+1:end) = false;
+end
 good_ic_idx = true(size(ica.label));
 good_ic_idx(SBJ_vars.ica_reject) = false;
-fprintf('%s: %d / %d components were kept in cleaning!\n',SBJ,sum(good_ic_idx),numel(ica.label));
+fprintf('%s: %d / %d components were kept in cleaning!\n',SBJ,sum(good_ic_idx),numel(good_ic_idx));
 
-final_ics = find(all([time_ic_idx, space_ic_idx, good_ic_idx],2));
+final_ics = find(all([time_ic_idx, space_ic_idx, var_ic_idx, good_ic_idx],2));
 fprintf('%s: %d / %d components selected!\n',SBJ,numel(final_ics),numel(ica.label));
 if sum(final_ics)<1
     error('No ICs found that match all criteria!');

@@ -11,6 +11,6 @@ cpa.min_sig_len = 0.01;                    % Minimum length of significant time 
 cpa.alpha       = 0.05;                     % Significance threshold for condition stats
 
 % Variance Criteria
-cpa.ic_rank_max = 11;                       % Maximum index of ICs ranked by relative variance explained
+cpa.ic_rank_max = 32;                       % Maximum index of ICs ranked by relative variance explained
 
 

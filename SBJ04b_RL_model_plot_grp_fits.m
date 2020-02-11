@@ -1,4 +1,4 @@
-function SBJ04b_RL_model_plot_grp_fits(SBJ,proc_id,stat_id)
+function SBJ04b_RL_model_plot_grp_fits(SBJs,proc_id,stat_id)
 % Run reinforcement learning model on single SBJ behavior
 % INPUTS:
 %   SBJ [str] - ID of subject to run
@@ -20,8 +20,6 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% Load Data
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];

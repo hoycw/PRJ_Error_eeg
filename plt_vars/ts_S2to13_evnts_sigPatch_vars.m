@@ -8,7 +8,7 @@ plt.legend_loc = 'northeast';
 
 plt.ylim_fudge = 0.1;
 
-plt.errbar_alpha = 0.5;
+plt.errbar_alpha = 0.2;
 %plt.main_style = '--';
 
 plt.plot_avg  = 0;

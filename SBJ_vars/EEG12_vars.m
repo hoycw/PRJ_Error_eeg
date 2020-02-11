@@ -47,7 +47,7 @@ SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
 SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
 SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null = {'EXG8'};
-SBJ_vars.ch_lab.replace = {}
+SBJ_vars.ch_lab.replace = {};
 % {{'P2','EXG6'},{'PO4','EXG7'}}; % {{'final','EXG#'},{'final2','EXG#2'}}
 % THESE ARE BAD
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel

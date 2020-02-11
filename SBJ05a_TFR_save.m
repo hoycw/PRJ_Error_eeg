@@ -79,10 +79,10 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     end
     cfg.trialdef.prestim    = trial_lim_s_pad(1);
     cfg.trialdef.poststim   = trial_lim_s_pad(2);
-    if startsWith(SBJ, 'EEG')
-        cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
-        cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
-    end
+    %     if startsWith(SBJ, 'EEG')
+    cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
+    cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
+    %     end
     cfg.trialfun            = 'tt_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc.resample_freq;

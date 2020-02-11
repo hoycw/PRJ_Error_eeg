@@ -12,6 +12,8 @@ ft_defaults
 %% General parameters
 SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
            'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};%'EEG02',
+tfr_SBJs = {'EP06','EP07','EP08','EP10','EP16',...%,'EP11','EP14','EP15','EP17','EP18','EP19'
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};%'EEG02',
 % Bad SBJ:
 %   EP01, EP02, EP05- recording errors
 %   EP03- low quality
@@ -57,7 +59,7 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+%         SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
         SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
@@ -101,8 +103,8 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ05d_TFR_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ05e_TFR_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
+        SBJ05d_TFR_grp_stats_LME_RL(tfr_SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ05e_TFR_plot_stats_LME_RL_fits(tfr_SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
