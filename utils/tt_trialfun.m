@@ -45,7 +45,8 @@ for i=1:length(event)
             cfg.oddball_sample = 1;
         end
     end 
-    if event(i).value == 254 || event(i).value == 255 && ~oddball_section
+    if event(i).value == 254
+    %if event(i).value == 254 || event(i).value == 255 && ~oddball_section
          trl = [];
     end
     % Add TT events: event code (1, 2) = (stim, feedback)
