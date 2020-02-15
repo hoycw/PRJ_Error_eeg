@@ -85,9 +85,9 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-%         SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},...
-%             plt_ids{st_ix},save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJs,an_ids{an_ix},stat_ids{st_ix},...
+            plt_ids{st_ix},save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Model Comparison Plots (Adjusted R-Squared)

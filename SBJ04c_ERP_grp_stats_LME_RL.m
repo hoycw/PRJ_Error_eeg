@@ -94,7 +94,8 @@ for s = 1:numel(SBJs)
         time_vec = st_roi.time{1};
         ch_list  = st_roi.label;
         if strcmp(st.measure,'ts')
-            data  = nan([sum(n_trials) numel(ch_list) numel(time_vec)]);
+            if numel(ch_list)>1; error('Why run st.measure = ts with more than one channel?'); end
+            data  = nan([sum(n_trials) numel(time_vec)]);
         elseif strcmp(st.measure,'mean')
             data  = nan([sum(n_trials) numel(ch_list)]);
         else; error(['unknown st.measure: ' st.measure]);
@@ -141,7 +142,7 @@ for s = 1:numel(SBJs)
     for trl_ix = 1:numel(st_roi.trial)
         full_trl_ix = full_trl_ix + 1;
         if strcmp(st.measure,'ts')
-            data(full_trl_ix,:,:) = st_roi.trial{trl_ix};
+            data(full_trl_ix,:) = st_roi.trial{trl_ix};
         elseif strcmp(st.measure,'mean')
             data(full_trl_ix,:) = mean(st_roi.trial{trl_ix},2);
         else; error(['unknown st.measure: ' st.measure]);
@@ -172,28 +173,18 @@ formula = ['ERP ~ ' reg_formula ' + (1|SBJ)'];
 
 % Run Model
 if strcmp(st.measure,'ts')
-    lme = cell([numel(ch_list) numel(time_vec)]);
-    pvals = nan([numel(reg_lab) numel(ch_list) numel(time_vec)]);
-    for ch_ix = 1:numel(ch_list)
-        for t_ix = 1:numel(time_vec)
-            tbl.ERP = data(:,ch_ix,t_ix);
-            %     for grp_ix = 1:numel(st.factors)
-            %         if st.categorical(grp_ix)
-            %             tbl.(st.factors{grp_ix}) = categorical(tbl.(st.factors{grp_ix}));
-            %         end
-            %     end
-            
-            lme{ch_ix,t_ix} = fitlme(tbl,formula);
-            pvals(:,ch_ix,t_ix) = lme{t_ix}.Coefficients.pValue(2:end);
-        end
-    end
-    
-    % Correct for Multiple Comparisons
-    if strcmp(st.mcp_method,'FDR')
-        [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2)*size(pvals,3) 1]));
-        qvals = reshape(qvals,[size(pvals,1) size(pvals,2) size(pvals,3)]);
-    else
-        error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
+    lme = cell(size(time_vec));
+    pvals = nan([numel(reg_lab) numel(time_vec)]);
+    for t_ix = 1:numel(time_vec)
+        tbl.ERP = data(:,t_ix);
+        %     for grp_ix = 1:numel(st.factors)
+        %         if st.categorical(grp_ix)
+        %             tbl.(st.factors{grp_ix}) = categorical(tbl.(st.factors{grp_ix}));
+        %         end
+        %     end
+        
+        lme{t_ix} = fitlme(tbl,formula);
+        pvals(:,t_ix) = lme{t_ix}.Coefficients.pValue(2:end);
     end
 elseif strcmp(st.measure,'mean')
     lme = cell(size(ch_list));
@@ -204,16 +195,16 @@ elseif strcmp(st.measure,'mean')
         % No correction for multiple comparisons
         pvals(:,ch_ix) = lme{ch_ix}.Coefficients.pValue(2:end);
     end
-    
-    % Correct for Multiple Comparisons
-    if strcmp(st.mcp_method,'FDR')
-        [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2) 1]));
-        qvals = reshape(qvals,[size(pvals,1) size(pvals,2)]);
-    else
-        error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
-    end
 else
     error(['Unknown st.measure: ' st.measure]);
+end
+
+% Correct for Multiple Comparisons
+if strcmp(st.mcp_method,'FDR')
+    [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2) 1]));
+    qvals = reshape(qvals,[size(pvals,1) size(pvals,2)]);
+else
+    error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
 end
 
 fprintf('\t\t Stats Complete:');
@@ -226,6 +217,6 @@ if ~exist(stat_out_dir,'dir')
 end
 stat_out_fname = [stat_out_dir 'GRP_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','lme','qvals','SBJs','time_vec');
+save(stat_out_fname,'-v7.3','lme','qvals','SBJs','time_vec','ch_list','reg_pk_time');
 
 end
