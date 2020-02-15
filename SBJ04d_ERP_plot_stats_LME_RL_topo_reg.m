@@ -1,5 +1,4 @@
 function SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
-error('need to write this first!');
 % Plots group RL beta topographies with significance for ERPs
 %   Only for single channel right now...
 

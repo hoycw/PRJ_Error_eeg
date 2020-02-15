@@ -10,20 +10,24 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};%'EEG02',
-tfr_SBJs = {'EP06','EP07','EP08','EP10','EP16',...%,'EP11','EP14','EP15','EP17','EP18','EP19'
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};%'EEG02',
+SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10'};
+% Not Ready SBJ:
+%   EP06: only 62 channels?
+%   EP09: 2 BDFs, unknown quality?
+%   EP15: low quality?
+%   EP18: low trial count (328)
+%   EEG07: low trial count (373)
+%   EEG09: multiple blocks, needs redo???
+%   EEG12: low trial count (271)
+%   EEG13-27: ready, not used yet
 % Bad SBJ:
-%   EP01, EP02, EP05- recording errors
-%   EP03- low quality
-%   EP04- weird behavior?
-%   EP09- 2 BDFs, unknown quality?
-%   EP12, 13- don't exist
-%   EP15- low quality?
-%   EEG02- low quality
-%   EEG09- multiple blocks, needs redo???
-%   EEG11- recording failure
+%   EP01, EP02, EP05: recording errors
+%   EP03: low quality
+%   EP04: weird behavior?
+%   EP12-13: don't exist
+%   EEG02: low quality
+%   EEG11: recording failure
 
 %% Single SBJ RL Model
 proc_id   = 'eeg_full_ft';
@@ -43,14 +47,14 @@ for s = 1:numel(SBJs)
 end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
-% % Main RL Model
-% an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-% stat_ids  = {'RLpRTulD_all_lme_st0t5'};%'RLpRTulD_all_lme_st0t5','RLpRTlD_all_lme_st0t5','RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
-% plt_id    = 'ts_F2to1_evnts_sigLine';
-% Pre-Feedback RL Model
-an_ids    = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
-stat_ids  = {'RLpRTulD_all_lme_st3t5'};%'RLpRTulD_all_lme_st0t5','RLpRTlD_all_lme_st0t5','RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
-plt_id    = 'ts_F4t1_evnts_sigLine';%'ts_F2to1_evnts_sigLine';
+% Main RL Model
+an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+stat_ids  = {'RLpRTulD_all_lme_st0t5'};%'RLpRTulD_all_lme_st0t5','RLpRTlD_all_lme_st0t5','RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
+plt_id    = 'ts_F2to1_evnts_sigLine';
+% % Pre-Feedback RL Model
+% an_ids    = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
+% stat_ids  = {'RLpRTulD_all_lme_st3t5'};%'RLpRTulD_all_lme_st0t5','RLpRTlD_all_lme_st0t5','RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
+% plt_id    = 'ts_F4t1_evnts_sigLine';%'ts_F2to1_evnts_sigLine';
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
@@ -59,7 +63,7 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-%         SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
         SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
@@ -72,7 +76,8 @@ end
 %% ERP: Linear Mixed Effects Model (Mean Windows)
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'RLpRTlD_all_lme_mn2t3','RLpRTlD_all_lme_mn3t4'};
+stat_ids  = {'RLpRTulD_all_lme_mn05sPE05','RLpRTulD_all_lme_mn05uPE05'};
+% stat_ids  = {'RLpRTlD_all_lme_mn2t3','RLpRTlD_all_lme_mn3t4'};
 plt_ids   = {'topo_F18t25','topo_F3t45'};
 save_fig  = 1;
 fig_vis   = 'on';
