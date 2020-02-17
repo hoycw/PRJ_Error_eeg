@@ -59,6 +59,7 @@ end
 proc_id    = 'eeg_full_ft';
 an_ids     = {'ITC_Fz_F2t1_fl05t20'};%{'ITC_Fz_F2t1_fl1t12b05'};%,'ITC_Pz_F2t1_fl1t12b05'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
+phs_id     = 'PHS_FRN4t8';
 conditions = 'DifFB';
 plt_id     = 'ts_F2to1_evnts_sigLine';%'ts_F4t1_evnts_sigLine';%
 save_fig    = 1;
@@ -66,17 +67,21 @@ fig_vis     = 'on';
 fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
-    for s = 2:numel(SBJs)
+    for s = 1:numel(SBJs)
         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
 %         SBJ05b_ITC_plot(SBJs{s}, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%         SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ05b_ITC_ERP_rose_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},phs_id,erp_ids{an_ix},...
             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
 %     SBJ05c_ITC_plot_grp(SBJs, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%     SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},phs_id,erp_ids{an_ix},...
             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

@@ -1,4 +1,4 @@
-function SBJ05b_ITC_ERP_rose_plot(SBJ,conditions,proc_id,itc_an_id,erp_an_id,plt_id,save_fig,varargin)
+function SBJ05b_ITC_ERP_rose_plot(SBJ,conditions,proc_id,itc_an_id,phs_id,erp_an_id,plt_id,save_fig,varargin)
 %% Compute and plot ITPC matrix for single SBJ; plot ERP on top
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -43,11 +43,14 @@ eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
 if ~an.itpc; error('why run this without ITPC an_vars?'); end
 if ~strcmp(an.event_type,erp_an.event_type); error('itc and erp event mismatch!'); end
+phs_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' phs_id '_vars.m'];
+eval(phs_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
 % Load data
 load([SBJ_vars.dirs.proc SBJ '_' erp_an_id '.mat']);
+if numel(roi.label)>1; error('ang no ready for multi-channel!'); end
 load([SBJ_vars.dirs.proc SBJ '_' proc_id '_' itc_an_id '.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
@@ -61,44 +64,34 @@ for grp_ix = 1:numel(grp_lab)
 end
 cond_idx = fn_condition_index(cond_lab, bhv);
 
-%% Angle Extraction
-an.lim = [0.18 0.3];
-an.freq = [4 8];
-figure;
-ang = cell(size(cond_lab));
-erps = cell(size(cond_lab));
+% Get trials for plotting
 trials = cell(size(cond_lab));
-cfgerp = []; cfgerp.latency = an.lim;
+for cond_ix = 1:numel(cond_lab)
+    cond_trial_ix = find(cond_idx==cond_ix);
+    trials{cond_ix} = nan([numel(roi.label) numel(cond_trial_ix) numel(roi.time{1})]);
+    for t_ix = 1:numel(cond_trial_ix)
+        trials{cond_ix}(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
+    end
+end
+
+%% Angle Extraction
+itpc = cell(size(cond_lab));
+ang  = cell(size(cond_lab));
 cfgs = [];
 cfgs.avgoverfreq = 'yes';
-cfgs.frequency = an.freq;
-cfgs.latency = an.lim;
+cfgs.frequency   = phs.freq;
+cfgs.latency     = phs.lim;
 for cond_ix = 1:numel(cond_lab)
+    % Compute phase angles
     cfgs.trials = find(cond_idx==cond_ix);
-    cfgerp.trials = find(cond_idx==cond_ix);
     complex = ft_selectdata(cfgs,tfr);
     ang{cond_ix} = squeeze(angle(complex.fourierspctrm));
     
-    
-    erps{cond_ix} = ft_selectdata(cfgerp,roi);
-    trials{cond_ix} = nan([numel(roi.label) numel(erps{cond_ix}.trial) numel(erps{cond_ix}.time{1})]);
-    for t_ix = 1:numel(erps{cond_ix}.trial)
-        trials{cond_ix}(:,t_ix,:) = erps{cond_ix}.trial{t_ix};
-    end
-%     F = tfr.fourierspctrm(cond_idx==cond_ix,:,:,:);
-%     itpc{cond_ix} = F./abs(F);       % Normalize to unit circle
-%     itpc{cond_ix} = sum(itpc{cond_ix},1);     % Sum phase angles
-%     itpc{cond_ix} = abs(itpc{cond_ix})/sum(cond_idx==cond_ix);     % Get mean of angles for consistency
-
-    subplot(2,6,cond_ix);
-    shadedErrorBar(erps{cond_ix}.time{1},squeeze(mean(trials{cond_ix}(1,:,:),2)),...
-        squeeze(std(trials{cond_ix}(1,:,:),[],2))./sqrt(size(trials{cond_ix},2)));
-    xlim(an.lim);
-    title([cond_lab{cond_ix} ': ' num2str(size(trials{cond_ix},2))]);
-    
-    subplot(2,6,cond_ix+6);
-    polarhistogram(ang{cond_ix},[-pi:pi/5:pi],'Normalization','probability');
-    title(cond_lab{cond_ix});
+    % Compute ITPC
+    F = tfr.fourierspctrm(cond_idx==cond_ix,:,:,:);
+    itpc{cond_ix} = F./abs(F);       % Normalize to unit circle
+    itpc{cond_ix} = sum(itpc{cond_ix},1);     % Sum phase angles
+    itpc{cond_ix} = abs(itpc{cond_ix})/sum(cond_idx==cond_ix);     % Get mean of angles for consistency
 end
 
 
@@ -134,16 +127,22 @@ end
 % Create a figure for each channel
 for ch_ix = 1:numel(tfr.label)
     %% Compute plotting data    
+    freq_idx = tfr.freq>=phs.freq(1) & tfr.freq<=phs.freq(2);
+    time_idx = tfr.time>=phs.lim(1) & tfr.time<=phs.lim(2);
+    
     % Compute means and variance
+    itpc_mean = zeros(size(cond_lab));
     means = NaN([numel(cond_lab) numel(roi.time{1})]);
     sems  = NaN([numel(cond_lab) numel(roi.time{1})]);
     for cond_ix = 1:numel(cond_lab)
         means(cond_ix,:) = squeeze(mean(trials{cond_ix}(ch_ix,:,:),2));
         sems(cond_ix,:) = squeeze(std(trials{cond_ix}(ch_ix,:,:),[],2))./sqrt(size(trials{cond_ix},2))';
+        
+        itpc_mean(cond_ix) = squeeze(mean(mean(itpc{cond_ix}(:,ch_ix,freq_idx,time_idx),4),3));
     end
     
     %% Create plot
-    fig_name = [SBJ '_' conditions '_' itc_an_id '_' erp_an_id '_' tfr.label{ch_ix}];
+    fig_name = [SBJ '_' conditions '_' itc_an_id '_' phs_id '_' erp_an_id '_rose_' tfr.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
@@ -161,7 +160,7 @@ for ch_ix = 1:numel(tfr.label)
     
     % Condition Plots
     for cond_ix = 1:length(cond_lab)
-        subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
+        subplot(2,numel(cond_lab),cond_ix);
         % Plot ITC Matrix
         yyaxis left
         %contourf(tfr.time, tfr.freq, squeeze(itpc{cond_ix}(1,ch_ix,:,:)));
@@ -172,6 +171,12 @@ for ch_ix = 1:numel(tfr.label)
         ylabel('Frequency (Hz)');
         caxis([min(clim(:,1)) max(clim(:,2))]);
         colorbar('northoutside');
+        
+        % Plot time-frequency ROI
+        line([phs.lim(1) phs.lim(1)], phs.freq, 'Color','k','LineWidth',2,'LineStyle','--');
+        line([phs.lim(2) phs.lim(2)], phs.freq, 'Color','k','LineWidth',2,'LineStyle','--');
+        line(phs.lim, [phs.freq(1) phs.freq(1)], 'Color','k','LineWidth',2,'LineStyle','--');
+        line(phs.lim, [phs.freq(2) phs.freq(2)], 'Color','k','LineWidth',2,'LineStyle','--');
         
         % Plot Events
         for evnt_ix = 1:numel(plt.evnt_lab)
@@ -187,11 +192,17 @@ for ch_ix = 1:numel(tfr.label)
                 'LineStyle','-'},'patchSaturation',0.3);
         ylabel('Amplitude (uV)');
         
-        title([tfr.label{ch_ix} ': ' cond_lab{cond_ix}]);
+        title([tfr.label{ch_ix} ': ' cond_lab{cond_ix} ' (' num2str(sum(cond_idx==cond_ix)) ')']);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');
         set(gca,'FontSize',16);
+        axis tight;
+        
+        % Plot Polar Historgram
+        subplot(2,numel(cond_lab),cond_ix+numel(cond_lab));
+        polarhistogram(ang{cond_ix},[-pi:pi/5:pi],'Normalization','probability');
+        title([cond_lab{cond_ix} ': ITPC = ' num2str(itpc_mean(cond_ix))]);
     end
     
     % Save Figure
