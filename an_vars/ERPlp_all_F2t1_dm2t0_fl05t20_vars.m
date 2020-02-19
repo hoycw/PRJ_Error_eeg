@@ -1,12 +1,12 @@
 % Data Selection
-an.ROI         = {'Fz'};             % Channel to be analyzed
-an.event_type  = 'S';           % event around which to cut trials
+an.ROI         = {'all'};             % Channel to be analyzed
+an.event_type  = 'F';           % event around which to cut trials
 an.trial_lim_s = [-0.2 1];       % window in SEC for cutting trials
 
 % Surface LaPlacian
-an.laplacian = 0;
-% cfglap = [];
-% cfglap.method = 'spline';
+an.laplacian = 1;
+cfglap = [];
+cfglap.method = 'spline';
 
 % ERP Filtering
 an.demean_yn   = 'yes';

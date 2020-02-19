@@ -49,7 +49,8 @@ plot_final_check = 0;
 
 %% View basic ERPs
 %   RL Model Analysis:
-an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+an_ids     = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
+% an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 conditions = 'DifFB';
 % %   Pre-Feedback RL Model Analysis:
 % an_ids     = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
@@ -82,23 +83,23 @@ end
 %% Plot ERP Topos
 proc_id    = 'eeg_full_ft';
 conditions = 'DifFB';
-an_id      = 'ERP_all_F2t1_dm2t0_fl05t20';
+an_id      = 'ERPlp_all_F2t1_dm2t0_fl05t20';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for s = 1:numel(SBJs)
-    % FRN by condition
-    plt_id    = 'topo_F18t25';
-    SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    
-    % P3 by condition
-    plt_id    = 'topo_F3t45';
-    SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    close all;
-end
+% for s = 1:numel(SBJs)
+%     % FRN by condition
+%     plt_id    = 'topo_F18t25';
+%     SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     
+%     % P3 by condition
+%     plt_id    = 'topo_F3t45';
+%     SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     close all;
+% end
 
 % FRN Group plot
 plt_id    = 'topo_F18t25';

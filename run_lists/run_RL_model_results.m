@@ -48,7 +48,8 @@ end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Main RL Model
-an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+an_ids    = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
+%an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 stat_ids  = {'RLpRTulD_all_lme_st0t5'};%'RLpRTulD_all_lme_st0t5','RLpRTlD_all_lme_st0t5','RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
 plt_id    = 'ts_F2to1_evnts_sigLine';
 % % Pre-Feedback RL Model
@@ -75,7 +76,7 @@ end
 
 %% ERP: Linear Mixed Effects Model (Mean Windows)
 proc_id   = 'eeg_full_ft';
-an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
+an_ids    = {'ERPlp_all_F2t1_dm2t0_fl05t20'};
 stat_ids  = {'RLpRTulD_all_lme_mn05sPE05','RLpRTulD_all_lme_mn05uPE05'};
 % stat_ids  = {'RLpRTlD_all_lme_mn2t3','RLpRTlD_all_lme_mn3t4'};
 plt_ids   = {'topo_F18t25','topo_F3t45'};
@@ -85,7 +86,7 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-%         SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
         SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJs,an_ids{an_ix},stat_ids{st_ix},...
             plt_ids{st_ix},save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end

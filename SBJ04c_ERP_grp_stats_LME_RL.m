@@ -73,6 +73,8 @@ if strcmp(st.measure,'mean') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_
     [~,pk_ix] = max(abs(pk_ts));
     reg_pk_time = tmp.time_vec(pk_ix);
     st.stat_lim = st.stat_lim+reg_pk_time;
+else
+    reg_pk_time = nan;
 end
 
 %% Load Data and Build Model
