@@ -56,6 +56,27 @@ for s = 1:numel(SBJs)
     clear tmp
 end
 
+%% Load Peak Timing Information
+if strcmp(st.measure,'mean') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_id'}))
+    % Load previous stats
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' st.pk_stat_id '_' st.pk_an_id '.mat']);
+    if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
+        error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
+    end
+    
+    % Obtain peak times for target regressor
+    reg_ix = find(strcmp(reg_lab,st.pk_reg_id));
+    pk_ts = nan(size(tmp.time_vec));
+    for t_ix = 1:numel(tmp.time_vec)
+        pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);
+    end
+    [~,pk_ix] = max(abs(pk_ts));
+    reg_pk_time = tmp.time_vec(pk_ix);
+    st.stat_lim = st.stat_lim+reg_pk_time;
+else
+    reg_pk_time = nan;
+end
+
 %% Load Data and Build Model
 cfgs  = []; cfgs.latency = st.stat_lim;
 model = zeros([sum(n_trials) numel(reg_lab)]);
@@ -65,7 +86,6 @@ for s = 1:numel(SBJs)
     % Load data
     fprintf('========================== Processing %s ==========================\n',SBJs{s});
     load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',an_id,'.mat'],'roi');
-    if numel(roi.label)>1; error('assuming single channel for now!'); end
     
     % Select time and trials of interest
     cfgs.trials  = find(full_cond_idx{s});
@@ -74,10 +94,12 @@ for s = 1:numel(SBJs)
     if s==1
         % Initialize matrices now that we know time axis
         time_vec = st_roi.time{1};
+        ch_list  = st_roi.label;
         if strcmp(st.measure,'ts')
+            if numel(ch_list)>1; error('Why run st.measure = ts with more than one channel?'); end
             data  = nan([sum(n_trials) numel(time_vec)]);
         elseif strcmp(st.measure,'mean')
-            data  = nan([sum(n_trials) 1]);
+            data  = nan([sum(n_trials) numel(ch_list)]);
         else; error(['unknown st.measure: ' st.measure]);
         end
         
@@ -124,7 +146,7 @@ for s = 1:numel(SBJs)
         if strcmp(st.measure,'ts')
             data(full_trl_ix,:) = st_roi.trial{trl_ix};
         elseif strcmp(st.measure,'mean')
-            data(full_trl_ix) = mean(st_roi.trial{trl_ix});
+            data(full_trl_ix,:) = mean(st_roi.trial{trl_ix},2);
         else; error(['unknown st.measure: ' st.measure]);
         end
     end
@@ -166,20 +188,25 @@ if strcmp(st.measure,'ts')
         lme{t_ix} = fitlme(tbl,formula);
         pvals(:,t_ix) = lme{t_ix}.Coefficients.pValue(2:end);
     end
-    
-    % Correct for Multiple Comparisons
-    if strcmp(st.mcp_method,'FDR')
-        [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2) 1]));
-        qvals = reshape(qvals,[size(pvals,1) size(pvals,2)]);
-    else
-        error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
-    end
 elseif strcmp(st.measure,'mean')
-    lme = {};
-    tbl.ERP = data;
-    lme{1} = fitlme(tbl,formula);
-    % No correction for multiple comparisons
-    qvals = lme{1}.Coefficients.pValue(2:end);
+    lme = cell(size(ch_list));
+    pvals = nan([numel(reg_lab) numel(ch_list)]);
+    for ch_ix = 1:numel(ch_list)
+        tbl.ERP = data(:,ch_ix);
+        lme{ch_ix} = fitlme(tbl,formula);
+        % No correction for multiple comparisons
+        pvals(:,ch_ix) = lme{ch_ix}.Coefficients.pValue(2:end);
+    end
+else
+    error(['Unknown st.measure: ' st.measure]);
+end
+
+% Correct for Multiple Comparisons
+if strcmp(st.mcp_method,'FDR')
+    [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2) 1]));
+    qvals = reshape(qvals,[size(pvals,1) size(pvals,2)]);
+else
+    error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
 end
 
 fprintf('\t\t Stats Complete:');
@@ -192,6 +219,6 @@ if ~exist(stat_out_dir,'dir')
 end
 stat_out_fname = [stat_out_dir 'GRP_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','lme','qvals','SBJs');
+save(stat_out_fname,'-v7.3','lme','qvals','SBJs','time_vec','ch_list','reg_pk_time');
 
 end

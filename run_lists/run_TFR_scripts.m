@@ -10,18 +10,24 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EP06','EP07','EP08','EP10','EP16',...%,'EP11','EP14','EP15','EP17','EP18','EP19'
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};%'EEG02',
+SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10'};
+% Not Ready SBJ:
+%   EP06: only 62 channels?
+%   EP09: 2 BDFs, unknown quality?
+%   EP15: low quality?
+%   EP18: low trial count (328)
+%   EEG07: low trial count (373)
+%   EEG09: multiple blocks, needs redo???
+%   EEG12: low trial count (271)
+%   EEG13-27: ready, not used yet
 % Bad SBJ:
-%   EP01, EP02, EP05- recording errors
-%   EP03- low quality
-%   EP04- weird behavior?
-%   EP09- 2 BDFs, unknown quality?
-%   EP12, 13- don't exist
-%   EP15- low quality?
-%   EEG02- low quality
-%   EEG09- multiple blocks, needs redo???
-%   EEG11- recording failure
+%   EP01, EP02, EP05: recording errors
+%   EP03: low quality
+%   EP04: weird behavior?
+%   EP12-13: don't exist
+%   EEG02: low quality
+%   EEG11: recording failure
 
 %% Compute TFRs
 proc_id    = 'eeg_full_ft';
@@ -53,6 +59,7 @@ end
 proc_id    = 'eeg_full_ft';
 an_ids     = {'ITC_Fz_F2t1_fl05t20'};%{'ITC_Fz_F2t1_fl1t12b05'};%,'ITC_Pz_F2t1_fl1t12b05'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
+phs_id     = 'PHS_FRN4t8';
 conditions = 'DifFB';
 plt_id     = 'ts_F2to1_evnts_sigLine';%'ts_F4t1_evnts_sigLine';%
 save_fig    = 1;
@@ -60,17 +67,21 @@ fig_vis     = 'on';
 fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
-    for s = 2:numel(SBJs)
+    for s = 1:numel(SBJs)
         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
 %         SBJ05b_ITC_plot(SBJs{s}, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%         SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ05b_ITC_ERP_rose_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},phs_id,erp_ids{an_ix},...
             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
 %     SBJ05c_ITC_plot_grp(SBJs, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%     SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},phs_id,erp_ids{an_ix},...
             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

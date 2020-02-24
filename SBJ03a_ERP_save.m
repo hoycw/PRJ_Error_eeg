@@ -31,6 +31,11 @@ eval(an_vars_cmd);
 load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
+%% Surface LaPlacian
+if an.laplacian
+    [clean_trials] = ft_scalpcurrentdensity(cfglap, clean_trials);
+end
+
 %% Select Data for ERP
 % Realign data to desired event
 if ~strcmp(proc.event_type,an.event_type)

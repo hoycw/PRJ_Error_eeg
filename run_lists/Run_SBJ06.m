@@ -10,10 +10,18 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EEG01','EEG04','EEG05','EEG06','EEG07','EEG08','EEG09','EEG12'};%'EEG03','EEG10',
-% Bad SBJs:
+SBJs = {'EEG01','EEG04','EEG05','EEG06','EEG08','EEG10'};
+% No results for oddball:
+%   EEG03
+% Not Ready SBJ:
+%   EEG07: low trial count (373)
+%   EEG09: multiple blocks, needs redo???
+%   EEG12: low trial count (271)
+%   EEG13-27: ready, not used yet
+% Bad SBJ:
 %   EPs: no oddball
-%   'EEG02': bad quality
+%   EEG02: low quality
+%   EEG11: recording failure
 
 %% Prototype Selection
 proc_id   = 'odd_full_ft';

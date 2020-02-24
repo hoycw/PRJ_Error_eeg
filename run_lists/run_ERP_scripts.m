@@ -10,18 +10,24 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG10','EEG12'};%'EEG02',
+SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10'};
+% Not Ready SBJ:
+%   EP06: only 62 channels?
+%   EP09: 2 BDFs, unknown quality?
+%   EP15: low quality?
+%   EP18: low trial count (328)
+%   EEG07: low trial count (373)
+%   EEG09: multiple blocks, needs redo???
+%   EEG12: low trial count (271)
+%   EEG13-27: ready, not used yet
 % Bad SBJ:
-%   EP01, EP02, EP05- recording errors
-%   EP03- low quality
-%   EP04- weird behavior?
-%   EP09- 2 BDFs, unknown quality?
-%   EP12, 13- don't exist
-%   EP15- low quality?
-%   EEG02- low quality
-%   EEG09- multiple blocks, needs redo???
-%   EEG11- recording failure
+%   EP01, EP02, EP05: recording errors
+%   EP03: low quality
+%   EP04: weird behavior?
+%   EP12-13: don't exist
+%   EEG02: low quality
+%   EEG11: recording failure
 
 %% Run preprocessing
 proc_id_ica = 'eeg_full_ft';
@@ -43,7 +49,8 @@ plot_final_check = 0;
 
 %% View basic ERPs
 %   RL Model Analysis:
-an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+an_ids     = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
+% an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 conditions = 'DifFB';
 % %   Pre-Feedback RL Model Analysis:
 % an_ids     = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
@@ -76,23 +83,23 @@ end
 %% Plot ERP Topos
 proc_id    = 'eeg_full_ft';
 conditions = 'DifFB';
-an_id      = 'ERP_all_F2t1_dm2t0_fl05t20';
+an_id      = 'ERPlp_all_F2t1_dm2t0_fl05t20';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for s = 1:numel(SBJs)
-    % FRN by condition
-    plt_id    = 'topo_F18t25';
-    SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    
-    % P3 by condition
-    plt_id    = 'topo_F3t45';
-    SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    close all;
-end
+% for s = 1:numel(SBJs)
+%     % FRN by condition
+%     plt_id    = 'topo_F18t25';
+%     SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     
+%     % P3 by condition
+%     plt_id    = 'topo_F3t45';
+%     SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     close all;
+% end
 
 % FRN Group plot
 plt_id    = 'topo_F18t25';
