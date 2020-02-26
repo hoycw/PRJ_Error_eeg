@@ -43,9 +43,9 @@ SBJ_vars.dirs.raw_filename = strcat(SBJ_vars.dirs.raw, SBJ_vars.raw_file);
 % Channel Selection
 %--------------------------------------
 % Channel Labels
-SBJ_vars.ch_lab.ears    = {};
-SBJ_vars.ch_lab.eog_h   = {};
-SBJ_vars.ch_lab.eog_v   = {};
+SBJ_vars.ch_lab.ears    = {'EXG1', 'EXG2'};
+    SBJ_vars.ch_lab.eog_h   = {'EXG3', 'EXG4'};
+    SBJ_vars.ch_lab.eog_v   = {'EXG5', 'Fp2'};
 SBJ_vars.ch_lab.null = {};
 SBJ_vars.ch_lab.replace = {}; % {{'final','EXG#'},{'final2','EXG#2'}}
 SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
@@ -56,5 +56,5 @@ SBJ_vars.trial_reject_ix = [];
 SBJ_vars.trial_reject_ix_oddball = [];
 SBJ_vars.ica_reject = [];
 SBJ_vars.odd_trigger_ix =
-SBj_vars.tt_trigger_ix =
+SBJ_vars.tt_trigger_ix =
 

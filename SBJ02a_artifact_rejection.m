@@ -44,6 +44,9 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.trialdef.poststim   = proc.trial_lim_s(2);
     cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
     cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
+    if b_ix > 1
+        cfg.endb1 = cfg_trl_unconcat{b_ix - 1}.endb1
+    end
     if startsWith(SBJ, 'EEG')
         cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
         cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
@@ -51,7 +54,11 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.trialfun            = 'tt_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc.resample_freq;
+    cfg.blocknum            = b_ix;
     cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
+    if b_ix == 1
+        cfg_trl_unconcat{b_ix}.endb1 = length(cfg_trl_unconcat{b_ix}.trl);
+    end
 end
 
 % Concatenate event times across blocks after adjusting times for gaps

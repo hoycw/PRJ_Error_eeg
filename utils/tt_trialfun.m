@@ -13,11 +13,18 @@ hdr   = ft_read_header(cfg.dataset);
 event = ft_read_event(cfg.dataset, 'header', hdr);
 fprintf('%i events found!\n',numel(event));
 
+if cfg.blocknum > 1
+   index_overall = cfg.endb1;
+else
+    index_overall = 1;
+end
 %checks to see if starting with oddball or not, oddball_section = 1 means yes
 oddball_section = 0;
-for i = 1:400
-    if (event(i).value == 3)
-        oddball_section = 1;
+if index_overall < 400
+    for i = index_overall:400
+        if (event(i).value == 3)
+            oddball_section = 1;
+        end
     end
 end
 % Compute resampling factor

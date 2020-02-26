@@ -19,13 +19,13 @@ import pickle
 
 # In[2]:
 
-SBJ = 'EEG23'
+SBJ = 'EEG24'
 
 
 # In[3]:
 
-#prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
-prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
+prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+#prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.png'
 data_dir = prj_dir+'data/'
@@ -54,8 +54,15 @@ logs = {'EEG01': 'eeg01_oddball_log_20190712145416.txt',
     'EEG20': 'eeg20_oddball_log_20191118084638.txt',
     'EEG21': 'eeg21_oddball_log_20191122180427.txt',
     'EEG22': 'eeg22_oddball_log_20191126170958.txt',
-    'EEG23': 'eeg23_oddball_log_20191206162710.txt'
-}
+    'EEG23': 'eeg23_oddball_log_20191206162710.txt',
+    'EEG24': 'eeg24_oddball_log_20191208095654.txt',
+    'EEG26': 'eeg26_oddball_log_20200203153621.txt',
+    'EEG27': 'eeg27_oddball_log_20200205081649.txt',
+    'EEG25': 'eeg25_oddball_log_20200126162425.txt',
+    'EEG28': 'eeg28_oddball_log_20200205151020.txt',
+    'EEG29': 'eeg29_oddball_log_20200212150313.txt',
+    'EEG30': 'eeg30_oddball_log_20200213084301.txt',
+    'EEG31': 'eeg31_oddball_log_20200213161345.txt'}
 
 
 # ### Load SBJ Data

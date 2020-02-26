@@ -198,7 +198,7 @@ if any(data['bad_fb']):
     tmp['error-tol'] = tmp['Tolerance']-tmp['error']
     print 'WARNING!!! Bad feedback found on {0} trials!'.format(len(bad_ix))
     print 'Max error-tolerance = {0}, mean = {1}'.format(np.max(tmp['error-tol']),np.mean(np.abs(tmp['error-tol'])))
-    tmp.ix[:,{'Tolerance','error','WIN','Hit','err-tol'}]
+#tmp.ix[:,{'Tolerance','error','WIN','Hit','err-tol'}]
 
 
 # In[9]:

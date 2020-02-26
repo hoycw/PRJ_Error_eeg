@@ -26,7 +26,7 @@ else
     end
 end
 for b_ix = 2:numel(SBJ_vars.block_name)
-    initial_bad_epochs{b_ix} = initial_bad_epochs{b_ix} + SBJ_vars.endsample{b_ix-1}/origsample*resample;  
+    initial_bad_epochs{b_ix} = initial_bad_epochs{b_ix} + SBJ_vars.endsample{b_ix-1}/SBJ_vars.origsample*SBJ_vars.resample;  
 end
 for b_ix = 2:numel(SBJ_vars.block_name)
     initial_bad_epochs{b_ix} = vertcat(initial_bad_epochs{b_ix-1},initial_bad_epochs{b_ix});
