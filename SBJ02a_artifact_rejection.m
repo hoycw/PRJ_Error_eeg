@@ -45,7 +45,7 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
     cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
     if b_ix > 1
-        cfg.endb1 = cfg_trl_unconcat{b_ix - 1}.endb1
+        cfg.endb1 = cfg_trl_unconcat{b_ix - 1}.endb1;
     end
     if startsWith(SBJ, 'EEG')
         cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
