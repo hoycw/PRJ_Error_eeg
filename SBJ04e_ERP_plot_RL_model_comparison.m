@@ -84,7 +84,7 @@ for ch_ix = 1:numel(ch_list)
     r2s = NaN([numel(stat_ids) numel(st_time_vec)]);
     for st_ix = 1:numel(stat_ids)
         for t_ix = 1:numel(st_time_vec)
-            r2s(st_ix,t_ix) = lmes{st_ix,t_ix}.Rsquared.Adjusted;
+            r2s(st_ix,t_ix) = lmes{st_ix,t_ix}.Rsquared.Ordinary;%Adjusted;
         end
     end
     
@@ -105,7 +105,7 @@ for ch_ix = 1:numel(ch_list)
     ylims = ylim;
     
     % Axes and Labels
-    ax.YLabel.String = 'Adjusted R2';
+    ax.YLabel.String = 'R2';%'Adjusted R2';
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';
