@@ -1,5 +1,7 @@
 function SBJ05d_PHS_grp_stats_CLcorr_RL(SBJs,proc_id,an_id,stat_id)
-% Run Mixed-Effects Linear model on all SBJ and trials
+% Run Circular-Linear correlation for phase at each time-frequency point
+% within SBJ, z-score that value to null distribution, then t-test those
+% z-scored correlation values vs. 0 across SBJ (and FDR correct)
 %   Only for one channel now...
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run

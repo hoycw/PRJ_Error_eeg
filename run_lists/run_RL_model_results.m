@@ -139,6 +139,8 @@ for an_ix = 1:numel(an_ids)
         SBJ05d_PHS_grp_stats_CLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
         SBJ05e_PHS_plot_stats_CLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ05e_PHS_plot_stats_wITPC_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Model Comparison Plots (Adjusted R-Squared)

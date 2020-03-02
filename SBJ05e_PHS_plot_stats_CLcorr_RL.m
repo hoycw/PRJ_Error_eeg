@@ -56,7 +56,7 @@ end
 warning('WARNING: Assuming same prdm_vars for all SBJ to get event timing!');
 prdm_vars = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/03_events/' SBJs{1} '_prdm_vars.mat']);
 
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'phs_corr','qvals');
+load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'phs_zcorr','qvals');
 
 %% Load TFR for axes
 load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/04_proc/' SBJs{1} '_' proc_id '_' an_id '.mat']);
@@ -77,7 +77,7 @@ end
 % Create a figure for each channel
 for ch_ix = 1:numel(st_tfr.label)
     % Get color lims per condition
-    corr_mat = squeeze(mean(phs_corr,1));
+    corr_mat = squeeze(mean(phs_zcorr,1));
     clim = [min(corr_mat(:)) max(corr_mat(:))];
     
     % Get significance mask
