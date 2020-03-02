@@ -45,7 +45,7 @@ load([SBJ_vars.dirs.SBJ,'04_proc/',SBJ,'_',an_id,'.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 % Select conditions (and trials)
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+[cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 % Get trials for plotting

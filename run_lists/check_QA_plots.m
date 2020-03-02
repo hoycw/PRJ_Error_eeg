@@ -47,6 +47,8 @@ n_be_tp = zeros(size(SBJs));
 n_rt = zeros(size(SBJs));
 n_bt = zeros(size(SBJs));
 n_bc = zeros(size(SBJs));
+n_bad_fb = zeros(size(SBJs));
+perc_bad_fb = n_bad_fb;
 n_good = zeros(size(SBJs));
 quest_diff = zeros([numel(SBJs) numel(ideal_ans)]);
 for s = 1:numel(SBJs)
@@ -68,6 +70,9 @@ for s = 1:numel(SBJs)
     for b = 1:size(bad_epochs,1)
         n_bad_points = n_bad_points + numel(bad_epochs(b,1):bad_epochs(b,2));
     end
+    
+    n_bad_fb(s) = sum(bhv.bad_fb);
+    perc_bad_fb(s) = sum(bhv.bad_fb)/numel(bhv.bad_fb);
     
     training_ix = find(bhv.blk==0);
     rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1));
@@ -161,6 +166,15 @@ set(gca,'FontSize',14);
 % xtickangle(45);
 % xlabel('SBJ');
 % title('# good RTs');
+% set(gca,'FontSize',14);
+
+% subplot(7,1,7);
+% scatter(1:numel(SBJs),sum(n_bad_fb,2),sz,SBJ_colors,'filled');
+% set(gca,'XTick',1:numel(SBJs));
+% set(gca,'XTickLabel',SBJs);
+% xtickangle(45);
+% xlabel('SBJ');
+% title('# bad feedback');
 % set(gca,'FontSize',14);
 
 %% 

@@ -47,7 +47,7 @@ load([SBJ_vars.dirs.proc SBJ '_' proc_id '_' an_id '.mat']);
 if numel(tfr.freq)>1; error('TFR is not averaged over frequencies!'); end
 
 % Select conditions (and trials)
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 %% Get event timing for plotting

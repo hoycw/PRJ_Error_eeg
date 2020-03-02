@@ -42,7 +42,7 @@ eval(an_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 
 % Load example data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{1} '_vars.m'];

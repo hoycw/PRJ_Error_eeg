@@ -29,8 +29,8 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 
 model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));
@@ -154,6 +154,33 @@ for s = 1:numel(SBJs)
     clear roi st_roi
 end
 
+%% Compute and plot correlations between regressors
+reg_corr = corr(model,'rows','complete');
+
+% Create figure directory
+stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
+fig_dir = [stat_out_dir model_id '_plots/'];
+if ~exist(fig_dir,'dir')
+    mkdir(fig_dir);
+end
+
+% Plot design matrix
+fig_name = ['GRP_' model_id '_design'];
+figure('Name',fig_name);
+imagesc(model);
+xticklabels(reg_lab);
+colorbar;
+saveas(gcf,[fig_dir fig_name '.png']);
+
+% Plot regressor correlation matrix
+fig_name = ['GRP_' model_id '_design_corr'];
+figure('Name',fig_name);
+imagesc(reg_corr);
+xticklabels(reg_lab);
+yticklabels(reg_lab);
+colorbar;
+saveas(gcf,[fig_dir fig_name '.png']);
+
 %% Build table
 fprintf('========================== Running Stats ==========================\n');
 tic
@@ -213,10 +240,6 @@ fprintf('\t\t Stats Complete:');
 toc
 
 %% Save Results
-stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
-if ~exist(stat_out_dir,'dir')
-    [~] = mkdir(stat_out_dir);
-end
 stat_out_fname = [stat_out_dir 'GRP_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
 save(stat_out_fname,'-v7.3','lme','qvals','SBJs','time_vec','ch_list','reg_pk_time');

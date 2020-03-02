@@ -50,8 +50,8 @@ load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' an_id '.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' eeg_proc_id '_final.mat']);
 
 % Select Conditions of Interest
-[reg_lab, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 %% Select Plotting Data

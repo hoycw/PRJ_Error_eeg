@@ -42,8 +42,8 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 % Select Conditions of Interest
-[reg_lab, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Stats
 load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat']);
@@ -158,11 +158,11 @@ for ch_ix = 1:numel(ch_list)
     fig_name = ['GRP_' stat_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
+        'outerposition',[0 0 0.7 1],'Visible',fig_vis);   %this size is for single plots
     
     %% Plot ERPs with significance
     axes = gobjects([3 1]);
-    subplot(3,1,1);
+    subplot(6,1,1:3);
     axes(1) = gca; hold on;
     
     % Plot Means (and variance)
@@ -235,7 +235,7 @@ for ch_ix = 1:numel(ch_list)
     axes(1).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     axes(1).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     axes(1).XLabel.String = 'Time (s)';
-    axes(1).Title.String  = ch_list{ch_ix};
+    axes(1).Title.String  = [ch_list{ch_ix} ' (n = ' num2str(numel(SBJs)) ')'];
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
@@ -244,7 +244,7 @@ for ch_ix = 1:numel(ch_list)
     axes(1).YLim = ylims;
     
     %% Plot Betas and R2
-    subplot(3,1,2);
+    subplot(6,1,4:5);
     axes(2) = gca; hold on;
     
     % Plot Model Betas
@@ -278,7 +278,7 @@ for ch_ix = 1:numel(ch_list)
     axes(2).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     axes(2).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     axes(2).XLabel.String = 'Time (s)';
-    axes(2).Title.String  = 'Model Weights';
+    % axes(2).Title.String  = 'Model Weights';
     if plt.legend
         legend(beta_lines,[reg_lab plt.evnt_lab],'Location',plt.legend_loc);
     end
@@ -287,7 +287,7 @@ for ch_ix = 1:numel(ch_list)
     axes(2).YLim = ylims;
     
     %% Plot R2
-    subplot(3,1,3);
+    subplot(6,1,6);
     axes(3) = gca; hold on;
     
     line(st_time_vec, r2, 'Color','k', 'LineWidth',2);
@@ -303,7 +303,7 @@ for ch_ix = 1:numel(ch_list)
     axes(3).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     axes(3).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     axes(3).XLabel.String = 'Time (s)';
-    axes(3).Title.String  = 'Model Fit';
+    % axes(3).Title.String  = 'Model Fit';
     set(gca,'FontSize',16);
     axes(3).YLim = ylims;
     

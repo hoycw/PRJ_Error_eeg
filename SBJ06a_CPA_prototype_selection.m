@@ -47,7 +47,7 @@ load([SBJ_vars.dirs.preproc SBJ '_preproc_eeg_full_ft.mat']);
 load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat']); %chose 02a - ica before rejection!
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles('Odd'); % maybe change this so not hardcoded
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles('Odd'); % maybe change this so not hardcoded
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 % Create contrast: (Unexpected - Expected) for each outcome

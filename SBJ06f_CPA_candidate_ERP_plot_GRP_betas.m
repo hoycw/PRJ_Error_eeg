@@ -42,7 +42,7 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 % Select Conditions of Interest
-[reg_lab, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
+[reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
 
 %% Load ERPs
 for s = 1:length(SBJs)

@@ -56,12 +56,12 @@ if ~strcmp(st.measure,'p2p') || ~strcmp(st.grp_method,'jackknife')
 end
 
 % Select Conditions of Interest
-[grp_lab, ~, ~] = fn_group_label_styles(st.model_lab);
-[cond_lab, cond_colors, ~, ~] = fn_condition_label_styles(st.model_lab);
+[grp_lab, ~, ~, ~] = fn_group_label_styles(st.model_lab);
+[cond_lab, ~, cond_colors, ~, ~] = fn_condition_label_styles(st.model_lab);
 % if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
-    [grp_cond_lab{grp_ix}, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
+    [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 
 % Load example data

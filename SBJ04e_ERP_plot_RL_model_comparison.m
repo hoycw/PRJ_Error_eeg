@@ -19,8 +19,9 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-        elseif strcmp(varargin{v},'plot_median')
-            plot_median = varargin{v+1};
+        elseif strcmp(varargin{v},'r2_version')
+            % 'Ordinary' or 'Adjusted' (default)
+            r2_version = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -30,7 +31,7 @@ end
 % Define default options
 if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
-if ~exist('plot_median','var'); plot_median = 0; end
+if ~exist('r2_version','var'); r2_version = 'Adjusted'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
@@ -84,12 +85,16 @@ for ch_ix = 1:numel(ch_list)
     r2s = NaN([numel(stat_ids) numel(st_time_vec)]);
     for st_ix = 1:numel(stat_ids)
         for t_ix = 1:numel(st_time_vec)
-            r2s(st_ix,t_ix) = lmes{st_ix,t_ix}.Rsquared.Ordinary;%Adjusted;
+            r2s(st_ix,t_ix) = lmes{st_ix,t_ix}.Rsquared.(r2_version);
         end
     end
     
     %% Create plot
-    fig_name = ['GRP_RL_R2_comparison_' an_id];
+    if strcmp(r2_version,'Ordinary')
+        fig_name = ['GRP_RL_R2ord_comparison_' an_id];
+    else
+        fig_name = ['GRP_RL_R2adj_comparison_' an_id];
+    end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
     
@@ -105,7 +110,7 @@ for ch_ix = 1:numel(ch_list)
     ylims = ylim;
     
     % Axes and Labels
-    ax.YLabel.String = 'R2';%'Adjusted R2';
+    ax.YLabel.String = [r2_version ' R2'];
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';

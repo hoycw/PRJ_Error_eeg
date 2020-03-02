@@ -1,6 +1,6 @@
 % Stat Parameters
 st.an_style    = 'lme';
-st.model_lab   = 'pWinPEus';
+st.model_lab   = 'RL';
 st.z_reg       = 1;                 % 0/1: zscore regressors?
 st.trial_cond  = {'DifOut'};
 st.stat_lim    = [0 0.5];            % window in SEC for stats

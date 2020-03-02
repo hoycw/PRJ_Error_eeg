@@ -39,7 +39,7 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 % Select conditions (and trials)
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+[cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 
 %% Load data
 er_avg = cell([numel(cond_lab) numel(SBJs)]);

@@ -19,18 +19,20 @@ addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath([app_dir 'fieldtrip/']);
 ft_defaults
+addpath([app_dir 'CircStat/']);
 
 %% Load Data 
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
-eval(proc_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
+if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
+if ~an.itpc; error('why run this without ITPC an_vars?'); end
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
 
+% Select conditions (and trials)
 model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));
@@ -98,9 +100,9 @@ for s = 1:numel(SBJs)
         
         % Load and add data
         if strcmp(st.measure,'ts')
-            data(1:n_trials(s),:,:) = squeeze(st_tfr.powspctrm);
+            data(1:n_trials(s),:,:) = squeeze(angle(tfr.fourierspctrm(:,1,:,:)));
         elseif strcmp(st.measure,'mean')
-            data(1:n_trials(s),:) = squeeze(mean(st_tfr.powspctrm,4));
+            data(1:n_trials(s),:) = squeeze(angle(nanmean(complex.fourierspctrm(:,1,:,:),4)));
         else; error(['unknown st.measure: ' st.measure]);
         end
         
@@ -134,6 +136,12 @@ for s = 1:numel(SBJs)
         sbj_factor(sum(n_trials(1:s-1))+1:sum(n_trials(1:s))) = s*ones([n_trials(s) 1]);
     end
     
+    % Compute Mean Phase Angle per trial
+    complex = ft_selectdata(cfgs,st_tfr);
+    for ch_ix = 1:numel(ch_list)
+        ang{ch_ix} = [ang{ch_ix}; squeeze(angle(nanmean(complex.fourierspctrm(:,ch_ix,:,:),4)))];
+    end
+        
     clear tfr st_tfr
 end
 

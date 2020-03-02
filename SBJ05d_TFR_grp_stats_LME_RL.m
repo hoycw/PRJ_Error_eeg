@@ -29,8 +29,8 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 
 model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));

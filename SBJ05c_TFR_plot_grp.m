@@ -39,12 +39,12 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 % Select conditions (and trials)
-[grp_lab, ~, ~] = fn_group_label_styles(conditions);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
+[grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
 % if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
-    [grp_cond_lab{grp_ix}, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
+    [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 
 % Load data

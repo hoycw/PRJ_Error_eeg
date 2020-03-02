@@ -29,8 +29,8 @@ load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' an_id '.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' eeg_proc_id '_final.mat']);
 
 model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Select Data to Model
 full_cond_idx = fn_condition_index(cond_lab, bhv);
