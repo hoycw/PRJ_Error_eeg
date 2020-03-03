@@ -55,11 +55,11 @@ for an_ix = 1:numel(an_ids)
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
-%% Compute ITPC
+%% Compute Phase
 proc_id    = 'eeg_full_ft';
-an_ids     = {'ITC_Fz_F2t1_fl1t12b05'};%{'ITC_Fz_F2t1_fl05t20'};%,'ITC_Pz_F2t1_fl1t12b05'};
+an_ids     = {'PHS_Fz_F2t1_fl1t12b05'};%{'ITC_Fz_F2t1_fl05t20'};%,'ITC_Pz_F2t1_fl1t12b05'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
-phs_id     = 'PHS_FRN4t8';
+%phs_id     = 'PHS_FRN4t8';
 conditions = 'DifFB';
 plt_id     = 'ts_F2to1_evnts_sigLine';%'ts_F4t1_evnts_sigLine';%
 save_fig    = 1;

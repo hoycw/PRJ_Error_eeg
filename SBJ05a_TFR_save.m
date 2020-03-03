@@ -69,6 +69,7 @@ cfg_trl_unconcat = cell(size(SBJ_vars.block_name));
 for b_ix = 1:numel(SBJ_vars.block_name)
     cfg = [];
     cfg.dataset             = SBJ_vars.dirs.raw_filename{b_ix};
+    cfg.blocknum            = b_ix;
     cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
     if strcmp(an.event_type,'S')
         cfg.trialdef.eventvalue = 1;%proc.event_code;
@@ -79,10 +80,8 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     end
     cfg.trialdef.prestim    = trial_lim_s_pad(1);
     cfg.trialdef.poststim   = trial_lim_s_pad(2);
-    %     if startsWith(SBJ, 'EEG')
     cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
     cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
-    %     end
     cfg.trialfun            = 'tt_trialfun';
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc.resample_freq;

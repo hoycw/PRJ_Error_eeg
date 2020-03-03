@@ -15,7 +15,11 @@ function bslnd_tfr = fn_bsln_ft_tfr(tfr, bsln_lim, bsln_type, n_boots)
 % addpath([app_dir 'fieldtrip/']);
 % ft_defaults
 
-if ~strcmp(tfr.dimord,'rpt_chan_freq_time')
+if strcmp(tfr.dimord,'rpt_chan_freq_time')
+    field = 'powspctrm';
+elseif strcmp(tfr.dimord,'rpttap_chan_freq_time')
+    field = 'fourierspctrm';
+else
     error('Check dimord to be sure trial dimension is first!')
 end
 
@@ -28,38 +32,38 @@ bsln_tfr = ft_selectdata(cfgs,tfr);
 if strcmp(bsln_type,'zboot')
     fprintf('\tComputing permutations: # boots / (%i) = ',n_boots);
     rng('shuffle'); % seed randi with time
-    sample_means = NaN([numel(tfr.label) size(tfr.powspctrm,3) n_boots]);
-    sample_stds  = NaN([numel(tfr.label) size(tfr.powspctrm,3) n_boots]);
+    sample_means = NaN([numel(tfr.label) size(tfr.(field),3) n_boots]);
+    sample_stds  = NaN([numel(tfr.label) size(tfr.(field),3) n_boots]);
     for boot_ix = 1:n_boots
         if mod(boot_ix,50)==0
             fprintf('%i..',boot_ix);
         end
         % Select a random set of trials (sampling WITH REPLACEMENT!)
-        shuffle_ix = randi(size(tfr.powspctrm,1),[1 size(tfr.powspctrm,1)]);
+        shuffle_ix = randi(size(tfr.(field),1),[1 size(tfr.(field),1)]);
         % Compute stats
-        sample_means(:,:,boot_ix) = nanmean(nanmean(bsln_tfr.powspctrm(shuffle_ix,:,:,:),4),1);
-        sample_stds(:,:,boot_ix)  = nanstd(nanstd(bsln_tfr.powspctrm(shuffle_ix,:,:,:),[],4),[],1);
+        sample_means(:,:,boot_ix) = nanmean(nanmean(bsln_tfr.(field)(shuffle_ix,:,:,:),4),1);
+        sample_stds(:,:,boot_ix)  = nanstd(nanstd(bsln_tfr.(field)(shuffle_ix,:,:,:),[],4),[],1);
     end
     fprintf('\n');
 end
 
 bslnd_tfr = tfr;
-for ch = 1:size(tfr.powspctrm,2)
+for ch = 1:size(tfr.(field),2)
 %     fprintf('\t%s (%i / %i)\n',tfr.label{ch},ch,numel(tfr.label));
-    for f = 1:size(tfr.powspctrm,3)
+    for f = 1:size(tfr.(field),3)
         % Perform Baseline Correction
-        for t = 1:size(tfr.powspctrm,1)
-            trials  = tfr.powspctrm(t,ch,f,:);
-            trl_bsln    = bsln_tfr.powspctrm(t,ch,f,:);
+        for t = 1:size(tfr.(field),1)
+            trials  = tfr.(field)(t,ch,f,:);
+            trl_bsln    = bsln_tfr.(field)(t,ch,f,:);
             switch bsln_type
                 case 'zboot'
-                    bslnd_tfr.powspctrm(t,ch,f,:) = (trials-mean(sample_means(ch,f,:)))/mean(sample_stds(ch,f,:));                    
+                    bslnd_tfr.(field)(t,ch,f,:) = (trials-mean(sample_means(ch,f,:)))/mean(sample_stds(ch,f,:));                    
                 case 'zscore'
-                    bslnd_tfr.powspctrm(t,ch,f,:) = (trials-nanmean(trl_bsln))/nanstd(trl_bsln);
+                    bslnd_tfr.(field)(t,ch,f,:) = (trials-nanmean(trl_bsln))/nanstd(trl_bsln);
                 case 'demean'
-                    bslnd_tfr.powspctrm(t,ch,f,:) = trials-nanmean(trl_bsln);
+                    bslnd_tfr.(field)(t,ch,f,:) = trials-nanmean(trl_bsln);
                 case 'my_relchange'
-                    bslnd_tfr.powspctrm(t,ch,f,:) = (trials-nanmean(trl_bsln))/nanmean(trl_bsln);
+                    bslnd_tfr.(field)(t,ch,f,:) = (trials-nanmean(trl_bsln))/nanmean(trl_bsln);
                 otherwise
                     error(['Unknown bsln_type: ' bsln_type])
             end

@@ -8,9 +8,9 @@ function [labels, names, colors, line_styles] = fn_regressor_label_styles(model_
 %% List of possible regressors and their colors
 regressors  = {...
     'pWin','sPE','uPE',... % Reward Feedback
-    'sTarD','psTarD','p2sTarD',... % Performance (signed)
-    'uTarD','puTarD','p2uTarD',... % Performance (unsigned)
-    'sThrD','uThrD' ... %'iThrD', ... % Performance (threshold)
+    'sTar','psTar','p2sTar',... % Performance (signed)
+    'uTar','puTar','p2uTar',... % Performance (unsigned)
+    'sThr','uThr' ... %'iThr', ... % Performance (threshold)
     };
 regressor_names = {...
     'Prob(Win)','+/- Pred Err','abs Pred Err',...
@@ -53,40 +53,40 @@ regressor_colors = {...
 switch model_id
     case 'RL'
         labels = {'pWin','sPE','uPE'};
-    case 'RLsTarD'
-        labels = {'pWin','sPE','uPE','sTarD'};
-    case 'RLTarD'
-        labels = {'pWin','sPE','uPE','sTarD','uTarD'};
-    case 'RLThrD'
-        labels = {'pWin','sPE','uPE','sThrD','uThrD'};
+    case 'RLsTar'
+        labels = {'pWin','sPE','uPE','sTar'};
+    case 'RLTar'
+        labels = {'pWin','sPE','uPE','sTar','uTar'};
+    case 'RLThr'
+        labels = {'pWin','sPE','uPE','sThr','uThr'};
     case 'RLfullD'
-        labels = {'pWin','sPE','uPE','sTarD','uTarD','sThrD','uThrD'};
+        labels = {'pWin','sPE','uPE','sTar','uTar','sThr','uThr'};
     case 'RL3D'
-        labels = {'pWin','sPE','uPE','sTarD','uTarD','uThrD'};
+        labels = {'pWin','sPE','uPE','sTar','uTar','uThr'};
     case 'RLsD'
-        labels = {'pWin','sPE','uPE','sTarD','sThrD'};
+        labels = {'pWin','sPE','uPE','sTar','sThr'};
     case 'RLuD'
-        labels = {'pWin','sPE','uPE','uTarD','uThrD'};
+        labels = {'pWin','sPE','uPE','uTar','uThr'};
         
     % Pre-Feedback Models
-    case 'pWTarD'
-        labels = {'pWin','sTarD','uTarD'};
+    case 'pWTar'
+        labels = {'pWin','sTar','uTar'};
     case 'pWallD'
-        labels = {'pWin','sTarD','uTarD','sThrD','uThrD'};
+        labels = {'pWin','sTar','uTar','sThr','uThr'};
         
     % Previous Trial Regressors:
     case 'RLpT'
         error('why running with previous trial regressors?');
-        labels = {'pWin','sPE','uPE','sTarD','psTarD'};
+        labels = {'pWin','sPE','uPE','sTar','psTar'};
     case 'RLpRTlD'
         error('why running with previous trial regressors?');
-        labels = {'pWin','sPE','uPE','sTarD','psTarD','sThrD'};
+        labels = {'pWin','sPE','uPE','sTar','psTar','sThr'};
     case 'RLpRTulD'
         error('why running with previous trial regressors?');
-        labels = {'pWin','sPE','uPE','sTarD','psTarD','sThrD','uThrD'};
+        labels = {'pWin','sPE','uPE','sTar','psTar','sThr','uThr'};
 %     case 'RLpRTiD'
 %         error('why running with previous trial regressors?');
-%         labels = {'pWin','sPE','uPE','sTarD','psTarD','iThrD'};
+%         labels = {'pWin','sPE','uPE','sTar','psTar','iThr'};
     otherwise
         error(strcat('Unknown model_id: ',model_id));
 end
@@ -98,9 +98,9 @@ line_styles = cell(size(labels));
 for reg_ix = 1:numel(labels)
     names{reg_ix}  = regressor_names{strcmp(labels{reg_ix},regressors)};
     colors{reg_ix} = regressor_colors{strcmp(labels{reg_ix},regressors)};
-    if any(strcmp(labels{reg_ix},'psTarD'))%{'psTarD','uThrD'}
+    if any(strcmp(labels{reg_ix},'psTar'))%{'psTar','uThr'}
         line_styles{reg_ix} = ':';
-    elseif strcmp(labels{reg_ix},'p2sTarD')
+    elseif strcmp(labels{reg_ix},'p2sTar')
         line_styles{reg_ix} = '-.';
     else
         line_styles{reg_ix} = '-';

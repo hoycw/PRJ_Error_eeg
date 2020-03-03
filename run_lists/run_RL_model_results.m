@@ -32,10 +32,10 @@ SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
 stat_ids = {'RL_all_lme_st0t5'};%'RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
-% stat_ids = {'pWTarD_all_lme_st3t5','pWallD_all_lme_st3t5'};
-% stat_ids  = {'RLpRTulD_all_lme_st0t5'};%,'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5','RLpRTlD_all_lme_st0t5'};
+% stat_ids = {'pWTar_all_lme_st3t5','pWallD_all_lme_st3t5'};
+% stat_ids  = {'RLpRTul_all_lme_st0t5'};%,'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5','RLpRTlD_all_lme_st0t5'};
 % RL models:
-%   RLfullD: pWin, sPE, uPE, sTarD, uTarD, uThrD (no sThrD!!!)
+%   RLfullD: pWin, sPE, uPE, sTar, uTar, uThr (no sThr!!!)
 %   RL/pWinPEus (original) = pWin, sPE, uPE
 %   RLRT = RL + tRT
 %   RLpRT = RLRT + ptRT
@@ -126,7 +126,7 @@ end
 %% PHS TFR: Linear Mixed Effects Model (Over Time-Frequency Phase)
 % conditions = 'DifFB';
 proc_id   = 'eeg_full_ft';
-an_ids    = {'ITC_Fz_F2t1_fl1t12b05'};%,'TFR_Pz_F2t1_db2t0_fl1t12b05'};
+an_ids    = {'PHS_Fz_F2t1_fl1t12b05'};%,'TFR_Pz_F2t1_db2t0_fl1t12b05'};
 stat_ids  = {'RL_all_CLcorr_st0t5'};
 %stat_ids  = {'RLpRTulD_all_lme_st0t5'};%'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
 %plt_id    = 'ts_F2to1_evnts_sigLine';
