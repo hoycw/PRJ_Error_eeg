@@ -161,7 +161,7 @@ for ch_ix = 1:numel(ch_list)
     
     %% Plot ERPs with significance
     axes = gobjects([3 1]);
-    subplot(3,1,1);
+    subplot(6,1,1:3);
     axes(1) = gca; hold on;
     
     % Plot Means (and variance)
@@ -244,7 +244,7 @@ for ch_ix = 1:numel(ch_list)
     axes(1).YLim = ylims;
     
     %% Plot Betas and R2
-    subplot(3,1,2);
+    subplot(6,1,4:5);
     axes(2) = gca; hold on;
     
     % Plot Model Betas
@@ -287,7 +287,7 @@ for ch_ix = 1:numel(ch_list)
     axes(2).YLim = ylims;
     
     %% Plot R2
-    subplot(3,1,3);
+    subplot(6,1,6);
     axes(3) = gca; hold on;
     
     line(st_time_vec, r2, 'Color','k', 'LineWidth',2);

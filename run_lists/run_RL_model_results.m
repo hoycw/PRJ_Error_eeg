@@ -86,7 +86,7 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-%         SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
         SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
@@ -98,8 +98,8 @@ end
 
 %% ERP: Linear Mixed Effects Model (Mean Windows)
 proc_id   = 'eeg_full_ft';
-an_ids    = {'ERPlp_all_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'RLpRTulD_all_lme_mn05sPE05','RLpRTulD_all_lme_mn05uPE05'};
+an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};%'ERPlp_all_F2t1_dm2t0_fl05t20'};
+stat_ids  = {'RL3D_all_lme_mn05sPE05','RL3D_all_lme_mn05uPE05'};
 % stat_ids  = {'RLpRTlD_all_lme_mn2t3','RLpRTlD_all_lme_mn3t4'};
 plt_ids   = {'topo_F18t25','topo_F3t45'};
 save_fig  = 1;
@@ -158,7 +158,7 @@ for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(model_ids)
         % Circular-Linear Correlation: Group Level
         stat_id = [model_ids{st_ix} '_CLcorr_' model_win];
-        SBJ05d_PHS_grp_stats_CLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
+%         SBJ05d_PHS_grp_stats_CLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
         SBJ05e_PHS_plot_stats_CLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         

@@ -97,6 +97,8 @@ cfgp.zlim     = clim;
 cfgp.layout   = 'biosemi64.lay';
 cfgp.colorbar = 'yes';
 cfgp.comment  = 'no';
+% cfgp.highlight = 'on';
+% cfgp.highlightsymbol = '*';
 cfgp.maskparameter = 'mask';
 for reg_ix = 1:numel(reg_lab)
     subplot(num_rc(1),num_rc(2),reg_ix);
@@ -104,7 +106,9 @@ for reg_ix = 1:numel(reg_lab)
     
     % Plot Beta Topos
     topo.avg  = betas(reg_ix,:)';
-    topo.mask = ones(size(topo.avg))*0.3;
+%     ch_ix = 1:numel(topo.label);
+%     topo.highlightchannel = ch_ix(qvals(reg_ix,:)'<=st.alpha);
+    topo.mask = ones(size(topo.avg))*0.1;%zeros(size(topo.avg));
     topo.mask(qvals(reg_ix,:)'<=st.alpha) = 1;
     % cfgp.zlim = [min(betas(reg_ix,:)) max(betas(reg_ix,:))];
     ft_topoplotER(cfgp, topo);

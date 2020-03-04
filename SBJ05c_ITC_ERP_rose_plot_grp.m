@@ -1,4 +1,4 @@
-function SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,itc_an_id,phs_id,erp_an_id,plt_id,save_fig,varargin)
+function SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,phs_an_id,phs_freq_lim,phs_time_lim,erp_an_id,plt_id,save_fig,varargin)
 %% Compute and plot ITPC matrix for group with ERP on top
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -36,13 +36,13 @@ if ischar(save_fig); save_fig = str2num(save_fig); end
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' erp_an_id '_vars.m'];
 eval(an_vars_cmd);
 erp_an = an;
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' itc_an_id '_vars.m'];
+an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' phs_an_id '_vars.m'];
 eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
 if ~an.complex; error('why run this without ITPC an_vars?'); end
 if ~strcmp(an.event_type,erp_an.event_type); error('itc and erp event mismatch!'); end
 if ~all(an.trial_lim_s==erp_an.trial_lim_s); error('itc and erp trial_lim_s mismatch!'); end
-% phs_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' phs_id '_vars.m'];
+% phs_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' phs_stat_id '_vars.m'];
 % eval(phs_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
@@ -56,45 +56,24 @@ for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 
-%% Load Peak Timing Information
-if strcmp(phs_id,'FRN') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_id'}))
-    % Load previous stats
-    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' st.pk_stat_id '_' st.pk_an_id '.mat']);
-    if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
-        error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
-    end
-    
-    % Obtain peak times for target regressor
-    reg_ix = find(strcmp(reg_lab,st.pk_reg_id));
-    pk_ts = nan(size(tmp.time_vec));
-    for t_ix = 1:numel(tmp.time_vec)
-        pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);
-    end
-    [~,pk_ix] = max(abs(pk_ts));
-    reg_pk_time = tmp.time_vec(pk_ix);
-    st.stat_lim = st.stat_lim+reg_pk_time;
-else
-    reg_pk_time = nan;
-end
-
 %% Load data
 cfgs = [];
 cfgs.avgoverfreq = 'yes';
-cfgs.frequency   = phs.freq;
-cfgs.latency     = phs.lim;
+cfgs.frequency   = phs_freq_lim;
+cfgs.latency     = phs_time_lim;
 for s = 1:numel(SBJs)
     fprintf('-------------------- Processing %s ------------------------\n',SBJs{s});
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
     eval(SBJ_vars_cmd);
     load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
     load([SBJ_vars.dirs.proc SBJs{s} '_' erp_an_id '.mat'],'roi');
-    load([SBJ_vars.dirs.proc SBJs{s} '_' proc_id '_' itc_an_id '.mat'],'tfr');
+    load([SBJ_vars.dirs.proc SBJs{s} '_' proc_id '_' phs_an_id '.mat'],'tfr');
     if s==1
         time_vec = tfr.time;
         roi_time_vec = roi.time{1};
         fois     = tfr.freq;
-        freq_idx = tfr.freq>=phs.freq(1) & tfr.freq<=phs.freq(2);
-        time_idx = tfr.time>=phs.lim(1) & tfr.time<=phs.lim(2);
+        freq_idx = tfr.freq>=phs_freq_lim(1) & tfr.freq<=phs_freq_lim(2);
+        time_idx = tfr.time>=phs_time_lim(1) & tfr.time<=phs_time_lim(2);
         ch_list  = tfr.label;
         itpc_all = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(fois) numel(time_vec)]);
         means    = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(roi_time_vec)]);
@@ -159,7 +138,7 @@ else
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' itc_an_id '/' conditions '/' erp_an_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' phs_an_id '/' conditions '/' erp_an_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -179,7 +158,8 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' conditions '_' itc_an_id '_' phs_id '_' erp_an_id '_' ch_list{ch_ix}];
+    fig_name = ['GRP_' conditions '_' phs_an_id '_f' num2str(phs_freq_lim,'%dt%d') ...
+        '_' num2str(phs_time_lim,'%.02ft%.02f') '_'  erp_an_id '_' ch_list{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
@@ -211,10 +191,10 @@ for ch_ix = 1:numel(ch_list)
         colorbar('northoutside');
         
         % Plot time-frequency ROI
-        line([phs.lim(1) phs.lim(1)], phs.freq, 'Color','k','LineWidth',2,'LineStyle','--');
-        line([phs.lim(2) phs.lim(2)], phs.freq, 'Color','k','LineWidth',2,'LineStyle','--');
-        line(phs.lim, [phs.freq(1) phs.freq(1)], 'Color','k','LineWidth',2,'LineStyle','--');
-        line(phs.lim, [phs.freq(2) phs.freq(2)], 'Color','k','LineWidth',2,'LineStyle','--');
+        line([phs_time_lim(1) phs_time_lim(1)], phs_freq_lim, 'Color','k','LineWidth',2,'LineStyle','--');
+        line([phs_time_lim(2) phs_time_lim(2)], phs_freq_lim, 'Color','k','LineWidth',2,'LineStyle','--');
+        line(phs_time_lim, [phs_freq_lim(1) phs_freq_lim(1)], 'Color','k','LineWidth',2,'LineStyle','--');
+        line(phs_time_lim, [phs_freq_lim(2) phs_freq_lim(2)], 'Color','k','LineWidth',2,'LineStyle','--');
         
         % Plot Events
         for evnt_ix = 1:numel(plt.evnt_lab)
