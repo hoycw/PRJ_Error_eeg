@@ -31,8 +31,7 @@ SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
 
 %% Compute TFRs
 proc_id    = 'eeg_full_ft';
-%an_ids     = {'TFR_Fz_F2t1_db2t0_fl05t20'};
-an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12b05'};%'TFR_Fz_F2t1_z2t05_fl1t14','TFR_Fz_F2t1_rc2t0_fl1t14','TFR_Fz_F2t1_db2t0_fl1t14'};
+an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12b05','TFR_Pz_F2t1_db2t0_fl1t12b05'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
 %an_ids = {'TFR_Fz_F2t1_z2t0_fl1t14','TFR_Pz_F2t1_z2t0_fl1t14'};
 conditions = 'DifFB';
@@ -57,9 +56,9 @@ end
 
 %% Compute Phase
 proc_id    = 'eeg_full_ft';
-an_ids     = {'PHS_Fz_F2t1_fl1t12b05'};%{'ITC_Fz_F2t1_fl05t20'};%,'ITC_Pz_F2t1_fl1t12b05'};
+an_ids     = {'PHS_Fz_F2t1_fl1t12b05','PHS_Pz_F2t1_fl1t12b05'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
-%phs_id     = 'PHS_FRN4t8';
+phs_id     = 'PHS_FRN4t8';
 conditions = 'DifFB';
 plt_id     = 'ts_F2to1_evnts_sigLine';%'ts_F4t1_evnts_sigLine';%
 save_fig    = 1;
@@ -79,10 +78,10 @@ for an_ix = 1:numel(an_ids)
     
 %     SBJ05c_ITC_plot_grp(SBJs, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
-%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},phs_id,erp_ids{an_ix},...
-%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},phs_id,erp_ids{an_ix},...
+            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% Compute and Plot POW (Time Series)

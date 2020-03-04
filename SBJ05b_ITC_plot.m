@@ -38,7 +38,7 @@ eval(SBJ_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
-if ~an.itpc; error('why run this without ITPC an_vars?'); end
+if ~an.complex; error('why run this without ITPC an_vars?'); end
 %plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 %eval(plt_vars_cmd);
 

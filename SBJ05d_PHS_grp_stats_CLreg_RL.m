@@ -1,7 +1,6 @@
-function SBJ05d_PHS_grp_stats_CLcorr_RL(SBJs,proc_id,an_id,stat_id)
-% Run Circular-Linear correlation for phase at each time-frequency point
-% across all SBJ (no random effects...), then Fisher z-transformed r values
-% and t-test against 0 (and FDR correct)
+function SBJ05d_PHS_grp_stats_CLreg_RL(SBJs,proc_id,an_id,stat_id)
+% Run Circular-Linear regression for phase at each time-frequency point
+% across all SBJ (no random effects...), then FDR correct
 %   Only for one channel now...
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
@@ -20,7 +19,7 @@ addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath([app_dir 'fieldtrip/']);
 ft_defaults
-addpath([app_dir 'CircStat/']);
+addpath([app_dir 'FMAtoolbox/']);
 
 %% Load Data 
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
@@ -30,7 +29,7 @@ if ~an.complex; error('why run this without ITPC an_vars?'); end
 
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
-if ~strcmp(st.an_style,'CLcorr'); error('stat_id not using circular-linear correlation!'); end
+if ~strcmp(st.an_style,'CLreg'); error('stat_id not using circular-linear regression!'); end
 
 % Select conditions (and trials)
 model_id = [st.model_lab '_' st.trial_cond{1}];
@@ -124,20 +123,20 @@ end
 fprintf('========================== Running Stats ==========================\n');
 tic
 % Stats for each regressor and TFR point
-phs_corr  = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
-% phs_zcorr = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
-% phs_null  = nan([numel(reg_lab) numel(fois) numel(time_vec) st.n_boots]);
+betas     = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
+r2s       = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
 pvals     = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
-% zpvals    = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
-% Phase-Model Correlations
-trial_idx_perm = zeros([size(model,1) st.n_boots]);
+% Phase-Model Regression
+%   CircularRegression can't do multiple regression, so one at a time
 for reg_ix = 1:numel(reg_lab)
     fprintf('%s (%d/%d) freq: ',reg_lab{reg_ix},reg_ix,numel(reg_lab));
     for f_ix = 1:numel(fois)
         fprintf('%.3f..',fois(f_ix));
         for t_ix = 1:numel(time_vec)
-            [phs_corr(reg_ix,f_ix,t_ix), pvals(reg_ix,f_ix,t_ix)] = circ_corrcl(...
-                data(:,f_ix,t_ix), model(:,reg_ix));
+            %[beta,R2,p] = CircularRegression(x,angles,p,varargin)
+            [slope_int, r2s(reg_ix,f_ix,t_ix), pvals(reg_ix,f_ix,t_ix)] = ...
+                CircularRegression(model(:,reg_ix), data(:,f_ix,t_ix));
+            betas(reg_ix,f_ix,t_ix) = slope_int(1);
             
 %             % Generate null distribution
 %             for boot_ix = 1:st.n_boots
@@ -147,7 +146,7 @@ for reg_ix = 1:numel(reg_lab)
 %                 [phs_null(reg_ix,f_ix,t_ix,boot_ix), ~] = circ_corrcl(data(:,f_ix,t_ix), ...
 %                     model(trial_idx_perm(:,boot_ix),reg_ix));
 %             end
-%             
+            
 %             % Z-score correlation values
 %             phs_zcorr(reg_ix,f_ix,t_ix) = ...
 %                 (phs_corr(reg_ix,f_ix,t_ix)-mean(phs_null(reg_ix,f_ix,t_ix,:),4)) / ...
@@ -158,16 +157,11 @@ for reg_ix = 1:numel(reg_lab)
     end
     fprintf('\n');
 end
-% tmp_zpval = sum(bsxfun(@ge,phs_null,phs_zcorr),4)./st.n_boots; % sum(boots>real)/n_boots
-% % warning: this is not the same as the above version! unclear which is
-% % right, but probably the simpler non-vectorized one...
 
 % Correct for Multiple Comparisons
 if strcmp(st.mcp_method,'FDR')
     [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2)*size(pvals,3) 1]));
     qvals = reshape(qvals,[size(pvals,1) size(pvals,2) size(pvals,3)]);
-%     [~, ~, ~, zqvals] = fdr_bh(reshape(zpvals,[size(zpvals,1)*size(zpvals,2)*size(zpvals,3) 1]));
-%     zqvals = reshape(zqvals,[size(zpvals,1) size(zpvals,2) size(zpvals,3)]);
 else
     error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
 end
@@ -181,6 +175,6 @@ if ~exist(stat_out_dir,'dir')
 end
 stat_out_fname = [stat_out_dir 'GRP_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','phs_corr','qvals','SBJs');%phs_null,'phs_zcorr','zqvals'
+save(stat_out_fname,'-v7.3','betas','r2s','qvals','SBJs');
 
 end

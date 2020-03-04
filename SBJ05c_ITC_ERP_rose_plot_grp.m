@@ -39,11 +39,11 @@ erp_an = an;
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' itc_an_id '_vars.m'];
 eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
-if ~an.itpc; error('why run this without ITPC an_vars?'); end
+if ~an.complex; error('why run this without ITPC an_vars?'); end
 if ~strcmp(an.event_type,erp_an.event_type); error('itc and erp event mismatch!'); end
 if ~all(an.trial_lim_s==erp_an.trial_lim_s); error('itc and erp trial_lim_s mismatch!'); end
-phs_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' phs_id '_vars.m'];
-eval(phs_vars_cmd);
+% phs_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' phs_id '_vars.m'];
+% eval(phs_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
@@ -56,7 +56,28 @@ for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 
-% Load data
+%% Load Peak Timing Information
+if strcmp(phs_id,'FRN') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_id'}))
+    % Load previous stats
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' st.pk_stat_id '_' st.pk_an_id '.mat']);
+    if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
+        error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
+    end
+    
+    % Obtain peak times for target regressor
+    reg_ix = find(strcmp(reg_lab,st.pk_reg_id));
+    pk_ts = nan(size(tmp.time_vec));
+    for t_ix = 1:numel(tmp.time_vec)
+        pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);
+    end
+    [~,pk_ix] = max(abs(pk_ts));
+    reg_pk_time = tmp.time_vec(pk_ix);
+    st.stat_lim = st.stat_lim+reg_pk_time;
+else
+    reg_pk_time = nan;
+end
+
+%% Load data
 cfgs = [];
 cfgs.avgoverfreq = 'yes';
 cfgs.frequency   = phs.freq;

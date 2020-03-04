@@ -9,6 +9,9 @@ function condition_n = fn_condition_index(cond_lab, bhv)
 
 condition_n = zeros(size(bhv.trl_n));
 for cond_ix = 1:numel(cond_lab)
+    if any(strcmp(cond_lab{cond_ix},{'ErQ1','ErQ2','LtQ3','LtQ4'}))
+        quartiles = quantile(bhv.rt,4);
+    end
     switch cond_lab{cond_ix}
         case 'Ez'
             condition_n(strcmp('easy',bhv.cond)) = cond_ix;
@@ -26,6 +29,14 @@ for cond_ix = 1:numel(cond_lab)
         case 'Lt'
             warning('WARNING!!! Assuming target_time = 1 sec...');
             condition_n(bhv.rt>1) = cond_ix;
+        case 'ErQ1'
+            condition_n(bhv.rt<=quartiles(1)) = cond_ix;
+        case 'ErQ2'
+            condition_n(bhv.rt>quartiles(1) &bhv.rt<=quartiles(2)) = cond_ix;
+        case 'LtQ3'
+            condition_n(bhv.rt>quartiles(2) & bhv.rt<=quartiles(3)) = cond_ix;
+        case 'LtQ4'
+            condition_n(bhv.rt>quartiles(3)) = cond_ix;
         case 'EzWn'
             matches = logical(strcmp('easy',bhv.cond)) & strcmp(bhv.fb,'W');
             condition_n(matches) = cond_ix;
@@ -44,13 +55,13 @@ for cond_ix = 1:numel(cond_lab)
         case 'HdSu'
             matches = logical(strcmp('hard',bhv.cond)) & strcmp(bhv.fb,'S');
             condition_n(matches) = cond_ix;
-        case 'odd'
+        case 'Odd'
             matches = logical(strcmp('odd',bhv.cond));
             condition_n(matches) = cond_ix;
-        case 'std'
+        case 'Std'
             matches = logical(strcmp('std',bhv.cond));
             condition_n(matches) = cond_ix;
-        case 'tar'
+        case 'Tar'
             matches = logical(strcmp('tar',bhv.cond));
             condition_n(matches) = cond_ix;
         otherwise

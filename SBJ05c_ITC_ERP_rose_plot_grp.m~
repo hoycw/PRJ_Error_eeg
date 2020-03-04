@@ -1,5 +1,7 @@
-function SBJ05cish_PHS_RL_plot_grp(SBJs,proc_id,itc_an_id,phs_id,stat_id,plt_id,save_fig,varargin)
+function SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,itc_an_id,phs_id,erp_an_id,plt_id,save_fig,varargin)
 %% Compute and plot ITPC matrix for group with ERP on top
+% INPUTS:
+%   conditions [str] - group of condition labels to segregate trials
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -10,7 +12,6 @@ else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath([app_dir 'fieldtrip/']);
-addpath([app_dir 'CircStat/']);
 ft_defaults
 
 %% Handle Variable Inputs & Defaults
@@ -31,7 +32,7 @@ if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
-%% Load Parameters
+%% Load Results
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' erp_an_id '_vars.m'];
 eval(an_vars_cmd);
 erp_an = an;
@@ -41,16 +42,12 @@ if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
 if ~an.complex; error('why run this without ITPC an_vars?'); end
 if ~strcmp(an.event_type,erp_an.event_type); error('itc and erp event mismatch!'); end
 if ~all(an.trial_lim_s==erp_an.trial_lim_s); error('itc and erp trial_lim_s mismatch!'); end
-phs_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' phs_id '_vars.m'];
-eval(phs_vars_cmd);
-stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
-eval(stat_vars_cmd);
+% phs_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' phs_id '_vars.m'];
+% eval(phs_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
 % Select conditions (and trials)
-model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
 % if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
@@ -59,57 +56,32 @@ for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 
-%% Load Behavior
-bhvs          = cell(size(SBJs));
-full_cond_idx = cell(size(SBJs));
-n_trials      = zeros([numel(SBJs) 1]);
-for s = 1:numel(SBJs)
-    % Load data
-    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
-        SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
-    bhvs{s} = tmp.bhv;
-    
-    % Select Conditions of Interest
-    full_cond_idx{s} = fn_condition_index(cond_lab, bhvs{s});
-    bhv_fields = fieldnames(bhvs{s});
-    orig_n_trials = numel(bhvs{s}.trl_n);
-    for f_ix = 1:numel(bhv_fields)
-        if numel(bhvs{s}.(bhv_fields{f_ix}))==orig_n_trials
-            bhvs{s}.(bhv_fields{f_ix}) = bhvs{s}.(bhv_fields{f_ix})(full_cond_idx{s}~=0);
-        end
-    end
-    n_trials(s) = numel(bhvs{s}.trl_n);
-    
-    clear tmp
-end
-
 %% Load Peak Timing Information
-% if strcmp(st.measure,'mean') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_id'}))
-%     % Load previous stats
-%     tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' st.pk_stat_id '_' st.pk_an_id '.mat']);
-%     if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
-%         error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
-%     end
-%     
-%     % Obtain peak times for target regressor
-%     reg_ix = find(strcmp(reg_lab,st.pk_reg_id));
-%     pk_ts = nan(size(tmp.time_vec));
-%     for t_ix = 1:numel(tmp.time_vec)
-%         pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);
-%     end
-%     [~,pk_ix] = max(abs(pk_ts));
-%     reg_pk_time = tmp.time_vec(pk_ix);
-%     st.stat_lim = st.stat_lim+reg_pk_time;
-% end
+if strcmp(st.measure,'mean') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_id'}))
+    % Load previous stats
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' st.pk_stat_id '_' st.pk_an_id '.mat']);
+    if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
+        error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
+    end
+    
+    % Obtain peak times for target regressor
+    reg_ix = find(strcmp(reg_lab,st.pk_reg_id));
+    pk_ts = nan(size(tmp.time_vec));
+    for t_ix = 1:numel(tmp.time_vec)
+        pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);
+    end
+    [~,pk_ix] = max(abs(pk_ts));
+    reg_pk_time = tmp.time_vec(pk_ix);
+    st.stat_lim = st.stat_lim+reg_pk_time;
+else
+    reg_pk_time = nan;
+end
 
 %% Load data
 cfgs = [];
 cfgs.avgoverfreq = 'yes';
 cfgs.frequency   = phs.freq;
 cfgs.latency     = phs.lim;
-
-model = zeros([sum(n_trials) numel(reg_lab)]);
-sbj_factor  = zeros([sum(n_trials) 1]);
 for s = 1:numel(SBJs)
     fprintf('-------------------- Processing %s ------------------------\n',SBJs{s});
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
@@ -124,91 +96,45 @@ for s = 1:numel(SBJs)
         freq_idx = tfr.freq>=phs.freq(1) & tfr.freq<=phs.freq(2);
         time_idx = tfr.time>=phs.lim(1) & tfr.time<=phs.lim(2);
         ch_list  = tfr.label;
-        ang      = cell(size(ch_list));
-    
-        % Load RL Model
-        tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
-        % model(1:n_trials(s),:) = tmp.model;
-        % Z-score SBJ model regressors
-        sbj_model = NaN(size(tmp.model));
-        if st.z_reg
-            for reg_ix = 1:numel(reg_lab)
-                sbj_model(:,reg_ix) = ...
-                    (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
-            end
-        else
-            sbj_model = model;
-        end
-        model(1:n_trials(s),:) = sbj_model;
-        
-        % Track SBJ
-        sbj_factor(1:n_trials(s),end) = s*ones([n_trials(s) 1]);
-    else
-        % Load RL Model
-        tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
-        % model(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),:) = tmp.model;
-        % Z-score SBJ model regressors
-        sbj_model = NaN(size(tmp.model));
-        if st.z_reg
-            for reg_ix = 1:numel(reg_lab)
-                sbj_model(:,reg_ix) = ...
-                    (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
-            end
-        else
-            sbj_model = model;
-        end
-        model(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),:) = sbj_model;
-        
-        % Track SBJ
-        sbj_factor(sum(n_trials(1:s-1))+1:sum(n_trials(1:s))) = s*ones([n_trials(s) 1]);
+        itpc_all = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(fois) numel(time_vec)]);
+        means    = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(roi_time_vec)]);
+        ang      = cell([numel(cond_lab) numel(ch_list)]);
     end
     
-    % Compute Mean Phase Angle per trial
-    complex = ft_selectdata(cfgs,tfr);
-    for ch_ix = 1:numel(ch_list)
-        ang{ch_ix} = [ang{ch_ix}; squeeze(angle(nanmean(complex.fourierspctrm(:,ch_ix,:,:),4)))];
-    end
+    % Compute ITPC
+    cond_idx = fn_condition_index(cond_lab, bhv);
+    for cond_ix = 1:numel(cond_lab)
+        cond_trial_ix = find(cond_idx==cond_ix);
+        % Phase angle computation
+        cfgs.trials = cond_trial_ix;
+        complex = ft_selectdata(cfgs,tfr);
+        for ch_ix = 1:numel(ch_list)
+            tmp_ang = angle(complex.fourierspctrm(:,ch_ix,:,:));
+            ang{cond_ix,ch_ix} = [ang{cond_ix,ch_ix}; tmp_ang(:)];
+        end
         
+        % ITPC Computation
+        F = tfr.fourierspctrm(cond_trial_ix,:,:,:);
+        itpc = F./abs(F);                               % Normalize to unit circle
+        itpc = sum(itpc,1);                             % Sum phase angles
+        itpc = abs(itpc)/numel(cond_trial_ix);        % Get mean of angles for consistency
+        % Add to running total
+        itpc_all(cond_ix,s,:,:,:) = squeeze(itpc);
+        
+        % ERP Computation
+        trials = nan([numel(ch_list) numel(cond_trial_ix) numel(roi_time_vec)]);
+        for t_ix = 1:numel(cond_trial_ix)
+            trials(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
+        end
+        means(cond_ix,s,:,:) = mean(trials,2);
+    end
     clear bhv roi tfr itpc SBJ_vars cond_idx
 end
 
 % Normalize by number of SBJs
-% itpc_avg = nan([numel(cond_lab) numel(ch_list) numel(fois) numel(time_vec)]);
-% itpc_avg(:,:,:,:) = nanmean(itpc_all,2);    % squeeze will take out ch dimension
+itpc_avg = nan([numel(cond_lab) numel(ch_list) numel(fois) numel(time_vec)]);
+itpc_avg(:,:,:,:) = nanmean(itpc_all,2);    % squeeze will take out ch dimension
 
-% % Concat SBJs
-% for ch_ix = 1:numel(ch_list)
-%     phs = vertcat(ang{:,ch_ix});
-% end
-
-%% Phase-Model Correlations
-phs_corr = nan(size(reg_lab));
-phs_pval = nan(size(reg_lab));
-for reg_ix = 1:numel(reg_lab)
-    for ch_ix = 1:numel(ch_list)
-        [phs_corr(reg_ix), phs_pval(reg_ix)] = circ_corrcl(ang{ch_ix}, model(:,reg_ix));
-    end
-end
-
-%% Bin regressor by phase
-bins = [-pi:pi/4:pi];
-reg_bar = nan([numel(reg_lab) numel(bins)]);
-for reg_ix = 1:numel(reg_lab)
-    for b_ix = 2:numel(bins)
-        phs_idx = ang{ch_ix}>=bins(b_ix-1) & ang{ch_ix}<bins(b_ix);
-        reg_bar(reg_ix,b_ix) = mean(model(phs_idx,reg_ix));
-    end
-end
-
-% plot
-figure;
-for r = 1:7
-    subplot(4,2,r);
-    bar(bins,reg_bar(r,:));
-    title([reg_lab{r} ': r = ' num2str(phs_corr(r)) ' (p = ' num2str(phs_pval(r)) ')']);
-end
-
-%% Or rose plot by binned regressor?
 %% Get event timing for plotting
 evnt_times = zeros(size(plt.evnt_lab));
 if strcmp(an.event_type,'S')

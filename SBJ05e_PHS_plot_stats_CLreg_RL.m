@@ -1,5 +1,5 @@
-function SBJ05e_PHS_plot_stats_wITPC_RL(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
-%% Plot group TFRs per regressor: z-scored weighted ITPC outlined by significance
+function SBJ05e_PHS_plot_stats_CLreg_RL(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
+%% Plot group TFRs per regressor: circular-linear correlations outlined by significance
 %   Only for single channel right now...
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -40,7 +40,7 @@ if ~an.complex; error('why run this without ITPC an_vars?'); end
 
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
-if ~strcmp(st.an_style,'wITPC'); error('stat_id not using wITPC!'); end
+if ~strcmp(st.an_style,'CLreg'); error('stat_id not using circular-linear regression!'); end
 % plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 % eval(plt_vars_cmd);
 
@@ -56,7 +56,7 @@ end
 warning('WARNING: Assuming same prdm_vars for all SBJ to get event timing!');
 prdm_vars = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/03_events/' SBJs{1} '_prdm_vars.mat']);
 
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'zwitpc','qvals');
+load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'betas','r2s','qvals');
 
 %% Load TFR for axes
 load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/04_proc/' SBJs{1} '_' proc_id '_' an_id '.mat']);
@@ -77,22 +77,16 @@ end
 % Create a figure for each channel
 for ch_ix = 1:numel(st_tfr.label)
     % Get color lims per condition
-    data_mat = squeeze(mean(zwitpc,1));
-    clim = [min(data_mat(:)) max(data_mat(:))];
+    beta_clim = [min(betas(:)) max(betas(:))];
+    r2_clim   = [min(r2s(:)) max(r2s(:))];
     
     % Get significance mask
     ns_alpha = 0.4;
     sig_mask = ones(size(qvals))*ns_alpha;
     sig_mask(qvals<=st.alpha) = 1;
 
-%     tick_ix = 1:3:numel(fois);
-%     yticklab = cell(size(tick_ix));
-%     for f = 1:numel(tick_ix)
-%         yticklab{f} = num2str(st_tfr.freq(tick_ix(f)),'%.1f');
-%     end
-    
-    %% Create plot
-    fig_name = ['GRP_' stat_id '_' an_id '_' st_tfr.label{ch_ix}];
+    %% Create Beta Plot
+    fig_name = ['GRP_' stat_id '_' an_id '_' st_tfr.label{ch_ix} '_betas'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
@@ -104,7 +98,7 @@ for ch_ix = 1:numel(st_tfr.label)
         subplot(num_rc(1),num_rc(2),reg_ix);
         axes(reg_ix) = gca; hold on;
         
-        im = imagesc(st_time_vec, fois, squeeze(data_mat(reg_ix,:,:)),clim);
+        im = imagesc(st_time_vec, fois, squeeze(betas(reg_ix,:,:)),beta_clim);
         im.AlphaData = squeeze(sig_mask(reg_ix,:,:));
         set(axes(reg_ix),'YDir','normal');
 %         set(axes(reg_ix),'YTick',tick_ix);
@@ -113,7 +107,43 @@ for ch_ix = 1:numel(st_tfr.label)
         set(axes(reg_ix),'XLim',[min(st_time_vec) max(st_time_vec)]);
         set(axes(reg_ix),'XTick',[min(st_time_vec):0.1:max(st_time_vec)]);
         %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
-        title([st_tfr.label{ch_ix} ': z-wITPC ' reg_lab{reg_ix}]);
+        title([st_tfr.label{ch_ix} ': Phase-' reg_lab{reg_ix} ' Beta']);
+        xlabel('Time (s)');
+        ylabel('Frequency (Hz)');
+        colorbar('northoutside');
+        set(axes(reg_ix),'FontSize',16);
+    end
+    
+    % Save figure
+    if save_fig
+        fig_filename = [fig_dir fig_name '.png'];
+        fprintf('Saving %s\n',fig_filename);
+        saveas(gcf,fig_filename);
+    end
+    
+    %% Create R2 Plot
+    fig_name = ['GRP_' stat_id '_' an_id '_' st_tfr.label{ch_ix} '_R2'];
+    figure('Name',fig_name,'units','normalized',...
+        'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
+    
+    % Beta Plots
+    %cfgplt = []; cfgplt.zlim = clim;
+    axes = gobjects([numel(reg_lab) 1]);
+    [num_rc,~] = fn_num_subplots(numel(reg_lab));
+    for reg_ix = 1:numel(reg_lab)
+        subplot(num_rc(1),num_rc(2),reg_ix);
+        axes(reg_ix) = gca; hold on;
+        
+        im = imagesc(st_time_vec, fois, squeeze(r2s(reg_ix,:,:)),r2_clim);
+        im.AlphaData = squeeze(sig_mask(reg_ix,:,:));
+        set(axes(reg_ix),'YDir','normal');
+%         set(axes(reg_ix),'YTick',tick_ix);
+%         set(axes(reg_ix),'YTickLabels',yticklab);
+        set(axes(reg_ix),'YLim',[min(fois) max(fois)]);
+        set(axes(reg_ix),'XLim',[min(st_time_vec) max(st_time_vec)]);
+        set(axes(reg_ix),'XTick',[min(st_time_vec):0.1:max(st_time_vec)]);
+        %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
+        title([st_tfr.label{ch_ix} ': Phase-' reg_lab{reg_ix} ' R2']);
         xlabel('Time (s)');
         ylabel('Frequency (Hz)');
         colorbar('northoutside');

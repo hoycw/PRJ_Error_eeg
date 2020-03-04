@@ -170,7 +170,7 @@ switch an.bsln_type
         cfgbsln.parameter    = 'powspctrm';
         tfr = ft_freqbaseline(cfgbsln,tfr);
     case 'none'
-        if an.itpc
+        if an.complex
             fprintf('\tNo baseline correction for ITPC data...\n');
         else
             error('Why no baseline correction if not ITPC?');
