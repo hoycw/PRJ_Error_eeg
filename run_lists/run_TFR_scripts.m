@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10'};
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12'};
 % Not Ready SBJ:
 %   EP06: only 62 channels?
 %   EP09: 2 BDFs, unknown quality?

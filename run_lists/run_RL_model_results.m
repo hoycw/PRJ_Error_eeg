@@ -11,7 +11,12 @@ ft_defaults
 
 %% General parameters
 SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10'};
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12'};
+all_SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12',...
+           'EEG13','EEG14','EEG15','EEG16','EEG17','EEG18','EEG19','EEG20',...
+           'EEG21','EEG22','EEG23','EEG24','EEG25','EEG26','EEG27','EEG28',...
+           'EEG29','EEG30','EEG31'};
 % Not Ready SBJ:
 %   EP06: only 62 channels?
 %   EP09: 2 BDFs, unknown quality?
@@ -31,22 +36,21 @@ SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
-% stat_ids = {'RL_all_lme_st0t5'};%'RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
-stat_ids = {'pWTar_all_lme_st3t5','pWallD_all_lme_st3t5'};
-% stat_ids  = {'RLpRTul_all_lme_st0t5'};%,'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5','RLpRTlD_all_lme_st0t5'};
+stat_ids = {'RL3D_all_lme_st0t5'};%'RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
+% stat_ids = {'pWTar_all_lme_st3t5','pWallD_all_lme_st3t5'};
 % RL models:
-%   RLfullD: pWin, sPE, uPE, sTar, uTar, uThr (no sThr!!!)
-%   RL/pWinPEus (original) = pWin, sPE, uPE
-%   RLRT = RL + tRT
-%   RLpRT = RLRT + ptRT
-%   RLpRTlD = RLpRT + lDist
-%   RLpRTiD = RLpRT + iDist
+%   RL3D: pWin, sPE, uPE, sTar, uTar, uThr (no sThr!!!)
+%   RLfullD: pWin, sPE, uPE, sTar, uTar, uThr, sThr
+%   RL: pWin, sPE, uPE
+%   pWTarD: pWin, uTar, sTar
+%   pWallD: pWin, uTar, sTar, uThr, sThr
 
-for s = 1:numel(SBJs)
+for s = 1:numel(all_SBJs)
     for st_ix = 1:numel(stat_ids)
-        SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
+        SBJ04a_RL_model(all_SBJs{s},proc_id,stat_ids{st_ix});
+        SBJ04b_BHV_RL_model_plot(all_SBJs{s},proc_id,stat_ids{st_ix});
     end
-    close all;
+    % close all;
 end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
