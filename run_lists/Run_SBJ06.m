@@ -11,6 +11,7 @@ ft_defaults
 
 %% General parameters
 SBJs = {'EEG01','EEG04','EEG05','EEG06','EEG08','EEG10'};
+SBJs = {'EEG01','EEG04','EEG05','EEG06','EEG08'};
 % No results for oddball:
 %   EEG03
 % Not Ready SBJ:
@@ -84,10 +85,10 @@ end
 eeg_proc_id = 'eeg_full_ft';
 odd_proc_id = 'odd_full_ft';
 conditions  = 'DifFB';
-cpa_id      = 'CPA';
+cpa_id      = 'CPA_odd2';
 an_ids      = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%{'ERP_Fz_S15t28_dm2t0_fl05t20','ERP_Pz_S15t28_dm2t0_fl05t20'};
 % an_ids      = {'POW_Fz_F2t1_dm2t0_fl4t8','POW_Pz_F2t1_dm2t0_fl1t3'};
-stat_id     = 'RLpRTulD_all_lme_st0t5';
+stat_id     = 'RL3D_all_lme_st0t5';
 save_fig    = 1;
 fig_vis     = 'on';
 fig_ftype   = 'png';
@@ -118,7 +119,7 @@ for an_ix = 1:numel(an_ids)
 %     end
     
     % Group LME Stats
-%     SBJ06d_CPA_candidate_ERP_GRP_stats_LME_RL(SBJs,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
+    SBJ06d_CPA_candidate_ERP_GRP_stats_LME_RL(SBJs,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
     
     plt_id    = 'ts_F2to1_evnts_sigLine';
     SBJ06e_CPA_candidate_ERP_plot_LME_RL_fits(SBJs,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id,...

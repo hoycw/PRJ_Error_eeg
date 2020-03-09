@@ -2,19 +2,19 @@
 an.ROI         = {'Fz'};             % Channel to be analyzed
 an.event_type  = 'F';           % event around which to cut trials
 an.trial_lim_s = [-0.2 1];       % window in SEC for cutting trials
-an.bsln_type   = 'none';
-an.bsln_lim    = [-0.2 0];
+an.bsln_type   = 'zscore';
+an.bsln_lim    = [-0.2 1];
 an.bsln_boots  = 0;
 % an.demean_yn   = 'no';    % don't need this for TFRs?
 an.avgoverfreq = 0;
-an.itpc        = 1;
+an.complex     = 1;
 
 % TFR Parameters
 cfg_tfr = [];
 cfg_tfr.method     = 'wavelet';
 cfg_tfr.output     = 'fourier';
 cfg_tfr.taper      = 'hanning';
-cfg_tfr.foi        = [1:0.5:4 5:12];
+cfg_tfr.foi        = [0.5:4.5 5:20];
 cfg_tfr.width      = 3; %default
 cfg_tfr.toi        = 'all'; %-0.2:0.004:1.0;
 cfg_tfr.keeptrials = 'yes'; % need trials for stats, can average later

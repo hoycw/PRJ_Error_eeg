@@ -1,10 +1,12 @@
-function [grp_labels, colors, line_styles] = fn_group_label_styles(model_id)
-%% Converts the name of a set of conditions into labels, plotting colors/styles
+function [grp_labels, grp_names, colors, line_styles] = fn_group_label_styles(model_id)
+%% Converts the name of a model into a set of group labels, plotting colors/styles
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
 %% List of possible labels and their colors
 factors  = {'Dif','Tol','Out','OutS','FB','Tim','Dif*Out','Tol*Out','Sur'};
-fact_colors = {[152 78 163]./255, [152 78 163]./255, [255 127 0]./255, [255 127 0]./255, [255 127 0]./255,...
+factor_names = {'Difficulty', 'Tolerance', 'Outcome', 'Outcome Surprise', 'Feedback', ...
+    'Timing', 'Difficulty*Outcome', 'Tolerance*Outcome', 'Surprise'};
+factor_colors = {[152 78 163]./255, [152 78 163]./255, [255 127 0]./255, [255 127 0]./255, [255 127 0]./255,...
     [255 255 51]./255, [166 86 40]./255, [166 86 40]./255, [166 86 40]./255};
 % Newer (different than RGB for 3 feedback conditions:
 %   purple, orange, yellow, brown (brown again for Sur/DO repeat)
@@ -54,15 +56,18 @@ switch model_id
         error(strcat('Unknown model_id: ',model_id));
 end
 
-% Assign colors and line styles
-colors = cell(size(grp_labels));
+%% Assign colors and line styles
+grp_names   = cell(size(grp_labels));
+colors      = cell(size(grp_labels));
 line_styles = cell(size(grp_labels));
-for cond_ix = 1:numel(grp_labels)
-    colors{cond_ix} = fact_colors{strcmp(grp_labels{cond_ix},factors)};
-    if isempty(strfind(grp_labels{cond_ix},'*'))
-        line_styles{cond_ix} = '-';     % Main effects
+for grp_ix = 1:numel(grp_labels)
+    grp_names{grp_ix} = factor_names{strcmp(grp_labels{grp_ix},factors)};
+    colors{grp_ix}    = factor_colors{strcmp(grp_labels{grp_ix},factors)};
+    % Define Line Styles
+    if isempty(strfind(grp_labels{grp_ix},'*'))
+        line_styles{grp_ix} = '-';     % Main effects
     else
-        line_styles{cond_ix} = '--';    % Interactions
+        line_styles{grp_ix} = '--';    % Interactions
     end
 end
 

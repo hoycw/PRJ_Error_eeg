@@ -20,8 +20,8 @@ eval(stat_vars_cmd);
 
 % Select Conditions of Interest
 model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~]  = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, ~, ~]  = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Behavior
 full_cond_idx = cell(size(SBJs));

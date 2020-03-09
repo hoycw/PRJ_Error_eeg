@@ -47,7 +47,7 @@ if numel(tfr.freq)>1; error('TFR is not averaged over frequencies!'); end
 if numel(tfr.label)==1; error([an_id ' has only one channel!']); end
 
 % Select conditions (and trials)
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 % Get trials for plotting

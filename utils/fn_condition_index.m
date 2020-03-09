@@ -7,6 +7,12 @@ function condition_n = fn_condition_index(cond_lab, bhv)
 % OUTPUTS:
 %   condition_n [int vector] - integer assignment of each trial based on conditions
 
+if any(strcmp(cond_lab,'LtQ3'))
+    quartiles = quantile(bhv.rt,4);
+elseif any(strcmp(cond_lab,'MdQ3'))
+    quartiles = quantile(bhv.rt,5);
+end
+
 condition_n = zeros(size(bhv.trl_n));
 for cond_ix = 1:numel(cond_lab)
     switch cond_lab{cond_ix}
@@ -20,12 +26,7 @@ for cond_ix = 1:numel(cond_lab)
             condition_n(strcmp(bhv.fb,'L')) = cond_ix;
         case 'Su'
             condition_n(strcmp(bhv.fb,'S')) = cond_ix;
-        case 'Er'
-            warning('WARNING!!! Assuming target_time = 1 sec...');
-            condition_n(bhv.rt<1) = cond_ix;
-        case 'Lt'
-            warning('WARNING!!! Assuming target_time = 1 sec...');
-            condition_n(bhv.rt>1) = cond_ix;
+        
         case 'EzWn'
             matches = logical(strcmp('easy',bhv.cond)) & strcmp(bhv.fb,'W');
             condition_n(matches) = cond_ix;
@@ -44,13 +45,31 @@ for cond_ix = 1:numel(cond_lab)
         case 'HdSu'
             matches = logical(strcmp('hard',bhv.cond)) & strcmp(bhv.fb,'S');
             condition_n(matches) = cond_ix;
-        case 'odd'
+        
+        case 'Er'
+            warning('WARNING!!! Assuming target_time = 1 sec...');
+            condition_n(bhv.rt<1) = cond_ix;
+        case 'Lt'
+            warning('WARNING!!! Assuming target_time = 1 sec...');
+            condition_n(bhv.rt>1) = cond_ix;
+        case 'ErQ1'
+            condition_n(bhv.rt<=quartiles(1)) = cond_ix;
+        case 'ErQ2'
+            condition_n(bhv.rt>quartiles(1) &bhv.rt<=quartiles(2)) = cond_ix;
+        case {'LtQ3','MdQ3'}
+            condition_n(bhv.rt>quartiles(2) & bhv.rt<=quartiles(3)) = cond_ix;
+        case 'LtQ4'
+            condition_n(bhv.rt>quartiles(3) & bhv.rt<=quartiles(4)) = cond_ix;
+        case 'LtQ5'
+            condition_n(bhv.rt>quartiles(4) & bhv.rt<=quartiles(5)) = cond_ix;
+        
+        case 'Odd'
             matches = logical(strcmp('odd',bhv.cond));
             condition_n(matches) = cond_ix;
-        case 'std'
+        case 'Std'
             matches = logical(strcmp('std',bhv.cond));
             condition_n(matches) = cond_ix;
-        case 'tar'
+        case 'Tar'
             matches = logical(strcmp('tar',bhv.cond));
             condition_n(matches) = cond_ix;
         otherwise

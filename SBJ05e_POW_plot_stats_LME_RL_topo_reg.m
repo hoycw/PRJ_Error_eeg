@@ -41,8 +41,8 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 % Select Conditions of Interest
-[reg_lab, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 % Check for window compatibility
 if strcmp(st.measure,'ts')

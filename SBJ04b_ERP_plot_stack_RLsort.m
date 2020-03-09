@@ -51,8 +51,8 @@ load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 load([SBJ_vars.dirs.proc SBJ '_model_' stat_id '.mat']);
 
 % Select conditions (and trials)
-[reg_lab, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 full_cond_idx = fn_condition_index(cond_lab, bhv);
 bhv_fields = fieldnames(bhv);

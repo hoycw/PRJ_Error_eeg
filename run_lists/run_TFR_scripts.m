@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10'};
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12'};
 % Not Ready SBJ:
 %   EP06: only 62 channels?
 %   EP09: 2 BDFs, unknown quality?
@@ -31,8 +31,7 @@ SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
 
 %% Compute TFRs
 proc_id    = 'eeg_full_ft';
-%an_ids     = {'TFR_Fz_F2t1_db2t0_fl05t20'};
-an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12b05'};%'TFR_Fz_F2t1_z2t05_fl1t14','TFR_Fz_F2t1_rc2t0_fl1t14','TFR_Fz_F2t1_db2t0_fl1t14'};
+an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12b05','TFR_Pz_F2t1_db2t0_fl1t12b05'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
 %an_ids = {'TFR_Fz_F2t1_z2t0_fl1t14','TFR_Pz_F2t1_z2t0_fl1t14'};
 conditions = 'DifFB';
@@ -55,11 +54,12 @@ for an_ix = 1:numel(an_ids)
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
-%% Compute ITPC
+%% Compute Phase
 proc_id    = 'eeg_full_ft';
-an_ids     = {'ITC_Fz_F2t1_fl1t12b05'};%{'ITC_Fz_F2t1_fl05t20'};%,'ITC_Pz_F2t1_fl1t12b05'};
+an_ids     = {'PHS_Fz_F2t1_fl1t12b05','PHS_Pz_F2t1_fl1t12b05'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
-phs_id     = 'PHS_FRN4t8';
+phs_freq_lim = [1 4];
+phs_time_lim = [0.3 0.33];
 conditions = 'DifFB';
 plt_id     = 'ts_F2to1_evnts_sigLine';%'ts_F4t1_evnts_sigLine';%
 save_fig    = 1;
@@ -68,7 +68,7 @@ fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
-        SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
+%         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
 %         SBJ05b_ITC_plot(SBJs{s}, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %         SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
@@ -81,8 +81,8 @@ for an_ix = 1:numel(an_ids)
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %     SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
 %             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},phs_id,erp_ids{an_ix},...
-%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},phs_freq_lim,phs_time_lim,erp_ids{an_ix},...
+            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% Compute and Plot POW (Time Series)

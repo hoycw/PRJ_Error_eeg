@@ -28,8 +28,8 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 
 model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, cond_colors, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, cond_colors, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load and Select Behavior
 % Load data
@@ -64,50 +64,75 @@ expected_score = pWin*2 - 1;
 sPE = double(bhv.score)/100 - expected_score;
 uPE = abs(sPE);
 
-%% Reaction Time Regressors
-% RT (-target_time to center for early/late)
-if any(strcmp(reg_lab,'tRT'))
-    tRT = bhv.rt-prdm_vars.target;
+%% Distance from Target
+% Signed Target Distance (RT - target_time to center for early/late)
+tar = bhv.rt-prdm_vars.target;
+if any(strcmp(reg_lab,'sTar'))
+    % Separately for wins and losses to maintain correct sign
+    sTar = nan(size(tar));
+    sTar(tar<0)  = log(-tar(tar<0));
+    sTar(tar>=0) = -log(tar(tar>=0));
+    % Invert to make large distances biggest values
+    sTar = sTar.^-1;
+end
+
+% Unsigned Target Distance
+if any(strcmp(reg_lab,'uTar'))
+    % Flip sign to make it positive
+    uTar = -log(abs(tar));
+    % Invert to make large distances biggest values
+    uTar = uTar.^-1;
 end
 
 % Previous trial RTs
-if any(strcmp(reg_lab,'ptRT'))
-    ptRT = nan(size(bhv.rt));
+if any(strcmp(reg_lab,'psTar'))
+    error('not using previous trial right now!');
+    psTar = nan(size(bhv.rt));
     for t_ix = 2:numel(bhv.rt)
-        ptRT(t_ix) = tRT(t_ix-1);
+        psTar(t_ix) = sTar(t_ix-1);
     end
 end
-if any(strcmp(reg_lab,'p2tRT'))
-    p2tRT = nan(size(bhv.rt));
+if any(strcmp(reg_lab,'p2sTar'))
+    error('not using previous trial right now!');
+    p2sTar = nan(size(bhv.rt));
     for t_ix = 3:numel(bhv.rt)
-        p2tRT(t_ix) = ptRT(t_ix-2);
+        p2sTar(t_ix) = psTar(t_ix-2);
     end
 end
 
-%% Distance from Tolerance
+%% Distance from Tolerance Threshold
 % Compute distance from closest tolerance bound
 %   Positive = win, Negative = loss
 early_idx = (bhv.rt-prdm_vars.target)<0;
-dist = nan(size(bhv.rt));
-dist(early_idx) = bhv.rt(early_idx)-(prdm_vars.target-bhv.tol(early_idx));
-dist(~early_idx) = (prdm_vars.target+bhv.tol(~early_idx))-bhv.rt(~early_idx);
+thr = nan(size(bhv.rt));
+thr(early_idx) = bhv.rt(early_idx)-(prdm_vars.target-bhv.tol(early_idx));
+thr(~early_idx) = (prdm_vars.target+bhv.tol(~early_idx))-bhv.rt(~early_idx);
 
 % Transform almost hit/miss into large values
-if any(strcmp(reg_lab,'lDist'))
-    lDist = nan(size(bhv.rt));
+if any(strcmp(reg_lab,'sThr'))
     % Separately for wins and losses to maintain correct sign for beta
     % interpretation (+ for win, - for loss)
-    lDist(bhv.hit==1) = -log(dist(bhv.hit==1));
-    lDist(bhv.hit==0) = log(-dist(bhv.hit==0));
-elseif any(strcmp(reg_lab,'iDist'))
-    iDist = dist.^-1;
+    sThr = nan(size(bhv.rt));
+    sThr(bhv.hit==1) = -log(thr(bhv.hit==1));
+    sThr(bhv.hit==0) = log(-thr(bhv.hit==0));
+    % Remove bad feedback trials in sThr
+    %   (incorrect feedback given due to rounding error)
+    sThr(logical(bhv.bad_fb)) = nan;
+% elseif any(strcmp(reg_lab,'iDist'))
+%     iDist = dist.^-1;
 end
 
 % Add unsigned version
-if any(strcmp(reg_lab,'ulDist'))
-    ulDist = abs(lDist);
-elseif any(strcmp(reg_lab,'uiDist'))
-    uiDist = abs(iDist);
+if any(strcmp(reg_lab,'uThr'))
+    % Separately for wins and losses to maintain correct sign for beta
+    % interpretation (+ for win, - for loss)
+    uThr = nan(size(bhv.rt));
+    uThr(bhv.hit==1) = -log(thr(bhv.hit==1));
+    uThr(bhv.hit==0) = log(-thr(bhv.hit==0));
+    % Keeping bad feedback trials because absolute distance is correct
+    uThr = abs(uThr);
+% elseif any(strcmp(reg_lab,'uiDist'))
+%     uiDist = abs(iDist);
 end
 
 %% Load Data and Build Model
@@ -115,9 +140,18 @@ model = nan([sum(n_trials) numel(reg_lab)]);
 for r_ix = 1:numel(reg_lab)
     model(:,r_ix) = eval(reg_lab{r_ix});
 end
+if any(isnan(model(:)))
+    fprintf(2,'\tWARNING: %d NaNs detected in model!\n',sum(isnan(model(:))));
+end
 
 %% Compute and plot correlations between regressors
 reg_corr = corr(model,'rows','complete');
+
+% Create figure directory
+fig_dir = [SBJ_vars.dirs.proc model_id '_plots/'];
+if ~exist(fig_dir,'dir')
+    mkdir(fig_dir);
+end
 
 % Plot design matrix
 fig_name = [SBJ '_' model_id '_design'];
@@ -125,7 +159,7 @@ figure('Name',fig_name);
 imagesc(model);
 xticklabels(reg_lab);
 colorbar;
-saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
+saveas(gcf,[fig_dir fig_name '.png']);
 
 % Plot regressor correlation matrix
 fig_name = [SBJ '_' model_id '_design_corr'];
@@ -134,7 +168,7 @@ imagesc(reg_corr);
 xticklabels(reg_lab);
 yticklabels(reg_lab);
 colorbar;
-saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
+saveas(gcf,[fig_dir fig_name '.png']);
 
 %% Plot Regressors by Condition
 cond_idx = fn_condition_index(cond_lab, bhv);
@@ -165,7 +199,7 @@ for reg_ix = 1:numel(reg_lab)
     if strcmp(reg_lab{reg_ix},'pWin'); legend([legend_obj{:}],cond_lab); end
     set(gca,'FontSize',16);
 end
-saveas(gcf,[SBJ_vars.dirs.proc fig_name '.png']);
+saveas(gcf,[fig_dir fig_name '.png']);
 
 %% Save Results
 stat_out_fname = [SBJ_vars.dirs.proc SBJ '_model_' model_id '.mat'];

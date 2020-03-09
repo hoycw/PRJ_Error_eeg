@@ -40,8 +40,8 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 % Select Conditions of Interest
-[reg_lab, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 % Check for window compatibility
 if strcmp(st.measure,'ts')
@@ -97,6 +97,8 @@ cfgp.zlim     = clim;
 cfgp.layout   = 'biosemi64.lay';
 cfgp.colorbar = 'yes';
 cfgp.comment  = 'no';
+% cfgp.highlight = 'on';
+% cfgp.highlightsymbol = '*';
 cfgp.maskparameter = 'mask';
 for reg_ix = 1:numel(reg_lab)
     subplot(num_rc(1),num_rc(2),reg_ix);
@@ -104,7 +106,9 @@ for reg_ix = 1:numel(reg_lab)
     
     % Plot Beta Topos
     topo.avg  = betas(reg_ix,:)';
-    topo.mask = ones(size(topo.avg))*0.3;
+%     ch_ix = 1:numel(topo.label);
+%     topo.highlightchannel = ch_ix(qvals(reg_ix,:)'<=st.alpha);
+    topo.mask = ones(size(topo.avg))*0.1;%zeros(size(topo.avg));
     topo.mask(qvals(reg_ix,:)'<=st.alpha) = 1;
     % cfgp.zlim = [min(betas(reg_ix,:)) max(betas(reg_ix,:))];
     ft_topoplotER(cfgp, topo);

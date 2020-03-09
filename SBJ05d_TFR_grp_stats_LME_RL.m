@@ -27,10 +27,11 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
+if ~strcmp(st.an_style,'lme'); error('stat_id not using lme!'); end
 
 model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));
@@ -83,7 +84,6 @@ for s = 1:numel(SBJs)
         
         % Load RL Model
         tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
-        % model(1:n_trials(s),:) = tmp.model;
         % Z-score SBJ model regressors
         sbj_model = NaN(size(tmp.model));
         if st.z_reg
@@ -105,11 +105,10 @@ for s = 1:numel(SBJs)
         end
         
         % Track SBJ
-        sbj_factor(1:n_trials(s),end) = s*ones([n_trials(s) 1]);
+        sbj_factor(1:n_trials(s)) = s*ones([n_trials(s) 1]);
     else
         % Load RL Model
         tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
-        % model(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),:) = tmp.model;
         % Z-score SBJ model regressors
         sbj_model = NaN(size(tmp.model));
         if st.z_reg

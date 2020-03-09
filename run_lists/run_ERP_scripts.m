@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10'};
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12'};
 % Not Ready SBJ:
 %   EP06: only 62 channels?
 %   EP09: 2 BDFs, unknown quality?
@@ -65,9 +65,11 @@ fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
-    plt_id     = 'ts_F2to1_evnts_sigLine';
+    %plt_id     = 'ts_F2to1_evnts_sigLine';
     for s = 1:numel(SBJs)
         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
+        SBJ03b_ERP_stack_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_ids{an_ix},save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end

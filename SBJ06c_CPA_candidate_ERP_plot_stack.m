@@ -51,7 +51,7 @@ prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
 
 %% Select trials by condition
 % Select Conditions
-[cond_lab, cond_colors, cond_styles, cond_markers] = fn_condition_label_styles(conditions);
+[cond_lab, ~, cond_colors, cond_styles, cond_markers] = fn_condition_label_styles(conditions);
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 % Select Trials

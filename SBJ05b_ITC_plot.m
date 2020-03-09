@@ -38,7 +38,7 @@ eval(SBJ_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
-if ~an.itpc; error('why run this without ITPC an_vars?'); end
+if ~an.complex; error('why run this without ITPC an_vars?'); end
 %plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 %eval(plt_vars_cmd);
 
@@ -47,12 +47,12 @@ load([SBJ_vars.dirs.proc SBJ '_' proc_id '_' an_id '.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 % Select conditions (and trials)
-[grp_lab, ~, ~] = fn_group_label_styles(conditions);
-[cond_lab, ~, ~, ~] = fn_condition_label_styles(conditions);
+[grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
 % if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
-    [grp_cond_lab{grp_ix}, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
+    [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 cond_idx = fn_condition_index(cond_lab, bhv);
 

@@ -50,7 +50,7 @@ load([SBJ_vars.dirs.events SBJ '_behav_' eeg_proc_id '_final.mat']);
 
 %% Select trials by condition
 % Select Conditions
-[cond_lab, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 cond_idx = fn_condition_index(cond_lab, bhv);
 
 % Select Trials
