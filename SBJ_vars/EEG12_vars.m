@@ -16,6 +16,7 @@ SBJ_vars.raw_file = {'eeg12.bdf'};
 SBJ_vars.bhv_file = {'eeg12(part 1)_response_log_2019081914'};
 SBJ_vars.oddball_file = {'eeg12_oddball_log_20190819141030.txt','eeg12_oddball_log_20190819141120.txt','eeg12_oddball_log_20190819142106.txt'};
 SBJ_vars.block_name = {''};
+SBJ_vars.odd_block_name = {''};
 
 SBJ_vars.dirs.SBJ     = [root_dir 'PRJ_Error_eeg/data/' SBJ_vars.SBJ '/'];
 SBJ_vars.dirs.raw     = [SBJ_vars.dirs.SBJ '00_raw/'];
@@ -56,9 +57,11 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
 'T7','P9','AF8', 'EXG6', 'EXG7'
     };
-SBJ_vars.trial_reject_ix = [21 42 71 100 101 128 129 183 209 212 213 214 215 219 149 220 221 242 252];
-SBJ_vars.trial_reject_ix_oddball = [25 91 115 116 121 158 276 279 280 281 292 293 297 308 309 311 344 345 346 347 363 375 376 377 390];
-SBJ_vars.ica_reject = [1 3 6 8 9 10 11 12 13 17 18 20 23 27 29 36 38 41:42 46:49 52:61];
+SBJ_vars.trial_reject_ix = [53 54 55 56 57 73 74 105 106 118 123 140 144 167 174 175 189 190 195 209 210 211 212 213 216 244 260 267 268 278 283 309 329 330 388 389 411 412 433 460 467 493 496 497 503 504 505 525 535 568];
+%old: SBJ_vars.trial_reject_ix = [21 42 71 100 101 128 129 183 209 212 213 214 215 219 149 220 221 242 252];
+%old: SBJ_vars.trial_reject_ix_oddball = [25 91 115 116 121 158 276 279 280 281 292 293 297 308 309 310 311 344 345 346 347 363 375 376 377 378 390];
+SBJ_vars.trial_reject_ix_oddball = [113 114 115 116 121 279 280 292 293 297 309 311 344 345 346 347 363 375 376 377 390];
+SBJ_vars.ica_reject = [1 3 6 8 9 10 11 13 16 23 25 26 28 38 43 44 48 51 53 54:61];
 SBJ_vars.tt_trigger_ix = 472;
 SBJ_vars.odd_trigger_ix = 3;
 % Variance highish -- around 700

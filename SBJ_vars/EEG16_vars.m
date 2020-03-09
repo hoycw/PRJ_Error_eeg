@@ -53,8 +53,8 @@ SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'P2', 'PO4'
     };
-SBJ_vars.trial_reject_ix = [131, 198, 273, 309, 366, 390, 408, 430, 431, 436, 492, 495, 496, 497, 512, 520, 521, 595, 596];
-SBJ_vars.trial_reject_ix_oddball = [87, 91, 118, 207, 242, 279, 296];
+SBJ_vars.trial_reject_ix = [131, 273, 366, 431, 436, 492, 495, 496, 497, 520, 521, 595, 596];
+SBJ_vars.trial_reject_ix_oddball = [242, 279, 296];
 SBJ_vars.ica_reject = [ 1, 2, 8, 9, 10, 12, 18, 19, 20, 23, 26, 29, 30, 32, 40, 43, 47, 48, 51, 53, 54, 55, 58, 59, 60, 61, 62];
 %Maybe: 40, 48
 SBJ_vars.tt_trigger_ix = 3;

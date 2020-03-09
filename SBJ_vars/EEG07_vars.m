@@ -54,8 +54,8 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
 'TP8','T8','T7', 'Iz', 'POz'
     };
-SBJ_vars.trial_reject_ix =[59 223 224 226 231 238 239 240 242 244 245 246 247 248 249 250 285 348];
-SBJ_vars.trial_reject_ix_oddball = [66 68 210 242 246 267 268 285 348 349 350 353 354 355 356 359 368];
+SBJ_vars.trial_reject_ix =[59 231 240 285 348];
+SBJ_vars.trial_reject_ix_oddball = [66 68 242 267 268 356 359 368];
 SBJ_vars.ica_reject = [1 3 7 9 14 16 21 24 30 31 35 36 40 41 45 48 50 52 53:59]; %Iffy about 7
 SBJ_vars.tt_trigger_ix = 1;
 SBJ_vars.odd_trigger_ix = 1445;
