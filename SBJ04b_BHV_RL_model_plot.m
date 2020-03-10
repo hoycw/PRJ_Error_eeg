@@ -70,6 +70,15 @@ n_trials = numel(bhv.trl_n);
 fprintf('\t%s: Loaded %d trials, kept %d for modeling...\n',SBJ,orig_n_trials,n_trials);
 
 %% Compute Mean Accuracy and Tolerance per Block
+% Adjust block numbers for EEG12
+if strcmp(SBJ,'EEG12')
+    blk5_starts = find(bhv.blk==5 & bhv.blk_trl_n==1);
+    for trl_ix = 1:blk5_starts(2)-1
+        bhv.blk(trl_ix) = bhv.blk(trl_ix)-4;
+    end
+end
+
+% Compute stats
 blk_ids = unique(bhv.blk);
 blk_ez  = false(size(blk_ids));
 blk_tol = nan(size(blk_ids));
