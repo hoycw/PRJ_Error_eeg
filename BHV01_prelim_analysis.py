@@ -67,6 +67,20 @@ with open(prdm_fname, 'rb') as f:
 behav_fname = os.path.join(sbj_dir,'03_events',SBJ+'_behav.csv')
 data = pd.read_csv(behav_fname)
 
+# Remove second set of training trials in restarted runs
+if len(data[(data['Trial']==0) & (data['Block']==-1)])>1:
+    train_start_ix = data[(data['Trial']==0) & (data['Block']==-1)].index
+    train_ix = [ix for ix in data.index if data.loc[ix,'Block']==-1]
+    later_ix = [ix for ix in data.index if ix >= train_start_ix[1]]
+    data = data.drop(set(later_ix).intersection(train_ix))
+    data = data.reset_index()
+
+# Change block numbers on EEG12 to not overlap
+if SBJ=='EEG12':
+    b4_start_ix = data[(data['Trial']==0) & (data['Block']==4)].index
+    for ix in range(b4_start_ix[1]):
+        if data.loc[ix,'Block']!=-1:
+            data.loc[ix,'Block'] = data.loc[ix,'Block']-4
 
 # In[48]:
 
@@ -91,7 +105,10 @@ for ix in range(len(data)):
 
 # Find middle of blocks to plot accuracy
 block_start_ix = data[data['Trial']==0].index
-block_mid_ix = [ix+prdm['n_trials']/2 for ix in block_start_ix[1:]]
+if SBJ=='EP11':#deal with missing BT_T0
+    block_mid_ix = [ix+prdm['n_trials']/2 for ix in block_start_ix]
+else:
+    block_mid_ix = [ix+prdm['n_trials']/2 for ix in block_start_ix[1:]]
 
 # Add in full_vis + E/H training: 0:4 + 5:19 = 10; 20:34 = 27.5 
 block_mid_ix.insert(0,np.mean([prdm['n_examples']+prdm['n_training'],

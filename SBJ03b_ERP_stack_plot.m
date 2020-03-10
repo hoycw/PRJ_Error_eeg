@@ -1,4 +1,4 @@
-function SBJ03b_ERP_plot_stack(SBJ,proc_id,an_id,plt_id,save_fig,varargin)
+function SBJ03b_ERP_stack_plot(SBJ,proc_id,an_id,plt_id,save_fig,varargin)
 error('copy of SBJ04b_stack_RLsort, need to adapt back to SBJ03b_ERP_plot');
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
