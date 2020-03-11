@@ -1,5 +1,5 @@
 %% Load BHV
-SBJ = 'EEG04';
+SBJ = 'EEG14';
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 

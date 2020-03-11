@@ -12,6 +12,11 @@ ft_defaults
 %% General parameters
 SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
            'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12'};
+all_SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
+           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12',...
+           'EEG13','EEG14','EEG15','EEG16','EEG17','EEG18','EEG19','EEG20',...
+           'EEG21','EEG22','EEG23','EEG24','EEG25','EEG26','EEG27','EEG28',...
+           'EEG29','EEG30','EEG31'};
 % Not Ready SBJ:
 %   EP06: only 62 channels?
 %   EP09: 2 BDFs, unknown quality?
@@ -49,9 +54,9 @@ plot_final_check = 0;
 
 %% View basic ERPs
 %   RL Model Analysis:
-an_ids     = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
+an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
 % an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-conditions = 'DifFB';
+conditions = 'FB';
 % %   Pre-Feedback RL Model Analysis:
 % an_ids     = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
 % conditions = 'DifFB';
@@ -65,13 +70,15 @@ fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
-    %plt_id     = 'ts_F2to1_evnts_sigLine';
+    plt_id     = 'stack_F2t1_evnt_c5';
     for s = 1:numel(SBJs)
         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
-        SBJ03b_ERP_stack_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_ids{an_ix},save_fig,...
+        SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ03b_ERP_plot_butterfly(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ03b_ERP_plot_stack(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
 %     SBJ03c_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
