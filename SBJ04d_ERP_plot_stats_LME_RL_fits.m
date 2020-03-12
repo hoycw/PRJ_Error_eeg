@@ -132,7 +132,11 @@ for ch_ix = 1:numel(ch_list)
     r2 = NaN(size(st_time_vec));
     plot_betas = NaN([numel(reg_lab) numel(st_time_vec)]);
     for t_ix = 1:numel(st_time_vec)
-        plot_betas(:,t_ix) = lme{t_ix}.Coefficients.Estimate(2:end);
+        if strcmp(st.model_lab,'SBJonly')
+            plot_betas(:,t_ix) = lme{t_ix}.Coefficients.Estimate;
+        else
+            plot_betas(:,t_ix) = lme{t_ix}.Coefficients.Estimate(2:end);
+        end
         r2(t_ix) = lme{t_ix}.Rsquared.Adjusted;
     end
     

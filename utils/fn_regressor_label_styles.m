@@ -10,19 +10,22 @@ regressors  = {...
     'pWin','sPE','uPE',... % Reward Feedback
     'sTar','psTar','p2sTar',... % Performance (signed)
     'uTar','puTar','p2uTar',... % Performance (unsigned)
-    'sThr','uThr' ... %'iThr', ... % Performance (threshold)
+    'sThr','uThr', ... %'iThr', ... % Performance (threshold)
+    'SBJ' ... % SBJ only null model
     };
 regressor_names = {...
     'Prob(Win)','+/- Pred Err','abs Pred Err',...
     '+/- Target Dist','+/- Target Dist (n-1)','+/- Target Dist (n-2)',...
     'abs Target Dist','abs Target Dist (n-1)','abs Target Dist (n-2)',...
     '+/- Thresh Dist','abs Thresh Dist', ...%'+/- Thresh Dist (^-1)'...
+    'SBJ' ...
     };
 regressor_colors = {...
     [0 0 0], [118 160 156]./255, [209 151 105]./255, ... % black, teal, tan
     [152 78 163]./255, [152 78 163]./255, [152 78 163]./255, ...% purple
     [247 129 191]./255, [247 129 191]./255, [247 129 191]./255, ...% pink
-    [97 61 46]./255, [189 65 45]./255 ...%brown, red
+    [97 61 46]./255, [189 65 45]./255, ...%brown, red
+    [0.2 0.2 0.2] ...   % dark gray
     };
 
 %   Original Plots: {pWin, sPE, uPE, tRT (3x), lDist (3x)}
@@ -67,6 +70,10 @@ switch model_id
         labels = {'pWin','sPE','uPE','sTar','sThr'};
     case 'RLuD'
         labels = {'pWin','sPE','uPE','uTar','uThr'};
+    
+    % Null SBJ only control model
+    case 'SBJonly'
+        labels = {'SBJ'};
         
     % Pre-Feedback Models
     case 'pWTar'

@@ -1,5 +1,6 @@
-function SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_id,stat_id)
+function SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_id,stat_id)
 % Run Mixed-Effects Linear model on all SBJ and trials
+%   NO MODEL! Only running with SBJ factor
 %   Only for one channel now...
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
@@ -27,6 +28,7 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
+if ~strcmp(st.model_lab,'SBJonly'); error('Only model_lab = SBJonly for this script!'); end
 
 model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
@@ -58,6 +60,7 @@ end
 
 %% Load Peak Timing Information
 if strcmp(st.measure,'mean') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_id'}))
+    error('not set up yet for null model');
     % Load previous stats
     tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' st.pk_stat_id '_' st.pk_an_id '.mat']);
     if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
@@ -79,7 +82,6 @@ end
 
 %% Load Data and Build Model
 cfgs  = []; cfgs.latency = st.stat_lim;
-model = zeros([sum(n_trials) numel(reg_lab)]);
 sbj_factor  = zeros([sum(n_trials) 1]);
 full_trl_ix = 0;
 for s = 1:numel(SBJs)
@@ -108,20 +110,6 @@ for s = 1:numel(SBJs)
         sbj_idx = sum(n_trials(1:s-1))+1:sum(n_trials(1:s));
     end
     
-    % Load RL Model
-    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
-    % Z-score SBJ model regressors
-    sbj_model = NaN(size(tmp.model));
-    if st.z_reg
-        for reg_ix = 1:numel(reg_lab)
-            sbj_model(:,reg_ix) = ...
-                (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
-        end
-    else
-        sbj_model = model;
-    end
-    model(sbj_idx,:) = sbj_model;
-    
     % Load and add data
     for trl_ix = 1:numel(st_roi.trial)
         full_trl_ix = full_trl_ix + 1;
@@ -139,51 +127,15 @@ for s = 1:numel(SBJs)
     clear roi st_roi
 end
 
-%% Compute and plot correlations between regressors
-reg_corr = corr(model,'rows','complete');
-
-% Create figure directory
-stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
-fig_dir = [stat_out_dir model_id '_plots/'];
-if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
-end
-
-% Plot design matrix
-fig_name = ['GRP_' model_id '_design'];
-figure('Name',fig_name);
-imagesc(model);
-xticklabels(reg_lab);
-colorbar;
-saveas(gcf,[fig_dir fig_name '.png']);
-
-% Plot regressor correlation matrix
-fig_name = ['GRP_' model_id '_design_corr'];
-figure('Name',fig_name);
-imagesc(reg_corr);
-xticklabels(reg_lab);
-yticklabels(reg_lab);
-colorbar;
-saveas(gcf,[fig_dir fig_name '.png']);
-
 %% Build table
 fprintf('========================== Running Stats ==========================\n');
 tic
 % Build Model Table
 tbl = table;
-for reg_ix = 1:numel(reg_lab)
-    %     if st.z_reg
-    %         tbl.(reg_lab{reg_ix}) = ...
-    %             (model(:,reg_ix)-nanmean(model(:,reg_ix)))./nanstd(model(:,reg_ix));
-    %     else
-    tbl.(reg_lab{reg_ix}) = model(:,reg_ix);
-    %     end
-end
 tbl.SBJ = categorical(sbj_factor);
 
 % Create Model Formula
-reg_formula = strjoin(reg_lab,' + ');
-formula = ['ERP ~ ' reg_formula ' + (1|SBJ)'];
+formula = 'ERP ~ 1 + (1|SBJ)';
 
 % Run Model
 if strcmp(st.measure,'ts')
@@ -198,7 +150,7 @@ if strcmp(st.measure,'ts')
         %     end
         
         lme{t_ix} = fitlme(tbl,formula);
-        pvals(:,t_ix) = lme{t_ix}.Coefficients.pValue(2:end);
+        pvals(:,t_ix) = lme{t_ix}.Coefficients.pValue;
     end
 elseif strcmp(st.measure,'mean')
     lme = cell(size(ch_list));
@@ -207,7 +159,7 @@ elseif strcmp(st.measure,'mean')
         tbl.ERP = data(:,ch_ix);
         lme{ch_ix} = fitlme(tbl,formula);
         % No correction for multiple comparisons
-        pvals(:,ch_ix) = lme{ch_ix}.Coefficients.pValue(2:end);
+        pvals(:,ch_ix) = lme{ch_ix}.Coefficients.pValue;
     end
 else
     error(['Unknown st.measure: ' st.measure]);
@@ -225,7 +177,7 @@ fprintf('\t\t Stats Complete:');
 toc
 
 %% Save Results
-stat_out_fname = [stat_out_dir 'GRP_' stat_id '_' an_id '.mat'];
+stat_out_fname = [root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
 save(stat_out_fname,'-v7.3','lme','qvals','SBJs','time_vec','ch_list','reg_pk_time');
 

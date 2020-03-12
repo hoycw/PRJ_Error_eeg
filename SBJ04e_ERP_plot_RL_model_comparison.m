@@ -1,5 +1,6 @@
-function SBJ04e_ERP_plot_RL_model_comparison(SBJs,proc_id,an_id,stat_ids,plt_id,save_fig,varargin)
+function SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
 % Plots Adjusted R2 model fits across different RL models
+%   if null_id is not empty (''), subtract off R2 for that stat_id
 %   Only for single channel right now...
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -54,6 +55,24 @@ for st_ix = 1:numel(stat_ids)
             error('st.measure not the same!');
         end
     end
+    clear st stat_vars_cmd
+end
+
+% Load SBJonly null model
+if ~isempty(null_id)
+    stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' null_id '_vars.m'];
+    eval(stat_vars_cmd);
+    null_st = st;
+    
+    if any(sts{1}.stat_lim ~= null_st.stat_lim)
+        error('st.stat_lim not aligned!');
+    end
+    if ~strcmp(sts{1}.measure, null_st.measure)
+        error('st.measure not the same!');
+    end
+    
+    % Load model
+    error('start here!!!')
     clear st stat_vars_cmd
 end
 

@@ -1,4 +1,5 @@
 function SBJ04d_ERP_plot_stats_LME_RL(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+error('Why not run the version with the model fits (R2)?');
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';

@@ -82,56 +82,35 @@ for s = 1:numel(SBJs)
         else; error(['unknown st.measure: ' st.measure]);
         end
         
-        % Load RL Model
-        tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
-        % Z-score SBJ model regressors
-        sbj_model = NaN(size(tmp.model));
-        if st.z_reg
-            for reg_ix = 1:numel(reg_lab)
-                sbj_model(:,reg_ix) = ...
-                    (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
-            end
-        else
-            sbj_model = model;
-        end
-        model(1:n_trials(s),:) = sbj_model;
-        
-        % Load and add data
-        if strcmp(st.measure,'ts')
-            data(1:n_trials(s),:,:) = squeeze(st_tfr.powspctrm);
-        elseif strcmp(st.measure,'mean')
-            data(1:n_trials(s),:) = squeeze(mean(st_tfr.powspctrm,4));
-        else; error(['unknown st.measure: ' st.measure]);
-        end
-        
-        % Track SBJ
-        sbj_factor(1:n_trials(s)) = s*ones([n_trials(s) 1]);
+        sbj_idx = 1:n_trials(s);
     else
-        % Load RL Model
-        tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
-        % Z-score SBJ model regressors
-        sbj_model = NaN(size(tmp.model));
-        if st.z_reg
-            for reg_ix = 1:numel(reg_lab)
-                sbj_model(:,reg_ix) = ...
-                    (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
-            end
-        else
-            sbj_model = model;
-        end
-        model(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),:) = sbj_model;
-        
-        % Load and add data
-        if strcmp(st.measure,'ts')
-            data(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),:,:) = squeeze(st_tfr.powspctrm);
-        elseif strcmp(st.measure,'mean')
-            data(sum(n_trials(1:s-1))+1:sum(n_trials(1:s)),:) = squeeze(mean(st_tfr.powspctrm,4));
-        else; error(['unknown st.measure: ' st.measure]);
-        end
-        
-        % Track SBJ
-        sbj_factor(sum(n_trials(1:s-1))+1:sum(n_trials(1:s))) = s*ones([n_trials(s) 1]);
+        sbj_idx = sum(n_trials(1:s-1))+1:sum(n_trials(1:s));
     end
+    
+    % Load RL Model
+    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    % Z-score SBJ model regressors
+    sbj_model = NaN(size(tmp.model));
+    if st.z_reg
+        for reg_ix = 1:numel(reg_lab)
+            sbj_model(:,reg_ix) = ...
+                (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
+        end
+    else
+        sbj_model = model;
+    end
+    model(sbj_idx,:) = sbj_model;
+    
+    % Load and add angle data
+    if strcmp(st.measure,'ts')
+        data(sbj_idx,:,:) = squeeze(st_tfr.powspctrm);
+    elseif strcmp(st.measure,'mean')
+        data(sbj_idx,:,:) = squeeze(mean(st_tfr.powspctrm,4));
+    else; error(['unknown st.measure: ' st.measure]);
+    end
+    
+    % Track SBJ
+    sbj_factor(sbj_idx) = s*ones([n_trials(s) 1]);
     
     clear tfr st_tfr
 end

@@ -45,12 +45,12 @@ stat_ids = {'RL3D_all_lme_st0t5'};%'RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'}
 %   pWTarD: pWin, uTar, sTar
 %   pWallD: pWin, uTar, sTar, uThr, sThr
 
-for s = 1:numel(all_SBJs)
+for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
-        SBJ04a_RL_model(all_SBJs{s},proc_id,stat_ids{st_ix});
-        SBJ04b_BHV_RL_model_plot(all_SBJs{s},proc_id,stat_ids{st_ix});
+        SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
+        SBJ04b_BHV_RL_model_plot(SBJs{s},proc_id,stat_ids{st_ix});
     end
-    % close all;
+    close all;
 end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
@@ -73,7 +73,7 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Model Comparison Plots (Adjusted R-Squared)
-    SBJ04e_ERP_plot_RL_model_comparison(SBJs,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+    SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
@@ -82,6 +82,7 @@ end
 an_ids    = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
 stat_ids  = {'pWTar_all_lme_st3t5','pWallD_all_lme_st3t5'};
 plt_id    = 'ts_F4t1_evnts_sigLine';%'ts_F2to1_evnts_sigLine';
+null_id   = 'SBJonly_all_lme_st0t5';
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
@@ -96,7 +97,7 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Model Comparison Plots (Adjusted R-Squared)
-    SBJ04e_ERP_plot_RL_model_comparison(SBJs,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+    SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
@@ -119,7 +120,7 @@ for an_ix = 1:numel(an_ids)
     
     % Model Comparison Plots (Adjusted R-Squared)
 %     error('need topo version!');
-%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
