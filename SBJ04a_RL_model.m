@@ -49,18 +49,71 @@ end
 n_trials = numel(bhv.trl_n);
 fprintf('\t%s: Loaded %d trials, kept %d for modeling...\n',SBJ,orig_n_trials,n_trials);
 
-%% Run Logistic Regression for Win Prediction
-% Select Data (fit on everything except surprise since no outcome)
+%% Compute Win Prediction
 s_idx = fn_condition_index({'Su'},bhv);
-X = bhv.tol(~s_idx);
-y = double(bhv.hit(~s_idx));
+if any(strcmp(reg_lab,'pWin'))
+    % Select Data (fit on everything except surprise since no outcome)
+    X = bhv.tol(~s_idx);
+    y = double(bhv.hit(~s_idx));
+    
+    % Logistic regression
+    betas = glmfit(X,y,'binomial','link','logit');
+    
+    z = betas(1) + (bhv.tol * betas(2));
+    pWin = 1 ./ (1+exp(-z));
+    expected_score = pWin*2 - 1;
+end
+if any(strcmp(reg_lab,'bAcc'))
+    % Adjust block numbers for EEG12
+    if strcmp(SBJ,'EEG12')
+        blk5_starts = find(bhv.blk==5 & bhv.blk_trl_n==1);
+        for trl_ix = 1:blk5_starts(2)-1
+            bhv.blk(trl_ix) = bhv.blk(trl_ix)-4;
+        end
+    end
+    
+    % Get block level accuracy
+    blks = unique(bhv.blk);
+    blk_acc = nan(size(blks));
+    for b_ix = 1:numel(blks)
+        blk_acc(b_ix) = mean(strcmp(bhv.fb(bhv.blk==blks(b_ix) & ~s_idx),'W'));
+    end
+    
+    % Format block accuracy as single trial predictor
+    bAcc = nan(size(bhv.trl_n));
+    for t_ix = 1:numel(bhv.trl_n)
+        bAcc(t_ix) = blk_acc(bhv.blk(t_ix)==blks);
+    end
+    expected_score = bAcc*2 - 1;
+elseif any(strcmp(reg_lab,'rAcc'))
+    % Analysis Parameters (to be finalized)
+    roll_win = 5;
+    roll_wi_cond = true;
+    
+    % Load original behavior
+    [bhv_orig] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
+    
+    % Build index of feedback
+    fb_idx = nan(size(bhv_orig.trl_n));
+    fb_idx(strcmp(bhv_orig.fb,'W')) = 1;
+    fb_idx(strcmp(bhv_orig.fb,'L')) = 0;
+    
+    % Compute rolling accuracy of last 5 trials
+    rAcc = nan(size(bhv.trl_n));
+    for t_ix = 1:numel(bhv.trl_n)
+        orig_ix = find(bhv_orig.trl_n==bhv.trl_n(t_ix));
+        if roll_wi_cond
+            prior_cond_ix = bhv_orig.trl_n(strcmp(bhv_orig.cond,bhv.cond(t_ix)) & bhv_orig.trl_n<bhv.trl_n(t_ix));
+            rAcc(t_ix) = nanmean(fb_idx(prior_cond_ix(end-roll_win+1:end)));
+        else
+            rAcc(t_ix) = nanmean(fb_idx(orig_ix-roll_win:orig_ix-1));
+        end
+    end
+    
+    expected_score = rAcc*2 - 1;
+end
 
-% Logistic regression
-betas = glmfit(X,y,'binomial','link','logit');
-
-z = betas(1) + (bhv.tol * betas(2));
-pWin = 1 ./ (1+exp(-z));
-expected_score = pWin*2 - 1;
+%% Compute Prediction Errors
 sPE = double(bhv.score)/100 - expected_score;
 uPE = abs(sPE);
 
@@ -204,6 +257,10 @@ saveas(gcf,[fig_dir fig_name '.png']);
 %% Save Results
 stat_out_fname = [SBJ_vars.dirs.proc SBJ '_model_' model_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','model','betas');
+if any(strcmp(reg_lab,'pWin'))
+    save(stat_out_fname,'-v7.3','model','betas');
+else
+    save(stat_out_fname,'-v7.3','model');
+end
 
 end

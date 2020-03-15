@@ -70,9 +70,6 @@ if ~isempty(null_id)
     if ~strcmp(sts{1}.measure, null_st.measure)
         error('st.measure not the same!');
     end
-    
-    % Load model
-    error('start here!!!')
     clear st stat_vars_cmd
 end
 
@@ -85,14 +82,24 @@ ch_list = st_roi.label;
 st_colors = distinguishable_colors(numel(stat_ids));
 
 %% Load Models
+% Load real models
 lmes = cell([numel(stat_ids) numel(st_time_vec)]);
 for st_ix = 1:numel(stat_ids)
     tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_ids{st_ix} '_' an_id '.mat']);
     lmes(st_ix,:) = tmp.lme;
 end
 
+% Load null model
+null_r2 = zeros(size(st_time_vec));
+if ~isempty(null_id)
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' null_id '_' an_id '.mat']);
+    for t_ix = 1:numel(st_time_vec)
+        null_r2(t_ix) = tmp.lme{t_ix}.Rsquared.(r2_version);
+    end
+end
+
 %% Plot Model Comparisons
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/model_compare/' an_id '/' strjoin(stat_ids,'-') '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/model_compare/' an_id '/' strjoin(stat_ids,'-') '/' null_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -104,7 +111,7 @@ for ch_ix = 1:numel(ch_list)
     r2s = NaN([numel(stat_ids) numel(st_time_vec)]);
     for st_ix = 1:numel(stat_ids)
         for t_ix = 1:numel(st_time_vec)
-            r2s(st_ix,t_ix) = lmes{st_ix,t_ix}.Rsquared.(r2_version);
+            r2s(st_ix,t_ix) = lmes{st_ix,t_ix}.Rsquared.(r2_version)-null_r2(t_ix);
         end
     end
     
@@ -133,7 +140,11 @@ for ch_ix = 1:numel(ch_list)
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';
-    ax.Title.String  = ch_list{ch_ix};
+    if isempty(null_id)
+        title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')']);
+    else
+        title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) '; -' null_id ')'],'Interpreter','none');
+    end
     if plt.legend
         legend(main_lines,stat_ids,'Location',plt.legend_loc,'Interpreter','none');
     end

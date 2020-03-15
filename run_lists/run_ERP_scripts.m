@@ -54,11 +54,10 @@ plot_final_check = 0;
 
 %% View basic ERPs
 %   RL Model Analysis:
-an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
 % an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 conditions = 'FB';
 % %   Pre-Feedback RL Model Analysis:
-% an_ids     = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
+an_ids     = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
 % conditions = 'DifFB';
 %   QA Plotting:
 % an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
@@ -66,19 +65,19 @@ conditions = 'FB';
 
 proc_id    = 'eeg_full_ft';
 save_fig   = 1;
-fig_vis    = 'on';
+fig_vis    = 'off';
 fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
     plt_id     = 'stack_F2t1_evnt_c5';
     for s = 1:numel(SBJs)
         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
-        SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        SBJ03b_ERP_plot_butterfly(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        SBJ03b_ERP_plot_stack(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ03b_ERP_plot_butterfly(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ03b_ERP_plot_stack(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
 %     SBJ03c_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);

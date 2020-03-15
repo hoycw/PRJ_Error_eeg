@@ -18,9 +18,18 @@ plot(bhv.tol+1,'Color','k')
 plot(1-bhv.tol,'Color','k')
 
 % Bad Feedback Losses
-bf_l_idx = bhv.hit==0 & bhv.bad_fb;
+bf_l_idx = strcmp(bhv.fb,'L') & bhv.bad_fb;
 scatter(find(bf_l_idx),bhv.rt(bf_l_idx),20,'r');
 % Losses
-gf_l_idx = bhv.hit==0 & ~bf_l_idx;
+gf_l_idx = strcmp(bhv.fb,'L') & ~bf_l_idx;
 scatter(find(gf_l_idx),bhv.rt(gf_l_idx),40,'r','filled');
 
+% Bad Feedback Wins
+bf_w_idx = strcmp(bhv.fb,'W') & bhv.bad_fb;
+scatter(find(bf_w_idx),bhv.rt(bf_w_idx),20,'g');
+% Wins
+gf_w_idx = strcmp(bhv.fb,'W') & ~bf_w_idx;
+scatter(find(gf_w_idx),bhv.rt(gf_w_idx),40,'g','filled');
+
+% Surprising
+scatter(find(strcmp(bhv.fb,'S')),bhv.rt(strcmp(bhv.fb,'S')),75,'b','d');
