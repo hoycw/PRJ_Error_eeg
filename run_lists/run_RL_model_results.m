@@ -35,10 +35,11 @@ all_SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
+stat_ids = {'pWallD_all_lme_st0t5'};
 % stat_ids = {'RLbA_all_lme_st0t5','RLbApW_all_lme_st0t5','RLrA_all_lme_st0t5','RLrApW_all_lme_st0t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
 % stat_ids = {'rATar_all_lme_st3t5','rAallD_all_lme_st3t5'};
-stat_ids = {'pWTar_all_lme_st3t5','pWallD_all_lme_st3t5'};
+% stat_ids = {'pWTar_all_lme_st3t5','pWallD_all_lme_st3t5'};
 % RL models:
 %   RL3D: pWin, sPE, uPE, sTar, uTar, uThr (no sThr!!!)
 %   RLfullD: pWin, sPE, uPE, sTar, uTar, uThr, sThr
@@ -58,7 +59,8 @@ end
 % Main RL Model
 %an_ids    = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_ids = {'RLbA_all_lme_st0t5','RLrA_all_lme_st0t5','RLrApW_all_lme_st0t5'};
+stat_ids  = {'pWallD_all_lme_st0t5'};
+% stat_ids = {'RLbA_all_lme_st0t5','RLrA_all_lme_st0t5','RLrApW_all_lme_st0t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st0t5';
@@ -77,10 +79,10 @@ for an_ix = 1:numel(an_ids)
 %     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_ids{an_ix},null_id);
     
     % Model Comparison Plots (Adjusted R-Squared)
-    SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
-    SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Ordinary');
+%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
+%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Ordinary');
 end
 
 %% Pre-Feedback ERP: Linear Mixed Effects Model (Over Time)

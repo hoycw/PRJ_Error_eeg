@@ -120,36 +120,46 @@ uPE = abs(sPE);
 %% Distance from Target
 % Signed Target Distance (RT - target_time to center for early/late)
 tar = bhv.rt-prdm_vars.target;
-if any(strcmp(reg_lab,'sTar'))
+if any(strcmp(reg_lab,'sTaEr'))
     % Separately for wins and losses to maintain correct sign
-    sTar = nan(size(tar));
-    sTar(tar<0)  = log(-tar(tar<0));
-    sTar(tar>=0) = -log(tar(tar>=0));
+    sTaEr = nan(size(tar));
+    sTaEr(tar<0)  = log(-tar(tar<0));
+    sTaEr(tar>=0) = -log(tar(tar>=0));
     % Invert to make large distances biggest values
-    sTar = sTar.^-1;
+    sTaEr = sTaEr.^-1;
+end
+if any(strcmp(reg_lab,'sTaPr'))
+    % Separately for wins and losses to maintain correct sign
+    sTaPr = nan(size(tar));
+    sTaPr(tar<0)  = log(-tar(tar<0));
+    sTaPr(tar>=0) = -log(tar(tar>=0));
 end
 
 % Unsigned Target Distance
-if any(strcmp(reg_lab,'uTar'))
+if any(strcmp(reg_lab,'uTaEr'))
     % Flip sign to make it positive
-    uTar = -log(abs(tar));
+    uTaEr = -log(abs(tar));
     % Invert to make large distances biggest values
-    uTar = uTar.^-1;
+    uTaEr = uTaEr.^-1;
+end
+if any(strcmp(reg_lab,'uTaPr'))
+    % Flip sign to make it positive
+    uTaPr = -log(abs(tar));
 end
 
 % Previous trial RTs
-if any(strcmp(reg_lab,'psTar'))
+if any(strcmp(reg_lab,'psTaEr'))
     error('not using previous trial right now!');
-    psTar = nan(size(bhv.rt));
+    psTaEr = nan(size(bhv.rt));
     for t_ix = 2:numel(bhv.rt)
-        psTar(t_ix) = sTar(t_ix-1);
+        psTaEr(t_ix) = sTaEr(t_ix-1);
     end
 end
-if any(strcmp(reg_lab,'p2sTar'))
+if any(strcmp(reg_lab,'p2sTaEr'))
     error('not using previous trial right now!');
-    p2sTar = nan(size(bhv.rt));
+    p2sTaEr = nan(size(bhv.rt));
     for t_ix = 3:numel(bhv.rt)
-        p2sTar(t_ix) = psTar(t_ix-2);
+        p2sTaEr(t_ix) = psTaEr(t_ix-2);
     end
 end
 
@@ -162,30 +172,47 @@ thr(early_idx) = bhv.rt(early_idx)-(prdm_vars.target-bhv.tol(early_idx));
 thr(~early_idx) = (prdm_vars.target+bhv.tol(~early_idx))-bhv.rt(~early_idx);
 
 % Transform almost hit/miss into large values
-if any(strcmp(reg_lab,'sThr'))
+if any(strcmp(reg_lab,'sThEr'))
     % Separately for wins and losses to maintain correct sign for beta
     % interpretation (+ for win, - for loss)
-    sThr = nan(size(bhv.rt));
-    sThr(bhv.hit==1) = -log(thr(bhv.hit==1));
-    sThr(bhv.hit==0) = log(-thr(bhv.hit==0));
-    % Remove bad feedback trials in sThr
+    sThEr = nan(size(bhv.rt));
+    sThEr(bhv.hit==1) = -log(thr(bhv.hit==1));
+    sThEr(bhv.hit==0) = log(-thr(bhv.hit==0));
+    sThEr = sThEr.^-1;
+    % Remove bad feedback trials in sThPr
     %   (incorrect feedback given due to rounding error)
-    sThr(logical(bhv.bad_fb)) = nan;
-% elseif any(strcmp(reg_lab,'iDist'))
-%     iDist = dist.^-1;
+    sThEr(logical(bhv.bad_fb)) = nan;
+end
+if any(strcmp(reg_lab,'sThPr'))
+    % Separately for wins and losses to maintain correct sign for beta
+    % interpretation (+ for win, - for loss)
+    sThPr = nan(size(bhv.rt));
+    sThPr(bhv.hit==1) = -log(thr(bhv.hit==1));
+    sThPr(bhv.hit==0) = log(-thr(bhv.hit==0));
+    % Remove bad feedback trials in sThPr
+    %   (incorrect feedback given due to rounding error)
+    sThPr(logical(bhv.bad_fb)) = nan;
 end
 
 % Add unsigned version
-if any(strcmp(reg_lab,'uThr'))
+if any(strcmp(reg_lab,'uThEr'))
     % Separately for wins and losses to maintain correct sign for beta
     % interpretation (+ for win, - for loss)
-    uThr = nan(size(bhv.rt));
-    uThr(bhv.hit==1) = -log(thr(bhv.hit==1));
-    uThr(bhv.hit==0) = log(-thr(bhv.hit==0));
+    uThEr = nan(size(bhv.rt));
+    uThEr(bhv.hit==1) = -log(thr(bhv.hit==1));
+    uThEr(bhv.hit==0) = log(-thr(bhv.hit==0));
+    uThEr = uThEr.^-1;
     % Keeping bad feedback trials because absolute distance is correct
-    uThr = abs(uThr);
-% elseif any(strcmp(reg_lab,'uiDist'))
-%     uiDist = abs(iDist);
+    uThEr = abs(uThEr);
+end
+if any(strcmp(reg_lab,'uThPr'))
+    % Separately for wins and losses to maintain correct sign for beta
+    % interpretation (+ for win, - for loss)
+    uThPr = nan(size(bhv.rt));
+    uThPr(bhv.hit==1) = -log(thr(bhv.hit==1));
+    uThPr(bhv.hit==0) = log(-thr(bhv.hit==0));
+    % Keeping bad feedback trials because absolute distance is correct
+    uThPr = abs(uThPr);
 end
 
 %% Load Data and Build Model

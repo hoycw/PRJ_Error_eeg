@@ -9,26 +9,35 @@ function [labels, names, colors, line_styles] = fn_regressor_label_styles(model_
 regressors  = {...
     'pWin','bAcc','rAcc',... % Outcome predictors
     'sPE','uPE',... % Reward Feedback
-    'sTar','psTar','p2sTar',... % Performance (signed)
-    'uTar','puTar','p2uTar',... % Performance (unsigned)
-    'sThr','uThr', ... %'iThr', ... % Performance (threshold)
+    'sTaEr','psTaEr','p2sTaEr',... % Performance (signed)
+    'sTaPr',... % Target precision (signed)
+    'uTaEr','puTaEr','p2uTaEr',... % Performance (unsigned)
+    'uTaPr',... % Target precision (unsigned)
+    'sThEr','uThEr', ... % Threshold Error
+    'sThPr','uThPr', ... %'iThr', ... % Threshold Precision
     'SBJ' ... % SBJ only null model
     };
 regressor_names = {...
     'Prob(Win)','Block Accuracy','Rolling Accuracy',...
     '+/- Pred Err','abs Pred Err',...
-    '+/- Target Dist','+/- Target Dist (n-1)','+/- Target Dist (n-2)',...
-    'abs Target Dist','abs Target Dist (n-1)','abs Target Dist (n-2)',...
-    '+/- Thresh Dist','abs Thresh Dist', ...%'+/- Thresh Dist (^-1)'...
+    '+/- Target Err','+/- Target Err (n-1)','+/- Target Err (n-2)',...
+    '+/- Target Prec',...
+    'abs Target Err','abs Target Err (n-1)','abs Target Err (n-2)',...
+    'abs Target Prec',...
+    '+/- Thresh Err','abs Thresh Err', ...
+    '+/- Thresh Prec','abs Thresh Prec', ...%'+/- Thresh Prec (^-1)'...
     'SBJ' ...
     };
 regressor_colors = {...
     [0 0 0], [0 0 0], [0 0 0], ... % black
-    [118 160 156]./255, [209 151 105]./255, ... % teal, tan
+    [118 160 156]./255, [37 52 148]./255, ... % teal, dark blue
     [152 78 163]./255, [152 78 163]./255, [152 78 163]./255, ...% purple
+    [247 104 161]./255,... % medium pink
     [247 129 191]./255, [247 129 191]./255, [247 129 191]./255, ...% pink
-    [97 61 46]./255, [189 65 45]./255, ...%brown, red
-    [0.2 0.2 0.2] ...   % dark gray
+    [122 1 119]./255,... % dark purple
+    [161 218 180]./255, [44 127 184]./255, ... % teal, medium blue
+    [209 151 105]./255, [189 65 45]./255, ...%tan, red
+    [0.3 0.3 0.3] ...   % dark gray
     };
 
 %   Original Plots: {pWin, sPE, uPE, tRT (3x), lDist (3x)}
@@ -57,23 +66,33 @@ regressor_colors = {...
 
 %% Convert model_id into set of conditions
 switch model_id
+    % Main Model
+    case 'RL4D'
+        labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sThPr','uThPr'};
+        
     % RL models with pWin
     case 'RL'
         labels = {'pWin','sPE','uPE'};
-    case 'RLsTar'
-        labels = {'pWin','sPE','uPE','sTar'};
-    case 'RLTar'
-        labels = {'pWin','sPE','uPE','sTar','uTar'};
-    case 'RLThr'
-        labels = {'pWin','sPE','uPE','sThr','uThr'};
-    case 'RLfullD'
-        labels = {'pWin','sPE','uPE','sTar','uTar','sThr','uThr'};
+    case 'RLTa'
+        labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr'};
+    case 'RLsTaEr'
+        labels = {'pWin','sPE','uPE','sTaEr'};
+    case 'RLTaEr'
+        labels = {'pWin','sPE','uPE','sTaEr','uTaEr'};
+    case 'RLTh'
+        labels = {'pWin','sPE','uPE','sThEr','uThEr','sThPr','uThPr'};
+    case 'RLThPr'
+        labels = {'pWin','sPE','uPE','sThPr','uThPr'};
+    case 'RLallD'
+        labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr','sThEr','uThEr','sThPr','uThPr'};
+    case 'RLmostD'
+        labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr','uThEr','uThPr'};
     case 'RL3D'
-        labels = {'pWin','sPE','uPE','sTar','uTar','uThr'};
+        labels = {'pWin','sPE','uPE','sTaEr','uTaEr','uThPr'};
     case 'RLsD'
-        labels = {'pWin','sPE','uPE','sTar','sThr'};
+        labels = {'pWin','sPE','uPE','sTaEr','sThPr'};
     case 'RLuD'
-        labels = {'pWin','sPE','uPE','uTar','uThr'};
+        labels = {'pWin','sPE','uPE','uTaEr','uThPr'};
     
     % RL models with alternative accuracy
     case 'RLbA'
@@ -81,41 +100,41 @@ switch model_id
     case 'RLbApW'
         labels = {'bAcc','pWin','sPE','uPE'};
     case 'RLbA3D'
-        labels = {'bAcc','sPE','uPE','sTar','uTar','uThr'};
+        labels = {'bAcc','sPE','uPE','sTaEr','uTaEr','uThPr'};
     case 'RLrA'
         labels = {'rAcc','sPE','uPE'};
     case 'RLrApW'
         labels = {'rAcc','pWin','sPE','uPE'};
     case 'RLrA3D'
-        labels = {'rAcc','sPE','uPE','sTar','uTar','uThr'};
+        labels = {'rAcc','sPE','uPE','sTaEr','uTaEr','uThPr'};
     
     % Null SBJ only control model
     case 'SBJonly'
         labels = {'SBJ'};
         
-    % Pre-Feedback Models
-    case 'pWTar'
-        labels = {'pWin','sTar','uTar'};
+    % Performance Models
+    case 'pWTaEr'
+        labels = {'pWin','sTaEr','uTaEr'};
     case 'pWallD'
-        labels = {'pWin','sTar','uTar','sThr','uThr'};
-    case 'rATar'
-        labels = {'rAcc','sTar','uTar'};
+        labels = {'pWin','sTaEr','uTaEr','sThPr','uThPr'};
+    case 'rATaEr'
+        labels = {'rAcc','sTaEr','uTaEr'};
     case 'rAallD'
-        labels = {'rAcc','sTar','uTar','sThr','uThr'};
+        labels = {'rAcc','sTaEr','uTaEr','sThPr','uThPr'};
         
     % Previous Trial Regressors:
     case 'RLpT'
         error('why running with previous trial regressors?');
-        labels = {'pWin','sPE','uPE','sTar','psTar'};
+        labels = {'pWin','sPE','uPE','sTaEr','psTaEr'};
     case 'RLpRTlD'
         error('why running with previous trial regressors?');
-        labels = {'pWin','sPE','uPE','sTar','psTar','sThr'};
+        labels = {'pWin','sPE','uPE','sTaEr','psTaEr','sThPr'};
     case 'RLpRTulD'
         error('why running with previous trial regressors?');
-        labels = {'pWin','sPE','uPE','sTar','psTar','sThr','uThr'};
+        labels = {'pWin','sPE','uPE','sTaEr','psTaEr','sThPr','uThPr'};
 %     case 'RLpRTiD'
 %         error('why running with previous trial regressors?');
-%         labels = {'pWin','sPE','uPE','sTar','psTar','iThr'};
+%         labels = {'pWin','sPE','uPE','sTaEr','psTaEr','iThr'};
     otherwise
         error(strcat('Unknown model_id: ',model_id));
 end
@@ -127,9 +146,9 @@ line_styles = cell(size(labels));
 for reg_ix = 1:numel(labels)
     names{reg_ix}  = regressor_names{strcmp(labels{reg_ix},regressors)};
     colors{reg_ix} = regressor_colors{strcmp(labels{reg_ix},regressors)};
-    if any(strcmp(labels{reg_ix},'psTar'))%{'psTar','uThr'}
+    if any(strcmp(labels{reg_ix},'psTaEr'))%{'psTaEr','uThPr'} % strcmp(labels{reg_ix}(1),'u') || 
         line_styles{reg_ix} = ':';
-    elseif strcmp(labels{reg_ix},'p2sTar')
+    elseif strcmp(labels{reg_ix},'p2sTaEr')
         line_styles{reg_ix} = '-.';
     else
         line_styles{reg_ix} = '-';
@@ -137,3 +156,47 @@ for reg_ix = 1:numel(labels)
 end
 
 end
+
+%% Regressors before adding error and precision:
+% regressors  = {...
+%     'pWin','bAcc','rAcc',... % Outcome predictors
+%     'sPE','uPE',... % Reward Feedback
+%     'sTaEr','psTaEr','p2sTaEr',... % Performance (signed)
+%     'sTaPr',... % Target precision (signed)
+%     'uTaEr','puTaEr','p2uTaEr',... % Performance (unsigned)
+%     'uTaPr',... % Target precision (unsigned)
+%     'sThPr','uThPr', ... %'iThr', ... % Performance (threshold)
+%     'SBJ' ... % SBJ only null model
+%     };
+% regressor_names = {...
+%     'Prob(Win)','Block Accuracy','Rolling Accuracy',...
+%     '+/- Pred Err','abs Pred Err',...
+%     '+/- Target Err','+/- Target Err (n-1)','+/- Target Err (n-2)',...
+%     '+/- Target Prec',...
+%     'abs Target Err','abs Target Err (n-1)','abs Target Err (n-2)',...
+%     'abs Target Prec',...
+%     '+/- Thresh Prec','abs Thresh Prec', ...%'+/- Thresh Prec (^-1)'...
+%     'SBJ' ...
+%     };
+% regressor_colors = {...
+%     [0 0 0], [0 0 0], [0 0 0], ... % black
+%     [118 160 156]./255, [209 151 105]./255, ... % teal, tan
+%     [152 78 163]./255, [152 78 163]./255, [152 78 163]./255, ...% purple
+%     []./255,...
+%     [247 129 191]./255, [247 129 191]./255, [247 129 191]./255, ...% pink
+%     []./255,...
+%     [97 61 46]./255, [189 65 45]./255, ...%brown, red
+%     [0.2 0.2 0.2] ...   % dark gray
+%     };
+% both error/precision:
+% regressor_colors = {...
+%     [0 0 0], [0 0 0], [0 0 0], ... % black
+%     [255 127 0]./255, [209 151 105]./255, ... % orange, tan
+%     [251 180 185]./255, [251 180 185]./255, [251 180 185]./255, ...% soft pink
+%     [247 104 161]./255,... % medium pink
+%     [197 27 138]./255, [197 27 138]./255, [197 27 138]./255, ...% dark magenta
+%     [122 1 119]./255,... % dark purple
+%     [161 218 180]./255, [44 127 184]./255, ... % teal, medium blue
+%     [65 182 196]./255, [37 52 148]./255, ...%light blue, dark blue
+%     [0.3 0.3 0.3] ...   % dark gray
+%     };
