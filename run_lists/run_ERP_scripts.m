@@ -57,7 +57,7 @@ plot_final_check = 0;
 % an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 conditions = 'FB';
 % %   Pre-Feedback RL Model Analysis:
-an_ids     = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
+an_ids     = {'ERP_Fz_F4t0_dm4t3_fl05t20'};%,'ERP_Pz_F4t1_dm4t3_fl05t20'};
 % conditions = 'DifFB';
 %   QA Plotting:
 % an_id      = 'ERP_Z4_F2t1_dm2t0_fl05t20';
@@ -65,7 +65,7 @@ an_ids     = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
 
 proc_id    = 'eeg_full_ft';
 save_fig   = 1;
-fig_vis    = 'off';
+fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)

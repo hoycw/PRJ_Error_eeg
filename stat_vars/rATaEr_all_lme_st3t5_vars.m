@@ -1,6 +1,6 @@
 % Stat Parameters
 st.an_style    = 'lme';
-st.model_lab   = 'pWTar';
+st.model_lab   = 'rATaEr';
 st.z_reg       = 1;                 % 0/1: zscore regressors?
 st.trial_cond  = {'Tar5'};
 st.stat_lim    = [-0.3 0.5];            % window in SEC for stats

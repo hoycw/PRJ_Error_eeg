@@ -7,7 +7,7 @@ function [labels, names, colors, line_styles] = fn_regressor_label_styles(model_
 
 %% List of possible regressors and their colors
 regressors  = {...
-    'pWin','bAcc','rAcc',... % Outcome predictors
+    'pWin','bAcc','rAcc','rAcc10',... % Outcome predictors
     'sPE','uPE',... % Reward Feedback
     'sTaEr','psTaEr','p2sTaEr',... % Performance (signed)
     'sTaPr',... % Target precision (signed)
@@ -18,7 +18,7 @@ regressors  = {...
     'SBJ' ... % SBJ only null model
     };
 regressor_names = {...
-    'Prob(Win)','Block Accuracy','Rolling Accuracy',...
+    'Prob(Win)','Block Accuracy','Rolling Accuracy','Rolling Accuracy 10',...
     '+/- Pred Err','abs Pred Err',...
     '+/- Target Err','+/- Target Err (n-1)','+/- Target Err (n-2)',...
     '+/- Target Prec',...
@@ -29,7 +29,7 @@ regressor_names = {...
     'SBJ' ...
     };
 regressor_colors = {...
-    [0 0 0], [0 0 0], [0 0 0], ... % black
+    [0 0 0], [0 0 0], [0 0 0], [0 0 0],... % black
     [118 160 156]./255, [37 52 148]./255, ... % teal, dark blue
     [152 78 163]./255, [152 78 163]./255, [152 78 163]./255, ...% purple
     [247 104 161]./255,... % medium pink
@@ -73,20 +73,12 @@ switch model_id
     % RL models with pWin
     case 'RL'
         labels = {'pWin','sPE','uPE'};
-    case 'RLTa'
-        labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr'};
     case 'RLsTaEr'
         labels = {'pWin','sPE','uPE','sTaEr'};
     case 'RLTaEr'
         labels = {'pWin','sPE','uPE','sTaEr','uTaEr'};
-    case 'RLTh'
-        labels = {'pWin','sPE','uPE','sThEr','uThEr','sThPr','uThPr'};
     case 'RLThPr'
         labels = {'pWin','sPE','uPE','sThPr','uThPr'};
-    case 'RLallD'
-        labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr','sThEr','uThEr','sThPr','uThPr'};
-    case 'RLmostD'
-        labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr','uThEr','uThPr'};
     case 'RL3D'
         labels = {'pWin','sPE','uPE','sTaEr','uTaEr','uThPr'};
     case 'RLsD'
@@ -95,18 +87,20 @@ switch model_id
         labels = {'pWin','sPE','uPE','uTaEr','uThPr'};
     
     % RL models with alternative accuracy
-    case 'RLbA'
-        labels = {'bAcc','sPE','uPE'};
-    case 'RLbApW'
-        labels = {'bAcc','pWin','sPE','uPE'};
-    case 'RLbA3D'
-        labels = {'bAcc','sPE','uPE','sTaEr','uTaEr','uThPr'};
-    case 'RLrA'
-        labels = {'rAcc','sPE','uPE'};
-    case 'RLrApW'
-        labels = {'rAcc','pWin','sPE','uPE'};
-    case 'RLrA3D'
-        labels = {'rAcc','sPE','uPE','sTaEr','uTaEr','uThPr'};
+%     case 'RLbA'
+%         labels = {'bAcc','sPE','uPE'};
+%     case 'RLbApW'
+%         labels = {'bAcc','pWin','sPE','uPE'};
+%     case 'RLbA3D'
+%         labels = {'bAcc','sPE','uPE','sTaEr','uTaEr','uThPr'};
+%     case 'RLrA10'
+%         labels = {'rAcc10','sPE','uPE'};
+%     case 'RLrA'
+%         labels = {'rAcc','sPE','uPE'};
+%     case 'RLrApW'
+%         labels = {'rAcc','pWin','sPE','uPE'};
+%     case 'RLrA3D'
+%         labels = {'rAcc','sPE','uPE','sTaEr','uTaEr','uThPr'};
     
     % Null SBJ only control model
     case 'SBJonly'
@@ -115,13 +109,31 @@ switch model_id
     % Performance Models
     case 'pWTaEr'
         labels = {'pWin','sTaEr','uTaEr'};
-    case 'pWallD'
+    case 'pWThPr'
+        labels = {'pWin','sThPr','uThPr'};
+    case 'pW4D'
         labels = {'pWin','sTaEr','uTaEr','sThPr','uThPr'};
     case 'rATaEr'
         labels = {'rAcc','sTaEr','uTaEr'};
-    case 'rAallD'
+    case 'rAThPr'
+        labels = {'rAcc','sThPr','uThPr'};
+    case 'rA4D'
         labels = {'rAcc','sTaEr','uTaEr','sThPr','uThPr'};
         
+    % OLD JUNK:
+%     case 'RLTa'
+%         labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr'};
+%     case 'RLTaPr'
+%         labels = {'pWin','sPE','uPE','sTaPr','uTaPr'};
+%     case 'RLTh'
+%         labels = {'pWin','sPE','uPE','sThEr','uThEr','sThPr','uThPr'};
+%     case 'RLThEr'
+%         labels = {'pWin','sPE','uPE','sThEr','uThEr'};
+%     case 'RLallD'
+%         labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr','sThEr','uThEr','sThPr','uThPr'};
+%     case 'RLmostD'
+%         labels = {'pWin','sPE','uPE','sTaEr','uTaEr','sTaPr','uTaPr','uThEr','uThPr'};
+    
     % Previous Trial Regressors:
     case 'RLpT'
         error('why running with previous trial regressors?');

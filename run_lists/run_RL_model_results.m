@@ -35,11 +35,10 @@ all_SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
-stat_ids = {'pWallD_all_lme_st0t5'};
 % stat_ids = {'RLbA_all_lme_st0t5','RLbApW_all_lme_st0t5','RLrA_all_lme_st0t5','RLrApW_all_lme_st0t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
 % stat_ids = {'rATar_all_lme_st3t5','rAallD_all_lme_st3t5'};
-% stat_ids = {'pWTar_all_lme_st3t5','pWallD_all_lme_st3t5'};
+stat_ids = {'pWTaEr_all_lme_st3t5','pWThPr_all_lme_st3t5','pW4D_all_lme_st3t5','rATaEr_all_lme_st3t5','rAThPr_all_lme_st3t5','rA4D_all_lme_st3t5'};
 % RL models:
 %   RL3D: pWin, sPE, uPE, sTar, uTar, uThr (no sThr!!!)
 %   RLfullD: pWin, sPE, uPE, sTar, uTar, uThr, sThr
@@ -58,40 +57,12 @@ end
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Main RL Model
 %an_ids    = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
-an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'pWallD_all_lme_st0t5'};
-% stat_ids = {'RLbA_all_lme_st0t5','RLrA_all_lme_st0t5','RLrApW_all_lme_st0t5'};
+an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
+% stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RL4D_all_lme_st0t5','RLallD_all_lme_st0t5'};
+% stat_ids = {'RLbA_all_lme_st0t5','RLrA_all_lme_st0t5','RL_all_lme_st0t5','RLrApW_all_lme_st0t5'};%'RLrApW_all_lme_st0t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st0t5';
-
-proc_id   = 'eeg_full_ft';
-save_fig  = 1;
-fig_vis   = 'on';
-fig_ftype = 'png';
-
-for an_ix = 1:numel(an_ids)
-    for st_ix = 1:numel(stat_ids)
-        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    end
-%     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_ids{an_ix},null_id);
-    
-    % Model Comparison Plots (Adjusted R-Squared)
-%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
-%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Ordinary');
-end
-
-%% Pre-Feedback ERP: Linear Mixed Effects Model (Over Time)
-% Pre-Feedback RL Model
-an_ids    = {'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20'};
-stat_ids  = {'pWTar_all_lme_st3t5','pWallD_all_lme_st3t5'};
-% stat_ids  = {'rATar_all_lme_st3t5','rAallD_all_lme_st3t5'};
-plt_id    = 'ts_F4t1_evnts_sigLine';%'ts_F2to1_evnts_sigLine';
-null_id   = '';%'SBJonly_all_lme_st3t5';
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
@@ -107,8 +78,35 @@ for an_ix = 1:numel(an_ids)
 %     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_ids{an_ix},null_id);
     
     % Model Comparison Plots (Adjusted R-Squared)
-%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
+%     SBJ04e_ERP_plot_RL_model_comparison_R2(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
+end
+
+%% Pre-Feedback ERP: Linear Mixed Effects Model (Over Time)
+% Pre-Feedback RL Model
+an_ids    = {'ERP_Fz_F4t0_dm4t3_fl05t20'};%,'ERP_Pz_F4t1_dm4t3_fl05t20'};
+stat_ids = {'pWTaEr_all_lme_st3t0','pWThPr_all_lme_st3t0','pW4D_all_lme_st3t0','rATaEr_all_lme_st3t0','rAThPr_all_lme_st3t0','rA4D_all_lme_st3t0'};
+plt_id    = 'ts_F4t0_evnts_sigLine';%'ts_F2to1_evnts_sigLine';
+null_id   = 'SBJonly_all_lme_st3t0';%'SBJonly_all_lme_st3t5';
+
+proc_id   = 'eeg_full_ft';
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'png';
+
+for an_ix = 1:numel(an_ids)
+    for st_ix = 1:numel(stat_ids)
+        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    end
+%     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_ids{an_ix},null_id);
+    
+    % Model Comparison Plots (Adjusted R-Squared)
+    SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% ERP: Linear Mixed Effects Model (Mean Windows)
