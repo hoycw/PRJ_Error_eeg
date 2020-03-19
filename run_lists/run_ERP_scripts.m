@@ -10,29 +10,11 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12'};
-all_SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12',...
-           'EEG13','EEG14','EEG15','EEG16','EEG17','EEG18','EEG19','EEG20',...
-           'EEG21','EEG22','EEG23','EEG24','EEG25','EEG26','EEG27','EEG28',...
-           'EEG29','EEG30','EEG31'};
-% Not Ready SBJ:
-%   EP06: only 62 channels?
-%   EP09: 2 BDFs, unknown quality?
-%   EP15: low quality?
-%   EP18: low trial count (328)
-%   EEG07: low trial count (373)
-%   EEG09: multiple blocks, needs redo???
-%   EEG12: low trial count (271)
-%   EEG13-27: ready, not used yet
-% Bad SBJ:
-%   EP01, EP02, EP05: recording errors
-%   EP03: low quality
-%   EP04: weird behavior?
-%   EP12-13: don't exist
-%   EEG02: low quality
-%   EEG11: recording failure
+sbj_id = 'good_prelim';
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' sbj_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 %% Run preprocessing
 proc_id_ica = 'eeg_full_ft';

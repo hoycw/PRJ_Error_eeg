@@ -1,4 +1,4 @@
-function SBJ05c_TFR_plot_grp(SBJs,conditions,proc_id,an_id,plt_id,save_fig,varargin)
+function SBJ05c_TFR_plot_grp(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,varargin)
 %% Plot TFRs averaged across the group
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -37,6 +37,12 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select conditions (and trials)
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
@@ -102,7 +108,7 @@ end
 % Create a figure for each channel
 for ch_ix = 1:numel(tfr_avg{1}.label)
     %% Create plot
-    fig_name = ['GRP_' conditions '_' an_id '_' tfr_avg{1}.label{ch_ix}];
+    fig_name = [SBJ_id '_' conditions '_' an_id '_' tfr_avg{1}.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
@@ -135,7 +141,7 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
                 'LineStyle',plt.evnt_styles{evnt_ix});
         end
         
-        title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix}]);
+        title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix} '(n=' num2str(numel(SBJs)) ')']);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');

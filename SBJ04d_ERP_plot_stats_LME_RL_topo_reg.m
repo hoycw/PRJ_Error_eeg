@@ -1,4 +1,4 @@
-function SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJs,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots group RL beta topographies with significance for ERPs
 %   Only for single channel right now...
 
@@ -38,6 +38,12 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select Conditions of Interest
 [reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
@@ -84,7 +90,7 @@ if ~exist(fig_dir,'dir')
 end
 
 % Create plot
-fig_name = ['GRP_' stat_id '_' an_id];
+fig_name = [SBJ_id '_' stat_id '_' an_id];
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);   %this size is for single plots
 
@@ -125,7 +131,7 @@ topo.avg  = r2;
 topo.mask = ones(size(topo.avg));
 cfgp.zlim = [min(r2) max(r2)];
 ft_topoplotER(cfgp, topo);
-title('Adjusted R2');
+title(['Adjusted R2 (' num2str(numel(SBJs)) ')']);
 axis tight
 
 %% Save figure

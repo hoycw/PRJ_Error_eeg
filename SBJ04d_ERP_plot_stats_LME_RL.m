@@ -1,4 +1,4 @@
-function SBJ04d_ERP_plot_stats_LME_RL(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ04d_ERP_plot_stats_LME_RL(SBJ_id,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
 error('Why not run the version with the model fits (R2)?');
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -39,6 +39,12 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select Conditions of Interest
 [reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
@@ -115,7 +121,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' stat_id '_' ch_list{ch_ix}];
+    fig_name = [SBJ_id '_' stat_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
@@ -197,7 +203,7 @@ for ch_ix = 1:numel(ch_list)
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';
-    ax.Title.String  = ch_list{ch_ix};
+    ax.Title.String  = [ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')'];
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end

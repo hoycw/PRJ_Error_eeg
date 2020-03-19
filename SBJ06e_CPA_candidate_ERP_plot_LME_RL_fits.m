@@ -1,4 +1,4 @@
-function SBJ06e_CPA_candidate_ERP_plot_LME_RL_fits(SBJs,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ06e_CPA_candidate_ERP_plot_LME_RL_fits(SBJ_id,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots group-averaged CPA candidates with significance, also beta weights per regressor
 %   Only for single channel right now...
 %% Set up paths
@@ -41,13 +41,19 @@ eval(stat_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
+
 % Select Conditions of Interest
 [reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
 [cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Stats
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' cpa_id '_' an_id '.mat'],'lme','qvals');
-tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' cpa_id '_' an_id '.mat'],'SBJs');
+load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' cpa_id '_' an_id '.mat'],'lme','qvals');
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' cpa_id '_' an_id '.mat'],'SBJs');
 if ~all(strcmp(SBJs,tmp.SBJs)); error('Mismatch in SBJs input and stats loaded'); end
 
 %% Load ERPs
@@ -154,7 +160,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' stat_id '_' cpa_id '_' an_id '_' ch_list{ch_ix}];
+    fig_name = [SBJ_id '_' stat_id '_' cpa_id '_' an_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
@@ -235,7 +241,7 @@ for ch_ix = 1:numel(ch_list)
     axes(1).XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     axes(1).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     axes(1).XLabel.String = 'Time (s)';
-    axes(1).Title.String  = ch_list{ch_ix};
+    axes(1).Title.String  = [ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')'];
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end

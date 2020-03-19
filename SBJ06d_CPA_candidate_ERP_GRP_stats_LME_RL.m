@@ -1,4 +1,4 @@
-function SBJ06d_CPA_candidate_ERP_GRP_stats_LME_RL(SBJs,eeg_proc_id,cpa_id,an_id,stat_id)
+function SBJ06d_CPA_candidate_ERP_GRP_stats_LME_RL(SBJ_id,eeg_proc_id,cpa_id,an_id,stat_id)
 % Run Linear Mixed-Effects + Reinforcement Learning model on all SBJ candidate ICs
 %   Only for one channel now...
 %% Set up paths
@@ -17,6 +17,12 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select Conditions of Interest
 model_id = [st.model_lab '_' st.trial_cond{1}];
@@ -168,7 +174,7 @@ stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
 if ~exist(stat_out_dir,'dir')
     [~] = mkdir(stat_out_dir);
 end
-stat_out_fname = [stat_out_dir 'GRP_' stat_id '_' cpa_id '_' an_id '.mat'];
+stat_out_fname = [stat_out_dir SBJ_id '_' stat_id '_' cpa_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
 save(stat_out_fname,'-v7.3','lme','qvals','SBJs');
 

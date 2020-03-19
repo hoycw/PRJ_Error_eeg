@@ -10,28 +10,11 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12'};
-all_SBJs = {'EP07','EP08','EP10','EP11','EP14','EP16','EP17','EP19',...
-           'EEG01','EEG03','EEG04','EEG05','EEG06','EEG08','EEG10','EEG12',...
-           'EEG13','EEG14','EEG15','EEG16','EEG17','EEG18','EEG19','EEG20',...
-           'EEG21','EEG22','EEG23','EEG24','EEG25','EEG26','EEG27','EEG28',...
-           'EEG29','EEG30','EEG31'};
-% Not Ready SBJ:
-%   EEG13-27: ready, not used yet
-% Bad SBJ:
-%   EP01, EP02, EP05: recording errors
-%   EP03: low quality
-%   EP04: weird behavior?
-%   EP06: only 62 channels?
-%   EP09: 2 BDFs, unknown quality?
-%   EP12-13: don't exist
-%   EP15: low quality?
-%   EP18: low trial count (328)
-%   EEG02: low quality
-%   EEG07: low trial count (373)
-%   EEG09: multiple blocks, needs redo???
-%   EEG11: recording failure
+SBJ_id = 'good_prelim';
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
@@ -58,7 +41,7 @@ end
 % Main RL Model
 %an_ids    = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'RL_all_lme_st1t6','RL3D_all_lme_st1t6','RL4D_all_lme_st1t6'};
+stat_ids  = {'RL_all_lme_st1t10','RL4D_all_lme_st1t10'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RL4D_all_lme_st0t5','RLallD_all_lme_st0t5'};
 % stat_ids = {'RLbA_all_lme_st0t5','RLrA_all_lme_st0t5','RL_all_lme_st0t5','RLrApW_all_lme_st0t5'};%'RLrApW_all_lme_st0t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
@@ -76,13 +59,13 @@ for an_ix = 1:numel(an_ids)
         SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-    SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_ids{an_ix},null_id);
+%     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_ids{an_ix},null_id);
     
     % Model Comparison Plots (Adjusted R-Squared)
-    SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
-    SBJ04e_ERP_plot_RL_model_comparison_R2(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
+%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
+%     SBJ04e_ERP_plot_RL_model_comparison_R2(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
 end
 
 %% Pre-Feedback ERP: Linear Mixed Effects Model (Over Time)

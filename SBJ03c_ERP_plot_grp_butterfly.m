@@ -1,4 +1,4 @@
-function SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save_fig,varargin)
+function SBJ03c_ERP_plot_grp_butterfly(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,varargin)
 %% Plot ERPs for group, with butterfly plots for SBJ means per condition
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -41,6 +41,12 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 [cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 
@@ -92,7 +98,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' conditions '_' an_id '_' ch_list{ch_ix} '_but'];    
+    fig_name = [SBJ_id '_' conditions '_' an_id '_' ch_list{ch_ix} '_but'];    
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
 %     [plot_rc,~] = fn_num_subplots(numel(w2.label));

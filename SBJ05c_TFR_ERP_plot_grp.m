@@ -1,4 +1,4 @@
-function SBJ05c_TFR_ERP_plot_grp(SBJs,conditions,proc_id,tfr_an_id,erp_an_id,plt_id,save_fig,varargin)
+function SBJ05c_TFR_ERP_plot_grp(SBJ_id,conditions,proc_id,tfr_an_id,erp_an_id,plt_id,save_fig,varargin)
 %% Plot TFRs averaged across the group
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -43,6 +43,12 @@ if ~strcmp(an.event_type,erp_an.event_type); error('itc and erp event mismatch!'
 if ~all(an.trial_lim_s==erp_an.trial_lim_s); error('itc and erp trial_lim_s mismatch!'); end
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select conditions (and trials)
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
@@ -131,7 +137,7 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
     end
     
     %% Create plot
-    fig_name = ['GRP_' conditions '_' tfr_an_id '_' erp_an_id '_' tfr_avg{1}.label{ch_ix}];
+    fig_name = [SBJ_id '_' conditions '_' tfr_an_id '_' erp_an_id '_' tfr_avg{1}.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
@@ -173,7 +179,7 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
                 'LineStyle','-'},'patchSaturation',0.3);
         ylabel('Amplitude (uV)');
         
-        title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix}]);
+        title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix} '(n=' num2str(numel(SBJs)) ')']);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');

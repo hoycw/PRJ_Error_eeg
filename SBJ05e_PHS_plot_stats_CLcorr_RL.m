@@ -1,4 +1,4 @@
-function SBJ05e_PHS_plot_stats_CLcorr_RL(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
+function SBJ05e_PHS_plot_stats_CLcorr_RL(SBJ_id,proc_id,an_id,stat_id,save_fig,varargin)
 %% Plot group TFRs per regressor: circular-linear correlations outlined by significance
 %   Only for single channel right now...
 %% Set up paths
@@ -44,11 +44,17 @@ if ~strcmp(st.an_style,'CLcorr'); error('stat_id not using circular-linear corre
 % plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 % eval(plt_vars_cmd);
 
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
+
 % Select Conditions of Interest
 [reg_lab, reg_names, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
 
 %% Load Stats
-tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'SBJs');
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'SBJs');
 if ~all(strcmp(SBJs,tmp.SBJs))
     fprintf(2,'Loaded SBJs: %s\n',strjoin(tmp.SBJs,', '));
     error('Not all SBJs match input SBJ list!');
@@ -56,7 +62,7 @@ end
 warning('WARNING: Assuming same prdm_vars for all SBJ to get event timing!');
 prdm_vars = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/03_events/' SBJs{1} '_prdm_vars.mat']);
 
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'phs_corr','qvals');%'phs_zcorr','zqvals'
+load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'phs_corr','qvals');%'phs_zcorr','zqvals'
 
 %% Load TFR for axes
 load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/04_proc/' SBJs{1} '_' proc_id '_' an_id '.mat']);
@@ -92,7 +98,7 @@ for ch_ix = 1:numel(st_tfr.label)
 %     end
     
     %% Create plot
-    fig_name = ['GRP_' stat_id '_' an_id '_' st_tfr.label{ch_ix}];
+    fig_name = [SBJ_id '_' stat_id '_' an_id '_' st_tfr.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
@@ -113,7 +119,7 @@ for ch_ix = 1:numel(st_tfr.label)
         set(axes(reg_ix),'XLim',[min(st_time_vec) max(st_time_vec)]);
         set(axes(reg_ix),'XTick',[min(st_time_vec):0.1:max(st_time_vec)]);
         %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
-        title([st_tfr.label{ch_ix} ': Phase-' reg_lab{reg_ix} ' Corr']);
+        title([st_tfr.label{ch_ix} ': Phase-' reg_lab{reg_ix} ' Corr (n=' num2str(numel(SBJs)) ')']);
         xlabel('Time (s)');
         ylabel('Frequency (Hz)');
         colorbar('northoutside');

@@ -1,4 +1,4 @@
-function SBJ04e_ERP_plot_RL_model_comparison_R2(SBJs,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
+function SBJ04e_ERP_plot_RL_model_comparison_R2(SBJ_id,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
 % Plots Adjusted R2 model fits across different RL models
 %   if null_id is not empty (''), subtract off R2 for that stat_id
 %   Only for single channel right now...
@@ -43,6 +43,12 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 sts = cell(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
@@ -126,9 +132,9 @@ for ch_ix = 1:numel(ch_list)
     
     %% Create plot
     if strcmp(r2_version,'Ordinary')
-        fig_name = ['GRP_RL_R2ord_comparison_' an_id];
+        fig_name = ['GRP_RL_R2ord_comparison_' an_id '_' SBJ_id];
     else
-        fig_name = ['GRP_RL_R2adj_comparison_' an_id];
+        fig_name = ['GRP_RL_R2adj_comparison_' an_id '_' SBJ_id];
     end
     if rm_null
         fig_name = [fig_name '_rmnull'];

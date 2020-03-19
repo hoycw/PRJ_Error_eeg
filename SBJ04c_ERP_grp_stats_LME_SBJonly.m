@@ -1,4 +1,4 @@
-function SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_id,stat_id)
+function SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_id,stat_id)
 % Run Mixed-Effects Linear model on all SBJ and trials
 %   NO MODEL! Only running with SBJ factor
 %   Only for one channel now...
@@ -29,6 +29,12 @@ eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
 if ~strcmp(st.model_lab,'SBJonly'); error('Only model_lab = SBJonly for this script!'); end
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
@@ -62,7 +68,7 @@ end
 if strcmp(st.measure,'mean') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_id'}))
     error('not set up yet for null model');
     % Load previous stats
-    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' st.pk_stat_id '_' st.pk_an_id '.mat']);
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_stat_id '_' st.pk_an_id '.mat']);
     if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
         error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
     end
@@ -177,7 +183,7 @@ fprintf('\t\t Stats Complete:');
 toc
 
 %% Save Results
-stat_out_fname = [root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'];
+stat_out_fname = [root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
 save(stat_out_fname,'-v7.3','lme','qvals','SBJs','time_vec','ch_list','reg_pk_time');
 

@@ -1,4 +1,5 @@
 function SBJ06f_CPA_candidate_ERP_plot_GRP_betas(SBJs,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
+error('use across SBJ LME!');
 % Plots group CPA candidate betas after SBJ stats, one per regressor
 %   Only for single channel right now...
 %% Set up paths

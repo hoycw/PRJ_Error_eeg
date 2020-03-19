@@ -1,4 +1,4 @@
-function SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,varargin)
+function SBJ03c_ERP_plot_grp_topo_cond(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,varargin)
 %% Plot ERP topography per condition for single window across group
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -37,6 +37,12 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select conditions (and trials)
 [cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
@@ -83,7 +89,7 @@ if ~exist(fig_dir,'dir')
 end
 
 % Create plot
-fig_name = ['GRP_' conditions '_' an_id '_' plt_id];
+fig_name = [SBJ_id '_' conditions '_' an_id '_' plt_id];
 [num_rc,~] = fn_num_subplots(numel(cond_lab));
 if num_rc(1)>1; fig_height = 0.5; else, fig_height = 0.3; end
 figure('Name',fig_name,'units','normalized',...
@@ -102,7 +108,7 @@ for cond_ix = 1:numel(cond_lab)
     cfgp.colorbar = 'yes';
     cfgp.comment  = 'no';
     tmp = ft_topoplotER(cfgp, er_grp{cond_ix});
-    title(cond_lab{cond_ix});
+    title([cond_lab{cond_ix} ' (n=' num2str(numel(SBJs)) ')']);
     tmp = caxis;
     clim = [min([clim(1) tmp(1)]) max([clim(2) tmp(2)])]; 
     axis tight

@@ -1,4 +1,4 @@
-function SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,phs_an_id,phs_freq_lim,phs_time_lim,erp_an_id,plt_id,save_fig,varargin)
+function SBJ05c_ITC_ERP_rose_plot_grp(SBJ_id,conditions,proc_id,phs_an_id,phs_freq_lim,phs_time_lim,erp_an_id,plt_id,save_fig,varargin)
 %% Compute and plot ITPC matrix for group with ERP on top
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -46,6 +46,12 @@ if ~all(an.trial_lim_s==erp_an.trial_lim_s); error('itc and erp trial_lim_s mism
 % eval(phs_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select conditions (and trials)
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
@@ -158,7 +164,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' conditions '_' phs_an_id '_f' num2str(phs_freq_lim,'%dt%d') ...
+    fig_name = [SBJ_id '_' conditions '_' phs_an_id '_f' num2str(phs_freq_lim,'%dt%d') ...
         '_' num2str(phs_time_lim,'%.02ft%.02f') '_'  erp_an_id '_' ch_list{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
@@ -211,7 +217,7 @@ for ch_ix = 1:numel(ch_list)
         ylabel('Amplitude (uV)');
         
         % Axis Parameters
-        title([ch_list{ch_ix} ': ' cond_lab{cond_ix}]);
+        title([ch_list{ch_ix} ': ' cond_lab{cond_ix} ' (n=' num2str(numel(SBJs)) ')']);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');

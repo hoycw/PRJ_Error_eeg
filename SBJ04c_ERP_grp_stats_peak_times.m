@@ -1,4 +1,5 @@
-function SBJ04c_ERP_grp_stats_peak_times(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
+function SBJ04c_ERP_grp_stats_peak_times(SBJ_id,proc_id,an_id,stat_id,save_fig,varargin)
+error('this needs checking/updates');
 % Compute grand average peak-to-peak FRN via jackknife:
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
@@ -54,6 +55,12 @@ eval(stat_vars_cmd);
 if ~strcmp(st.measure,'p2p') || ~strcmp(st.grp_method,'jackknife')
     error('peak latencies need jackknife and p2p!');
 end
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select Conditions of Interest
 [grp_lab, ~, ~, ~] = fn_group_label_styles(st.model_lab);
@@ -169,7 +176,7 @@ if st.plot_erps
     for ch_ix = 1:numel(ch_list)
         tmp = erps(:,:,ch_ix,:);
         ylims = [min(tmp(:)) max(tmp(:))];
-        fig_name = ['ERPs_SBJ_' ch_list{ch_ix}];
+        fig_name = ['ERPs_' SBJ_id '_' ch_list{ch_ix}];
         ch_figs(ch_ix) = figure('Name',fig_name);
         for cond_ix = 1:numel(cond_lab)
             subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix); hold on;
@@ -187,7 +194,7 @@ if st.plot_erps
     % Plot ERPs after subsampling
     if strcmp(st.grp_method,'jackknife')
         for ch_ix = 1:numel(ch_list)
-            fig_name = ['ERPs_jackknife_' ch_list{ch_ix}];
+            fig_name = ['ERPs_jackknife_' ch_list{ch_ix} '_' SBJ_id];
             ch_figs(ch_ix) = figure('Name',fig_name);
             tmp = gavg(:,:,ch_ix,:);
             ylims = [min(tmp(:)) max(tmp(:))];
@@ -209,7 +216,7 @@ if st.plot_erps
     if strcmp(st.measure,'p2p')
         for ch_ix = 1:numel(ch_list)
             % ch_figs(ch_ix) = figure('Name',['ERPs_jackknife_' ch_list{ch_ix}]);
-            fig_name = ['ERPs_peaks_' ch_list{ch_ix}];
+            fig_name = ['ERPs_peaks_' ch_list{ch_ix} '_' SBJ_id];
             figure('Name',fig_name);
             tmp = pk_amp(:,:,ch_ix,:);
             ylims = [min(tmp(:)) max(tmp(:))];
@@ -287,7 +294,7 @@ end
 %% Plot results
 for ch_ix = 1:numel(ch_list)
     % Create and format the plot
-    fig_name = ['GRP_violins_pk_lat_' stat_id '_' an_id '_' ch_list{ch_ix}];
+    fig_name = ['GRP_violins_pk_lat_' stat_id '_' an_id '_' ch_list{ch_ix} '_' SBJ_id];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
     

@@ -1,4 +1,4 @@
-function SBJ05e_TFR_plot_stats_LME_RL_fits(SBJs,proc_id,an_id,stat_id,save_fig,varargin)
+function SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_id,stat_id,save_fig,varargin)
 %% Plot group TFRs per regressor: betas outlined by significance; + R2 plot
 %   Only for single channel right now...
 %% Set up paths
@@ -40,12 +40,18 @@ eval(stat_vars_cmd);
 % plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 % eval(plt_vars_cmd);
 
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
+
 % Select Conditions of Interest
 [reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
 [cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Stats
-tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'SBJs');
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'SBJs');
 if ~all(strcmp(SBJs,tmp.SBJs))
     fprintf(2,'Loaded SBJs: %s\n',strjoin(tmp.SBJs,', '));
     error('Not all SBJs match input SBJ list!');
@@ -53,7 +59,7 @@ end
 warning('WARNING: Assuming same prdm_vars for all SBJ to get event timing!');
 prdm_vars = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/03_events/' SBJs{1} '_prdm_vars.mat']);
 
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'lme','qvals');
+load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'lme','qvals');
 
 %% Load TFR for axes
 load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/04_proc/' SBJs{1} '_' proc_id '_' an_id '.mat']);
@@ -96,7 +102,7 @@ for ch_ix = 1:numel(st_tfr.label)
 %     end
     
     %% Create plot
-    fig_name = ['GRP_' stat_id '_' an_id '_' st_tfr.label{ch_ix}];
+    fig_name = [SBJ_id '_' stat_id '_' an_id '_' st_tfr.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
@@ -135,7 +141,7 @@ for ch_ix = 1:numel(st_tfr.label)
     set(axes(numel(reg_lab)+1),'XLim',[min(st_time_vec) max(st_time_vec)]);
     set(axes(numel(reg_lab)+1),'XTick',[min(st_time_vec):0.1:max(st_time_vec)]);
     %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
-    title([st_tfr.label{ch_ix} ': R2']);
+    title([st_tfr.label{ch_ix} ': R2 (n=' num2str(numel(SBJs)) ')']);
     xlabel('Time (s)');
     ylabel('Frequency (Hz)');
     colorbar('northoutside');

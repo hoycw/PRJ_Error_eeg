@@ -1,4 +1,4 @@
-function SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
+function SBJ04e_ERP_plot_RL_model_comparison(SBJ_id,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
 % Plots AIC model fits across different RL models
 %   Only for single channel right now...
 %% Set up paths
@@ -42,6 +42,12 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 sts = cell(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
@@ -132,7 +138,7 @@ for ch_ix = 1:numel(ch_list)
             '; RL=' num2str(rel_lik_null,'%.2f') ')'];
     
     %% Create plot
-    fig_name = ['GRP_RL_AIC_comparison_' an_id];
+    fig_name = ['GRP_RL_AIC_comparison_' an_id '_' SBJ_id];
     if plot_null
         fig_name = [fig_name '_null'];
     end

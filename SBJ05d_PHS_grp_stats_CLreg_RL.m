@@ -1,4 +1,4 @@
-function SBJ05d_PHS_grp_stats_CLreg_RL(SBJs,proc_id,an_id,stat_id)
+function SBJ05d_PHS_grp_stats_CLreg_RL(SBJ_id,proc_id,an_id,stat_id)
 % Run Circular-Linear regression for phase at each time-frequency point
 % across all SBJ (no random effects...), then FDR correct
 %   Only for one channel now...
@@ -30,6 +30,12 @@ if ~an.complex; error('why run this without ITPC an_vars?'); end
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
 if ~strcmp(st.an_style,'CLreg'); error('stat_id not using circular-linear regression!'); end
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select conditions (and trials)
 model_id = [st.model_lab '_' st.trial_cond{1}];
@@ -173,7 +179,7 @@ stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
 if ~exist(stat_out_dir,'dir')
     [~] = mkdir(stat_out_dir);
 end
-stat_out_fname = [stat_out_dir 'GRP_' stat_id '_' an_id '.mat'];
+stat_out_fname = [stat_out_dir SBJ_id '_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
 save(stat_out_fname,'-v7.3','betas','r2s','qvals','SBJs');
 

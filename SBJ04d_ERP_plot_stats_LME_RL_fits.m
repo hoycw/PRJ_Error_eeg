@@ -1,4 +1,4 @@
-function SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots group ERPs with significance, also beta weights per regressor
 %   Only for single channel right now...
 %% Set up paths
@@ -40,6 +40,12 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
+
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 % Select Conditions of Interest
 [reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
@@ -159,7 +165,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = ['GRP_' stat_id '_' ch_list{ch_ix}];
+    fig_name = [SBJ_id '_' stat_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.7 1],'Visible',fig_vis);   %this size is for single plots
