@@ -1,10 +1,17 @@
 %% Load BHV
-SBJ = 'EEG14';
+SBJ = 'EEG01';
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
+proc_id   = 'eeg_full_ft';
 
 [bhv] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
 %load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+
+%% Compute total score
+bhv.total_score = zeros(size(bhv.score));
+for t_ix = 2:numel(bhv.trl_n)
+    bhv.total_score(t_ix) = sum(bhv.score(1:t_ix));
+end
 
 %% Plot SBJ Behavior Timeline
 figure; hold on;

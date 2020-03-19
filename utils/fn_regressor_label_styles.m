@@ -7,7 +7,7 @@ function [labels, names, colors, line_styles] = fn_regressor_label_styles(model_
 
 %% List of possible regressors and their colors
 regressors  = {...
-    'pWin','bAcc','rAcc','rAcc10',... % Outcome predictors
+    'pWin','bAcc','rAcc','rAcc10','score',... % Outcome predictors
     'sPE','uPE',... % Reward Feedback
     'sTaEr','psTaEr','p2sTaEr',... % Performance (signed)
     'sTaPr',... % Target precision (signed)
@@ -18,7 +18,7 @@ regressors  = {...
     'SBJ' ... % SBJ only null model
     };
 regressor_names = {...
-    'Prob(Win)','Block Accuracy','Rolling Accuracy','Rolling Accuracy 10',...
+    'Prob(Win)','Block Accuracy','Rolling Accuracy','Rolling Accuracy 10','Total Score',...
     '+/- Pred Err','abs Pred Err',...
     '+/- Target Err','+/- Target Err (n-1)','+/- Target Err (n-2)',...
     '+/- Target Prec',...
@@ -29,7 +29,7 @@ regressor_names = {...
     'SBJ' ...
     };
 regressor_colors = {...
-    [0 0 0], [0 0 0], [0 0 0], [0 0 0],... % black
+    [0 0 0], [0 0 0], [0 0 0], [0 0 0], [0.4 0.4 0.4],... % blacks, gray
     [118 160 156]./255, [37 52 148]./255, ... % teal, dark blue
     [152 78 163]./255, [152 78 163]./255, [152 78 163]./255, ...% purple
     [247 104 161]./255,... % medium pink
@@ -95,8 +95,8 @@ switch model_id
 %         labels = {'bAcc','sPE','uPE','sTaEr','uTaEr','uThPr'};
 %     case 'RLrA10'
 %         labels = {'rAcc10','sPE','uPE'};
-%     case 'RLrA'
-%         labels = {'rAcc','sPE','uPE'};
+    case 'RLrA'
+        labels = {'rAcc','sPE','uPE'};
 %     case 'RLrApW'
 %         labels = {'rAcc','pWin','sPE','uPE'};
 %     case 'RLrA3D'
