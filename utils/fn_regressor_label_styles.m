@@ -73,6 +73,8 @@ switch model_id
     % RL models with pWin
     case 'RL'
         labels = {'pWin','sPE','uPE'};
+    case 'RLscr'
+        labels = {'pWin','score','sPE','uPE'};
     case 'RLsTaEr'
         labels = {'pWin','sPE','uPE','sTaEr'};
     case 'RLTaEr'
@@ -113,12 +115,16 @@ switch model_id
         labels = {'pWin','sThPr','uThPr'};
     case 'pW4D'
         labels = {'pWin','sTaEr','uTaEr','sThPr','uThPr'};
+    case 'pWscr4D'
+        labels = {'pWin','score','sTaEr','uTaEr','sThPr','uThPr'};
     case 'rATaEr'
         labels = {'rAcc','sTaEr','uTaEr'};
     case 'rAThPr'
         labels = {'rAcc','sThPr','uThPr'};
     case 'rA4D'
         labels = {'rAcc','sTaEr','uTaEr','sThPr','uThPr'};
+    case 'rAscr4D'
+        labels = {'rAcc','score','sTaEr','uTaEr','sThPr','uThPr'};
         
     % OLD JUNK:
 %     case 'RLTa'

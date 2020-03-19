@@ -133,20 +133,17 @@ elseif any(strcmp(reg_lab,'rAcc'))
     % Compute rolling accuracy of last 5 trials
     %   Include training trials!
     run_idx_nfv = ones(size(bhv_orig_nfv.trl_n));
-    if any(strcmp(SBJ,{'EP09','EEG12','EEG24','EEG25'}))
-        new_run_ix_nfv = find(abs(diff(bhv_orig_nfv.trl_n))>prdm_vars.n_trials)+1;
-        run_idx_nfv(new_run_ix_nfv:end) = 2;
-    end
-    
+    new_run_ix = find(abs(diff(bhv_orig_nfv.trl_n))>prdm_vars.n_trials)+1;
+    run_idx(find(bhv_orig_nfv.trl_n==bhv.trl_n(new_run_ix)):end) = 2;
     rAcc = nan(size(bhv.trl_n));
     for t_ix = 1:numel(bhv.trl_n)
+        orig_ix = find(bhv_orig_nfv.trl_n==bhv.trl_n(t_ix));
         if roll_wi_cond
             prior_cond_ix = find(strcmp(bhv_orig_nfv.cond,bhv.cond(t_ix)) & bhv_orig_nfv.trl_n<bhv.trl_n(t_ix));
-            prior_cond_ix = prior_cond_ix(run_idx_nfv(prior_cond_ix)==run_idx(t_ix));
+            prior_cond_ix = prior_cond_ix(run_idx(prior_cond_ix)==run_idx(orig_ix));
             rAcc(t_ix) = nanmean(fb_idx(prior_cond_ix(end-roll_win+1:end)));
         else
             error('need to set up for double runs EEG12,24,25');
-            orig_ix = find(bhv_orig_nfv.trl_n==bhv.trl_n(t_ix));
             rAcc(t_ix) = nanmean(fb_idx(orig_ix-roll_win:orig_ix-1));
         end
     end
@@ -162,11 +159,11 @@ uPE = abs(sPE);
 if any(strcmp(reg_lab,'score'))    
     % Compute total score (exclude training trials)
     full_score = zeros(size(bhv_orig_ntr.score));
-    new_run_ix_ntr = find(abs(diff(bhv_orig_ntr.trl_n))>prdm_vars.n_trials)+1;
+    new_run_ix = find(abs(diff(bhv_orig_ntr.trl_n))>prdm_vars.n_trials)+1;
     first_trl_ix = 1;
     for t_ix = 1:numel(bhv_orig_ntr.trl_n)
-        if n_runs==2 && t_ix==new_run_ix_ntr
-            first_trl_ix = new_run_ix_ntr;
+        if n_runs==2 && t_ix==new_run_ix
+            first_trl_ix = new_run_ix;
         end
         full_score(t_ix) = sum(bhv_orig_ntr.score(first_trl_ix:t_ix));
     end
@@ -178,11 +175,11 @@ if any(strcmp(reg_lab,'score'))
         if n_runs==2 && t_ix==new_run_ix
             run_ix = 2;
         end
-        ntr_ix = find(bhv_orig_ntr.trl_n==bhv.trl_n(t_ix));
-        if numel(ntr_ix)>1
-            ntr_ix = ntr_ix(run_ix);
+        ix = find(bhv_orig_ntr.trl_n==bhv.trl_n(t_ix));
+        if numel(ix)>1
+            ix = ix(run_ix);
         end
-        score(t_ix) = full_score(ntr_ix);
+        score(t_ix) = full_score(ix);
     end
 end
 
