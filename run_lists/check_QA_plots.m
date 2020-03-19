@@ -54,7 +54,7 @@ quest_diff = zeros([numel(SBJs) numel(ideal_ans)]);
 for s = 1:numel(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
     eval(SBJ_vars_cmd);
-    quest_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/questionare_vars/' SBJs{s} '_questionnaire_vars.m'];
+    quest_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/questionnaire_vars/' SBJs{s} '_questionnaire_vars.m'];
     try
         eval(quest_vars_cmd);
         for q = 1:numel(ideal_ans)
