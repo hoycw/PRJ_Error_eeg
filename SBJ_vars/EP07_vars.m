@@ -51,11 +51,11 @@ SBJ_vars.ch_lab.prefix  = '1-';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {...
- 'AF8', 'Iz', 'T7', 'F8'
+ 'AF8', 'Iz', 'T7', 'F8', 'FC6', 'O2', 'FT8'
     };
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 10000;
-SBJ_vars.trial_reject_ix = [19 33 57 151 184 219 220 226 254 255 262 299 300 301 303 326 342 358 380 381 384 412 417 422 424 450 451 452 455 476 477 500 502 514 515 519 525 526 527 528 543 565 575];
-SBJ_vars.ica_reject = [2, 4, 11, 12, 18, 28, 38, 49, 57, 58, 60];
-%MAX AROUND 1500
+SBJ_vars.trial_reject_ix = [33 57 151 164 224 253 254 260 297 298 301 324 340 356 357 382 410 415 420 448 449 450 453 474 475 498 500 512 513 517 523 524 525 526 541 563 573];
+SBJ_vars.ica_reject = [2, 4, 6, 11, 12, 13, 17, 18, 21, 22, 23, 25, 29, 37, 38, 39, 40, 41, 43, 45, 48, 49, 51, 53, 54, 55, 57]; %17???
+%MAX AROUND 1400
 %Max around 25
