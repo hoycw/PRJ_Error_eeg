@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good_prelim';
+SBJ_id = 'good1';
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
 tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);
@@ -19,7 +19,8 @@ SBJs = tmp{1}; clear tmp;
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
 % stat_ids = {'RLbA_all_lme_st0t5','RLbApW_all_lme_st0t5','RLrA_all_lme_st0t5','RLrApW_all_lme_st0t5'};
-stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RL4D_all_lme_st0t5'};
+stat_ids  = {'RLTaEr_all_lme_st1t5','RLThPr_all_lme_st1t5','RLsD_all_lme_st1t5','RLuD_all_lme_st1t5','RLsTauTh_all_lme_st1t5','RLuTasTh_all_lme_st1t5'};
+% stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RL4D_all_lme_st0t5'};
 % stat_ids = {'rATar_all_lme_st3t5','rAallD_all_lme_st3t5'};
 % stat_ids = {'pWTaEr_all_lme_st3t5','pWThPr_all_lme_st3t5','pW4D_all_lme_st3t5','rATaEr_all_lme_st3t5','rAThPr_all_lme_st3t5','rA4D_all_lme_st3t5'};
 % RL models:
@@ -41,12 +42,12 @@ end
 % Main RL Model
 %an_ids    = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'RL_all_lme_st1t10','RL4D_all_lme_st1t10'};
+stat_ids  = {'RL_all_lme_st1t5'};%,'RLTaEr_all_lme_st1t5','RLThPr_all_lme_st1t5','RLsD_all_lme_st1t5','RLuD_all_lme_st1t5','RLsTauTh_all_lme_st1t5','RLuTasTh_all_lme_st1t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RL4D_all_lme_st0t5','RLallD_all_lme_st0t5'};
 % stat_ids = {'RLbA_all_lme_st0t5','RLrA_all_lme_st0t5','RL_all_lme_st0t5','RLrApW_all_lme_st0t5'};%'RLrApW_all_lme_st0t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
-null_id   = 'SBJonly_all_lme_st1t6';
+null_id   = 'SBJonly_all_lme_st1t5';
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
@@ -55,16 +56,18 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+        SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-%     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_ids{an_ix},null_id);
+%     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
     
     % Model Comparison Plots (Adjusted R-Squared)
-%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%     SBJ04e_ERP_plot_RL_model_comparison(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
-%     SBJ04e_ERP_plot_RL_model_comparison_R2(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%     SBJ04e_ERP_plot_RL_model_comparison_R2(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',1);
+%     SBJ04e_ERP_plot_RL_model_comparison_R2(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
 end
 
@@ -83,14 +86,14 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ04d_ERP_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+        SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-%     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJs,proc_id,an_ids{an_ix},null_id);
+%     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
     
     % Model Comparison Plots (Adjusted R-Squared)
-    SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+    SBJ04e_ERP_plot_RL_model_comparison(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
@@ -106,14 +109,14 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ04c_ERP_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJs,an_ids{an_ix},stat_ids{st_ix},...
+        SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_ids{an_ix},stat_ids{st_ix},...
             plt_ids{st_ix},save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Model Comparison Plots (Adjusted R-Squared)
 %     error('need topo version!');
-%     SBJ04e_ERP_plot_RL_model_comparison(SBJs,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%     SBJ04e_ERP_plot_RL_model_comparison(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
@@ -129,14 +132,14 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ05d_TFR_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ05e_TFR_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
+        SBJ05d_TFR_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Model Comparison Plots (Adjusted R-Squared)
 %     error('this needs to be a martix version!');
-%     SBJ05f_TFR_plot_RL_model_comparison(SBJs,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+%     SBJ05f_TFR_plot_RL_model_comparison(SBJ_id,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
@@ -156,38 +159,38 @@ for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(model_ids)
         % Circular-Linear Correlation: Group Level
         stat_id = [model_ids{st_ix} '_CLcorr_' model_win];
-%         SBJ05d_PHS_grp_stats_CLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
-        SBJ05e_PHS_plot_stats_CLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_id,save_fig,...
+%         SBJ05d_PHS_grp_stats_CLcorr_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+        SBJ05e_PHS_plot_stats_CLcorr_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
 %         % Circular-Linear Correlation: SBJ z-score, GRP t-test
 %         stat_id = [model_ids{st_ix} '_zCLcorr_' model_win];
-%         SBJ05d_PHS_grp_stats_zCLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
-%         SBJ05e_PHS_plot_stats_zCLcorr_RL(SBJs,proc_id,an_ids{an_ix},stat_id,save_fig,...
+%         SBJ05d_PHS_grp_stats_zCLcorr_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+%         SBJ05e_PHS_plot_stats_zCLcorr_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
 %         % Circular-Linear Regression: Group level, separate for each regressor
 %         stat_id = [model_ids{st_ix} '_CLreg_' model_win];
-%         SBJ05d_PHS_grp_stats_CLreg_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
-%         SBJ05e_PHS_plot_stats_CLreg_RL(SBJs,proc_id,an_ids{an_ix},stat_id,save_fig,...
+%         SBJ05d_PHS_grp_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+%         SBJ05e_PHS_plot_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
 %         % Jack-Knife wITPC LME Regression: Group level
 %         stat_id = [model_ids{st_ix} '_lme_' model_win];
-%         SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
-%         SBJ05e_TFR_plot_stats_LME_RL_fits(tfr_SBJs,proc_id,an_ids{an_ix},stat_id,save_fig,...
+%         SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+%         SBJ05e_TFR_plot_stats_LME_RL_fits(tfr_SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
 %         % wITPC: SBJ level z-score, GRP t-test
 %         stat_id = [model_ids{st_ix} '_wITPC_' model_win];
-%         SBJ05d_PHS_grp_stats_wITPC_RL(SBJs,proc_id,an_ids{an_ix},stat_id);
-%         SBJ05e_PHS_plot_stats_wITPC_RL(SBJs,proc_id,an_ids{an_ix},stat_id,save_fig,...
+%         SBJ05d_PHS_grp_stats_wITPC_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+%         SBJ05e_PHS_plot_stats_wITPC_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Model Comparison Plots (Adjusted R-Squared)
 %     error('this needs to be a martix version!');
-%     SBJ05f_TFR_plot_RL_model_comparison(SBJs,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+%     SBJ05f_TFR_plot_RL_model_comparison(SBJ_id,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
@@ -203,13 +206,13 @@ end
 % 
 % for an_ix = 1:numel(an_ids)
 %     for st_ix = 1:numel(stat_ids)
-%         SBJ05d_TFR_grp_stats_LME_RL(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix});
-%         SBJ05e_POW_plot_stats_LME_RL_fits(SBJs,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+%         SBJ05d_TFR_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+%         SBJ05e_POW_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %     end
 %     
 %     % Model Comparison Plots (Adjusted R-Squared)
-% %     SBJ05f_POW_plot_RL_model_comparison(SBJs,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+% %     SBJ05f_POW_plot_RL_model_comparison(SBJ_id,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
 % %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 % end
 

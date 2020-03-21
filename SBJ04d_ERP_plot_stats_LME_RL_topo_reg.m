@@ -55,13 +55,13 @@ if strcmp(st.measure,'ts')
 end
 
 %% Load Stats
-tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'SBJs');
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'SBJs');
 if ~all(strcmp(SBJs,tmp.SBJs))
     fprintf(2,'Loaded SBJs: %s\n',strjoin(tmp.SBJs,', '));
     error('Not all SBJs match input SBJ list!');
 end
 
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat'],'lme','qvals','ch_list','reg_pk_time');
+load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'lme','qvals','ch_list','reg_pk_time');
 if numel(ch_list)<64; error('Cannot plot opo wihtout full cap!'); end
 
 % Get beta values and color limits

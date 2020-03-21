@@ -75,8 +75,6 @@ switch model_id
         labels = {'pWin','sPE','uPE'};
     case 'RLscr'
         labels = {'pWin','score','sPE','uPE'};
-    case 'RLsTaEr'
-        labels = {'pWin','sPE','uPE','sTaEr'};
     case 'RLTaEr'
         labels = {'pWin','sPE','uPE','sTaEr','uTaEr'};
     case 'RLThPr'
@@ -87,6 +85,20 @@ switch model_id
         labels = {'pWin','sPE','uPE','sTaEr','sThPr'};
     case 'RLuD'
         labels = {'pWin','sPE','uPE','uTaEr','uThPr'};
+    case 'RLsTauTh'
+        labels = {'pWin','sPE','uPE','sTaEr','uThPr'};
+    case 'RLuTasTh'
+        labels = {'pWin','sPE','uPE','uTaEr','sThPr'};
+    
+    % RL with Single Performance
+    case 'RLsTaEr'
+        labels = {'pWin','sPE','uPE','sTaEr'};
+    case 'RLuTaEr'
+        labels = {'pWin','sPE','uPE','uTaEr'};
+    case 'RLsThPr'
+        labels = {'pWin','sPE','uPE','sThPr'};
+    case 'RLuThPr'
+        labels = {'pWin','sPE','uPE','uThPr'};
     
     % RL models with alternative accuracy
 %     case 'RLbA'

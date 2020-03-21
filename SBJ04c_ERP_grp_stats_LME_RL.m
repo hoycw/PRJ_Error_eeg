@@ -156,7 +156,7 @@ if ~exist(fig_dir,'dir')
 end
 
 % Plot design matrix
-fig_name = ['GRP_' model_id '_design_' SBJ_id];
+fig_name = [SBJ_id '_' model_id '_design'];
 figure('Name',fig_name);
 imagesc(model);
 xticklabels(reg_lab);
@@ -164,7 +164,7 @@ colorbar;
 saveas(gcf,[fig_dir fig_name '.png']);
 
 % Plot regressor correlation matrix
-fig_name = ['GRP_' model_id '_design_corr_' SBJ_id];
+fig_name = [SBJ_id '_' model_id '_design_corr'];
 figure('Name',fig_name);
 imagesc(reg_corr);
 xticklabels(reg_lab);

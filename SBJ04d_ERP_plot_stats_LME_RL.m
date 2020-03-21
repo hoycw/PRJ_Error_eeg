@@ -51,7 +51,7 @@ SBJs = tmp{1}; clear tmp;
 [cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load Stats
-load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_id '_' an_id '.mat']);
+load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat']);
 
 %% Load ERPs
 for s = 1:length(SBJs)
