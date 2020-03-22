@@ -36,7 +36,8 @@ plot_final_check = 0;
 
 %% View basic ERPs
 %   RL Model Analysis:
-an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+an_ids     = {'ERP_all_F2t1_dm2t0_fl05t20'};
+% an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 %     'ERP_Fz_F4t1_dm4t3_fl05t20','ERP_Pz_F4t1_dm4t3_fl05t20',...
 %     'ERP_Fz_F4t0_dm4t3_fl05t20','ERP_Pz_F4t0_dm4t3_fl05t20'};
 conditions = 'FB';

@@ -10,7 +10,11 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EEG01','EEG02','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG09','EEG10','EEG12'};
+SBJ_id = 'goodEEG';
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 %% Run preprocessing
 % proc_id = 'odd_full_ft';
@@ -35,24 +39,24 @@ SBJs = {'EEG01','EEG02','EEG03','EEG04','EEG05','EEG06','EEG07','EEG08','EEG09',
 
 %% View basic ERPs
 proc_id    = 'odd_full_ft';
-an_ids     = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
+an_ids     = {'ERP_all_S2t1_dm2t0_fl05t20'};%'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
 conditions = 'Odd';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
-    %     for s = 1:numel(SBJs)
-    %         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
-    %         plt_id     = 'ts_S2t1_evnts_sigLine';
-    %         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-    %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    %     end
+    for s = 1:numel(SBJs)
+        SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
+        plt_id     = 'ts_S2t1_evnts_sigLine';
+%         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    end
     
     % Group ERP plot
-    plt_id     = 'ts_S2t1_evnts_sigLine';
-    SBJ03c_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     plt_id     = 'ts_S2t1_evnts_sigLine';
+%     SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % plt_id = 'ts_F2to13_but_evnts_sigPatch';
     % SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
@@ -61,16 +65,26 @@ for an_ix = 1:numel(an_ids)
     %close all;
 end
 
+%% View Topos
+proc_id    = 'odd_full_ft';
+an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
+conditions = 'Odd';
+save_fig   = 1;
+fig_vis    = 'on';
+fig_ftype  = 'png';
+
+for s = 1:numel(SBJs)
+    SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+end
+
 % Group Topo Plot: P3
-an_id  = 'ERP_all_S2t1_dm2t0_fl05t20';
 plt_id = 'topo_F3t45';
-SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+SBJ03c_ERP_plot_grp_topo_cond(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,...
     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 % Group Topo Plot: N2
-an_id  = 'ERP_all_S2t1_dm2t0_fl05t20';
 plt_id = 'topo_F18t25';
-SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+SBJ03c_ERP_plot_grp_topo_cond(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,...
     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 %% OLD SHEILA STUFF:

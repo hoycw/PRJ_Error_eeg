@@ -10,19 +10,11 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJs = {'EEG01','EEG04','EEG05','EEG06','EEG08','EEG10'};
-SBJs = {'EEG01','EEG04','EEG05','EEG06','EEG08'};
-% No results for oddball:
-%   EEG03
-% Not Ready SBJ:
-%   EEG07: low trial count (373)
-%   EEG09: multiple blocks, needs redo???
-%   EEG12: low trial count (271)
-%   EEG13-27: ready, not used yet
-% Bad SBJ:
-%   EPs: no oddball
-%   EEG02: low quality
-%   EEG11: recording failure
+SBJ_id = 'goodEEG';
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
 %% Prototype Selection
 proc_id   = 'odd_full_ft';
@@ -32,22 +24,32 @@ save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for s = 2:numel(SBJs)
+for s = 1:numel(SBJs)
     %ODD02a_artifact_rejection(SBJs{x}, 'eeg_full_ft', 'odd_full_ft', 1, 'on', 'ERP_stack_full_events_odd')
     %SBJ02a_artifact_rejection(SBJs{x}, 'eeg_full_ft', 1, 'on')
     %SBJ01_preproc(SBJs{x}, 'eeg_full_ft');
 %     SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
 %         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     try
+        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
+            save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    catch
+        fprintf(2,'No ICs found for CPA %s\n',SBJs{s});
+    end
+    try
         SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd2', plt_id,...
             save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-
     catch
-        fprintf(2,'No ICs found for %s\n',SBJs{s});
+        fprintf(2,'No ICs found for CPA_odd2 %s\n',SBJs{s});
     end
 end
 
 for s = 1:numel(SBJs)
+    try
+        load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_odd2_' proc_id '_prototype.mat']);
+    catch
+        final_ics = [];
+    end
     load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_' proc_id '_prototype.mat']);
     orig_ics = final_ics;
     try
@@ -57,6 +59,7 @@ for s = 1:numel(SBJs)
     end
     fprintf('%s: n_tar = %d; n_odd2 = %d; overlap = %d\n',SBJs{s},numel(orig_ics),numel(final_ics),numel(intersect(orig_ics,final_ics)));
 end
+
 % COMPARISON OUTPUT:
 % EEG01: n_origs = 3; n_odd = 3; overlap = 3
 % EEG03: n_origs = 1; n_odd = 1; overlap = 0

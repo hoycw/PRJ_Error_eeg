@@ -41,8 +41,8 @@ end
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Main RL Model
 %an_ids    = {'ERPlp_Fz_F2t1_dm2t0_fl05t20'};
-an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'RL_all_lme_st1t5'};%,'RLTaEr_all_lme_st1t5','RLThPr_all_lme_st1t5','RLsD_all_lme_st1t5','RLuD_all_lme_st1t5','RLsTauTh_all_lme_st1t5','RLuTasTh_all_lme_st1t5'};
+an_ids    = {'ERP_Pz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
+stat_ids  = {'RL3D_all_lme_st1t5'};%,'RLTaEr_all_lme_st1t5','RLThPr_all_lme_st1t5','RLsD_all_lme_st1t5','RLuD_all_lme_st1t5','RLsTauTh_all_lme_st1t5','RLuTasTh_all_lme_st1t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RL4D_all_lme_st0t5','RLallD_all_lme_st0t5'};
 % stat_ids = {'RLbA_all_lme_st0t5','RLrA_all_lme_st0t5','RL_all_lme_st0t5','RLrApW_all_lme_st0t5'};%'RLrApW_all_lme_st0t5'};
 % stat_ids  = {'RL_all_lme_st0t5','RL3D_all_lme_st0t5','RLfullD_all_lme_st0t5'};

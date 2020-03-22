@@ -23,6 +23,7 @@ eval(cpa_vars_cmd);
 
 %% Load the data
 %loaded data from after SBJ02a --> already cleaned and trial segmented
+% load([SBJ_vars.dirs.preproc SBJ '_preproc_eeg_full_ft.mat']);
 load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat']); %chose 02a - ica before rejection!
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
@@ -33,35 +34,10 @@ cond_idx = fn_condition_index(cond_lab, bhv);
 [diff_lab, diff_pairs, diff_colors, diff_styles] = fn_condition_diff_label_styles(cpa.diff_id);
 if numel(diff_lab)>1; error('Too many condition contrasts!'); end
 
-%% Exclude bad trials
-% Find trials that overlap with bad_epochs from raw visual inspection
-load([SBJ_vars.dirs.preproc SBJ '_preproc_eeg_full_ft.mat'],'data');
-load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
-if ~isempty(bad_epochs)
-    bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
-        event_onsets,proc.trial_lim_s*data.fsample);    
-else
-    bad_raw_trials = [];
-end
-
-% Identify training and bad behavioral trials
-training_ix = find(bhv.blk==0);
-rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1) & bhv.rt>0);
-rt_high_ix  = find(bhv.rt >= proc.rt_bounds(2));
-%exclude_trials = unique(vertcat(bad_raw_trials, training_ix));
-exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
-
-% Exclude bad trials
-cfgs = [];  
-cfgs.trials = setdiff([1:numel(trials.trial)], exclude_trials');
-trials = ft_selectdata(cfgs, trials);
-eog_trials = ft_selectdata(cfgs, eog_trials);
-
 %% Temporal Criteria: Condition Stats
 % Select stats epoch
 cfg = [];
-% NOT THIS SIMPLE: cfg.trials  = setdiff(1:numel(ica.trial),SBJ_vars.trial_reject_ix);
-%   need to toss orig_exclude (bad_epochs, RTs), then trial_reject_ix
+cfg.trials  = setdiff(1:numel(ica.trial),SBJ_vars.trial_reject_ix);
 cfg.latency = cpa.time_win;
 st_ica = ft_selectdata(cfg,ica);
 
