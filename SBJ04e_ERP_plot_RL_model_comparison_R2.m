@@ -92,13 +92,13 @@ st_colors = distinguishable_colors(numel(stat_ids));
 % Load real models
 lmes = cell([numel(stat_ids) numel(st_time_vec)]);
 for st_ix = 1:numel(stat_ids)
-    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_ids{st_ix} '_' an_id '.mat']);
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_ids{st_ix} '_' an_id '.mat']);
     lmes(st_ix,:) = tmp.lme;
 end
 
 % Load null model
 null_r2 = zeros(size(st_time_vec));
-tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' null_id '_' an_id '.mat']);
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' null_id '_' an_id '.mat']);
 for t_ix = 1:numel(st_time_vec)
     null_r2(t_ix) = tmp.lme{t_ix}.Rsquared.(r2_version);
 end
@@ -132,9 +132,9 @@ for ch_ix = 1:numel(ch_list)
     
     %% Create plot
     if strcmp(r2_version,'Ordinary')
-        fig_name = ['GRP_RL_R2ord_comparison_' an_id '_' SBJ_id];
+        fig_name = [SBJ_id '_RL_R2ord_comparison_' an_id];
     else
-        fig_name = ['GRP_RL_R2adj_comparison_' an_id '_' SBJ_id];
+        fig_name = [SBJ_id '_RL_R2adj_comparison_' an_id];
     end
     if rm_null
         fig_name = [fig_name '_rmnull'];

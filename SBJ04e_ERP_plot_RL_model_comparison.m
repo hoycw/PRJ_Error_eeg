@@ -91,13 +91,13 @@ st_colors = distinguishable_colors(numel(stat_ids));
 % Load real models
 lmes = cell([numel(stat_ids) numel(st_time_vec)]);
 for st_ix = 1:numel(stat_ids)
-    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' stat_ids{st_ix} '_' an_id '.mat']);
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_ids{st_ix} '_' an_id '.mat']);
     lmes(st_ix,:) = tmp.lme;
 end
 
 % Load null model
 null_aic = zeros(size(st_time_vec));
-tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/GRP_' null_id '_' an_id '.mat']);
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' null_id '_' an_id '.mat']);
 for t_ix = 1:numel(st_time_vec)
     null_aic(t_ix) = tmp.lme{t_ix}.ModelCriterion.AIC;
 end
@@ -138,7 +138,7 @@ for ch_ix = 1:numel(ch_list)
             '; RL=' num2str(rel_lik_null,'%.2f') ')'];
     
     %% Create plot
-    fig_name = ['GRP_RL_AIC_comparison_' an_id '_' SBJ_id];
+    fig_name = [SBJ_id '_RL_AIC_comparison_' an_id];
     if plot_null
         fig_name = [fig_name '_null'];
     end
