@@ -43,8 +43,7 @@ eval(plt_vars_cmd);
 
 %% Load the data
 %loaded data from after SBJ02a --> already cleaned and trial segmented
-load([SBJ_vars.dirs.preproc SBJ '_preproc_eeg_full_ft.mat']);
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat']); %chose 02a - ica before rejection!
+load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' proc_id '_prototype.mat']);
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 [cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles('Odd'); % maybe change this so not hardcoded
@@ -56,20 +55,25 @@ if numel(diff_lab)>1; error('Too many condition contrasts!'); end
 
 %% Compute plotting data
 trials = cell(size(cond_lab));
-means  = NaN([numel(cond_lab) numel(ica.label) numel(ica.time{1})]);
-sems   = NaN([numel(cond_lab) numel(ica.label) numel(ica.time{1})]);
+means  = NaN([numel(cond_lab) numel(clean_ica.label) numel(clean_ica.time{1})]);
+sems   = NaN([numel(cond_lab) numel(clean_ica.label) numel(clean_ica.time{1})]);
 for cond_ix = 1:numel(cond_lab)
     % Select trials for plotting
     cond_trial_ix = find(cond_idx==cond_ix);
-    trials{cond_ix} = nan([numel(ica.label) numel(cond_trial_ix) numel(ica.time{1})]);
+    trials{cond_ix} = nan([numel(clean_ica.label) numel(cond_trial_ix) numel(clean_ica.time{1})]);
     for t_ix = 1:numel(cond_trial_ix)
-        trials{cond_ix}(:,t_ix,:) = ica.trial{cond_trial_ix(t_ix)};
+        trials{cond_ix}(:,t_ix,:) = clean_ica.trial{cond_trial_ix(t_ix)};
     end
     
     % Compute mean and variance
     means(cond_ix,:,:) = squeeze(mean(trials{cond_ix},2));
     sems(cond_ix,:,:) = squeeze(std(trials{cond_ix},[],2))./sqrt(size(trials{cond_ix},2))';
 end
+
+% Select stats epoch
+cfg = [];
+cfg.latency = cpa.time_win;
+st_ica = ft_selectdata(cfg,clean_ica);
 
 %% Plot data
 fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/'];
@@ -87,17 +91,22 @@ for f_ix = 1:numel(final_ics)
     ebars = cell(size(cond_lab));
     main_lines = gobjects([numel(cond_lab)+1 1]);
     for cond_ix = 1:numel(cond_lab)
-        ebars{cond_ix} = shadedErrorBar(ica.time{1}, means(cond_ix, comp_ix, :), sems(cond_ix, comp_ix, :),...
+        ebars{cond_ix} = shadedErrorBar(clean_ica.time{1}, means(cond_ix, comp_ix, :), sems(cond_ix, comp_ix, :),...
             'lineProps',{'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
             'LineStyle',cond_styles{cond_ix}},'patchSaturation',plt.errbar_alpha);
         hold on
         main_lines(cond_ix) = ebars{cond_ix}.mainLine;
     end
     
-    % Plot Significance
+    % Compute summary metrics (% sig, min_sig_len)
+    %sig_perc = sum(sig_wins(comp_ix,:)) / size(sig_wins,2);
     [sig_lims] = fn_find_chunks(sig_wins(comp_ix,:));
     sig_lims(squeeze(sig_wins(comp_ix,sig_lims(:,1)))==0,:) = [];
+    if ~isempty(sig_lims)
+        sig_len = sum(diff(sig_lims,1,2)+1);
+    end
     
+    % Plot Significance
     data_lim = [min(min(means(:,comp_ix,:)-sems(:,comp_ix,:))) max(max(means(:,comp_ix,:)+sems(:,comp_ix,:)))];
     for sig_ix = 1:size(sig_lims,1)
         sig_times = st_ica.time{1}(sig_lims(sig_ix,1):sig_lims(sig_ix,2));
@@ -116,7 +125,8 @@ for f_ix = 1:numel(final_ics)
     axes(1).XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     axes(1).XLabel.String = 'Time (s)';
     title(['IC#' num2str(comp_ix) '- sig len (s): '...
-        num2str(sig_len(comp_ix)/ica.fsample) ' (' num2str(100*sig_len(comp_ix)/numel(st_ica.time{1}),'%.1f') '%)']);
+        num2str(sig_len/clean_ica.fsample) ' ('...
+        num2str(100*sig_len/numel(st_ica.time{1}),'%.1f') '%)']);
     leg_lab = [cond_lab diff_lab(1)];%'F' 
     if plt.legend
        legend(main_lines,leg_lab,'Location',plt.legend_loc);
@@ -131,8 +141,13 @@ for f_ix = 1:numel(final_ics)
 %     cfgp.highlightsymbol = '*';
     cfgp.layout    = 'biosemi64.lay';
     cfgp.comment   = 'no';
-    ft_topoplotIC(cfgp, ica);
-    title(['Peak Elecs: ' strjoin(top_elecs(comp_ix,:),',')]); 
+    ft_topoplotIC(cfgp, clean_ica);
+    if strcmp(cpa.elec_method,'peak')
+        space_str = strjoin(top_elecs(comp_ix,:),',');
+    elseif strcmp(cpa.elec_method,'topo_corr')
+        space_str = ['r=' num2str(topo_corrs(comp_ix),'%.3f')];
+    end
+    title(['Peak Elecs: ' space_str]); 
     set(gca,'FontSize',16);
 
     % Save Figure
@@ -142,9 +157,5 @@ for f_ix = 1:numel(final_ics)
         saveas(gcf,fig_fname);
     end
 end
-
-%% Save Data
-clean_data_fname = [SBJ_vars.dirs.proc SBJ '_' cpa_id '_' proc_id '_prototype.mat'];
-save(clean_data_fname, '-v7.3', 'final_ics');
 
 end

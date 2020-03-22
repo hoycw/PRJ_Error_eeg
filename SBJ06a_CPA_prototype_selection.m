@@ -23,8 +23,9 @@ eval(cpa_vars_cmd);
 
 %% Load the data
 %loaded data from after SBJ02a --> already cleaned and trial segmented
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat']); %chose 02a - ica before rejection!
-load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'],'ica'); %chose 02a - ica before rejection!
+load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat'],'bhv');
+load([SBJ_vars.dirs.events SBJ '_' proc_id '_02a_orig_exclude_trial_ix.mat']);
 
 [cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles('Odd'); % maybe change this so not hardcoded
 cond_idx = fn_condition_index(cond_lab, bhv);
@@ -34,36 +35,15 @@ cond_idx = fn_condition_index(cond_lab, bhv);
 if numel(diff_lab)>1; error('Too many condition contrasts!'); end
 
 %% Exclude bad trials
-% Find trials that overlap with bad_epochs from raw visual inspection
-load([SBJ_vars.dirs.preproc SBJ '_preproc_eeg_full_ft.mat'],'data');
-load([SBJ_vars.dirs.events SBJ '_raw_bad_epochs.mat']);
-if ~isempty(bad_epochs)
-    bad_raw_trials = fn_find_trials_overlap_epochs(bad_epochs,1:size(data.trial{1},2),...
-        event_onsets,proc.trial_lim_s*data.fsample);    
-else
-    bad_raw_trials = [];
-end
-
-% Identify training and bad behavioral trials
-training_ix = find(bhv.blk==0);
-rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1) & bhv.rt>0);
-rt_high_ix  = find(bhv.rt >= proc.rt_bounds(2));
-%exclude_trials = unique(vertcat(bad_raw_trials, training_ix));
-exclude_trials = unique(vertcat(bad_raw_trials, training_ix, rt_low_ix, rt_high_ix));
-
-% Exclude bad trials
 cfgs = [];  
-cfgs.trials = setdiff([1:numel(trials.trial)], exclude_trials');
-trials = ft_selectdata(cfgs, trials);
-eog_trials = ft_selectdata(cfgs, eog_trials);
+cfgs.trials = setdiff([1:numel(ica.trial)], SBJ_vars.trial_reject_ix_oddball);
+clean_ica = ft_selectdata(cfgs, ica);
 
 %% Temporal Criteria: Condition Stats
 % Select stats epoch
 cfg = [];
-% NOT THIS SIMPLE: cfg.trials  = setdiff(1:numel(ica.trial),SBJ_vars.trial_reject_ix);
-%   need to toss orig_exclude (bad_epochs, RTs), then trial_reject_ix
 cfg.latency = cpa.time_win;
-st_ica = ft_selectdata(cfg,ica);
+st_ica = ft_selectdata(cfg,clean_ica);
 
 st_trials = cell([2 1]);
 for d_ix = 1:2
@@ -75,10 +55,10 @@ for d_ix = 1:2
 end
 
 % diff_waves = zeros(numel(st_data.label), numel(diff_lab), numel(st_data.time{1}));
-sig_wins = nan([numel(ica.label) numel(st_ica.time{1})]);
-p_vals   = nan([numel(ica.label) numel(st_ica.time{1})]);
-sig_perc = zeros(size(ica.label));
-sig_len  = zeros(size(ica.label));
+sig_wins = nan([numel(st_ica.label) numel(st_ica.time{1})]);
+p_vals   = nan([numel(st_ica.label) numel(st_ica.time{1})]);
+sig_perc = zeros(size(st_ica.label));
+sig_len  = zeros(size(st_ica.label));
 for comp_ix = 1:numel(st_ica.label)
     % Compute stats between conditions in contrast within time windows
     for time_ix = 1:numel(st_ica.time{1})
@@ -102,44 +82,78 @@ end
 
 % Select components with consecutive significance
 time_ic_idx = sig_len./st_ica.fsample >= cpa.min_sig_len;
-fprintf('%s: %d / %d components meet temporal criteria!\n',SBJ,sum(time_ic_idx),numel(ica.label));
+fprintf('%s: %d / %d components meet temporal criteria!\n',SBJ,sum(time_ic_idx),numel(st_ica.label));
 
 %% Spatial Criteria: Topo Matching
 % Average ERP into topo map
-%erp_topos = nan([numel(ica.label) numel(ica.topolabel)]);
+%erp_topos = nan([numel(st_ica.label) numel(st_ica.topolabel)]);
 % !!!Implement grubbs' test???
 %   can use isoutlier(data,'method','grubbs');
-space_ic_idx = false(size(ica.label));
+space_ic_idx = false(size(st_ica.label));
 if strcmp(cpa.elec_method,'peak')
-    top_elecs = cell([numel(ica.label) cpa.n_max_elec]);
-    for comp_ix = 1:numel(ica.label)
-        [~, top_ix] = maxk(abs(ica.topo(:,comp_ix)), cpa.n_max_elec);
-        top_elecs(comp_ix,:) = ica.topolabel(top_ix);
+    top_elecs = cell([numel(st_ica.label) cpa.n_max_elec]);
+    for comp_ix = 1:numel(st_ica.label)
+        [~, top_ix] = maxk(abs(clean_ica.topo(:,comp_ix)), cpa.n_max_elec);
+        top_elecs(comp_ix,:) = clean_ica.topolabel(top_ix);
         if numel(intersect(top_elecs(comp_ix,:),cpa.elec_list)) >= cpa.min_elec_match
             space_ic_idx(comp_ix) = true;
         end
     end
+elseif strcmp(cpa.elec_method,'topo_corr')
+    % Load and average group topo
+    load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'],'trials'); %chose 02a - ica before rejection!
+    load([root_dir 'PRJ_Error_eeg/data/GRP/' cpa.topo_SBJ_id '_Odd_' cpa.topo_an_id '.mat']);
+    cfg_avg = [];
+    cfg_avg.channel = trials.label;
+    cfg_avg.latency = cpa.topo_lim;
+    cfg_avg.avgovertime = 'yes';
+    topo = ft_selectdata(cfg_avg,er_grp{strcmp(cond_lab,cpa.topo_cond)});
+    if ~all(strcmp(clean_ica.topolabel,topo.label))
+        topo_order = zeros(size(topo.label));
+        for lab_ix = 1:numel(topo.label)
+            topo_order(lab_ix) = find(strcmp(clean_ica.topolabel,topo.label{lab_ix}));
+        end
+    else
+        topo_order = 1:numel(topo.label);
+    end
+    
+    % Correlate ICA and grand average topos
+    topo_corrs = nan(size(st_ica.label));
+    topo_pvals = nan(size(st_ica.label));
+    for comp_ix = 1:numel(st_ica.label)
+        [tmp_corr, tmp_pval] = corrcoef(clean_ica.topo(topo_order,comp_ix), topo.avg);
+        topo_corrs(comp_ix) = tmp_corr(1,2);
+        topo_pvals(comp_ix) = tmp_pval(1,2);
+    end
+    space_ic_idx = topo_pvals<=cpa.topo_pval;
+else
+    error(['unknown cpa.elec_method: ' cpa.elec_method]);
 end
-fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),numel(ica.label));
+fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),numel(clean_ica.label));
 
 %% Combine Criteria
-var_ic_idx = true(size(ica.label));
+var_ic_idx = true(size(clean_ica.label));
 if isfield(cpa,'ic_rank_max')
     % Select components ranked highest when ordered by variance
     var_ic_idx(cpa.ic_rank_max+1:end) = false;
 end
-good_ic_idx = true(size(ica.label));
+good_ic_idx = true(size(clean_ica.label));
 good_ic_idx(SBJ_vars.ica_reject) = false;
 fprintf('%s: %d / %d components were kept in cleaning!\n',SBJ,sum(good_ic_idx),numel(good_ic_idx));
 
 final_ics = find(all([time_ic_idx, space_ic_idx, var_ic_idx, good_ic_idx],2));
-fprintf('%s: %d / %d components selected!\n',SBJ,numel(final_ics),numel(ica.label));
+fprintf('%s: %d / %d components selected!\n',SBJ,numel(final_ics),numel(clean_ica.label));
 if sum(final_ics)<1
     error('No ICs found that match all criteria!');
 end
 
 %% Save Data
 clean_data_fname = [SBJ_vars.dirs.proc SBJ '_' cpa_id '_' proc_id '_prototype.mat'];
-save(clean_data_fname, '-v7.3', 'final_ics');
+fprintf('Saving %s\n',clean_data_fname);
+if strcmp(cpa.elec_method,'peak')
+    save(clean_data_fname, '-v7.3', 'final_ics','clean_ica','sig_wins','top_elecs');
+elseif strcmp(cpa.elec_method,'topo_corr')
+    save(clean_data_fname, '-v7.3', 'final_ics','clean_ica','sig_wins','topo_corrs');
+end
 
 end

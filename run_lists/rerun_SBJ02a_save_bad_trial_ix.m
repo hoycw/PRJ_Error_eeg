@@ -11,13 +11,18 @@ ft_defaults
 
 %% General parameters
 proc_id = 'eeg_full_ft';
-SBJs = {'EEG12', 'EEG13', 'EEG14', 'EEG15', 'EEG16', 'EEG17', 'EEG18', 'EEG19', 'EEG20', 'EEG21', 'EEG22', 'EEG23'};
-% SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
-%            'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG10','EEG12'};
+% SBJ_id  = 'goodEEG';
+% 
+% sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+% tmp = textscan(sbj_file,'%s');
+% fclose(sbj_file);
+% SBJs = tmp{1}; clear tmp;
+SBJs = {'EEG13','EEG14','EEG15','EEG16','EEG17','EEG18','EEG19','EEG20','EEG21','EEG22','EEG23'};
 
-%% REDO SBJ01 SAVING
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
+
+%% REDO SBJ01 SAVING
 for s = 1:numel(SBJs)
     %% Processing variables
     SBJ = SBJs{s};

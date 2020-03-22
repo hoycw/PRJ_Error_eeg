@@ -16,6 +16,12 @@ tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);
 SBJs = tmp{1}; clear tmp;
 
+%% Generate condition-specific topos
+conditions = 'Odd';
+proc_id    = 'odd_full_ft';
+an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
+SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
+
 %% Prototype Selection
 proc_id   = 'odd_full_ft';
 % cpa_id    = 'CPA';%'CPA_odd';
@@ -31,19 +37,27 @@ for s = 1:numel(SBJs)
 %     SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
 %         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     try
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
-            save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    catch
-        fprintf(2,'No ICs found for CPA %s\n',SBJs{s});
-    end
-    try
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd2', plt_id,...
+        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd_topo');
+        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA_odd_topo', plt_id,...
             save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     catch
         fprintf(2,'No ICs found for CPA_odd2 %s\n',SBJs{s});
     end
+%     try
+%         SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
+%             save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     catch
+%         fprintf(2,'No ICs found for CPA %s\n',SBJs{s});
+%     end
+%     try
+%         SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd2', plt_id,...
+%             save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     catch
+%         fprintf(2,'No ICs found for CPA_odd2 %s\n',SBJs{s});
+%     end
 end
 
+%%
 for s = 1:numel(SBJs)
     try
         load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_' proc_id '_prototype.mat']);
