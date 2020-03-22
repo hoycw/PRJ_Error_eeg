@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 proc_id = 'eeg_full_ft';
-SBJs = {'EEG01','EEG03','EEG04','EEG05','EEG06'};
+SBJs = {'EEG12', 'EEG13', 'EEG14', 'EEG15', 'EEG16', 'EEG17', 'EEG18', 'EEG19', 'EEG20', 'EEG21', 'EEG22', 'EEG23'};
 % SBJs = {'EP06','EP07','EP08','EP10','EP11','EP14','EP15','EP16','EP17','EP18','EP19',...
 %            'EEG01','EEG02','EEG03','EEG04','EEG06','EEG07','EEG08','EEG10','EEG12'};
 
@@ -50,6 +50,7 @@ for s = 1:numel(SBJs)
         cfg.trialfun            = 'tt_trialfun';
         % Add downsample frequency since triggers are loaded from raw file
         cfg.resamp_freq         = proc.resample_freq;
+        cfg.blocknum            = b_ix;
         cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
     end
     
