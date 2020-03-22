@@ -34,36 +34,41 @@ load(data_fname);
 
 %% Cut into trials
 % Need to recut trials on updated data with the nans
-for b_ix = 1:numel(SBJ_vars.odd_block_name)
-    cfg = [];
-    cfg.dataset             = SBJ_vars.dirs.raw_filename{b_ix};
-    cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
-    cfg.trialdef.eventvalue = proc.event_code;        % feedback cocde
-    cfg.trialdef.prestim    = proc.trial_lim_s(1);
-    cfg.trialdef.poststim   = proc.trial_lim_s(2);
-    cfg.tt_trigger_ix = SBJ_vars.tt_trigger_ix;
-    cfg.odd_trigger_ix = SBJ_vars.odd_trigger_ix;
-    cfg.trialfun            = 'oddball_trialfun';
-    % Add downsample frequency since triggers are loaded from raw file
-    if b_ix > 1
-        cfg.endb1 = cfg_trl_unconcat{b_ix - 1}.endb1
-    end
-    cfg.resamp_freq         = proc.resample_freq;
-    cfg.blocknum            = b_ix;
-    cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
-    if b_ix == 1
-        cfg_trl_unconcat{b_ix}.endb1 = length(cfg_trl_unconcat{b_ix}.trl);
+numel_prev_block = 0;
+for b_ix = 1:numel(SBJ_vars.block_name)
+    if numel_prev_block < 400
+        cfg = [];
+        cfg.dataset             = SBJ_vars.dirs.raw_filename{b_ix};
+        cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
+        cfg.trialdef.eventvalue = proc.event_code;        % feedback cocde
+        cfg.trialdef.prestim    = proc.trial_lim_s(1);
+        cfg.trialdef.poststim   = proc.trial_lim_s(2);
+        cfg.tt_trigger_ix = SBJ_vars.tt_trigger_ix;
+        cfg.odd_trigger_ix = SBJ_vars.odd_trigger_ix;
+        cfg.trialfun            = 'oddball_trialfun';
+        % Add downsample frequency since triggers are loaded from raw file
+        if b_ix > 1
+            cfg.endb1 = cfg_trl_unconcat{b_ix - 1}.endb1
+        end
+        cfg.resamp_freq         = proc.resample_freq;
+        cfg.blocknum            = b_ix;
+        cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
+        numel_prev_block = length(cfg_trl_unconcat{b_ix}.trl);
+        if b_ix == 1
+            cfg_trl_unconcat{b_ix}.endb1 = length(cfg_trl_unconcat{b_ix}.trl);
+        end
     end
 end
-hdr = ft_read_header(SBJ_vars.dirs.raw_filename{1});
-endsample = hdr.nSamples;
-origFs = hdr.Fs;
-if numel(SBJ_vars.odd_block_name)>1
-    for b_ix = 2:numel(SBJ_vars.odd_block_name)
-       cfg_trl_unconcat{b_ix}.trl(:,1) = cfg_trl_unconcat{b_ix}.trl(:,1)+endsample/origFs*proc.resample_freq;
-       cfg_trl_unconcat{b_ix}.trl(:,2) = cfg_trl_unconcat{b_ix}.trl(:,2)+endsample/origFs*proc.resample_freq;
-       cfg_trl_unconcat{1}.trl = vertcat(cfg_trl_unconcat{b_ix-1}.trl, cfg_trl_unconcat{b_ix}.trl);
-    end
+if numel(SBJ_vars.block_name)>1 & numel_prev_block <400 %tells you if all in the first block
+    % Get length of first block
+    hdr = ft_read_header(SBJ_vars.dirs.raw_filename{1});
+    endsample = hdr.nSamples;
+    origFs = hdr.Fs;
+    
+    % Adjust event times for concatenated blocks
+    cfg_trl_unconcat{2}.trl(:,1) = cfg_trl_unconcat{2}.trl(:,1)+endsample/origFs*proc.resample_freq;
+    cfg_trl_unconcat{2}.trl(:,2) = cfg_trl_unconcat{2}.trl(:,2)+endsample/origFs*proc.resample_freq;
+    cfg_trl.trl = vertcat(cfg_trl.trl, cfg_trl_unconcat{2}.trl);
 end
 cfg_trl = cfg_trl_unconcat{1};
 % If the recording was started part way through, toss events not recorded
