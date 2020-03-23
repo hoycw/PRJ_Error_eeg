@@ -12,7 +12,7 @@ cpa.topo_SBJ_id = 'goodEEG';
 % Temporal Criteria
 cpa.diff_id   = 'OddStd';
 cpa.time_win  = [0.15 0.4];                 % Epoch to search for differences (in sec)
-cpa.min_sig_len = 0.02;                    % Minimum length of significant time (sec)
+cpa.min_sig_len = 0.05;                    % Minimum length of significant time (sec)
 cpa.alpha       = 0.05;                     % Significance threshold for condition stats
 
 % Variance Criteria

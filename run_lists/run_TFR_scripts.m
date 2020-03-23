@@ -10,11 +10,14 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-sbj_id = 'good_prelim';
+sbj_id = 'good1';
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' sbj_id '.sbj']);
 tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);
 SBJs = tmp{1}; clear tmp;
+
+warning('ADDING EEG03/04!!!');
+SBJs = [SBJs; {'EEG03'; 'EEG04'}];
 
 %% Compute TFRs
 proc_id    = 'eeg_full_ft';
@@ -56,8 +59,8 @@ fig_ftype  = 'png';
 for an_ix = 2:numel(an_ids)
     for s = 1:numel(SBJs)
         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
-        SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
-            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %         SBJ05b_ITC_ERP_rose_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},phs_id,erp_ids{an_ix},...
 %             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
