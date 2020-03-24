@@ -12,8 +12,8 @@ import scipy.stats
 
 SBJ = sys.argv[1]
 
-#prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
-prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
+prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+#prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.png'
 data_dir = prj_dir+'data/'

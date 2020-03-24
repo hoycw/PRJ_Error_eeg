@@ -74,22 +74,21 @@ fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
-%         SBJ06b_CPA_prototype_ERP_save(SBJs{s}, proc_id, an_ids{an_ix}, cpa_id);
+        SBJ06b_CPA_prototype_ERP_save(SBJs{s}, proc_id, an_ids{an_ix}, cpa_id);
     end
-    plt_id    = 'ts_S2t1_evnts_sigLine';
-    SBJ06c_CPA_prototype_ERP_plot_GRP(SBJ_id,conditions,proc_id,cpa_id,an_ids{an_ix},plt_id,...
+    plt_id    = 'ts_F2to1_evnts_sigLine';
+    SBJ06c_CPA_prototype_ERP_plot_GRP(SBJ_id,conditions,proc_id,cpa_id,an_id,plt_id,...
         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
-an_id  = 'ERP_all_S2t1_dm2t0_fl05t20';
-plt_id = 'topo_F3t45';
+an_id = 'ERP_all_S2t1_dm2t0_fl05t20';
 SBJ06c_CPA_prototype_ERP_plot_GRP_topo_cond(SBJ_id,conditions,proc_id,cpa_id,an_id,plt_id,...
     save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 %%
 for s = 1:numel(SBJs)
     try
-        load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_odd_topo_' proc_id '_prototype.mat']);
+        load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_' proc_id '_prototype.mat']);
         orig_ics = final_ics;
     catch
         orig_ics = [];

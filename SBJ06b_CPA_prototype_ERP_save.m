@@ -1,4 +1,4 @@
-function SBJ06b_CPA_candidate_ERP_save(SBJ,eeg_proc_id,odd_proc_id,an_id,cpa_id)
+function SBJ06b_CPA_prototype_ERP_save(SBJ,proc_id,an_id,cpa_id)
 %% Plot ERPs for single SBJ
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -17,7 +17,7 @@ ft_defaults
 %% Load Results
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' eeg_proc_id '_vars.m'];
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
@@ -25,15 +25,15 @@ cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars
 eval(cpa_vars_cmd);
 
 % Load data
-load([SBJ_vars.dirs.preproc SBJ '_' eeg_proc_id '_02a.mat'],'ica');
-load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' odd_proc_id '_prototype.mat']);
-load([SBJ_vars.dirs.events SBJ '_behav_' eeg_proc_id '_final.mat']);
+% load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'],'ica');
+load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' proc_id '_prototype.mat'],'clean_ica','final_ics');
+load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 
 %% Reconstruct and Clean Data
 % Reconstruction
 cfg = [];
-cfg.component = setdiff(1:numel(ica.label),final_ics);
-recon = ft_rejectcomponent(cfg, ica);
+cfg.component = setdiff(1:numel(clean_ica.label),final_ics);
+recon = ft_rejectcomponent(cfg, clean_ica);
 
 % Repair Bad Channels
 cfg = [];
@@ -47,12 +47,7 @@ cfgn.layout  = 'biosemi64.lay';
 cfgn.method  = 'template';
 cfg.neighbours = ft_prepare_neighbours(cfgn);
 
-full_recon = ft_channelrepair(cfg, recon);
-
-% Toss bad trials
-cfgs = [];
-cfgs.trials = setdiff([1:numel(full_recon.trial)], SBJ_vars.trial_reject_ix);
-clean_trials = ft_selectdata(cfgs, full_recon);
+clean_trials = ft_channelrepair(cfg, recon);
 
 %% Select trials and epoch for plotting
 % Select epoch
@@ -117,7 +112,7 @@ if an.dsamp_yn
 end
 
 %% Save Results
-data_out_fname = [SBJ_vars.dirs.proc SBJ '_' cpa_id '_' an_id '.mat'];
+data_out_fname = [SBJ_vars.dirs.proc SBJ '_proto_' cpa_id '_' an_id '.mat'];
 fprintf('Saving %s\n',data_out_fname);
 save(data_out_fname,'-v7.3','roi');
 

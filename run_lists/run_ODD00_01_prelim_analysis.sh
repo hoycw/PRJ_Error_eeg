@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Move to scripts directory
-#root_dir="/Volumes/hoycw_clust/PRJ_Error_eeg/"
-root_dir="/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/"
+root_dir="/Volumes/hoycw_clust/PRJ_Error_eeg/"
+#root_dir="/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/"
 cd $root_dir/scripts/
 
 # Load the correct SBJ list
@@ -18,10 +18,10 @@ SBJs=(`cat "${root_dir}scripts/SBJ_lists/${list_name}.sbj"`)
 
 # Run BHV scripts for these SBJs
 for sbj in "${SBJs[@]}"; do
-echo "=================================================================\n"
-echo "Running ${sbj}\n"
-echo "=================================================================\n"
-
-python ODD01_prelim_analysis.py ${sbj}
+    echo "=================================================================\n"
+    echo "Running ${sbj}\n"
+    echo "=================================================================\n"
+    
+    python ODD01_prelim_analysis.py ${sbj}
 done
 

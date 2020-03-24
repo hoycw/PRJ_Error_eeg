@@ -1,6 +1,8 @@
-function SBJ06b_CPA_prototype_plot(SBJ, proc_id, cpa_id, plt_id,save_fig,varargin)
-%% Candidate-Prototype Analysis (CPA): Prototype Selection
-%   Selects top IC based on spatial (elec_list) and temporal (time_win)
+function SBJ06b_CPA_prototype_ERP_plot_GRP(SBJ_id, proc_id, cpa_id, an_id, plt_id, save_fig,varargin)
+error('use broken out reconstruct, ERP, plot scripts');
+%% Candidate-Prototype Analysis (CPA): Prototype ERP Plot
+%   Reconstruct oddball data based on final prototype ICs
+%   Compute ERPs, and plot at group level
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
@@ -32,48 +34,102 @@ if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Load processing variables
-SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
-eval(SBJ_vars_cmd);
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
 cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars.m'];
 eval(cpa_vars_cmd);
+an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
+eval(an_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
-%% Load the data
-%loaded data from after SBJ02a --> already cleaned and trial segmented
-load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' proc_id '_prototype.mat']);
-load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+% Select SBJs
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
 
-[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles('Odd'); % maybe change this so not hardcoded
-cond_idx = fn_condition_index(cond_lab, bhv);
+[cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles('Odd');
 
 % Create contrast: (Unexpected - Expected) for each outcome
 [diff_lab, diff_pairs, diff_colors, diff_styles] = fn_condition_diff_label_styles(cpa.diff_id);
 if numel(diff_lab)>1; error('Too many condition contrasts!'); end
+    
+%% Load the data
+% Load example data
+load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/04_proc/' SBJs{1} '_' ...
+    cpa_id '_' proc_id '_prototype.mat'],'clean_ica');
+plot_time = clean_ica.time{1};
+% Select stats epoch
+cfg = []; cfg.latency = cpa.time_win;
+st_ica = ft_selectdata(cfg,clean_ica);
 
-%% Compute plotting data
-trials = cell(size(cond_lab));
-means  = NaN([numel(cond_lab) numel(clean_ica.label) numel(clean_ica.time{1})]);
-sems   = NaN([numel(cond_lab) numel(clean_ica.label) numel(clean_ica.time{1})]);
-for cond_ix = 1:numel(cond_lab)
-    % Select trials for plotting
-    cond_trial_ix = find(cond_idx==cond_ix);
-    trials{cond_ix} = nan([numel(clean_ica.label) numel(cond_trial_ix) numel(clean_ica.time{1})]);
-    for t_ix = 1:numel(cond_trial_ix)
-        trials{cond_ix}(:,t_ix,:) = clean_ica.trial{cond_trial_ix(t_ix)};
+% Load EEG20 (full cap, no bad chan) for topo channel order
+% tmp = load([root_dir 'PRJ_Error_eeg/data/EEG01/02_preproc/EEG01_eeg_full_ft_final.mat'],'clean_trials');
+% ch_list = tmp.clean_trials.label; clear tmp
+
+% topo   = NaN([numel(SBJs) numel(ch_list)]);
+means  = NaN([numel(cond_lab) numel(SBJs) numel(clean_ica.time{1})]);
+sems   = NaN([numel(cond_lab) numel(SBJs) numel(clean_ica.time{1})]);
+for s = 1:numel(SBJs)
+    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
+    eval(SBJ_vars_cmd);
+    
+    proto_fname = [SBJ_vars.dirs.proc SBJs{s} '_' cpa_id '_' proc_id '_prototype.mat'];
+    if exist(proto_fname,'file')
+        load(proto_fname);
+        load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
+        cond_idx = fn_condition_index(cond_lab, bhv);
+        
+        % Reconstruction
+        cfg = [];
+        cfg.component = setdiff(1:numel(clean_ica.label),final_ics);
+        recon = ft_rejectcomponent(cfg, clean_ica);
+        
+        % Repair Bad Channels
+        cfg = [];
+        cfg.method         = 'average';
+        cfg.missingchannel = SBJ_vars.ch_lab.bad(:); % not in data (excluded from ica)
+        cfg.layout         = 'biosemi64.lay';
+        
+        cfgn = [];
+        cfgn.channel = 'all';
+        cfgn.layout  = 'biosemi64.lay';
+        cfgn.method  = 'template';
+        cfg.neighbours = ft_prepare_neighbours(cfgn);
+        full_recon = ft_channelrepair(cfg, recon);
+        
+        Average topo
+        topo_sbj = nan([size(topo,2) 1]);
+        for ch_ix = 1:numel(clean_ica.topolabel)
+            full_ch_ix = find(strcmp(ch_list,clean_ica.topolabel{ch_ix}));
+            topo_sbj(full_ch_ix) = mean(clean_ica.topo(ch_ix,final_ics));
+        end
+        topo(s,:) = sbj_topo;
+        
+        % Compute plotting data
+        for cond_ix = 1:numel(cond_lab)
+            % Select trials for plotting
+            cond_trial_ix = find(cond_idx==cond_ix);
+            cond_trials = nan([numel(final_ics) numel(cond_trial_ix) numel(clean_ica.time{1})]);
+            for t_ix = 1:numel(cond_trial_ix)
+                cond_trials(:,t_ix,:) = clean_ica.trial{cond_trial_ix(t_ix)}(final_ics,:);
+            end
+            
+            % Compute mean and variance
+            means(cond_ix,s,:) = squeeze(mean(cond_trials,2));
+            sems(cond_ix,s,:) = squeeze(std(cond_trials,[],2))./sqrt(size(cond_trials,2))';
+        end
+    else
+        fprintf(2,'\tWarning: %s does not exist, skipping %s\n',proto_fname,SBJs{s});
     end
     
-    % Compute mean and variance
-    means(cond_ix,:,:) = squeeze(mean(trials{cond_ix},2));
-    sems(cond_ix,:,:) = squeeze(std(trials{cond_ix},[],2))./sqrt(size(trials{cond_ix},2))';
+    clear SBJ_vars full_recon final_ics clean_ica cond_idx cond_trials cond_trial_ix
 end
 
-% Select stats epoch
-cfg = [];
-cfg.latency = cpa.time_win;
-st_ica = ft_selectdata(cfg,clean_ica);
+%% Combien across SBJ
+plot_mean = mean(means,2);
+plot_sem  = mean(sems,2);
 
 %% Plot data
 fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/'];
@@ -83,7 +139,7 @@ end
 
 for f_ix = 1:numel(final_ics)
     comp_ix = final_ics(f_ix);
-    fig_name = [SBJ '_' proc_id '_' cpa_id '_IC' num2str(comp_ix)];
+    fig_name = [SBJ_id '_' proc_id '_' cpa_id];
     figure('Name', fig_name, 'units','normalized',...
         'outerposition',[0 0 0.6 0.5], 'Visible', fig_vis);
     axes = subplot(1,3,[1 2]); hold on;
