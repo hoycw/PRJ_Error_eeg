@@ -1,4 +1,4 @@
-function SBJ06b_CPA_candidate_ERP_save(SBJ,eeg_proc_id,odd_proc_id,an_id,cpa_id)
+function SBJ06d_CPA_candidate_ERP_save(SBJ,eeg_proc_id,odd_proc_id,an_id,cpa_id)
 %% Plot ERPs for single SBJ
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials

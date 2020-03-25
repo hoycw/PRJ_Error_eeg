@@ -31,43 +31,31 @@ save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for s = 1:numel(SBJs)
+for s = 12:numel(SBJs)
     %ODD02a_artifact_rejection(SBJs{x}, 'eeg_full_ft', 'odd_full_ft', 1, 'on', 'ERP_stack_full_events_odd')
     %SBJ02a_artifact_rejection(SBJs{x}, 'eeg_full_ft', 1, 'on')
     %SBJ01_preproc(SBJs{x}, 'eeg_full_ft');
-%     SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
-%         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    try
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd_topo');
-        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA_odd_topo', plt_id,...
-            save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        close all;
-    catch
-        fprintf(2,'No ICs found for CPA_odd2 %s\n',SBJs{s});
-    end
-    try
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA');
-        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA', plt_id,...
-            save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        close all;
-    catch
-        fprintf(2,'No ICs found for CPA %s\n',SBJs{s});
-    end
-    try
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd2');
-        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA_odd2', plt_id,...
-            save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        close all;
-    catch
-        fprintf(2,'No ICs found for CPA_odd2 %s\n',SBJs{s});
-    end
+    %     SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
+    %         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    
+    % Topo correlation
+    SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd_topo', save_fig);
+    SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA_odd_topo', plt_id,...
+        save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    close all;
+    
+    % Top Elec Match
+    SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd2', save_fig);
+    SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA_odd2', plt_id,...
+        save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    close all;
 end
 
 %% Reconstruct Prototype Oddball ERPs
-proc_id   = 'odd_full_ft';
+proc_id    = 'odd_full_ft';
 conditions = 'Odd';
-cpa_id    = 'CPA';%'CPA_odd';
-an_ids    = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
+cpa_id     = 'CPA';%'CPA_odd';
+an_ids     = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';

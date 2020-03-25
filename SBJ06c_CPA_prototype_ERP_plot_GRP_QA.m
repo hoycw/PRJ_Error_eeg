@@ -1,5 +1,7 @@
-function SBJ06c_CPA_prototype_ERP_plot_GRP(SBJ_id,conditions,proc_id,cpa_id,an_id,plt_id,save_fig,varargin)
-%% Plot ERPs reconstructed from prototype CPA selection for group 
+function SBJ06c_CPA_prototype_ERP_plot_GRP_QA(SBJ_id,conditions,proc_id,cpa_id,save_fig,varargin)
+error('added this to SBJ06a for single SBJ and all ICs, never wrote this group level script');
+%% Plot QA for prototype selection across group
+%   Plot significant time vs. IC #
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
 
@@ -21,8 +23,6 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-%         elseif strcmp(varargin{v},'write_report')
-%             write_report = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -36,10 +36,8 @@ if ischar(save_fig); save_fig = str2num(save_fig); end
 if ~strcmp(conditions,'Odd'); error('Why run prototype ERPs if not Odd?'); end
 
 %% Load Results
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
-eval(an_vars_cmd);
-plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
-eval(plt_vars_cmd);
+cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars.m'];
+eval(cpa_vars_cmd);
 
 % Select SBJs
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
@@ -49,57 +47,54 @@ SBJs = tmp{1}; clear tmp;
 
 [cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
 
-% Load example data
+%% Load example data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{1} '_vars.m'];
 eval(SBJ_vars_cmd);
-tmp = load([root_dir 'PRJ_Error_eeg/data/',SBJs{1},'/04_proc/',SBJs{1},'_proto_' cpa_id '_' an_id,'.mat'],'roi');
-time_vec = tmp.roi.time{1};
-ch_list  = tmp.roi.label;
+tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/04_proc/',...
+    SBJs{1} '_' cpa_id '_' proc_id '_prototype.mat'],'clean_ica');
+cfg = []; cfg.latency = cpa.time_win;
+st_ica = ft_selectdata(cfg,tmp.clean_ica);
+clear tmp
 
-% Load all data
-means = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
+%% Load all data
+ic_list = cell(size(SBJs));
+sig_len = cell(size(SBJs));
+space_metric = cell(size(SBJs));
 for s = 1:length(SBJs)
+    % Load SBJ data
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
     eval(SBJ_vars_cmd);
     
-    load([SBJ_vars.dirs.proc SBJs{s} '_proto_' cpa_id '_' an_id '.mat']);
+    load([SBJ_vars.dirs.proc SBJs{s} '_' cpa_id '_' proc_id '_prototype.mat']);
     load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
+    ic_list{s} = final_ics;
     
-    % Select Conditions of Interest
-    cond_idx = fn_condition_index(cond_lab, bhv);
-    for cond_ix = 1:numel(cond_lab)
-        cond_trial_ix = find(cond_idx==cond_ix);
-        trials = nan([numel(ch_list) numel(cond_trial_ix) numel(time_vec)]);
-        for t_ix = 1:numel(cond_trial_ix)
-            trials(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
-        end
-        means(cond_ix,s,:,:) = mean(trials,2);
-    end
-    
-    clear tmp SBJ_vars bhv roi
-end
-
-%% Get event timing for plotting
-evnt_times = zeros(size(plt.evnt_lab));
-if strcmp(an.event_type,'S')
-    for evnt_ix = 1:numel(plt.evnt_lab)
-        switch plt.evnt_lab{evnt_ix}
-            case 'S'
-                evnt_times(evnt_ix) = 0;
-            case 'R'
-                evnt_times(evnt_ix) = prdm_vars.target;
-            case {'F','Fon'}
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
-            case 'Foff'
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
-            otherwise
-                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
+    % Compile Temporal Criteria
+    sig_len{s} = nan(size(final_ics));
+    for f_ix = 1:numel(final_ics)
+        comp_ix = final_ics(f_ix);
+        [sig_lims] = fn_find_chunks(sig_wins(comp_ix,:));
+        sig_lims(squeeze(sig_wins(comp_ix,sig_lims(:,1)))==0,:) = [];
+        for seg_ix = 1:size(sig_lims,1)
+            sig_len{s}(f_ix) = sum(diff(sig_lims,1,2)+1)./clean_ica.fsample;
         end
     end
-elseif strcmp(an.event_type,'F')
-    evnt_times(1) = 0;
-else
-    error('Unknown an.event_type');
+    
+    % Compile Spatial Criteria
+    space_metric{s} = nan(size(final_ics));
+    if strcmp(cpa.elec_method,'peak')
+        for f_ix = 1:numel(final_ics)
+            comp_ix = final_ics(f_ix);
+            space_metric{s}(f_ix) = numel(intersect(top_elecs(comp_ix,:),cpa.elec_list));
+        end
+    elseif strcmp(cpa.elec_method,'topo_corr')
+        for f_ix = 1:numel(final_ics)
+            comp_ix = final_ics(f_ix);
+            space_metric{s}(f_ix) = topo_corrs(comp_ix);
+        end
+    end
+     
+    clear tmp SBJ_vars bhv clean_ica final_ics sig_wins top_elecs topo_corrs
 end
 
 %% Plot Results
@@ -110,15 +105,6 @@ end
 
 % Create a figure for each channel
 for ch_ix = 1:numel(ch_list)
-    %% Compute plotting data    
-    % Compute means and variance
-    plt_means = NaN([numel(cond_lab) numel(time_vec)]);
-    sems  = NaN([numel(cond_lab) numel(time_vec)]);
-    for cond_ix = 1:numel(cond_lab)
-        plt_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
-        sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
-    end
-    
     %% Create plot
     fig_name = [SBJ_id '_proto_' cpa_id '_' conditions '_' an_id '_' ch_list{ch_ix}];    
     figure('Name',fig_name,'units','normalized',...

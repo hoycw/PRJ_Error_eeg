@@ -1,4 +1,4 @@
-function SBJ06d_CPA_candidate_ERP_GRP_stats_LME_RL(SBJ_id,eeg_proc_id,cpa_id,an_id,stat_id)
+function SBJ06f_CPA_candidate_ERP_GRP_stats_LME_RL(SBJ_id,eeg_proc_id,cpa_id,an_id,stat_id)
 % Run Linear Mixed-Effects + Reinforcement Learning model on all SBJ candidate ICs
 %   Only for one channel now...
 %% Set up paths

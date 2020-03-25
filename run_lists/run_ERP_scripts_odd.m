@@ -87,6 +87,13 @@ plt_id = 'topo_F18t25';
 SBJ03c_ERP_plot_grp_topo_cond(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,...
     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
+%% Save topo for CPA prototype selection
+proc_id    = 'odd_full_ft';
+an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
+conditions = 'Odd';
+
+SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
+
 %% OLD SHEILA STUFF:
 %{
 %% View difference wave ERPs
