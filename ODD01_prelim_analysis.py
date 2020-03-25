@@ -12,8 +12,11 @@ import scipy.stats
 
 SBJ = sys.argv[1]
 
-prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
-#prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
+if os.path.exists('/Volumes/hoycw_clust/PRJ_Error_eeg/'):
+    print('yes!')
+    prj_dir='/Volumes/hoycw_clust/PRJ_Error_eeg/'
+else:
+    prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.png'
 data_dir = prj_dir+'data/'
@@ -52,30 +55,17 @@ data_all = data
 
 # Exclude: Training/Examples, first trial of each block
 data = data[(data['Block']!=-1) & (data['ITI']>0)]
-
+condition_titles = ['Target', 'Standard', 'Oddball']
 # plot for each block the number correct, separated by condition
 f, axes = plt.subplots(1,3)
-sns.lineplot(block_range, accurate_ratio[0,:], ax=axes[0], markers = 'True', marker = "o")
-plt.subplots_adjust(top=0.8,wspace=0.8)
-sns.lineplot(block_range, accurate_ratio[1,:], ax=axes[1], markers = 'True', marker = "o")
-plt.subplots_adjust(top=0.8,wspace=0.8)
-sns.lineplot(block_range, accurate_ratio[2,:], ax=axes[2], markers = 'True', marker = "o")
-plt.subplots_adjust(top=0.8,wspace=0.8)
-axes[0].set_xticks([0,1,2])
-axes[1].set_xticks([0,1,2])
-axes[2].set_xticks([0,1,2])
-axes[0].set_xlabel('Block Number')
-axes[1].set_xlabel('Block Number')
-axes[2].set_xlabel('Block Number')
-axes[0].set_ylabel('Accuracy Rate')
-axes[1].set_ylabel('Accuracy Rate')
-axes[2].set_ylabel('Accuracy Rate')
-axes[0].set_ylim(0, 1.05)
-axes[1].set_ylim(0, 1.05)
-axes[2].set_ylim(0, 1.05)
-axes[0].set_title('Target')
-axes[1].set_title('Standard')
-axes[2].set_title('Oddball')
+for index in range(len(condition_titles)):
+    sns.lineplot(block_range, accurate_ratio[index,:], ax=axes[index], markers = 'True', marker = "o")
+    plt.subplots_adjust(top=0.8,wspace=0.8)
+    axes[index].set_xticks([0,1,2])
+    axes[index].set_xlabel('Block Number')
+    axes[index].set_ylabel('Accuracy Rate')
+    axes[index].set_ylim(0, 1.05)
+    axes[index].set_title(condition_titles[index])
 
 f.suptitle(SBJ + ' Condition and Accuracy in Oddball Task') # can also get the figure from plt.gcf()
 if os.path.isdir(results_dir + 'BHV/ODD/accuracy/') == False:
