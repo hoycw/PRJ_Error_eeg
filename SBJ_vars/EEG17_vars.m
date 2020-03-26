@@ -54,9 +54,9 @@ SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'T7', 'Iz'
     };
 %Maybe get rid of AF7
-SBJ_vars.trial_reject_ix = [22, 33, 40, 99, 144, 190, 233, 234, 275, 276, 284, 285, 315, 316, 335, 336, 470, 485, 491, 518, 521, 524, 582];
-SBJ_vars.trial_reject_ix_oddball = [121, 207, 208,  324, 325];
-SBJ_vars.ica_reject = [1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 14, 16, 17, 19, 20, 21, 22, 28, 29, 34, 32, 35, 36, 38, 41, 44, 45, 49, 50, 51, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63];
+SBJ_vars.trial_reject_ix = [40, 144, 285, 336, 518, 524, 582];
+SBJ_vars.trial_reject_ix_oddball = [324];
+SBJ_vars.ica_reject = [1, 5, 6, 7, 11, 14, 15, 16, 28, 19, 20, 21, 22, 24, 25, 27, 30, 31, 33, 34, 35, 37, 38, 41, 44, 45, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62];
 % Maybe too many components!!
 SBJ_vars.tt_trigger_ix = 3;
 SBJ_vars.odd_trigger_ix = 404;
