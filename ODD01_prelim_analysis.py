@@ -59,7 +59,7 @@ condition_titles = ['Target', 'Standard', 'Oddball']
 # plot for each block the number correct, separated by condition
 f, axes = plt.subplots(1,3)
 for index in range(len(condition_titles)):
-    sns.lineplot(block_range, accurate_ratio[index,:], ax=axes[index], markers = 'True', marker = "o")
+    axes[index].plot(block_range, accurate_ratio[index,:], 'o-')
     plt.subplots_adjust(top=0.8,wspace=0.8)
     axes[index].set_xticks([0,1,2])
     axes[index].set_xlabel('Block Number')
