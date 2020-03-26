@@ -76,7 +76,7 @@ cfg.latency = cpa.time_win;
 st_ica = ft_selectdata(cfg,clean_ica);
 
 %% Plot data
-fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/final_ics/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end

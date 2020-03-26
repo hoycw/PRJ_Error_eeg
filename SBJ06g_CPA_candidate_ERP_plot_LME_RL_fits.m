@@ -1,4 +1,4 @@
-function SBJ06e_CPA_candidate_ERP_plot_LME_RL_fits(SBJ_id,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ06g_CPA_candidate_ERP_plot_LME_RL_fits(SBJ_id,eeg_proc_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots group-averaged CPA candidates with significance, also beta weights per regressor
 %   Only for single channel right now...
 %% Set up paths

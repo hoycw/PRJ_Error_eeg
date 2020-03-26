@@ -1,4 +1,4 @@
-function SBJ06a_CPA_prototype_selection(SBJ, proc_id, cpa_id)
+function SBJ06a_CPA_prototype_selection(SBJ, proc_id, cpa_id,save_fig,varargin)
 %% Candidate-Prototype Analysis (CPA): Prototype Selection
 %   Selects top IC based on spatial (elec_list) and temporal (time_win)
 
@@ -12,6 +12,24 @@ addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath(ft_dir);
 ft_defaults
+
+%% Handle Variable Inputs & Defaults
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'fig_vis') && ischar(varargin{v+1})
+            fig_vis = varargin{v+1};
+        elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
+            fig_ftype = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Define default options
+if ~exist('fig_vis','var'); fig_vis = 'on'; end
+if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
+if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Load processing variables
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
@@ -92,10 +110,12 @@ fprintf('%s: %d / %d components meet temporal criteria!\n',SBJ,sum(time_ic_idx),
 space_ic_idx = false(size(st_ica.label));
 if strcmp(cpa.elec_method,'peak')
     top_elecs = cell([numel(st_ica.label) cpa.n_max_elec]);
+    n_elec_match = zeros(size(st_ica.label));
     for comp_ix = 1:numel(st_ica.label)
         [~, top_ix] = maxk(abs(clean_ica.topo(:,comp_ix)), cpa.n_max_elec);
         top_elecs(comp_ix,:) = clean_ica.topolabel(top_ix);
-        if numel(intersect(top_elecs(comp_ix,:),cpa.elec_list)) >= cpa.min_elec_match
+        n_elec_match(comp_ix) = numel(intersect(top_elecs(comp_ix,:),cpa.elec_list));
+        if n_elec_match(comp_ix) >= cpa.min_elec_match
             space_ic_idx(comp_ix) = true;
         end
     end
@@ -144,7 +164,64 @@ fprintf('%s: %d / %d components were kept in cleaning!\n',SBJ,sum(good_ic_idx),n
 final_ics = find(all([time_ic_idx, space_ic_idx, var_ic_idx, good_ic_idx],2));
 fprintf('%s: %d / %d components selected!\n',SBJ,numel(final_ics),numel(clean_ica.label));
 if sum(final_ics)<1
-    error('No ICs found that match all criteria!');
+    warning('No ICs found that match all criteria!');
+end
+
+%% QA plots
+fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/QA/'];
+if ~exist(fig_dir,'dir')
+    mkdir(fig_dir);
+end
+fig_name = [SBJ '_proto_' cpa_id '_QA'];
+figure('Name',fig_name,'units','normalized',...
+    'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
+ns_sz = 25;
+sig_sz = 75;
+
+% Temporal Cirterion
+subplot(2,1,1); hold on;
+ylim([0 diff(cpa.time_win)]);
+scatter(1:numel(clean_ica.label),sig_len./st_ica.fsample,ns_sz,'k');
+scatter(find(time_ic_idx),sig_len(time_ic_idx)./st_ica.fsample,sig_sz,'k','filled');
+scatter(final_ics,sig_len(final_ics)./st_ica.fsample,sig_sz,'r','filled');
+line(xlim, [cpa.min_sig_len cpa.min_sig_len],'Color','r');
+line([cpa.ic_rank_max cpa.ic_rank_max],ylim,'Color','r');
+xlabel('IC #');
+ylabel('min sig len (s)');
+title([num2str(sum(time_ic_idx)) '/' num2str(numel(final_ics)) '; Window: ' ...
+    num2str(cpa.time_win(1)) '-' num2str(cpa.time_win(2)) ' (' num2str(diff(cpa.time_win)) ' s)']);
+set(gca,'FontSize',14);
+
+% Spatial Criterion
+subplot(2,1,2); hold on;
+if strcmp(cpa.elec_method,'peak')
+    ylim([0 5]);
+    scatter(1:numel(clean_ica.label),n_elec_match,ns_sz,'k');
+    scatter(find(space_ic_idx),n_elec_match(space_ic_idx),sig_sz,'k','filled');
+    scatter(final_ics,n_elec_match(final_ics),sig_sz,'r','filled');
+    line(xlim, [cpa.min_elec_match cpa.min_elec_match],'Color','r');
+    line([cpa.ic_rank_max cpa.ic_rank_max],ylim,'Color','r');
+    ylabel('# elec match');
+    title([num2str(sum(time_ic_idx)) '/' num2str(numel(final_ics)) '; elecs: ' strjoin(cpa.elec_list)]);
+elseif strcmp(cpa.elec_method,'topo_corr')
+    ylim([-1 1]);
+    scatter(1:numel(clean_ica.label),topo_corrs,ns_sz,'k');
+    scatter(find(space_ic_idx),topo_corrs(space_ic_idx),sig_sz,'k','filled');
+    scatter(final_ics,topo_corrs(final_ics),sig_sz,'r','filled');
+    % line(xlim, [cpa.min_elec_match cpa.min_elec_match],'Color','r');
+    line([cpa.ic_rank_max cpa.ic_rank_max],ylim,'Color','r');
+    ylabel('topo corr');
+    title([num2str(sum(time_ic_idx)) '/' num2str(numel(final_ics)) '; ' ...
+        cpa.topo_cond ' topo (' num2str(cpa.topo_lim(1)) '-' num2str(cpa.topo_lim(2)) ' s)']);
+end
+xlabel('IC #');
+set(gca,'FontSize',14);
+
+% Save figure
+if save_fig
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
+    fprintf('Saving %s\n',fig_fname);
+    saveas(gcf,fig_fname);
 end
 
 %% Save Data

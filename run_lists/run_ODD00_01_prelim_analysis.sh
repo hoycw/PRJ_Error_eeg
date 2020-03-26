@@ -21,10 +21,10 @@ SBJs=(`cat "${root_dir}scripts/SBJ_lists/${list_name}.sbj"`)
 
 # Run BHV scripts for these SBJs
 for sbj in "${SBJs[@]}"; do
-echo "=================================================================\n"
-echo "Running ${sbj}\n"
-echo "=================================================================\n"
-
-python ODD01_prelim_analysis.py ${sbj}
+    echo "=================================================================\n"
+    echo "Running ${sbj}\n"
+    echo "=================================================================\n"
+    
+    python ODD01_prelim_analysis.py ${sbj}
 done
 
