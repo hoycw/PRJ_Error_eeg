@@ -16,9 +16,6 @@ tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);
 SBJs = tmp{1}; clear tmp;
 
-warning('ADDING EEG03/04!!!');
-SBJs = [SBJs; {'EEG03'; 'EEG04'}];
-
 %% Compute TFRs
 proc_id    = 'eeg_full_ft';
 an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12b05','TFR_Pz_F2t1_db2t0_fl1t12b05'};
@@ -56,7 +53,7 @@ save_fig    = 1;
 fig_vis     = 'on';
 fig_ftype  = 'png';
 
-for an_ix = 2:numel(an_ids)
+for an_ix = 1%:numel(an_ids)
     for s = 1:numel(SBJs)
         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
 %         SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
@@ -83,21 +80,21 @@ save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for an_ix = 1:numel(an_ids)
-    for s = 1:numel(SBJs)
-        SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix});
-        
-        % Plot evoked POW time series
-        SBJ05b_POW_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    end
-    SBJ05c_POW_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    
-%     plt_id = 'ts_F2to1_but_evnts_sigPatch';
-%     SBJ05c_POW_plot_grp_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+% for an_ix = 1:numel(an_ids)
+%     for s = 1:numel(SBJs)
+%         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix});
+%         
+%         % Plot evoked POW time series
+%         SBJ05b_POW_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     end
+%     SBJ05c_POW_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-end
+%     
+% %     plt_id = 'ts_F2to1_but_evnts_sigPatch';
+% %     SBJ05c_POW_plot_grp_butterfly(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
+% %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+% end
 
 %% Compute and Plot POW (Topos)
 proc_id    = 'eeg_full_ft';
@@ -108,17 +105,17 @@ save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for an_ix = 1:numel(an_ids)
-%     for s = 1:numel(SBJs)
-%         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix});
-%         
-%         % Plot POW topos
-%         SBJ05b_POW_plot_topo_cond(SBJs{s},conditions,proc_id,an_ids{an_ix},...
-%             topo_plt_ids{an_ix},save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%         close all;
-%     end
-    SBJ05c_POW_plot_grp_topo_cond(SBJs,conditions,proc_id,an_ids{an_ix},...
-        topo_plt_ids{an_ix},save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-end
+% for an_ix = 1:numel(an_ids)
+% %     for s = 1:numel(SBJs)
+% %         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix});
+% %         
+% %         % Plot POW topos
+% %         SBJ05b_POW_plot_topo_cond(SBJs{s},conditions,proc_id,an_ids{an_ix},...
+% %             topo_plt_ids{an_ix},save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+% %         close all;
+% %     end
+%     SBJ05c_POW_plot_grp_topo_cond(SBJs,conditions,proc_id,an_ids{an_ix},...
+%         topo_plt_ids{an_ix},save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+% end
 
 

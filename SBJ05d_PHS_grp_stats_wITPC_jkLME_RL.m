@@ -1,4 +1,4 @@
-function SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJs,proc_id,an_id,stat_id)
+function SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJ_id,proc_id,an_id,stat_id)
 % Run weighted itner-trial pahse coherence for phase at each time-frequency point
 % within SBJ, z-score that value to null distribution, then t-test those
 % z-scored correlation values vs. 0 across SBJ (and FDR correct)
