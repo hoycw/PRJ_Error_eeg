@@ -76,7 +76,7 @@ end
 %% Plot ERP Topos
 proc_id    = 'eeg_full_ft';
 conditions = 'DifFB';
-an_id      = 'ERPlp_all_F2t1_dm2t0_fl05t20';
+an_id      = 'ERP_all_F2t1_dm2t0_fl05t20';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';

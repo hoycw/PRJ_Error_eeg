@@ -123,18 +123,24 @@ end
 
 % Compute topo correlations
 % Load and average group topo
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'],'trials'); %chose 02a - ica before rejection!
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat'],'clean_trials'); %chose 02a - ica before rejection!
 load([root_dir 'PRJ_Error_eeg/data/GRP/' cpa.topo_SBJ_id '_Odd_' cpa.topo_an_id '.mat']);
 cfg_avg = [];
-cfg_avg.channel = trials.label;
+cfg_avg.channel = clean_trials.label;
 cfg_avg.latency = cpa.topo_lim;
 cfg_avg.avgovertime = 'yes';
 topo = ft_selectdata(cfg_avg,er_grp{strcmp(cond_lab,cpa.topo_cond)});
-if ~all(strcmp(clean_ica.topolabel,topo.label))
+topo_match = true(size(topo.label));
+if numel(clean_ica.topolabel)~=numel(topo.label) || ~all(strcmp(clean_ica.topolabel,topo.label))
     topo_order = zeros(size(topo.label));
     for lab_ix = 1:numel(topo.label)
-        topo_order(lab_ix) = find(strcmp(clean_ica.topolabel,topo.label{lab_ix}));
+        if any(strcmp(clean_ica.topolabel,topo.label{lab_ix}))
+            topo_order(lab_ix) = find(strcmp(clean_ica.topolabel,topo.label{lab_ix}));
+        else
+            topo_match(lab_ix) = false;
+        end
     end
+    topo_order(topo_order==0) = [];
 else
     topo_order = 1:numel(topo.label);
 end
@@ -143,7 +149,7 @@ end
 topo_corrs = nan(size(st_ica.label));
 topo_pvals = nan(size(st_ica.label));
 for comp_ix = 1:numel(st_ica.label)
-    [tmp_corr, tmp_pval] = corrcoef(clean_ica.topo(topo_order,comp_ix), topo.avg);
+    [tmp_corr, tmp_pval] = corrcoef(clean_ica.topo(topo_order,comp_ix), topo.avg(topo_match));
     topo_corrs(comp_ix) = tmp_corr(1,2);
     topo_pvals(comp_ix) = tmp_pval(1,2);
 end

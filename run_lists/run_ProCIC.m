@@ -39,12 +39,12 @@ for s = 1:numel(SBJs)
     %         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Topo correlation
-    if ~any(strcmp(SBJs{s},{'EEG17','EEG18','EEG19','EEG20','EEG21','EEG22','EEG23','EEG29'}))
+%     if ~any(strcmp(SBJs{s},{'EEG17','EEG18','EEG19','EEG20','EEG21','EEG22','EEG23','EEG29'}))
         SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, cpa_id, save_fig);
         SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, cpa_id, plt_id,...
             save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         close all;
-    end
+%     end
 end
 
 %% Reconstruct Prototype Oddball ERPs
