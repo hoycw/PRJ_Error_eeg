@@ -142,12 +142,8 @@ for f_ix = 1:numel(final_ics)
     cfgp.layout    = 'biosemi64.lay';
     cfgp.comment   = 'no';
     ft_topoplotIC(cfgp, clean_ica);
-    if strcmp(cpa.elec_method,'peak')
-        space_str = strjoin(top_elecs(comp_ix,:),',');
-    elseif strcmp(cpa.elec_method,'topo_corr')
-        space_str = ['r=' num2str(topo_corrs(comp_ix),'%.3f')];
-    end
-    title(['Peak Elecs: ' space_str]); 
+    title([num2str(numel(intersect(top_elecs(comp_ix,:),cpa.elec_list))) ...
+        ' peaks: ' strjoin(top_elecs(comp_ix,:),',') '; r=' num2str(topo_corrs(comp_ix),'%.3f')]); 
     set(gca,'FontSize',16);
 
     % Save Figure

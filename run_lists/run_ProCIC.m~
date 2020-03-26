@@ -24,7 +24,7 @@ an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
 
 %% Prototype Selection
 proc_id   = 'odd_full_ft';
-% cpa_id    = 'CPA';%'CPA_odd';
+cpa_id    = 'CPA_odd_comb';
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig   = 1;
@@ -35,39 +35,23 @@ for s = 1:numel(SBJs)
     %ODD02a_artifact_rejection(SBJs{x}, 'eeg_full_ft', 'odd_full_ft', 1, 'on', 'ERP_stack_full_events_odd')
     %SBJ02a_artifact_rejection(SBJs{x}, 'eeg_full_ft', 1, 'on')
     %SBJ01_preproc(SBJs{x}, 'eeg_full_ft');
-%     SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
-%         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    try
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd_topo');
-        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA_odd_topo', plt_id,...
+    %     SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA', plt_id,...
+    %         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    
+    % Topo correlation
+    if ~any(strcmp(SBJs{s},{'EEG17','EEG18','EEG19','EEG20','EEG21','EEG22','EEG23','EEG29'}))
+        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, cpa_id, save_fig);
+        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, cpa_id, plt_id,...
             save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         close all;
-    catch
-        fprintf(2,'No ICs found for CPA_odd2 %s\n',SBJs{s});
-    end
-    try
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA');
-        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA', plt_id,...
-            save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        close all;
-    catch
-        fprintf(2,'No ICs found for CPA %s\n',SBJs{s});
-    end
-    try
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, 'CPA_odd2');
-        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, 'CPA_odd2', plt_id,...
-            save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        close all;
-    catch
-        fprintf(2,'No ICs found for CPA_odd2 %s\n',SBJs{s});
     end
 end
 
 %% Reconstruct Prototype Oddball ERPs
-proc_id   = 'odd_full_ft';
+proc_id    = 'odd_full_ft';
 conditions = 'Odd';
-cpa_id    = 'CPA';%'CPA_odd';
-an_ids    = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
+cpa_id     = 'CPA_odd_comb';
+an_ids     = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
@@ -76,54 +60,40 @@ for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
         SBJ06b_CPA_prototype_ERP_save(SBJs{s}, proc_id, an_ids{an_ix}, cpa_id);
     end
-    plt_id    = 'ts_F2to1_evnts_sigLine';
-    SBJ06c_CPA_prototype_ERP_plot_GRP(SBJ_id,conditions,proc_id,cpa_id,an_id,plt_id,...
+    plt_id    = 'ts_S2t1_evnts_sigLine';
+    SBJ06c_CPA_prototype_ERP_plot_GRP(SBJ_id,conditions,proc_id,cpa_id,an_ids{an_ix},plt_id,...
         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
-an_id = 'ERP_all_S2t1_dm2t0_fl05t20';
+topo_an_id  = 'ERP_all_S2t1_dm2t0_fl05t20';
+for s = 1:numel(SBJs)
+    SBJ06b_CPA_prototype_ERP_save(SBJs{s}, proc_id, an_id, cpa_id);
+end
+plt_id = 'topo_F3t45';
 SBJ06c_CPA_prototype_ERP_plot_GRP_topo_cond(SBJ_id,conditions,proc_id,cpa_id,an_id,plt_id,...
     save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 %%
 for s = 1:numel(SBJs)
-    try
-        load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_' proc_id '_prototype.mat']);
-        orig_ics = final_ics;
-    catch
-        orig_ics = [];
+    if ~any(strcmp(SBJs{s},{'EEG17','EEG18','EEG19','EEG20','EEG21','EEG22','EEG23','EEG29'}))
+        load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_' cpa_id '_' proc_id '_prototype.mat']);
+        fprintf('%s: %d\n',SBJs{s},numel(final_ics));
     end
-    try
-        load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_odd2_' proc_id '_prototype.mat']);
-    catch
-        final_ics = [];
-    end
-    fprintf('%s: n_tar = %d; n_odd2 = %d; overlap = %d\n',SBJs{s},numel(orig_ics),numel(final_ics),numel(intersect(orig_ics,final_ics)));
 end
-
-% COMPARISON OUTPUT:
-% EEG01: n_origs = 3; n_odd = 3; overlap = 3
-% EEG03: n_origs = 1; n_odd = 1; overlap = 0
-% EEG04: n_origs = 1; n_odd = 1; overlap = 1
-% EEG05: n_origs = 2; n_odd = 1; overlap = 0
-% EEG06: n_origs = 2; n_odd = 4; overlap = 2
-% EEG07: n_origs = 1; n_odd = 2; overlap = 1
-% EEG08: n_origs = 1; n_odd = 2; overlap = 1
-% EEG09: n_origs = 4; n_odd = 6; overlap = 3
-% EEG10: n_origs = 1; n_odd = 1; overlap = 0
-% EEG12: n_origs = 2; n_odd = 2; overlap = 2
-% 
-%========
-% EEG01: n_origs = 1; n_odd = 0; overlap = 0
-% EEG03: n_origs = 1; n_odd = 1 (but #42); overlap = 1
-% EEG04: n_origs = 1 (but #25); n_odd = 1 (but same #25); overlap = 1
-% EEG05: n_origs = 1; n_odd = 0; overlap = 0
-% EEG06: n_origs = 1; n_odd = 1; overlap = 1
-% EEG07: n_origs = 1; n_odd = 0; overlap = 0
-% EEG08: n_origs = 1; n_odd = 2; overlap = 1
-% EEG09: n_origs = 1; n_odd = 1; overlap = 1
-% EEG10: n_origs = 1; n_odd = 1 (but #40); overlap = 1
-% EEG12: n_origs = 1; n_odd = 1; overlap = 1
+% for s = 1:numel(SBJs)
+%     try
+%         load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_odd_topo_' proc_id '_prototype.mat']);
+%         orig_ics = final_ics;
+%     catch
+%         orig_ics = [];
+%     end
+%     try
+%         load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_CPA_odd2_' proc_id '_prototype.mat']);
+%     catch
+%         final_ics = [];
+%     end
+%     fprintf('%s: n_tar = %d; n_odd2 = %d; overlap = %d\n',SBJs{s},numel(orig_ics),numel(final_ics),numel(intersect(orig_ics,final_ics)));
+% end
 
 %% Test Candidate
 eeg_proc_id = 'eeg_full_ft';

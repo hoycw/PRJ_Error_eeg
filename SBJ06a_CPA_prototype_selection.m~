@@ -105,7 +105,7 @@ sig_len = sig_len./st_ica.fsample;
 sig_len_chunk = sig_len_chunk./st_ica.fsample;
 
 % Select components with consecutive significance
-time_ic_idx = sig_len >= cpa.min_sig_len;
+time_ic_idx = sig_len_chunk >= cpa.min_sig_len;
 fprintf('%s: %d / %d components meet temporal criteria!\n',SBJ,sum(time_ic_idx),numel(st_ica.label));
 
 %% Spatial Criteria: Topo Matching
@@ -160,8 +160,6 @@ else
     topo_corr_idx = true;
 end
 space_ic_idx = all([peak_idx, topo_corr_idx],2);
-fprintf('%s: %d / %d components meet peak criterion!\n',SBJ,sum(peak_idx),numel(clean_ica.label));
-fprintf('%s: %d / %d components meet topo corr criterion!\n',SBJ,sum(topo_corr_idx),numel(clean_ica.label));
 fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),numel(clean_ica.label));
 
 %% Combine Criteria
@@ -182,12 +180,12 @@ end
 
 %% QA plots
 % Plot individual criteria
-fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/QA_all/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/QA/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
-fig_name = [SBJ '_proto_' cpa_id '_QA_all'];
+fig_name = [SBJ '_proto_' cpa_id '_QA'];
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
 ns_sz = 25;
@@ -244,7 +242,7 @@ if save_fig
 end
 
 %% Plot combined spatial criteria (Peak vs. topo corr)
-fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/QA_peak_topo/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/QA_comb/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -258,7 +256,7 @@ topo_mrkr = 's';
 ns_mrkr   = 'o';
 
 % Combined spatial (peak elec vs. topo corr)
-fig_name = [SBJ '_proto_' cpa_id '_QA_peak_topo'];
+fig_name = [SBJ '_proto_' cpa_id '_QA_comb_spatial'];
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
 hold on;
@@ -274,22 +272,9 @@ xlabel('# elec match');
 ylabel('topo corr');
 title([num2str(sum(space_ic_idx)) '/' num2str(numel(final_ics)) '; peak: ' ...
     num2str(sum(peak_idx)) '; corr: ' num2str(sum(topo_corr_idx))]);
-set(gca,'FontSize',14);
-
-% Save figure
-if save_fig
-    fig_fname = [fig_dir fig_name '.' fig_ftype];
-    fprintf('Saving %s\n',fig_fname);
-    saveas(gcf,fig_fname);
-end
 
 %% Plot Combined temporal-spatial (Peak vs. temporal)
-fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/prototype/' cpa_id '/QA_peak_time/'];
-if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
-end
-
-fig_name = [SBJ '_proto_' cpa_id '_QA_peak_time'];
+fig_name = [SBJ '_proto_' cpa_id '_QA_comb_space_time'];
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
 
@@ -306,14 +291,13 @@ scatter(n_elec_match(both_ns_idx),sig_len(both_ns_idx),ns_sz,'k',ns_mrkr);
 scatter(n_elec_match(pk_only_idx),sig_len(pk_only_idx),sig_sz,'r',pk_mrkr);
 scatter(n_elec_match(time_only_idx),sig_len(time_only_idx),sig_sz,'r',time_mrkr);
 scatter(n_elec_match(final_ics),sig_len(final_ics),sig_sz,'r','filled');
-xlim([0 cpa.n_max_elec]);
-ylim([0 diff(cpa.time_win)]);
 line([cpa.min_elec_match cpa.min_elec_match], ylim, 'Color','r');
 line(xlim, [cpa.min_sig_len cpa.min_sig_len],'Color','r');
+xlim([0 cpa.n_max_elec]);
+ylim([0 ]);
 xlabel('# elec match');
-ylabel('sig len (s)');
-title(['peak: ' num2str(sum(peak_idx)) '; time: ' num2str(sum(time_ic_idx))]);
-set(gca,'FontSize',14);
+ylabel('topo corr');
+
 
 % Save figure
 if save_fig
@@ -325,7 +309,10 @@ end
 %% Save Data
 clean_data_fname = [SBJ_vars.dirs.proc SBJ '_' cpa_id '_' proc_id '_prototype.mat'];
 fprintf('Saving %s\n',clean_data_fname);
-save(clean_data_fname, '-v7.3', 'final_ics','clean_ica','sig_wins','sig_len',...
-    'sig_len_chunk','top_elecs','topo_corrs','topo_pvals');
+if strcmp(cpa.elec_method,'peak')
+    save(clean_data_fname, '-v7.3', 'final_ics','clean_ica','sig_wins','top_elecs');
+elseif strcmp(cpa.elec_method,'topo_corr')
+    save(clean_data_fname, '-v7.3', 'final_ics','clean_ica','sig_wins','topo_corrs');
+end
 
 end
