@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'goodEEG';
+SBJ_id = 'EXG_rerun';%'goodEEG';
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
 tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);
@@ -20,7 +20,7 @@ SBJs = tmp{1}; clear tmp;
 conditions = 'Odd';
 proc_id    = 'odd_full_ft';
 an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
-% SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
+SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
 
 %% Prototype Selection
 proc_id   = 'odd_full_ft';
@@ -39,12 +39,10 @@ for s = 1:numel(SBJs)
     %         save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Topo correlation
-%     if ~any(strcmp(SBJs{s},{'EEG17','EEG18','EEG19','EEG20','EEG21','EEG22','EEG23','EEG29'}))
-        SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, cpa_id, save_fig);
-        SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, cpa_id, plt_id,...
-            save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        close all;
-%     end
+    SBJ06a_CPA_prototype_selection(SBJs{s}, proc_id, cpa_id, save_fig);
+    SBJ06b_CPA_prototype_plot(SBJs{s}, proc_id, cpa_id, plt_id,...
+        save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    close all;
 end
 
 %% Reconstruct Prototype Oddball ERPs

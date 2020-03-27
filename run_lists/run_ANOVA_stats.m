@@ -96,6 +96,51 @@ end
 % SBJ03c_ERP_plot_grp_topo_cond(SBJs,conditions,proc_id,an_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
+%% ERP Stats: Window Mean
+proc_id    = 'eeg_full_ft';
+save_fig   = 1;
+fig_vis    = 'on';
+fig_ftype  = 'png';
+% for s = 1:numel(SBJs)
+%     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+% end
+
+an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifOut_anv_mn2t3_jk';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifFB_anv_mn2t3_jk';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id      = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifOut_anv_mn3t4_jk';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id      = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+stat_id    = 'DifFB_anv_mn3t4_jk';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+%% ERP Stats: Peak-to-Peak
+proc_id    = 'eeg_full_ft';
+save_fig   = 1;
+fig_vis    = 'on';
+fig_ftype  = 'png';
+
+an_id   = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id = 'DifOut_anv_p2pFRN';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+an_id   = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_id = 'DifFB_anv_p2pFRN';
+SBJ04c_ERP_grp_stats_ANOVA(SBJs,proc_id,an_id,stat_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
 %% ========================================================================
 %   OLD UNUSED ANALYSES (not going in the paper)
 %  ========================================================================

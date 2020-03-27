@@ -18,11 +18,10 @@ SBJs = tmp{1}; clear tmp;
 
 %% Compute TFRs
 proc_id    = 'eeg_full_ft';
-an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12b05','TFR_Pz_F2t1_db2t0_fl1t12b05'};
+an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
-%an_ids = {'TFR_Fz_F2t1_z2t0_fl1t14','TFR_Pz_F2t1_z2t0_fl1t14'};
 conditions = 'DifFB';
-plt_id     = 'ts_F2to1_evnts_sigLine';%'ts_F4t1_evnts_sigLine';%
+plt_id     = 'ts_F2to1_evnts_sigLine';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
@@ -43,17 +42,17 @@ end
 
 %% Compute Phase
 proc_id    = 'eeg_full_ft';
-an_ids     = {'PHS_Fz_F2t1_fl1t12b05','PHS_Pz_F2t1_fl1t12b05'};
+an_ids     = {'PHS_Fz_F2t1_fl1t12','PHS_Pz_F2t1_fl1t12'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 phs_freq_lim = [1 4];
 phs_time_lim = [0.3 0.33];
 conditions = 'DifFB';
-plt_id     = 'ts_F2to1_evnts_sigLine';%'ts_F4t1_evnts_sigLine';%
+plt_id     = 'ts_F2to1_evnts_sigLine';
 save_fig    = 1;
 fig_vis     = 'on';
 fig_ftype  = 'png';
 
-for an_ix = 1%:numel(an_ids)
+for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
 %         SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
@@ -70,16 +69,20 @@ for an_ix = 1%:numel(an_ids)
 %             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
-%% Compute and Plot POW (Time Series)
-proc_id    = 'eeg_full_ft';
-conditions = 'DifFB';
-an_ids     = {'POW_Fz_F2t1_rc2t0_fl4t8','POW_Fz_F2t1_z2t0_fl4t8'};
-%an_ids     = {'POW_Fz_F2t1_db2t0_fl4t8','POW_Fz_F2t1_db2t0_fl8t12','POW_Pz_F2t1_db2t0_fl1t4'};
-plt_id     = 'ts_F2to1_evnts_sigLine';
-save_fig   = 1;
-fig_vis    = 'on';
-fig_ftype  = 'png';
+%% ========================================================================
+%   OLD UNUSED ANALYSES (not going in the paper)
+%  ========================================================================
 
+% %% Compute and Plot POW (Time Series)
+% proc_id    = 'eeg_full_ft';
+% conditions = 'DifFB';
+% an_ids     = {'POW_Fz_F2t1_rc2t0_fl4t8','POW_Fz_F2t1_z2t0_fl4t8'};
+% %an_ids     = {'POW_Fz_F2t1_db2t0_fl4t8','POW_Fz_F2t1_db2t0_fl8t12','POW_Pz_F2t1_db2t0_fl1t4'};
+% plt_id     = 'ts_F2to1_evnts_sigLine';
+% save_fig   = 1;
+% fig_vis    = 'on';
+% fig_ftype  = 'png';
+% 
 % for an_ix = 1:numel(an_ids)
 %     for s = 1:numel(SBJs)
 %         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix});
@@ -96,15 +99,15 @@ fig_ftype  = 'png';
 % %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 % end
 
-%% Compute and Plot POW (Topos)
-proc_id    = 'eeg_full_ft';
-conditions = 'DifFB';
-an_ids     = {'POW_all_F2t1_db2t0_fl4t8','POW_all_F2t1_db2t0_fl8t12','POW_all_F2t1_db2t0_fl1t4'};
-topo_plt_ids = {'topo_F18t25','topo_F18t25','topo_F3t45'};
-save_fig   = 1;
-fig_vis    = 'on';
-fig_ftype  = 'png';
-
+% %% Compute and Plot POW (Topos)
+% proc_id    = 'eeg_full_ft';
+% conditions = 'DifFB';
+% an_ids     = {'POW_all_F2t1_db2t0_fl4t8','POW_all_F2t1_db2t0_fl8t12','POW_all_F2t1_db2t0_fl1t4'};
+% topo_plt_ids = {'topo_F18t25','topo_F18t25','topo_F3t45'};
+% save_fig   = 1;
+% fig_vis    = 'on';
+% fig_ftype  = 'png';
+% 
 % for an_ix = 1:numel(an_ids)
 % %     for s = 1:numel(SBJs)
 % %         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix});

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Move to scripts directory
-if [-d "$/Volumes/hoycw_clust/PRJ_Error_eeg/"]; then
+if [ -d "/Volumes/hoycw_clust/PRJ_Error_eeg/" ]; then
     root_dir="/Volumes/hoycw_clust/PRJ_Error_eeg/"
 else
     root_dir="/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/"
