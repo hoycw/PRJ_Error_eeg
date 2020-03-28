@@ -60,25 +60,21 @@ cfgs.trials = setdiff([1:numel(ica.trial)], SBJ_vars.trial_reject_ix_oddball);
 clean_ica = ft_selectdata(cfgs, ica);
 
 %% ERP filtering for Temporal Criterion
-if cpa.erp_filt
-    % Select window and channels of interest
-    cfgs = [];
-    cfgs.latency = an.trial_lim_s;
-    roi = ft_selectdata(cfgs, clean_ica);
-    
-    % Preprocess Data for ERP
-    cfgpp = [];
-    cfgpp.hpfilter       = an.hp_yn;
-    cfgpp.hpfreq         = an.hp_freq;
-    cfgpp.hpfiltord      = an.hp_filtord; % Leaving blank causes instability error, 1 or 2 works
-    cfgpp.lpfilter       = an.lp_yn;
-    cfgpp.lpfreq         = an.lp_freq;
-    cfgpp.demean         = an.demean_yn;
-    cfgpp.baselinewindow = an.bsln_lim;
-    roi = ft_preprocessing(cfgpp, roi);
-else
-    roi = clean_ica;
-end
+% Select window and channels of interest
+cfgs = [];
+cfgs.latency = an.trial_lim_s;
+roi = ft_selectdata(cfgs, clean_ica);
+
+% Preprocess Data for ERP
+cfgpp = [];
+cfgpp.hpfilter       = an.hp_yn;
+cfgpp.hpfreq         = an.hp_freq;
+cfgpp.hpfiltord      = an.hp_filtord; % Leaving blank causes instability error, 1 or 2 works 
+cfgpp.lpfilter       = an.lp_yn;
+cfgpp.lpfreq         = an.lp_freq;
+cfgpp.demean         = an.demean_yn;
+cfgpp.baselinewindow = an.bsln_lim;
+roi = ft_preprocessing(cfgpp, roi);
 
 %% Temporal Criteria: Condition Stats
 % Select stats epoch

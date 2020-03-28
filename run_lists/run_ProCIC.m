@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'EXG_rerun';%'goodEEG';
+SBJ_id = 'goodEEG';
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
 tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);
@@ -20,11 +20,11 @@ SBJs = tmp{1}; clear tmp;
 conditions = 'Odd';
 proc_id    = 'odd_full_ft';
 an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
-SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
+% SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
 
 %% Prototype Selection
 proc_id   = 'odd_full_ft';
-cpa_id    = 'CPA_odd_comb';
+cpa_id    = 'CPA_ERP20';
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig   = 1;
