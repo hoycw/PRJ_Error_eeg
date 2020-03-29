@@ -38,8 +38,6 @@ proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_va
 eval(proc_vars_cmd);
 cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars.m'];
 eval(cpa_vars_cmd);
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' cpa.erp_an_id '_vars.m'];
-eval(an_vars_cmd);
 
 %% Load the data
 %loaded data from after SBJ02a --> already cleaned and trial segmented
@@ -61,6 +59,9 @@ clean_ica = ft_selectdata(cfgs, ica);
 
 %% ERP filtering for Temporal Criterion
 if cpa.erp_filt
+    an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' cpa.erp_an_id '_vars.m'];
+    eval(an_vars_cmd);
+    
     % Select window and channels of interest
     cfgs = [];
     cfgs.latency = an.trial_lim_s;
@@ -177,20 +178,36 @@ for comp_ix = 1:numel(st_ica.label)
     topo_pvals(comp_ix) = tmp_pval(1,2);
 end
 
+% Exclude single elec topos
+hi_idx = false(size(st_ica.label));
+lo_idx = false(size(st_ica.label));
+for comp_ix = 1:numel(st_ica.label)
+    topo_mean = mean(clean_ica.topo(:,comp_ix));
+    topo_sd   = std(clean_ica.topo(:,comp_ix));
+    hi_idx(comp_ix) = any(clean_ica.topo(:,comp_ix) > topo_mean+cpa.sd_thresh*topo_sd);
+    lo_idx(comp_ix) = any(clean_ica.topo(:,comp_ix) < topo_mean-cpa.sd_thresh*topo_sd);
+end
+
 % Combine spatial criteria
 if any(strcmp(cpa.elec_method,'peak'))
 	peak_idx = n_elec_match >= cpa.min_elec_match;
+    fprintf('%s: %d / %d components meet peak criterion\n',SBJ,sum(peak_idx),numel(clean_ica.label));
 else
     peak_idx = true;
 end
 if any(strcmp(cpa.elec_method,'topo_corr'))
 	topo_corr_idx = topo_pvals <= cpa.topo_pval;
+    fprintf('%s: %d / %d components meet topo corr criterion\n',SBJ,sum(topo_corr_idx),numel(clean_ica.label));
 else
-    topo_corr_idx = true;
+    topo_corr_idx = true(size(topo_pvals));
 end
-space_ic_idx = all([peak_idx, topo_corr_idx],2);
-fprintf('%s: %d / %d components meet peak criterion!\n',SBJ,sum(peak_idx),numel(clean_ica.label));
-fprintf('%s: %d / %d components meet topo corr criterion!\n',SBJ,sum(topo_corr_idx),numel(clean_ica.label));
+if any(strcmp(cpa.elec_method,'elec_outlier'))
+    outlier_idx = any([hi_idx lo_idx],2);
+    fprintf('%s: %d / %d components tossed for outlier topo weights\n',SBJ,sum(outlier_idx),numel(clean_ica.label));
+else
+    outlier_idx = false(size(hi_idx));
+end
+space_ic_idx = all([peak_idx, topo_corr_idx, ~outlier_idx],2);
 fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),numel(clean_ica.label));
 
 %% Combine Criteria

@@ -284,6 +284,13 @@ if any(strcmp(reg_lab,'uThPr'))
     uThPr = abs(uThPr);
 end
 
+%% Inter-Trial Interval
+ITI = bhv.ITI_type;
+ITI(ITI==0) = nan;
+if any(~isnan(ITI(bhv.blk_trl_n==1)))
+    error('First trial in block is not NaN in ITI regressor!');
+end
+
 %% Load Data and Build Model
 model = nan([sum(n_trials) numel(reg_lab)]);
 for r_ix = 1:numel(reg_lab)

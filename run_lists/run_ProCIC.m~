@@ -24,7 +24,7 @@ an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
 
 %% Prototype Selection
 proc_id   = 'odd_full_ft';
-cpa_id    = 'CPA_main';
+cpa_id    = 'CPA_ERP20';
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig   = 1;
@@ -48,7 +48,7 @@ end
 %% Reconstruct Prototype Oddball ERPs
 proc_id    = 'odd_full_ft';
 conditions = 'Odd';
-cpa_id     = 'CPA_main';
+cpa_id     = 'CPA_odd_comb';
 an_ids     = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
 save_fig   = 1;
 fig_vis    = 'on';
@@ -97,7 +97,7 @@ end
 eeg_proc_id = 'eeg_full_ft';
 odd_proc_id = 'odd_full_ft';
 conditions  = 'DifFB';
-cpa_id      = 'CPA_main';
+cpa_id      = 'CPA_odd_comb10';
 an_ids      = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%{'ERP_Fz_S15t28_dm2t0_fl05t20','ERP_Pz_S15t28_dm2t0_fl05t20'};
 % an_ids      = {'POW_Fz_F2t1_dm2t0_fl4t8','POW_Pz_F2t1_dm2t0_fl1t3'};
 stat_id     = 'RL_all_lme_st0t5';
@@ -111,9 +111,9 @@ for an_ix = 1:numel(an_ids)
         SBJ06d_CPA_candidate_ERP_save(SBJs{s},eeg_proc_id,odd_proc_id,an_ids{an_ix},cpa_id);
         
         % Plot full TT epoch with trial stack
-        plt_id    = 'stack_F2t1_evnt_c5';%'stack_S15to28_evnt_c5';
-        SBJ06e_CPA_candidate_ERP_plot_stack(SBJs{s},conditions,eeg_proc_id,cpa_id,an_ids{an_ix},...
-            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         plt_id    = 'stack_F2t1_evnt_c5';%'stack_S15to28_evnt_c5';
+%         SBJ06e_CPA_candidate_ERP_plot_stack(SBJs{s},conditions,eeg_proc_id,cpa_id,an_ids{an_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
         % Plot feedback TT epoch with only ERPs
 %         plt_id    = 'ts_F2to1_evnts_sigLine';

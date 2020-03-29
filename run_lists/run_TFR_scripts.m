@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';
+SBJ_id = 'good2';
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
 tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);

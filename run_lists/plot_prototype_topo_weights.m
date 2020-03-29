@@ -1,7 +1,7 @@
 root_dir='/Volumes/hoycw_clust/';
 SBJ_id = 'goodEEG';
 proc_id   = 'odd_full_ft';
-cpa_id    = 'CPA_ERP20';
+cpa_id    = 'CPA_odd_comb10';
 
 %%
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
@@ -14,8 +14,8 @@ proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_va
 eval(proc_vars_cmd);
 cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars.m'];
 eval(cpa_vars_cmd);
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' cpa.erp_an_id '_vars.m'];
-eval(an_vars_cmd);
+% an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' cpa.erp_an_id '_vars.m'];
+% eval(an_vars_cmd);
 
 %% Load ICs and weights
 topo_weights = cell(numel(SBJs));
@@ -34,7 +34,7 @@ for s = 1:numel(SBJs)
 end
 
 %% Compute thresholds
-sd_thresh = 5;
+sd_thresh = 3;
 tmp_colors = distinguishable_colors(100);
 figure; hold on;
 fprintf('\nthresh = %d\n',sd_thresh);

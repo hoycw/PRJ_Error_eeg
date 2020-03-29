@@ -10,8 +10,8 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-sbj_id = 'good1';
-sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' sbj_id '.sbj']);
+SBJ_id = 'good2';
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
 tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);
 SBJs = tmp{1}; clear tmp;
@@ -43,7 +43,7 @@ save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
 
-for an_ix = 1:numel(an_ids)
+for an_ix = 1%:numel(an_ids)
     plt_id     = 'stack_F2t1_evnt_c5';
     for s = 1:numel(SBJs)
         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
@@ -54,7 +54,7 @@ for an_ix = 1:numel(an_ids)
 %         SBJ03b_ERP_plot_stack(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-%     SBJ03c_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%     SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
 %     plt_id = 'ts_F2to1_but_evnts_sigPatch';
@@ -73,7 +73,7 @@ fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for s = 1:numel(SBJs)
-    SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
+    SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
 %     % FRN by condition
 %     plt_id    = 'topo_F18t25';
 %     SBJ03b_ERP_plot_topo_cond(SBJs{s},conditions,proc_id,an_id,plt_id,save_fig,...

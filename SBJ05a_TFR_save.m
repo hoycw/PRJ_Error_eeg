@@ -83,9 +83,15 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
     cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
     cfg.trialfun            = 'tt_trialfun';
+    if b_ix > 1
+        cfg.endb1 = cfg_trl_unconcat{b_ix - 1}.endb1;
+    end
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc.resample_freq;
     cfg_trl_unconcat{b_ix}  = ft_definetrial(cfg);
+    if b_ix == 1
+        cfg_trl_unconcat{b_ix}.endb1 = length(cfg_trl_unconcat{b_ix}.trl);
+    end
 end
 
 % Concatenate event times across blocks after adjusting times for gaps
