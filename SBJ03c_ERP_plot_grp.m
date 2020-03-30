@@ -104,7 +104,7 @@ else
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' conditions '/' an_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' conditions '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end

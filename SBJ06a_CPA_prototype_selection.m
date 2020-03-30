@@ -40,8 +40,8 @@ cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars
 eval(cpa_vars_cmd);
 
 %% Load the data
-%loaded data from after SBJ02a --> already cleaned and trial segmented
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'],'ica'); %chose 02a - ica before rejection!
+% Load data from post-SBJ02a -->  ica before rejection, trial segmented, RT and training tossed
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'],'ica','heog_ics','veog_ics');
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat'],'bhv');
 load([SBJ_vars.dirs.events SBJ '_' proc_id '_02a_orig_exclude_trial_ix.mat']);
 
@@ -217,7 +217,7 @@ if isfield(cpa,'ic_rank_max')
     var_ic_idx(cpa.ic_rank_max+1:end) = false;
 end
 good_ic_idx = true(size(clean_ica.label));
-good_ic_idx(SBJ_vars.ica_reject) = false;
+good_ic_idx([SBJ_vars.ica_reject, heog_ics, veog_ics]) = false;
 fprintf('%s: %d / %d components were kept in cleaning!\n',SBJ,sum(good_ic_idx),numel(good_ic_idx));
 
 final_ics = find(all([time_ic_idx, space_ic_idx, var_ic_idx, good_ic_idx],2));

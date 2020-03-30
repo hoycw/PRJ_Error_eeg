@@ -104,7 +104,7 @@ for t_ix = 1:numel(st_time_vec)
 end
 
 %% Plot Model Comparisons
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/model_compare_R2/' an_id '/' strjoin(stat_ids,'-') '/' null_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' strjoin(stat_ids,'-') '/' null_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
