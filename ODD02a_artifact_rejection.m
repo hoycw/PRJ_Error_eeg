@@ -164,7 +164,7 @@ if gen_figs
     xlabel('HEOG (r)');
     ylabel('VEOG (r)');
     legend('non-sig','sig','location','best');
-    eog_ic_fname = [SBJ_vars.dirs.preproc SBJ '_eog_ic_corr_' proc_id '.png'];
+    eog_ic_fname = [SBJ_vars.dirs.preproc SBJ '_eog_ic_corr_' odd_proc_id '.png'];
     saveas(gcf,eog_ic_fname);
 
     % Print EOG-ICA correlation results
