@@ -97,14 +97,14 @@ if strcmp(an.event_type,'S')
                 error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
         end
     end
-elseif strcmp(an.event_type,'F')
+elseif any(strcmp(an.event_type,{'F','R'}))
     evnt_times(1) = 0;
 else
     error('Unknown an.event_type');
 end
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' conditions '/' an_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' conditions '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end

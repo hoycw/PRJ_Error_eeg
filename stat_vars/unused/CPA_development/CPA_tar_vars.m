@@ -1,3 +1,4 @@
+fprintf(2,'This was the original CPA_vars.m\n');
 % Spatial Criteria
 cpa.elec_list = {'CPz','FCz', 'Fz', 'Cz'};
 cpa.elec_method = 'peak';                    % consider 'grubbs' as recommended by Wessel?

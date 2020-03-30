@@ -1,4 +1,4 @@
-function SBJ06a_CPA_prototype_selection(SBJ, proc_id, cpa_id,save_fig,varargin)
+function SBJ06a_CPA_prototype_selection(SBJ, proc_id, cpa_id, save_fig,varargin)
 %% Candidate-Prototype Analysis (CPA): Prototype Selection
 %   Selects top IC based on spatial (elec_list) and temporal (time_win)
 
@@ -40,8 +40,8 @@ cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars
 eval(cpa_vars_cmd);
 
 %% Load the data
-%loaded data from after SBJ02a --> already cleaned and trial segmented
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'],'ica'); %chose 02a - ica before rejection!
+% Load data from post-SBJ02a -->  ica before rejection, trial segmented, RT and training tossed
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'],'ica','heog_ics','veog_ics');
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat'],'bhv');
 load([SBJ_vars.dirs.events SBJ '_' proc_id '_02a_orig_exclude_trial_ix.mat']);
 
@@ -57,11 +57,35 @@ cfgs = [];
 cfgs.trials = setdiff([1:numel(ica.trial)], SBJ_vars.trial_reject_ix_oddball);
 clean_ica = ft_selectdata(cfgs, ica);
 
+%% ERP filtering for Temporal Criterion
+if cpa.erp_filt
+    an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' cpa.erp_an_id '_vars.m'];
+    eval(an_vars_cmd);
+    
+    % Select window and channels of interest
+    cfgs = [];
+    cfgs.latency = an.trial_lim_s;
+    roi = ft_selectdata(cfgs, clean_ica);
+    
+    % Preprocess Data for ERP
+    cfgpp = [];
+    cfgpp.hpfilter       = an.hp_yn;
+    cfgpp.hpfreq         = an.hp_freq;
+    cfgpp.hpfiltord      = an.hp_filtord; % Leaving blank causes instability error, 1 or 2 works
+    cfgpp.lpfilter       = an.lp_yn;
+    cfgpp.lpfreq         = an.lp_freq;
+    cfgpp.demean         = an.demean_yn;
+    cfgpp.baselinewindow = an.bsln_lim;
+    roi = ft_preprocessing(cfgpp, roi);
+else
+    roi = clean_ica;
+end
+
 %% Temporal Criteria: Condition Stats
 % Select stats epoch
 cfg = [];
 cfg.latency = cpa.time_win;
-st_ica = ft_selectdata(cfg,clean_ica);
+st_ica = ft_selectdata(cfg,roi);
 
 st_trials = cell([2 1]);
 for d_ix = 1:2
@@ -154,20 +178,36 @@ for comp_ix = 1:numel(st_ica.label)
     topo_pvals(comp_ix) = tmp_pval(1,2);
 end
 
+% Exclude single elec topos
+hi_idx = false(size(st_ica.label));
+lo_idx = false(size(st_ica.label));
+for comp_ix = 1:numel(st_ica.label)
+    topo_mean = mean(clean_ica.topo(:,comp_ix));
+    topo_sd   = std(clean_ica.topo(:,comp_ix));
+    hi_idx(comp_ix) = any(clean_ica.topo(:,comp_ix) > topo_mean+cpa.sd_thresh*topo_sd);
+    lo_idx(comp_ix) = any(clean_ica.topo(:,comp_ix) < topo_mean-cpa.sd_thresh*topo_sd);
+end
+
 % Combine spatial criteria
 if any(strcmp(cpa.elec_method,'peak'))
 	peak_idx = n_elec_match >= cpa.min_elec_match;
+    fprintf('%s: %d / %d components meet peak criterion\n',SBJ,sum(peak_idx),numel(clean_ica.label));
 else
     peak_idx = true;
 end
 if any(strcmp(cpa.elec_method,'topo_corr'))
 	topo_corr_idx = topo_pvals <= cpa.topo_pval;
+    fprintf('%s: %d / %d components meet topo corr criterion\n',SBJ,sum(topo_corr_idx),numel(clean_ica.label));
 else
-    topo_corr_idx = true;
+    topo_corr_idx = true(size(topo_pvals));
 end
-space_ic_idx = all([peak_idx, topo_corr_idx],2);
-fprintf('%s: %d / %d components meet peak criterion!\n',SBJ,sum(peak_idx),numel(clean_ica.label));
-fprintf('%s: %d / %d components meet topo corr criterion!\n',SBJ,sum(topo_corr_idx),numel(clean_ica.label));
+if any(strcmp(cpa.elec_method,'elec_outlier'))
+    outlier_idx = any([hi_idx lo_idx],2);
+    fprintf('%s: %d / %d components tossed for outlier topo weights\n',SBJ,sum(outlier_idx),numel(clean_ica.label));
+else
+    outlier_idx = false(size(hi_idx));
+end
+space_ic_idx = all([peak_idx, topo_corr_idx, ~outlier_idx],2);
 fprintf('%s: %d / %d components meet spatial criteria!\n',SBJ,sum(space_ic_idx),numel(clean_ica.label));
 
 %% Combine Criteria
@@ -177,7 +217,7 @@ if isfield(cpa,'ic_rank_max')
     var_ic_idx(cpa.ic_rank_max+1:end) = false;
 end
 good_ic_idx = true(size(clean_ica.label));
-good_ic_idx(SBJ_vars.ica_reject) = false;
+good_ic_idx([SBJ_vars.ica_reject, heog_ics, veog_ics]) = false;
 fprintf('%s: %d / %d components were kept in cleaning!\n',SBJ,sum(good_ic_idx),numel(good_ic_idx));
 
 final_ics = find(all([time_ic_idx, space_ic_idx, var_ic_idx, good_ic_idx],2));

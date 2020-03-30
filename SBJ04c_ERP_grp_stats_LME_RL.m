@@ -178,12 +178,7 @@ tic
 % Build Model Table
 tbl = table;
 for reg_ix = 1:numel(reg_lab)
-    %     if st.z_reg
-    %         tbl.(reg_lab{reg_ix}) = ...
-    %             (model(:,reg_ix)-nanmean(model(:,reg_ix)))./nanstd(model(:,reg_ix));
-    %     else
     tbl.(reg_lab{reg_ix}) = model(:,reg_ix);
-    %     end
 end
 tbl.SBJ = categorical(sbj_factor);
 
@@ -197,12 +192,6 @@ if strcmp(st.measure,'ts')
     pvals = nan([numel(reg_lab) numel(time_vec)]);
     for t_ix = 1:numel(time_vec)
         tbl.ERP = data(:,t_ix);
-        %     for grp_ix = 1:numel(st.factors)
-        %         if st.categorical(grp_ix)
-        %             tbl.(st.factors{grp_ix}) = categorical(tbl.(st.factors{grp_ix}));
-        %         end
-        %     end
-        
         lme{t_ix} = fitlme(tbl,formula);
         pvals(:,t_ix) = lme{t_ix}.Coefficients.pValue(2:end);
     end

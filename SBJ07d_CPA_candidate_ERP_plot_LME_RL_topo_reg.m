@@ -1,6 +1,6 @@
-function SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ07d_CPA_candidate_ERP_plot_LME_RL_topo_reg(SBJ_id,cpa_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots group RL beta topographies with significance for ERPs
-%   Only for single channel right now...
+% Plots group RL beta topos for CPA candidates with significance, also beta weights per regressor
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -55,14 +55,14 @@ if strcmp(st.measure,'ts')
 end
 
 %% Load Stats
-tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'SBJs');
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' cpa_id '_' an_id '.mat'],'SBJs');
 if ~all(strcmp(SBJs,tmp.SBJs))
     fprintf(2,'Loaded SBJs: %s\n',strjoin(tmp.SBJs,', '));
     error('Not all SBJs match input SBJ list!');
 end
 
-load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'lme','qvals','ch_list','reg_pk_time');
-if numel(ch_list)<64; error('Cannot plot opo wihtout full cap!'); end
+load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' cpa_id '_' an_id '.mat'],'lme','qvals','ch_list','reg_pk_time');
+if numel(ch_list)<64; error('Cannot plot topo without full cap!'); end
 
 % Get beta values and color limits
 clim  = zeros([1 2]);
@@ -84,13 +84,13 @@ topo.time   = reg_pk_time;
 topo.dimord = 'chan_time';
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' stat_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/CPA/candidate/' cpa_id '/' an_id '/' stat_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 % Create plot
-fig_name = [SBJ_id '_' stat_id '_' an_id];
+fig_name = [SBJ_id '_' stat_id '_' cpa_id '_' an_id];
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);   %this size is for single plots
 
@@ -103,8 +103,8 @@ cfgp.zlim     = clim;
 cfgp.layout   = 'biosemi64.lay';
 cfgp.colorbar = 'yes';
 cfgp.comment  = 'no';
-cfgp.highlight = 'on';
-cfgp.highlightsymbol = '*';
+% cfgp.highlight = 'on';
+% cfgp.highlightsymbol = '*';
 cfgp.maskparameter = 'mask';
 for reg_ix = 1:numel(reg_lab)
     subplot(num_rc(1),num_rc(2),reg_ix);
@@ -112,8 +112,8 @@ for reg_ix = 1:numel(reg_lab)
     
     % Plot Beta Topos
     topo.avg  = betas(reg_ix,:)';
-    ch_ix = 1:numel(topo.label);
-    cfgp.highlightchannel = ch_ix(qvals(reg_ix,:)'<=st.alpha);
+%     ch_ix = 1:numel(topo.label);
+%     topo.highlightchannel = ch_ix(qvals(reg_ix,:)'<=st.alpha);
     topo.mask = ones(size(topo.avg))*0.1;%zeros(size(topo.avg));
     topo.mask(qvals(reg_ix,:)'<=st.alpha) = 1;
     % cfgp.zlim = [min(betas(reg_ix,:)) max(betas(reg_ix,:))];

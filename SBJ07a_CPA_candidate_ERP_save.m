@@ -1,4 +1,4 @@
-function SBJ06d_CPA_candidate_ERP_save(SBJ,eeg_proc_id,odd_proc_id,an_id,cpa_id)
+function SBJ07a_CPA_candidate_ERP_save(SBJ,eeg_proc_id,odd_proc_id,an_id,cpa_id)
 %% Plot ERPs for single SBJ
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
@@ -49,9 +49,19 @@ cfg.neighbours = ft_prepare_neighbours(cfgn);
 
 full_recon = ft_channelrepair(cfg, recon);
 
+% Check for null channels (EEG17-23, EEG29)
+null_neg = {};
+for null_ix = 1:numel(SBJ_vars.ch_lab.null)
+    null_lab = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.null{null_ix} SBJ_vars.ch_lab.suffix];
+    if any(strcmp(full_recon.label,null_lab))
+        null_neg = [null_neg {['-' null_lab]}];
+    end
+end
+
 % Toss bad trials
 cfgs = [];
-cfgs.trials = setdiff([1:numel(full_recon.trial)], SBJ_vars.trial_reject_ix);
+cfgs.channel = [{'all'}, null_neg];
+cfgs.trials  = setdiff([1:numel(full_recon.trial)], SBJ_vars.trial_reject_ix);
 clean_trials = ft_selectdata(cfgs, full_recon);
 
 %% Select trials and epoch for plotting

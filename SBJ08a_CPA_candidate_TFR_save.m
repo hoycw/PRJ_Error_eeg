@@ -1,11 +1,8 @@
-function SBJ05a_TFR_save(SBJ, proc_id, an_id)
+function SBJ08a_CPA_candidate_TFR_save(SBJ, eeg_proc_id, odd_proc_id, cpa_id, an_id)
+% Reconstruct TFR of only Candidate ICs
 % Filter SBJ data to create time-frequency representation (TFR):
 %   Reconstruct and clean raw data, filter, cut trials to event, select channels, save
 %   If POW (an_avgoverfreq == 1), average across frequencies
-% INPUTS:
-%   SBJ [str] - ID of subject to run
-%   proc_id [str] - ID of preprocessing pipeline
-%   an_id [str] - ID of the analysis parameters to use
 % OUTPUTS:
 %   tfr [ft struct] - filtered data
 
@@ -22,17 +19,64 @@ ft_defaults
 %% Load Data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' eeg_proc_id '_vars.m'];
 eval(proc_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
+cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars.m'];
+eval(cpa_vars_cmd);
 
+%% Load BHV, ICA, reconstruct and clean
 % Load Behavioral Data
-load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
+load([SBJ_vars.dirs.events SBJ '_behav_' eeg_proc_id '_final.mat']);
 
-%% Load ICA, reconstruct and clean
-if numel(SBJ_vars.block_name)>2; error('not ready for 3+ blocks!'); end
-clean_data = fn_load_clean_experiment(SBJ, proc_id);
+% Load EEG Data
+load([SBJ_vars.dirs.preproc SBJ '_preproc_' eeg_proc_id '.mat'],'data','icaunmixing','icatopolabel');
+load([SBJ_vars.dirs.preproc SBJ '_' eeg_proc_id '_02a.mat'], 'heog_ics','veog_ics');
+load([SBJ_vars.dirs.proc SBJ '_' cpa_id '_' odd_proc_id '_prototype.mat']);
+
+% Rebuild ICs from full session data
+cfg           = [];
+cfg.unmixing  = icaunmixing;
+cfg.topolabel = icatopolabel;
+ica           = ft_componentanalysis(cfg, data);
+
+% Rebuild Data with Clean ICA Components
+cfg = [];
+cfg.component = setdiff(1:numel(ica.label),final_ics);
+cfg.demean = 'no';
+recon = ft_rejectcomponent(cfg, ica);
+
+% Repair Bad Channels
+cfg = [];
+cfg.method         = 'average';
+cfg.missingchannel = SBJ_vars.ch_lab.bad(:); % not in data (excluded from ica)
+cfg.layout         = 'biosemi64.lay';
+
+cfgn = [];
+cfgn.channel = 'all';
+cfgn.layout  = 'biosemi64.lay';
+cfgn.method  = 'template';
+cfg.neighbours = ft_prepare_neighbours(cfgn);
+
+full_recon = ft_channelrepair(cfg, recon);
+
+% Check for null channels (EEG17-23, EEG29)
+null_neg = {};
+for null_ix = 1:numel(SBJ_vars.ch_lab.null)
+    null_lab = [SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.null{null_ix} SBJ_vars.ch_lab.suffix];
+    if any(strcmp(full_recon.label,null_lab))
+        null_neg = [null_neg {['-' null_lab]}];
+    end
+end
+
+% Remove null if needed
+if ~isempty(null_neg)
+    fprintf(2,'Removing null channels: '); disp(null_neg);
+    cfgs = [];
+    cfgs.channel = [{'all'}, null_neg];
+    full_recon = ft_selectdata(cfgs, full_recon);
+end
 
 %% Determine Filter Padding
 %   At a minimum, trial_lim_s must extend 1/2*max(filter_window) prior to 
@@ -114,7 +158,7 @@ if any(cfg_trl.trl(:,1)<1)
 end
 
 % Cut trials
-trials = ft_redefinetrial(cfg_trl, clean_data);
+trials = ft_redefinetrial(cfg_trl, full_recon);
 
 % Check trial_lim_s is within trial time (round to avoid annoying computer math)
 if round(trial_lim_s_pad(1)+1/trials.fsample,3) < round(trials.time{1}(1),3) || ...
@@ -124,7 +168,7 @@ end
 
 %% Remove bad trials
 [bhv_orig] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
-load([SBJ_vars.dirs.events SBJ '_' proc_id '_02a_orig_exclude_trial_ix.mat']);
+load([SBJ_vars.dirs.events SBJ '_' eeg_proc_id '_02a_orig_exclude_trial_ix.mat']);
 fprintf(2,'\tWarning: Removing %d trials (%d bad_raw, %d training, %d rts)\n', numel(exclude_trials),...
     numel(bad_raw_trials), numel(training_ix), numel(rt_low_ix)+numel(rt_high_ix));
 
@@ -194,7 +238,7 @@ if an.avgoverfreq
 end
 
 %% Save Results
-data_out_fname = [SBJ_vars.dirs.proc SBJ '_' proc_id '_' an_id '.mat'];
+data_out_fname = [SBJ_vars.dirs.proc SBJ '_' eeg_proc_id '_' cpa_id '_' an_id '.mat'];
 fprintf('Saving %s\n',data_out_fname);
 save(data_out_fname,'-v7.3','tfr');
 

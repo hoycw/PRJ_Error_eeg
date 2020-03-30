@@ -1,5 +1,5 @@
-function SBJ05d_TFR_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_id)
-% Run Mixed-Effects Linear model on all SBJ and trials
+function SBJ08d_CPA_candidate_TFR_grp_stats_LME_RL(SBJ_id,proc_id,cpa_id,an_id,stat_id)
+% Run Mixed-Effects Linear model on candidate IC TFRs for all SBJ and trials
 %   Only for one channel now...
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
@@ -23,6 +23,8 @@ ft_defaults
 %% Load Data 
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);
+cpa_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' cpa_id '_vars.m'];
+eval(cpa_vars_cmd);
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
 eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
@@ -70,7 +72,7 @@ sbj_factor  = zeros([sum(n_trials) 1]);
 for s = 1:numel(SBJs)
     % Load data
     fprintf('========================== Processing %s ==========================\n',SBJs{s});
-    load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_' proc_id '_' an_id '.mat'],'tfr');
+    load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_' proc_id '_' cpa_id '_' an_id '.mat'],'tfr');
     if numel(tfr.label)>1; error('assuming single channel for now!'); end
     
     % Select time and trials of interest
@@ -128,12 +130,7 @@ tic
 % Build Model Table
 tbl = table;
 for reg_ix = 1:numel(reg_lab)
-    %     if st.z_reg
-    %         tbl.(reg_lab{reg_ix}) = ...
-    %             (model(:,reg_ix)-nanmean(model(:,reg_ix)))./nanstd(model(:,reg_ix));
-    %     else
     tbl.(reg_lab{reg_ix}) = model(:,reg_ix);
-    %     end
 end
 tbl.SBJ = categorical(sbj_factor);
 
@@ -147,13 +144,7 @@ if strcmp(st.measure,'ts')
     pvals = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
     for f_ix = 1:numel(fois)
         for t_ix = 1:numel(time_vec)
-            tbl.TFR = data(:,f_ix,t_ix);
-            %     for grp_ix = 1:numel(st.factors)
-            %         if st.categorical(grp_ix)
-            %             tbl.(st.factors{grp_ix}) = categorical(tbl.(st.factors{grp_ix}));
-            %         end
-            %     end
-            
+            tbl.TFR = data(:,f_ix,t_ix);            
             lme{f_ix,t_ix} = fitlme(tbl,formula);
             pvals(:,f_ix,t_ix) = lme{f_ix,t_ix}.Coefficients.pValue(2:end);
         end
@@ -191,7 +182,7 @@ stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
 if ~exist(stat_out_dir,'dir')
     [~] = mkdir(stat_out_dir);
 end
-stat_out_fname = [stat_out_dir SBJ_id '_' stat_id '_' an_id '.mat'];
+stat_out_fname = [stat_out_dir SBJ_id '_' stat_id '_' cpa_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
 save(stat_out_fname,'-v7.3','lme','qvals','SBJs');
 

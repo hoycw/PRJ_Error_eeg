@@ -13,13 +13,13 @@ eval(SBJ_vars_cmd);
 load([SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'],'data','icaunmixing','icatopolabel');
 load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'], 'heog_ics','veog_ics');
 
-%% Rebuild Data from ICA Components
+%% Rebuild Independent Components from Full Session Data
 cfg           = [];
 cfg.unmixing  = icaunmixing;
 cfg.topolabel = icatopolabel;
 ica           = ft_componentanalysis(cfg, data);
 
-%% Rebuild Data with Clean ICA Components
+%% Rebuild Data with Only Clean ICA Components
 cfg = [];
 cfg.component = unique([SBJ_vars.ica_reject, heog_ics, veog_ics]);
 cfg.demean = 'no';
