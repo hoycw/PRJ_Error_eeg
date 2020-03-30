@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';
+SBJ_id = 'good2';
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
 tmp = textscan(sbj_file,'%s');
 fclose(sbj_file);
@@ -31,9 +31,9 @@ end
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Main RL Model
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'RL3D_all_lme_st05t5'};
+stat_ids  = {'RL_all_lme_st05t5'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
-null_id   = 'SBJonly_all_lme_st0t5';
+null_id   = 'SBJonly_all_lme_st05t5';
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
@@ -42,7 +42,7 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+%         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
         SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
