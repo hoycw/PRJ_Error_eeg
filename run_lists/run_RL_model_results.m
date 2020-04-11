@@ -30,7 +30,7 @@ end
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 stat_ids  = {'RL_all_lme_st05t5'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
-null_id   = 'SBJonly_all_lme_st0t5';
+null_id   = 'SBJonly_all_lme_st05t5';
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
@@ -39,8 +39,9 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        % SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+
+%       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+    SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
 %     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);

@@ -10,8 +10,16 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
+<<<<<<< HEAD
 SBJ_id = 'goodall';
 SBJs = load_SBJ_file(SBJ_id);
+=======
+SBJ_id = 'good2';%'goodEEG';
+sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
+tmp = textscan(sbj_file,'%s');
+fclose(sbj_file);
+SBJs = tmp{1}; clear tmp;
+>>>>>>> fa78d68822e09830587ce6d033850dc2563ba55c
 
 %% Generate condition-specific topos
 conditions = 'Odd';
@@ -81,8 +89,7 @@ eeg_proc_id = 'eeg_full_ft';
 odd_proc_id = 'odd_full_ft';
 conditions  = 'DifFB';
 cpa_id      = 'CPA_main';
-an_ids      = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%{'ERP_Fz_S15t28_dm2t0_fl05t20','ERP_Pz_S15t28_dm2t0_fl05t20'};
-% an_ids      = {'POW_Fz_F2t1_dm2t0_fl4t8','POW_Pz_F2t1_dm2t0_fl1t3'};
+an_ids      = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 stat_id     = 'RL_all_lme_st05t5';
 save_fig    = 1;
 fig_vis     = 'on';
@@ -106,11 +113,11 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Group LME Stats
-    SBJ07c_CPA_candidate_ERP_GRP_stats_LME_RL(SBJ_id,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
+%     SBJ07c_CPA_candidate_ERP_GRP_stats_LME_RL(SBJ_id,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id);
     
     plt_id    = 'ts_F2to1_evnts_sigLine';
-%     SBJ07d_CPA_candidate_ERP_plot_LME_RL_fits(SBJ_id,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id,...
-%         plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ07d_CPA_candidate_ERP_plot_LME_RL_fits(SBJ_id,eeg_proc_id,cpa_id,an_ids{an_ix},stat_id,...
+        plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     %close all
 end
 
@@ -126,7 +133,7 @@ save_fig    = 1;
 fig_vis     = 'on';
 fig_ftype   = 'png';
 
-for st_ix = 2:numel(stat_ids)
+for st_ix = 1:numel(stat_ids)
     for s = 1:numel(SBJs)
         % Compute ERP for Candidate
         SBJ07a_CPA_candidate_ERP_save(SBJs{s},eeg_proc_id,odd_proc_id,an_id,cpa_id);
@@ -168,13 +175,36 @@ fig_ftype   = 'png';
 for an_ix = 1:numel(an_ids)
     % Compute TFRs
     for s = 1:numel(SBJs)
-        SBJ08a_CPA_candidate_TFR_save(SBJs{s}, eeg_proc_id, odd_proc_id, cpa_id, an_ids{s});
+%         SBJ08a_CPA_candidate_TFR_save(SBJs{s}, eeg_proc_id, odd_proc_id, cpa_id, an_ids{an_ix});
     end
     
     for st_ix = 1:numel(stat_ids)
-        SBJ08d_TFR_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ08e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
+        SBJ08d_CPA_candidate_TFR_grp_stats_LME_RL(SBJ_id,eeg_proc_id,cpa_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ08e_CPA_candidate_TFR_plot_stats_LME_RL_fits(SBJ_id,eeg_proc_id,cpa_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    end
+end
+
+%% Phase TFR: Linear Mixed Effects Model (Over Time-Frequency Phase)
+eeg_proc_id = 'eeg_full_ft';
+odd_proc_id = 'odd_full_ft';
+cpa_id      = 'CPA_main';
+an_ids      = {'PHS_Fz_F2t1_fl1t12'};
+stat_ids    = {'RL_all_lme_st0t5'};
+save_fig    = 1;
+fig_vis     = 'on';
+fig_ftype   = 'png';
+
+for an_ix = 1:numel(an_ids)
+    % Compute TFRs
+    for s = 1:numel(SBJs)
+        SBJ08a_CPA_candidate_TFR_save(SBJs{s}, eeg_proc_id, odd_proc_id, cpa_id, an_ids{an_ix});
+    end
+    
+    for st_ix = 1:numel(stat_ids)
+%         SBJ08d_CPA_candidate_TFR_grp_stats_LME_RL(SBJ_id,eeg_proc_id,cpa_id,an_ids{an_ix},stat_ids{st_ix});
+%         SBJ08e_CPA_candidate_TFR_plot_stats_LME_RL_fits(SBJ_id,eeg_proc_id,cpa_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
 end
 

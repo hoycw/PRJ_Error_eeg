@@ -5,6 +5,10 @@ function [labels, names, colors, line_styles] = fn_regressor_label_styles(model_
 %   add categorical 0/1 if becomes necessary
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
+if ~strcmp(model_id,'RL')
+    error('first paper should only be using RL!');
+end
+
 %% List of possible regressors and their colors
 regressors  = {...
     'pWin','bAcc','rAcc','rAcc10','score',... % Outcome predictors
@@ -30,9 +34,10 @@ regressor_names = {...
     'ITI', ...
     'SBJ' ...
     };
+% Colors with just RL model:
 regressor_colors = {...
-    [0 0 0], [0 0 0], [0 0 0], [0 0 0], [0.4 0.4 0.4],... % blacks, gray
-    [118 160 156]./255, [37 52 148]./255, ... % teal, dark blue
+    [209 151 105]./255, [0 0 0], [0 0 0], [0 0 0], [0.4 0.4 0.4],... % blacks, gray
+    [118 160 156]./255, [152 78 163]./255, ... % teal, dark blue
     [152 78 163]./255, [152 78 163]./255, [152 78 163]./255, ...% purple
     [247 104 161]./255,... % medium pink
     [247 129 191]./255, [247 129 191]./255, [247 129 191]./255, ...% pink
@@ -42,6 +47,20 @@ regressor_colors = {...
     [0.3 0.3 0.3], ...   % dark gray
     [0.3 0.3 0.3] ...   % dark gray
     };
+
+% Colors optimized for performance too:
+% regressor_colors = {...
+%     [0 0 0], [0 0 0], [0 0 0], [0 0 0], [0.4 0.4 0.4],... % blacks, gray
+%     [118 160 156]./255, [37 52 148]./255, ... % teal, dark blue
+%     [152 78 163]./255, [152 78 163]./255, [152 78 163]./255, ...% purple
+%     [247 104 161]./255,... % medium pink
+%     [247 129 191]./255, [247 129 191]./255, [247 129 191]./255, ...% pink
+%     [122 1 119]./255,... % dark purple
+%     [161 218 180]./255, [44 127 184]./255, ... % teal, medium blue
+%     [209 151 105]./255, [189 65 45]./255, ...%tan, red
+%     [0.3 0.3 0.3], ...   % dark gray
+%     [0.3 0.3 0.3] ...   % dark gray
+%     };
 
 %   Original Plots: {pWin, sPE, uPE, tRT (3x), lDist (3x)}
 % regressor_colors = {...

@@ -30,7 +30,7 @@ for s = 1:numel(SBJs)
     end
 end
 
-fprintf('%d / %d SBJs missing EOG ICs from SBJ_vars.ica_reject\n',sum(~eogs_missing),numel(SBJs));
-fprintf('SBJs with missing: '); disp(SBJs(~eogs_match)');
+fprintf('%d / %d SBJs missing EOG ICs from SBJ_vars.ica_reject\n',sum(eogs_missing),numel(SBJs));
+fprintf('SBJs with missing: '); disp(SBJs(eogs_missing)');
 fprintf('%d / %d SBJs mismatch between oddball and TT EOG ICs\n',sum(eog_diff),numel(SBJs));
 fprintf('SBJs with mismatch odd/TT EOG ICs: '); disp(SBJs(eog_diff)');

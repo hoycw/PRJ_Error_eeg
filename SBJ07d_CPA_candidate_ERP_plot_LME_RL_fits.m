@@ -160,7 +160,7 @@ for ch_ix = 1:numel(ch_list)
     fig_name = [SBJ_id '_' stat_id '_' cpa_id '_' an_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
+        'outerposition',[0 0 0.7 1],'Visible',fig_vis);   %this size is for single plots
     
     %% Plot ERPs with significance
     axes = gobjects([3 1]);
