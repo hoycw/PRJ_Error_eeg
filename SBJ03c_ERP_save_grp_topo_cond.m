@@ -19,10 +19,7 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 
 % Select SBJs
-sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
-tmp = textscan(sbj_file,'%s');
-fclose(sbj_file);
-SBJs = tmp{1}; clear tmp;
+SBJs = load_SBJ_file(SBJ_id);
 
 % Select conditions (and trials)
 [cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);

@@ -17,7 +17,9 @@ proc_id = 'eeg_full_ft';
 % tmp = textscan(sbj_file,'%s');
 % fclose(sbj_file);
 % SBJs = tmp{1}; clear tmp;
-SBJs = {'EEG13','EEG14','EEG15','EEG16','EEG17','EEG18','EEG19','EEG20','EEG21','EEG22','EEG23'};
+%% General parameters
+SBJ_id = 'goodEEG';
+SBJs = load_SBJ_file(SBJ_id);
 
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);

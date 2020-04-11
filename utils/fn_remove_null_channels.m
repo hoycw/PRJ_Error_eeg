@@ -14,7 +14,7 @@ ft_defaults
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
 eval(SBJ_vars_cmd);
 
-load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat']);
+load([SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat']);
 
 null_neg = cell(size(SBJ_vars.ch_lab.null));
 for null_ix = 1:numel(SBJ_vars.ch_lab.null)
@@ -23,8 +23,8 @@ end
 
 cfg = [];
 cfg.channel = [{'all'}, null_neg];
-trials = ft_selectdata(cfg, trials);
+clean_trials = ft_selectdata(cfg, clean_trials);
 
-clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_02a.mat'];
-save(clean_data_fname, '-v7.3', 'trials', 'cfg_trl', 'ica', 'heog_ics', 'veog_ics', 'eog_trials');
+clean_data_fname = [SBJ_vars.dirs.preproc SBJ '_' proc_id '_final.mat'];
+save(clean_data_fname, '-v7.3', 'clean_trials');
 end

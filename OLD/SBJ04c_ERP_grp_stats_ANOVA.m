@@ -283,12 +283,13 @@ end
 
 %% Plot results
 for ch_ix = 1:numel(ch_list)
+    fig_labels = {'Likely Win', 'Unlikely Loss', 'Unlikely Win', 'Likely Loss'};
     % Create and format the plot
     fig_name = ['GRP_violins_' stat_id '_' an_id '_' ch_list{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
     
-    violins = violinplot(squeeze(data(:,:,ch_ix))', cond_lab, ...
+    violins = violinplot(squeeze(data(:,:,ch_ix))', fig_labels, ...
         'ShowMean', true, 'ViolinAlpha', 0.3);
     
     for cond_ix = 1:numel(cond_lab)

@@ -44,10 +44,7 @@ plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.
 eval(plt_vars_cmd);
 
 % Select SBJs
-sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
-tmp = textscan(sbj_file,'%s');
-fclose(sbj_file);
-SBJs = tmp{1}; clear tmp;
+SBJs = load_SBJ_file(SBJ_id);
 
 sts = cell(size(stat_ids));
 for st_ix = 1:numel(stat_ids)

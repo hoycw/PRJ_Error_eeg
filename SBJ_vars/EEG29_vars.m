@@ -52,9 +52,9 @@ SBJ_vars.ch_lab.prefix  = '';    % before every channel
 SBJ_vars.ch_lab.suffix  = '';    % after every channel
 SBJ_vars.ch_lab.trigger = 'Status';
 SBJ_vars.ch_lab.bad     = {'FC4', 'P3', 'P5'};
-SBJ_vars.trial_reject_ix = [4, 277, 347, 299, 334, 466, 471, 472];
-SBJ_vars.trial_reject_ix_oddball = [173, 208, 242];
-SBJ_vars.ica_reject = [2, 6, 8, 9, 10, 12, 13, 16, 17, 18, 19, 20, 21, 24, 25, 27, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 43, 45, 44, 49, 52, 53, 54, 55, 56, 57:62];
+SBJ_vars.trial_reject_ix = [277, 347, 334, 471, 472];
+SBJ_vars.trial_reject_ix_oddball = [173];
+SBJ_vars.ica_reject = [2, 5, 7, 9, 10, 13, 16, 18, 19, 20, 21, 22, 23, 25, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 45, 44, 46, 47, 48, 49, 52, 53, 54, 55, 56, 57:61];
 SBJ_vars.odd_trigger_ix = 404;
 SBJ_vars.tt_trigger_ix = 3;
 % Maybe redo -- weird oscillatory stuff!!!

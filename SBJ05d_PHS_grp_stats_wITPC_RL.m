@@ -33,10 +33,7 @@ eval(stat_vars_cmd);
 if ~strcmp(st.an_style,'wITPC'); error('stat_id not using wITPC!'); end
 
 % Select SBJs
-sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
-tmp = textscan(sbj_file,'%s');
-fclose(sbj_file);
-SBJs = tmp{1}; clear tmp;
+SBJs = load_SBJ_file(SBJ_id);
 
 % Select conditions (and trials)
 model_id = [st.model_lab '_' st.trial_cond{1}];

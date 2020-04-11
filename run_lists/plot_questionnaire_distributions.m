@@ -18,26 +18,10 @@ maybe_id = 'maybe';
 bad_id   = 'bad';
 
 root_dir = '/Volumes/hoycw_clust/';
-sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
-tmp = textscan(sbj_file,'%s');
-fclose(sbj_file);
-SBJs = tmp{1}; clear tmp;
-
-good_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' good_id '.sbj']);
-tmp = textscan(good_file,'%s');
-fclose(good_file);
-good_SBJs = tmp{1}; clear tmp;
-
-maybe_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' maybe_id '.sbj']);
-tmp = textscan(maybe_file,'%s');
-fclose(maybe_file);
-maybe_SBJs = tmp{1}; clear tmp;
-
-bad_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' bad_id '.sbj']);
-tmp = textscan(bad_file,'%s');
-fclose(bad_file);
-bad_SBJs = tmp{1}; clear tmp;
-
+SBJs = load_SBJ_file(SBJ_id);
+good_SBJs = load_SBJ_file(good_id);
+maybe_SBJs = load_SBJ_file(maybe_id);
+bad_SBJs = load_SBJ_file(bad_id);
 
 % SBJs = {'EP06','EP07','EP08','EP09','EP10',...
 %     'EP11','EP14','EP15','EP16','EP17','EP18','EP19',...

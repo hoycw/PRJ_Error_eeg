@@ -52,7 +52,7 @@ stat_conds = {'EzOutS','HdOutS'};%'DifOut','DifFB'};%,'DifOutS'};
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'svg';
-
+SBJ_id = 'goodall';
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_conds)
         plt_id     = 'ts_F2to1_evnts_sigLine';
@@ -61,7 +61,7 @@ for an_ix = 1:numel(an_ids)
         %         SBJ03b_ERP_plot(SBJs{s},stat_conds{st_ix},proc_id,an_id,plt_id,save_fig,...
         %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         %     end
-        SBJ03c_ERP_plot_grp(SBJs,stat_conds{st_ix},proc_id,an_ids{an_ix},plt_id,save_fig,...
+         SBJ03c_ERP_plot_grp(SBJ_id,stat_conds{st_ix},proc_id,an_ids{an_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
         %     plt_id = 'ts_F2to1_but_evnts_sigPatch';

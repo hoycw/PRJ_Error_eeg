@@ -57,10 +57,7 @@ if ~strcmp(st.measure,'p2p') || ~strcmp(st.grp_method,'jackknife')
 end
 
 % Select SBJs
-sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
-tmp = textscan(sbj_file,'%s');
-fclose(sbj_file);
-SBJs = tmp{1}; clear tmp;
+SBJs = load_SBJ_file(SBJ_id);
 
 % Select Conditions of Interest
 [grp_lab, ~, ~, ~] = fn_group_label_styles(st.model_lab);

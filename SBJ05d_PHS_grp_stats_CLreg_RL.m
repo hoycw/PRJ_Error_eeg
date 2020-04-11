@@ -32,10 +32,7 @@ eval(stat_vars_cmd);
 if ~strcmp(st.an_style,'CLreg'); error('stat_id not using circular-linear regression!'); end
 
 % Select SBJs
-sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
-tmp = textscan(sbj_file,'%s');
-fclose(sbj_file);
-SBJs = tmp{1}; clear tmp;
+SBJs = load_SBJ_file(SBJ_id);
 
 % Select conditions (and trials)
 model_id = [st.model_lab '_' st.trial_cond{1}];
@@ -181,6 +178,6 @@ if ~exist(stat_out_dir,'dir')
 end
 stat_out_fname = [stat_out_dir SBJ_id '_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','betas','r2s','qvals','SBJs');
+save(stat_out_fname,'-v7.3','betas','r2s','qvals','data', 'model', 'SBJs');
 
 end

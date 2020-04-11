@@ -10,11 +10,8 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good2';
-sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);
-tmp = textscan(sbj_file,'%s');
-fclose(sbj_file);
-SBJs = tmp{1}; clear tmp;
+SBJ_id = 'goodall';
+SBJs = load_SBJ_file(SBJ_id);
 
 %% Run preprocessing
 proc_id_ica = 'eeg_full_ft';
@@ -48,7 +45,7 @@ for an_ix = 1%:numel(an_ids)
     for s = 1:numel(SBJs)
         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
 %         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%               'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %         SBJ03b_ERP_plot_butterfly(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %         SBJ03b_ERP_plot_stack(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
@@ -64,7 +61,7 @@ for an_ix = 1%:numel(an_ids)
 end
 
 %% ERPs: Full Cap Topography
-an_id      = 'ERP_all_F2t1_dm2t0_fl05t20';
+an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
 
 proc_id    = 'eeg_full_ft';
 conditions = 'DifFB';
