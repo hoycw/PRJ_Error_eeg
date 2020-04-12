@@ -1,4 +1,5 @@
-function group_accuracy_plots(SBJ_id, proc_id)
+function group_accuracy_plots_TT(SBJ_id, proc_id)
+% Plots group accuracy for TT Task as a bar plot
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';

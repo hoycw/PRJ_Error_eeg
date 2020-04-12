@@ -1,5 +1,5 @@
 function SBJ05e_PHS_plot_stats_CLreg_RL_rose_plot(SBJ_id,proc_id,an_id,stat_id,save_fig)
-%% Plot group TFRs per regressor: circular-linear correlations outlined by significance
+%% Plot rose plot of phase values at both max and min TFR tiles
 %   Only for single channel right now...
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -94,7 +94,7 @@ for cond_ix = 1:size(betas,1)
             rho_norm = matrix_mean_vector(cond_ix, tfr_ix, pe_ix, 2) * range(rL) + rL(1);
             hold on
             polarplot([matrix_mean_vector(cond_ix, tfr_ix, pe_ix, 1) matrix_mean_vector(cond_ix, tfr_ix, pe_ix, 1)], [0 rho_norm], 'Color', 'k');
-            title(titles{(2*tfr_ix+pe_ix)-2});
+            title([titles{(2*tfr_ix+pe_ix)-2} ' Frequency: '  num2str(matrix_tfr_tiles(cond_ix, tfr_ix, 1)) ' Time Vec: ' num2str(matrix_tfr_tiles(cond_ix, tfr_ix, 2))]);
         end
     end
     if save_fig

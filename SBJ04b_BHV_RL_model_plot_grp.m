@@ -1,4 +1,5 @@
 function SBJ04b_BHV_RL_model_plot_grp(SBJ_id,proc_id,stat_id, varargin)
+% Plots Group Level RL Model Fits (Rereferenced to the midpoint y value and not), as well as the correlation between the Model Fit and several behavioral parameters
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
@@ -138,7 +139,7 @@ ylabel('Accuracy');
 set(gca,'FontSize',14);
 hold on
 %}
-%% Normalized Y Values
+%% Normalized X Values
 fig_name_aligned = ['GRP_BHV_acc_' model_id '_pWin_Aligned'];
 fig_aligned = figure('Name',fig_name_aligned,'Visible',fig_vis);
 title('GRP Level Accuracy vs. Tolerance -- Rereferenced');
