@@ -84,6 +84,56 @@ else
     n_runs = 1;
 end
 
+%% Compute Reward Value, Likelihood, and Magnitude
+RVal = nan(size(bhv.trl_n));
+RLik = nan(size(bhv.trl_n));
+RMag = nan(size(bhv.trl_n));
+for cond_ix = 1:numel(cond_lab)
+    idx = logical(fn_condition_index(cond_lab(cond_ix),bhv));
+    switch cond_lab{cond_ix}
+        case 'EzWn'
+            RVal(idx) = 1;
+            RLik(idx) = 1;
+            RMag(idx) = 1;
+        case 'EzLs'
+            RVal(idx) = -1;
+            RLik(idx) = 0;
+            RMag(idx) = 1;
+        case 'EzSu'
+            RVal(idx) = 0;
+            RLik(idx) = 0;
+            RMag(idx) = 0;
+        case 'HdWn'
+            RVal(idx) = 1;
+            RLik(idx) = 0;
+            RMag(idx) = 1;
+        case 'HdLs'
+            RVal(idx) = -1;
+            RLik(idx) = 1;
+            RMag(idx) = 1;
+        case 'HdSu'
+            RVal(idx) = 0;
+            RLik(idx) = 0;
+            RMag(idx) = 0;
+        otherwise
+            error(['Unknown trial type: ' cond_lab{cond_ix}]);
+    end
+end
+
+%% Compute Outcome Likelihood
+OLik = nan(size(bhv.trl_n));
+for cond_ix = 1:numel(cond_lab)
+    idx = fn_condition_index(cond_lab(cond_ix),bhv);
+    if strcmp(cond_lab{cond_ix}(1:2),'Ez')
+        n_trls = sum(strcmp('easy',bhv.cond));
+    elseif strcmp(cond_lab{cond_ix}(1:2),'Hd')
+        n_trls = sum(strcmp('hard',bhv.cond));
+    else
+        error('Neither Ez nor Hd, what is it?');
+    end
+    OLik(logical(idx)) = sum(idx)/n_trls;
+end
+
 %% Compute Win Prediction
 s_idx = fn_condition_index({'Su'},bhv);
 if any(strcmp(reg_lab,'pWin'))
@@ -155,8 +205,8 @@ elseif any(strcmp(reg_lab,'rAcc'))
 end
 
 %% Compute Prediction Errors
-sPE = double(bhv.score)/100 - expected_score;
-uPE = abs(sPE);
+sRPE = double(bhv.score)/100 - expected_score;
+uRPE = abs(sRPE);
 
 %% Compute total score
 if any(strcmp(reg_lab,'score'))    

@@ -1,6 +1,6 @@
 % Stat Parameters
 st.an_style    = 'CLcorr';
-st.model_lab   = 'RL';
+st.model_lab   = 'RPE';
 st.z_reg       = 1;                 % 0/1: zscore regressors?
 st.trial_cond  = {'DifFB'};
 st.stat_lim    = [0 0.5];            % window in SEC for stats
