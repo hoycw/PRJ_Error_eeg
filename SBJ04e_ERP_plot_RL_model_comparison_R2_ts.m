@@ -1,5 +1,6 @@
-function SBJ04e_ERP_plot_RL_model_comparison(SBJ_id,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
-% Plots AIC model fits across different RL models
+function SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
+% Plots Adjusted R2 model fits across different RL models for time series
+%   if null_id is not empty (''), subtract off R2 for that stat_id
 %   Only for single channel right now...
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -19,11 +20,11 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-        elseif strcmp(varargin{v},'plot_null')
-            plot_null = varargin{v+1};
-%         elseif strcmp(varargin{v},'r2_version')
-%             % 'Ordinary' or 'Adjusted' (default)
-%             r2_version = varargin{v+1};
+        elseif strcmp(varargin{v},'rm_null')
+            rm_null = varargin{v+1};
+        elseif strcmp(varargin{v},'r2_version')
+            % 'Ordinary' or 'Adjusted' (default)
+            r2_version = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -33,8 +34,8 @@ end
 % Define default options
 if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
-if ~exist('plot_null','var'); plot_null = 1; end
-% if ~exist('r2_version','var'); r2_version = 'Adjusted'; end
+if ~exist('rm_null','var'); rm_null = 1; end
+if ~exist('r2_version','var'); r2_version = 'Adjusted'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
@@ -69,10 +70,10 @@ eval(stat_vars_cmd);
 null_st = st;
 
 if any(sts{1}.stat_lim ~= null_st.stat_lim)
-    error('null_st.stat_lim not aligned!');
+    error('st.stat_lim not aligned!');
 end
 if ~strcmp(sts{1}.measure, null_st.measure)
-    error('null_st.measure not the same!');
+    error('st.measure not the same!');
 end
 clear st stat_vars_cmd
 
@@ -93,10 +94,10 @@ for st_ix = 1:numel(stat_ids)
 end
 
 % Load null model
-null_aic = zeros(size(st_time_vec));
+null_r2 = zeros(size(st_time_vec));
 tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' null_id '_' an_id '.mat']);
 for t_ix = 1:numel(st_time_vec)
-    null_aic(t_ix) = tmp.lme{t_ix}.ModelCriterion.AIC;
+    null_r2(t_ix) = tmp.lme{t_ix}.Rsquared.(r2_version);
 end
 
 %% Plot Model Comparisons
@@ -108,64 +109,65 @@ end
 % Create a figure for each channel
 for ch_ix = 1:numel(ch_list)
     %% Compute plotting data    
-    % Collect AIC
-    aics = NaN([numel(stat_ids) numel(st_time_vec)]);
-    mean_aic = NaN(size(stat_ids));
-    for st_ix = 1:numel(stat_ids)
-        for t_ix = 1:numel(st_time_vec)
-            aics(st_ix,t_ix) = lmes{st_ix,t_ix}.ModelCriterion.AIC;
-        end
-        mean_aic(st_ix) = nanmean(aics(st_ix,:));
-    end
-    
-    % Compute relative likelihoods
-    aic_min = min(mean_aic);
-    rel_lik = nan(size(stat_ids));
+    % Compute means and variance
+    r2s = NaN([numel(stat_ids) numel(st_time_vec)]);
+    mean_r2 = NaN(size(stat_ids));
     st_leg  = cell(size(stat_ids));
     for st_ix = 1:numel(stat_ids)
-        rel_lik(st_ix) = exp((aic_min-mean_aic(st_ix))/2);
-        st_leg{st_ix} = [stat_ids{st_ix} ' (mean=' num2str(round(mean_aic(st_ix)))...
-            '; RL=' num2str(rel_lik(st_ix),'%.2f') ')'];
+        for t_ix = 1:numel(st_time_vec)
+            if rm_null
+                r2s(st_ix,t_ix) = lmes{st_ix,t_ix}.Rsquared.(r2_version)-null_r2(t_ix);
+            else
+                r2s(st_ix,t_ix) = lmes{st_ix,t_ix}.Rsquared.(r2_version);
+            end
+        end
+        mean_r2(st_ix) = nanmean(r2s(st_ix,:));
+        st_leg{st_ix} = [stat_ids{st_ix} ' (mean=' num2str(mean_r2(st_ix),'%.3f') ')'];
     end
-    
-    % Compute for null model
-    mean_aic_null = nanmean(null_aic);
-    rel_lik_null = exp((aic_min-mean_aic_null)/2);
-    null_leg = [null_id ' (mean=' num2str(round(mean_aic_null)) ...
-            '; RL=' num2str(rel_lik_null,'%.2f') ')'];
+    mean_r2_null = nanmean(null_r2);
+    null_leg = [null_id ' (mean=' num2str(mean_r2_null,'%.3f') ')'];
     
     %% Create plot
-    fig_name = [SBJ_id '_RL_AIC_comparison_' an_id];
-    if plot_null
-        fig_name = [fig_name '_null'];
+    if strcmp(r2_version,'Ordinary')
+        fig_name = [SBJ_id '_RL_R2ord_comparison_' an_id];
+    else
+        fig_name = [SBJ_id '_RL_R2adj_comparison_' an_id];
+    end
+    if rm_null
+        fig_name = [fig_name '_rmnull'];
     end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
     
-    %% Plot AIC
+    %% Plot R2
     ax = gca; hold on;
     
     % Plot Means (and variance)
     main_lines = gobjects(size(stat_ids));
     for st_ix = 1:numel(stat_ids)
-        main_lines(st_ix) = line(st_time_vec, aics(st_ix,:),...
+        main_lines(st_ix) = line(st_time_vec, r2s(st_ix,:),...
             'Color',st_colors(st_ix,:),'LineWidth',2);
     end
-    if plot_null
-        main_lines(end+1) = plot(st_time_vec, null_aic,...
+    if ~rm_null
+        main_lines(end+1) = plot(st_time_vec, null_r2,...
             'Color', [0.4 0.4 0.4], 'LineStyle', '--');
         st_leg = [st_leg null_leg];
     end
     ylims = ylim;
     
     % Axes and Labels
-    ax.YLabel.String = 'AIC';
+    ax.YLabel.String = [r2_version ' R2'];
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';
-    title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')']);
+    if rm_null
+        %title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) '; -' null_id ')'],'Interpreter','none');
+        title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) '); SBJ null removed']);
+    else
+        title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')']);
+    end
     if plt.legend
-        legend(main_lines,st_leg,'Location','best','Interpreter','none');%plt.legend_loc
+        legend(main_lines,st_leg,'Location',plt.legend_loc,'Interpreter','none');
     end
     set(gca,'FontSize',16);
     

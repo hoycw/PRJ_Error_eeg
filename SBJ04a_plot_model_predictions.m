@@ -4,14 +4,14 @@ cond_lab = {'Likely Win', 'Unlikely Neu', 'Unlikely Loss', 'Unlikely Win', 'Unli
 
 % Categorical Reward
 exp_value   = [1 1 1 -1 -1 -1];
-value_cat   = [1 nan 0 1 nan 0];
-value       = [1 0 -1 1 0 -1];
+valence_cat   = [1 nan 0 1 nan 0];
+valence       = [1 0 -1 1 0 -1];
 magnitude   = [1 0 1 1 0 1];
-interaction = exp_value .* value;
+interaction = exp_value .* valence;
 
 % Continuous Reward Prediction Error
 rp      = [0.6 0.6 0.6 -0.6 -0.6 -0.6];
-rpe     = value - rp;
+rpe     = valence - rp;
 rpe_mag = abs(rpe);
 
 % Categorical Likelihood
@@ -25,9 +25,9 @@ fig_name  = 'model_prediction_comparison';
 fig_ftype = 'png';
 figure('Name',fig_name,'units','normalized','OuterPosition',[0 0 1 1]);
 
-value_color = [209 151 105]./255;
-value_style = '-';
-value_mark  = 's';
+valence_color = [209 151 105]./255;
+valence_style = '-';
+valence_mark  = 's';
 
 mag_color = [118 160 156]./255;
 mag_style = ':';
@@ -66,8 +66,8 @@ xlim([0 7]);
 ylim([-0.3 1.1]);
 yticks([0 1]);
 
-tmp1 = plot(easy_idx_nn, value_cat(easy_idx_nn), 'Color', value_color, 'LineStyle', value_style, 'LineWidth', width, 'Marker', value_mark);
-plot(hard_idx_nn, value_cat(hard_idx_nn), 'Color', value_color, 'LineStyle', value_style, 'LineWidth', width, 'Marker', value_mark);
+tmp1 = plot(easy_idx_nn, valence_cat(easy_idx_nn), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
+plot(hard_idx_nn, valence_cat(hard_idx_nn), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
 
 tmp2 = plot(easy_idx_nn+offset, magnitude(easy_idx_nn), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
 plot(hard_idx_nn+offset, magnitude(hard_idx_nn), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
@@ -78,8 +78,8 @@ plot(hard_idx_nn+2*offset, lik_cat(hard_idx_nn), 'Color', lik_color, 'LineStyle'
 % tmp4 = plot(easy_idx_nn+3*offset, interaction(easy_idx_nn), 'Color', alt_color, 'LineStyle', alt_style, 'LineWidth', width, 'Marker', alt_mark);
 % plot(hard_idx_nn+3*offset, interaction(hard_idx_nn), 'Color', alt_color, 'LineStyle', alt_style, 'LineWidth', width, 'Marker', alt_mark);
 
-legend([tmp1 tmp2 tmp3], {'Reward Value','Reward Magnitude','Reward Likelihood'}, 'Location','southwest');
-% legend([tmp1 tmp2 tmp3 tmp4], {'Value','Magnitude','Likelihood','Interaction'}, 'Location','southwest');
+legend([tmp1 tmp2 tmp3], {'Reward Valence','Reward Magnitude','Reward Likelihood'}, 'Location','southwest');
+% legend([tmp1 tmp2 tmp3 tmp4], {'Valence','Magnitude','Likelihood','Interaction'}, 'Location','southwest');
 [~] = fn_min_white_space(gca);
 
 %--------------------- Binary Outcomes: Prediction Errors ---------------------
@@ -93,8 +93,8 @@ xlim([0 7]);
 ylim([-2.1 2.1]);
 yticks([-2:1:2]);
 
-tmp1 = plot(easy_idx_nn, rpe(easy_idx_nn), 'Color', value_color, 'LineStyle', value_style, 'LineWidth', width, 'Marker', value_mark);
-plot(hard_idx_nn, rpe(hard_idx_nn), 'Color', value_color, 'LineStyle', value_style, 'LineWidth', width, 'Marker', value_mark);
+tmp1 = plot(easy_idx_nn, rpe(easy_idx_nn), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
+plot(hard_idx_nn, rpe(hard_idx_nn), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
 
 tmp2 = plot(easy_idx_nn+offset, rpe_mag(easy_idx_nn), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
 plot(hard_idx_nn+offset, rpe_mag(hard_idx_nn), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
@@ -116,8 +116,8 @@ xlim([0 7]);
 ylim([-1.6 1.1]);
 yticks([-1 0 1]);
 
-tmp1 = plot(easy_idx, value(easy_idx), 'Color', value_color, 'LineStyle', value_style, 'LineWidth', width, 'Marker', value_mark);
-plot(hard_idx, value(hard_idx), 'Color', value_color, 'LineStyle', value_style, 'LineWidth', width, 'Marker', value_mark);
+tmp1 = plot(easy_idx, valence(easy_idx), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
+plot(hard_idx, valence(hard_idx), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
 
 tmp2 = plot(easy_idx+offset, magnitude(easy_idx), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
 plot(hard_idx+offset, magnitude(hard_idx), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
@@ -128,8 +128,8 @@ plot(hard_idx+2*offset, lik_cat(hard_idx), 'Color', lik_color, 'LineStyle', lik_
 % tmp4 = plot(easy_idx+3*offset, interaction(easy_idx), 'Color', 'r', 'LineStyle', alt_style, 'LineWidth', width, 'Marker', alt_mark);
 % plot(hard_idx+3*offset, interaction(hard_idx), 'Color', 'r', 'LineStyle', alt_style, 'LineWidth', width, 'Marker', alt_mark);
 
-legend([tmp1 tmp2 tmp3], {'Reward Value','Reward Magnitude','Reward Likelihood'}, 'Location','southwest');
-% legend([tmp1 tmp2 tmp3 tmp4], {'Value','Magnitude','Likelihood', 'Interaction'}, 'Location','southwest');
+legend([tmp1 tmp2 tmp3], {'Reward Valence','Reward Magnitude','Reward Likelihood'}, 'Location','southwest');
+% legend([tmp1 tmp2 tmp3 tmp4], {'Valence','Magnitude','Likelihood', 'Interaction'}, 'Location','southwest');
 [~] = fn_min_white_space(gca);
 
 %--------------------- All Outcomes: Prediction Errors ---------------------
@@ -143,8 +143,8 @@ xlim([0 7]);
 ylim([-2.1 2.1]);
 yticks([-2:1:2]);
 
-tmp1 = plot(easy_idx, rpe(easy_idx), 'Color', value_color, 'LineStyle', value_style, 'LineWidth', width, 'Marker', value_mark);
-plot(hard_idx, rpe(hard_idx), 'Color', value_color, 'LineStyle', value_style, 'LineWidth', width, 'Marker', value_mark);
+tmp1 = plot(easy_idx, rpe(easy_idx), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
+plot(hard_idx, rpe(hard_idx), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
 
 tmp2 = plot(easy_idx+offset, rpe_mag(easy_idx), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
 plot(hard_idx+offset, rpe_mag(hard_idx), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
@@ -155,7 +155,7 @@ legend([tmp1 tmp2 tmp3], {'RPE','RPE Salience','Outcome Likelihood'}, 'Location'
 [~] = fn_min_white_space(gca);
 
 %% Save figure
-fig_dir = [root_dir 'PRJ_Error_eeg/results/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/model_predictions/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end

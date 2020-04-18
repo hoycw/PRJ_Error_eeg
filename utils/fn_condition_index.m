@@ -16,6 +16,8 @@ end
 condition_n = zeros(size(bhv.trl_n));
 for cond_ix = 1:numel(cond_lab)
     switch cond_lab{cond_ix}
+        case 'All'
+            condition_n = ones(size(condition_n));
         case 'Ez'
             condition_n(strcmp('easy',bhv.cond)) = cond_ix;
         case 'Hd'
@@ -45,6 +47,13 @@ for cond_ix = 1:numel(cond_lab)
         case 'HdSu'
             matches = logical(strcmp('hard',bhv.cond)) & strcmp(bhv.fb,'S');
             condition_n(matches) = cond_ix;
+            
+        case 'Pos'
+            matches = fn_condition_index({'EzWn','HdWn','HdSu'}, bhv);
+            condition_n(matches~=0) = cond_ix;
+        case 'Neg'
+            matches = fn_condition_index({'EzLs','HdLs','EzSu'}, bhv);
+            condition_n(matches~=0) = cond_ix;
         
         case 'Er'
             warning('WARNING!!! Assuming target_time = 1 sec...');

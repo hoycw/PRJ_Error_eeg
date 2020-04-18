@@ -1,6 +1,6 @@
-function SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_id)
-% Run Mixed-Effects Linear model on all SBJ and trials
-%   Only for one channel now...
+function SBJ04c_ERP_grp_stats_GLM_P2P(SBJ_id,proc_id,an_id,stat_id)
+% Run GLM model on all SBJ and trials
+%   Should only be used for peak-to-peak RVLM models! (LME for all others)
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
 %   proc_id [str] - ID of preprocessing pipeline
@@ -60,36 +60,21 @@ for s = 1:numel(SBJs)
 end
 
 %% Load Peak Timing Information
-if strcmp(st.measure,'mean') && isfield(st,'pk_an_id')
-    if all(isfield(st,{'pk_trial_cond','pk_erp_cond','pk_lim','pk_sign'}))    % ERP peak
-        % Load ERP
-        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_trial_cond '_' st.pk_an_id '.mat']);
-        
-        % Select Time Windows
-        [pk_cond_lab] = fn_condition_label_styles(st.pk_trial_cond);
-        cfgs = []; cfgs.latency = st.pk_lim;
-        st_erp = ft_selectdata(cfgs,tmp.er_grp{strcmp(pk_cond_lab,st.pk_erp_cond)});
-        
-        % Obtain peak times in window
-        pk_ts = st_erp.avg;
-        [~,pk_ix] = max(pk_ts*st.pk_sign);
-        reg_pk_time = st_erp.time(pk_ix);
-    elseif all(isfield(st,{'pk_reg_id','pk_stat_id'}))   % regression beta peak
-        % Load previous stats
-        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_stat_id '_' st.pk_an_id '.mat']);
-        if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
-            error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
-        end
-        
-        % Obtain peak times for target regressor
-        reg_ix = find(strcmp(reg_lab,st.pk_reg_id));
-        pk_ts = nan(size(tmp.time_vec));
-        for t_ix = 1:numel(tmp.time_vec)
-            pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);
-        end
-        [~,pk_ix] = max(abs(pk_ts));
-        reg_pk_time = tmp.time_vec(pk_ix);
+if strcmp(st.measure,'mean') && all(isfield(st,{'pk_reg_id','pk_stat_id','pk_an_id'}))
+    % Load previous stats
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_stat_id '_' st.pk_an_id '.mat']);
+    if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
+        error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
     end
+    
+    % Obtain peak times for target regressor
+    reg_ix = find(strcmp(reg_lab,st.pk_reg_id));
+    pk_ts = nan(size(tmp.time_vec));
+    for t_ix = 1:numel(tmp.time_vec)
+        pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);
+    end
+    [~,pk_ix] = max(abs(pk_ts));
+    reg_pk_time = tmp.time_vec(pk_ix);
     st.stat_lim = st.stat_lim+reg_pk_time;
 else
     reg_pk_time = nan;
@@ -136,7 +121,7 @@ for s = 1:numel(SBJs)
                 (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
         end
     else
-        sbj_model = tmp.model;
+        sbj_model = model;
     end
     model(sbj_idx,:) = sbj_model;
     
