@@ -1,4 +1,4 @@
-function SBJs = load_SBJ_file(SBJ_id)
+function SBJs = fn_load_SBJ_list(SBJ_id)
 
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';

@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 SBJ_id = 'goodall';
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';

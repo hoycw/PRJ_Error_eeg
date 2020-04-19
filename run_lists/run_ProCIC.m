@@ -12,7 +12,7 @@ ft_defaults
 %% General parameters
 <<<<<<< HEAD
 SBJ_id = 'goodall';
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 =======
 SBJ_id = 'good2';%'goodEEG';
 sbj_file = fopen([root_dir 'PRJ_Error_EEG/scripts/SBJ_lists/' SBJ_id '.sbj']);

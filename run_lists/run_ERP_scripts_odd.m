@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 SBJ_id = 'goodEEG';
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Run preprocessing
 % proc_id = 'odd_full_ft';

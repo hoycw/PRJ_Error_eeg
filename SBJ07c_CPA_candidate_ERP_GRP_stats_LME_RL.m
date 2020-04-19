@@ -21,7 +21,7 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 
 % Select SBJs
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select Conditions of Interest
 model_id = [st.model_lab '_' st.trial_cond{1}];

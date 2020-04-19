@@ -33,7 +33,7 @@ eval(stat_vars_cmd);
 if ~strcmp(st.an_style,'lme'); error('stat_id not using lme!'); end
 
 % Select SBJs
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select conditions (and trials)
 model_id = [st.model_lab '_' st.trial_cond{1}];

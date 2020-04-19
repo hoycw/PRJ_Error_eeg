@@ -14,7 +14,7 @@ proc_id = 'odd_full_ft';
 eeg_proc_id = 'eeg_full_ft';
 SBJ_id = 'goodEEG';
 
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
 eval(proc_vars_cmd);

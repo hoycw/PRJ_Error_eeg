@@ -45,7 +45,7 @@ if ~strcmp(st.an_style,'wITPC'); error('stat_id not using wITPC!'); end
 % eval(plt_vars_cmd);
 
 % Select SBJs
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select Conditions of Interest
 [reg_lab, reg_names, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);

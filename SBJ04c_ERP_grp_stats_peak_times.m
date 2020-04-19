@@ -57,7 +57,7 @@ if ~strcmp(st.measure,'p2p') || ~strcmp(st.grp_method,'jackknife')
 end
 
 % Select SBJs
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select Conditions of Interest
 [grp_lab, ~, ~, ~] = fn_group_label_styles(st.model_lab);
