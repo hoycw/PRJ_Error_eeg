@@ -140,7 +140,7 @@ end
 
 %% Compute Win Prediction
 s_idx = fn_condition_index({'Su'},bhv);
-if any(strcmp(reg_lab,'pWin'))
+if any(strcmp(reg_lab,'pWin')) || any(strcmp(reg_lab,'sRPE')) || any(strcmp(reg_lab,'uRPE'))
     % Select Data (fit on everything except surprise since no outcome)
     X = bhv.tol(~s_idx);
     y = double(bhv.hit(~s_idx));

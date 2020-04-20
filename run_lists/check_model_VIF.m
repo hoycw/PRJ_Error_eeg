@@ -1,5 +1,5 @@
 SBJ_id = 'good1';
-stat_id = 'RVLM_all_lme_mn1FRN';
+stat_id = 'RVLMsRPE_all_lme_st05t5';
 
 %% Load Data 
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];

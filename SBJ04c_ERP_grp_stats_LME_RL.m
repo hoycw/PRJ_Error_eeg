@@ -213,7 +213,6 @@ elseif strcmp(st.measure,'mean')
     for ch_ix = 1:numel(ch_list)
         tbl.ERP = data(:,ch_ix);
         lme{ch_ix} = fitlme(tbl,formula);
-        % No correction for multiple comparisons
         pvals(:,ch_ix) = lme{ch_ix}.Coefficients.pValue(2:end);
     end
 else

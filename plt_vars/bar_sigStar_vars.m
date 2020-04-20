@@ -1,5 +1,6 @@
 % Bar Properties
 plt.bar_width = 0.8;
+plt.bar_color = [0.6 0.6 0.6];
 
 % Significance Properties
 plt.sig_mrkr   = '*';

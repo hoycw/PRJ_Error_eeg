@@ -1,5 +1,5 @@
-function SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
-% Plots AIC model fits across different RL models for point estimates
+function SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,metric,save_fig,varargin)
+% Plots model performance across different RL models for point estimates
 %   Only for single channel right now...
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -21,9 +21,9 @@ if ~isempty(varargin)
             fig_ftype = varargin{v+1};
         elseif strcmp(varargin{v},'plot_null')
             plot_null = varargin{v+1};
-%         elseif strcmp(varargin{v},'r2_version')
-%             % 'Ordinary' or 'Adjusted' (default)
-%             r2_version = varargin{v+1};
+        elseif strcmp(varargin{v},'r2_version')
+            % 'Ordinary' or 'Adjusted' (default)
+            r2_version = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -34,7 +34,7 @@ end
 if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ~exist('plot_null','var'); plot_null = 1; end
-% if ~exist('r2_version','var'); r2_version = 'Adjusted'; end
+if ~exist('r2_version','var'); r2_version = 'Adjusted'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
@@ -46,11 +46,13 @@ eval(plt_vars_cmd);
 % Select SBJs
 SBJs = load_SBJ_file(SBJ_id);
 
-sts = cell(size(stat_ids));
+sts        = cell(size(stat_ids));
+model_labs = cell(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
     stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_ids{st_ix} '_vars.m'];
     eval(stat_vars_cmd);
     sts{st_ix} = st;
+    model_labs{st_ix} = sts{st_ix}.model_lab;
     if strcmp(st.measure,'ts'); error('this script is for point estimates!');end
     
     if st_ix>1
@@ -80,17 +82,19 @@ for st_ix = 1:numel(stat_ids)
 end
 
 % Load SBJonly null model
-stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' null_id '_vars.m'];
-eval(stat_vars_cmd);
-null_st = st;
-
-if any(sts{1}.stat_lim ~= null_st.stat_lim)
-    error('null_st.stat_lim not aligned!');
+if plot_null
+    stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' null_id '_vars.m'];
+    eval(stat_vars_cmd);
+    null_st = st;
+    
+    if any(sts{1}.stat_lim ~= null_st.stat_lim)
+        error('null_st.stat_lim not aligned!');
+    end
+    if ~strcmp(sts{1}.measure, null_st.measure)
+        error('null_st.measure not the same!');
+    end
+    clear st stat_vars_cmd
 end
-if ~strcmp(sts{1}.measure, null_st.measure)
-    error('null_st.measure not the same!');
-end
-clear st stat_vars_cmd
 
 % Get Plotting Parameters
 load([root_dir 'PRJ_Error_EEG/data/' SBJs{1} '/04_proc/' SBJs{1} '_' an_id '.mat'],'roi');
@@ -100,16 +104,22 @@ st_colors = distinguishable_colors(numel(stat_ids)+plot_null);
 
 %% Load Models
 % Load real models
-aics = NaN(size(stat_ids));
+data = NaN(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
     tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_ids{st_ix} '_' an_id '.mat']);
-    aics(st_ix) = tmp.lme{1}.ModelCriterion.AIC;
+    if strcmp(metric,'AIC')
+        data(st_ix) = tmp.(sts{1}.an_style){1}.ModelCriterion.AIC;
+    elseif strcmp(metric,'R2')
+        data(st_ix) = tmp.(sts{1}.an_style){1}.Rsquared.(r2_version);
+    else
+        error(['Unknown metric: ' metric]);
+    end
     if st_ix==1
         if strcmp(sts{st_ix}.measure,'mean')
             st_lim = sts{st_ix}.stat_lim + tmp.reg_pk_time;
             measure_str = [sts{1}.measure '(' num2str(st_lim(1)) '-' num2str(st_lim(2)) ')'];
         elseif strcmp(sts{st_ix}.measure,'p2p')
-            error('write p2p measure_str');
+            measure_str = 'Peak-to-Peak';
         else
             error(['Unknown st.measure: ' sts{st_ix}.measure]);
         end
@@ -117,73 +127,97 @@ for st_ix = 1:numel(stat_ids)
 end
 
 % Load null model
-tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' null_id '_' an_id '.mat']);
-null_aic = tmp.lme{1}.ModelCriterion.AIC;
+if plot_null
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' null_id '_' an_id '.mat']);
+    if strcmp(metric,'AIC')
+        null_data = tmp.(sts{1}.an_style){1}.ModelCriterion.AIC;
+    elseif strcmp(metric,'R2')
+        null_data = tmp.(sts{1}.an_style){1}.Rsquared.(r2_version);
+    else
+        error(['Unknown metric: ' metric]);
+    end
+end
 
 %% Plot Model Comparisons
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' strjoin(stat_ids,'-') '/' null_id '/' plt_id '/'];
+if plot_null
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' strjoin(stat_ids,'-')...
+        '/' null_id '/' plt_id '/'];
+else
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' strjoin(stat_ids,'-') '/' plt_id '/'];
+end
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
-%% Compute plotting data
+%% Compute comparison labels
 % Compute relative likelihoods
-aic_min = min(aics);
-rel_lik = nan(size(stat_ids));
-rl_leg  = cell(size(stat_ids));
-model_labs = cell(size(stat_ids));
-for st_ix = 1:numel(stat_ids)
-    rel_lik(st_ix) = exp((aic_min-aics(st_ix))/2);
-    model_labs{st_ix} = sts{st_ix}.model_lab;
-    rl_leg{st_ix} = ['RL=' num2str(rel_lik(st_ix),'%.2f')];
+comp_leg  = cell(size(stat_ids));
+if strcmp(metric,'AIC')
+    data_min = min(data);
+    rel_lik = nan(size(stat_ids));
+    for st_ix = 1:numel(stat_ids)
+        rel_lik(st_ix) = exp((data_min-data(st_ix))/2);
+        comp_leg{st_ix} = ['RL=' num2str(rel_lik(st_ix),'%.2f')];
+    end
+    
+    % Compute for null model
+    if plot_null
+        rel_lik_null = exp((data_min-null_data)/2);
+        null_comp_leg = ['RL=' num2str(rel_lik_null,'%.2f')];
+    end
+elseif strcmp(metric,'R2')
+    for st_ix = 1:numel(stat_ids)
+        comp_leg{st_ix} = num2str(data(st_ix),'%.3f');
+    end
+    if plot_null
+        null_comp_leg = num2str(null_data,'%.3f');
+    end
 end
 
-% Compute for null model
-rel_lik_null = exp((aic_min-null_aic)/2);
-null_rl_leg = ['RL=' num2str(rel_lik_null,'%.2f')];
-
 %% Create plot
-fig_name = [SBJ_id '_RL_AIC_comparison_' an_id];
+fig_name = [SBJ_id '_RL_' metric '_comparison_' an_id];
 if plot_null
     fig_name = [fig_name '_null'];
 end
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
 
-%% Plot AIC
+%% Plot Model Performance
 ax = gca; hold on;
 
 % Create plotting variables
 if plot_null
     plot_ids = [model_labs {'SBJonly'}];
-    plot_aics = [aics null_aic];
-    plot_RLs = [rl_leg null_rl_leg];
-    leg = [rl_leg null_rl_leg];
+    plot_data = [data null_data];
+    plot_comp = [comp_leg null_comp_leg];
+%     leg = [comp_leg null_rl_leg];
 else
     plot_ids = model_labs;
-    plot_aics = aics;
-    plot_RLs = rl_leg;
-    leg = rl_leg;
+    plot_data = data;
+    plot_comp = comp_leg;
+%     leg = rl_leg;
 end
 
 % Get YLim
 rl_fudge = plt.sig_yfudge/2;
-y_range = max(plot_aics)-min(plot_aics);
+y_range = max(plot_data)-min(plot_data);
 
-% Plot AIC
-b = bar(1:numel(plot_ids),plot_aics,'BarWidth',plt.bar_width,'FaceColor','flat');
+% Plot Metric
+b = bar(1:numel(plot_ids),plot_data,'BarWidth',plt.bar_width,'FaceColor',plt.bar_color);%'flat');
 % for st_ix = 1:numel(plot_ids)
 %     b.CData(st_ix,:) = st_colors(st_ix,:);
 % end
 
-% Add Relative Likelihoods
+% Add Comparison Values
 for st_ix = 1:numel(plot_ids)
-    text(st_ix,plot_aics(st_ix)+y_range*rl_fudge,plot_RLs{st_ix},'FontSize',16,'HorizontalAlignment','center');
+    text(st_ix,plot_data(st_ix)+y_range*rl_fudge,plot_comp{st_ix},...
+        'FontSize',16,'HorizontalAlignment','center');
 end
 
 % Axes and Labels
-ax.YLim          = [min(plot_aics)-y_range*plt.sig_yfudge max(plot_aics)+y_range*plt.sig_yfudge];
-ax.YLabel.String = 'AIC';
+ax.YLim          = [min(plot_data)-y_range*plt.sig_yfudge...
+                    max(plot_data)+y_range*plt.sig_yfudge];
+ax.YLabel.String = metric;
 ax.XLim          = [0 numel(plot_ids)+1];
 ax.XTick         = 1:numel(plot_ids);
 ax.XTickLabel    = plot_ids;

@@ -15,7 +15,7 @@ regressors  = {...
 regressor_names = {...
     'Reward Valence','Reward Magnitude','Reward Likelihood',...
     'Prob(Win)','Block Accuracy','Rolling Accuracy','Rolling Accuracy 10','Total Score',...
-    '+/- Pred Err','abs Pred Err',...
+    '+/- Reward Pred Err','abs Reward Pred Err',...
     'Outcome Likelihood',...
     'ITI', ...
     'SBJ' ...
@@ -59,19 +59,35 @@ switch model_id
     case 'RVLM'
         labels = {'RVal','RLik','RMag'};
     
-    % RL models with pWin
-    case 'RPE'
-        labels = {'pWin','sRPE','uRPE'};
+    % RL models without pWin
     case 'sRPE'
-        labels = {'pWin','sRPE'};
+        labels = {'sRPE'};
     case 'uRPE'
+        labels = {'uRPE'};
+    case 'RPEs'
+        labels = {'sRPE','uRPE'};
+    case 'RPEsOL'
+        labels = {'sRPE','uRPE','OLik'};
+        
+    % RL models with pWin
+    case 'RL'
+        labels = {'pWin','sRPE','uRPE'};
+    case 'sRL'
+        labels = {'pWin','sRPE'};
+    case 'uRL'
         labels = {'pWin','uRPE'};
-    case 'RPEOL'
+    case 'RLOL'
         labels = {'pWin','sRPE','uRPE','OLik'};
-    case 'RPEiti'
+    case 'RLiti'
         labels = {'pWin','sRPE','uRPE','ITI'};
-    case 'RPEscr'
+    case 'RLscr'
         labels = {'pWin','score','sRPE','uRPE'};
+        
+    % Combinations of Outcome and RL models
+    case 'RVLMsRPE'
+        labels = {'RVal','RLik','RMag','sRPE'};
+    case 'RVLMRLOL'
+        labels = {'RVal','RLik','RMag','pWin','sRPE','uRPE','OLik'};
     
     % RL models with alternative accuracy
 %     case 'RLbA'
@@ -113,12 +129,23 @@ line_styles = cell(size(labels));
 for reg_ix = 1:numel(labels)
     names{reg_ix}  = regressor_names{strcmp(labels{reg_ix},regressors)};
     colors{reg_ix} = regressor_colors{strcmp(labels{reg_ix},regressors)};
-    if any(strcmp(labels{reg_ix},'psTaEr'))%{'psTaEr','uThPr'} % strcmp(labels{reg_ix}(1),'u') || 
-        line_styles{reg_ix} = ':';
-    elseif strcmp(labels{reg_ix},'p2sTaEr')
-        line_styles{reg_ix} = '-.';
-    else
-        line_styles{reg_ix} = '-';
+    line_styles{reg_ix} = '-';
+%     if any(strcmp(labels{reg_ix},'psTaEr'))%{'psTaEr','uThPr'} % strcmp(labels{reg_ix}(1),'u') || 
+%         line_styles{reg_ix} = ':';
+%     elseif strcmp(labels{reg_ix},'p2sTaEr')
+%         line_styles{reg_ix} = '-.';
+%     else
+%         line_styles{reg_ix} = '-';
+%     end
+end
+
+% Check for overlap in type of regressor
+unique_colors = unique(vertcat(colors{:}),'rows');
+if size(unique_colors,1)~=numel(labels)
+    for reg_ix = 1:numel(labels)
+        if any(strcmp(labels{reg_ix},{'RVal','RLik','RMag'}))
+            line_styles{reg_ix} = ':';
+        end
     end
 end
 
