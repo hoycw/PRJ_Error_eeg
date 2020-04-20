@@ -85,7 +85,7 @@ titles = {'Negative PEs: Max Beta Tile',  'Positive PEs: Max Beta Tile', 'Negati
             rho_norm = matrix_mean_vector(tfr_ix, pe_ix, 2) * range(rL) + rL(1);
             hold on
             polarplot([matrix_mean_vector(tfr_ix, pe_ix, 1) matrix_mean_vector(tfr_ix, pe_ix, 1)], [0 rho_norm], 'Color', 'k', 'LineWidth', 2);
-            title([titles{(2*tfr_ix+pe_ix)-2} ' Frequency: '  num2str(matrix_tfr_tiles(tfr_ix, 1)) ' Hz, Time: ' num2str(st_time_vec(matrix_tfr_tiles(tfr_ix, 2))) ' sec']); 
+            title([titles{(2*tfr_ix+pe_ix)-2} ' Frequency: '  num2str(matrix_tfr_tiles(tfr_ix, 2)) ' Hz, Time: ' num2str(st_time_vec(matrix_tfr_tiles(tfr_ix, 1))) ' sec']); 
             %{
             polarhistogram(matrix_angles{cond_ix, tfr_ix, pe_ix},[-pi:pi/5:pi],'Normalization','probability', 'FaceColor', pe_colors{pe_ix}, 'FaceAlpha', 0.5);
             fig_temp = subplot(2,2,(2*tfr_ix+1)-2);
