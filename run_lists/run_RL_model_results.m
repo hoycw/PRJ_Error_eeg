@@ -10,8 +10,13 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
+<<<<<<< HEAD
 SBJ_id = 'good1';%'goodall';
 SBJs = load_SBJ_file(SBJ_id);
+=======
+SBJ_id = 'goodall';
+SBJs = fn_load_SBJ_list(SBJ_id);
+>>>>>>> 7503e4fa659c7545565d2b65b92af1aa20f1f3e4
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';

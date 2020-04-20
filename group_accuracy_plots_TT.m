@@ -1,4 +1,4 @@
-function group_accuracy_plots_TT(SBJ_id, proc_id)
+function group_accuracy_plots_TT(SBJ_id, proc_id, fig_type)
 % Plots group accuracy for TT Task as a bar plot
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -12,7 +12,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% Load Necessary Data
-sbj_list = load_SBJ_file(SBJ_id);
+sbj_list = fn_load_SBJ_list(SBJ_id);
 SBJ_colors = distinguishable_colors(numel(sbj_list));
 cond_lab = {'easy','hard'};
 acc_cond = zeros([numel(sbj_list) 2]);
@@ -44,12 +44,29 @@ end
 %% Plot Accuracy per Condition Across Subjects
 figure;
 labels = categorical({'Easy', 'Hard'});
-bar(labels,avg_cond)                
+bar(labels,avg_cond) 
+set(gca, 'FontSize', 18)
 hold on
 er = errorbar(1:2,avg_cond,std_dev_cond,std_dev_cond);
-er.Color = [0 0 0];                            
-er.LineStyle = 'none'; 
-fig_name = [root_dir 'PRJ_Error_eeg/results/BHV/accuracy/GRP_accuracy_TT.png'];
+er.Color = [0 0 0];
+er.LineStyle = 'none';
+hold on;
+ax1 = gca;
+ax1_pos = ax1.Position;
+ax2 = axes('Position',ax1_pos,...
+'XAxisLocation','top',...
+    'YAxisLocation','right',...
+    'Color','none');
+ax2.XLim = [1 2];
+
+for sbj_ix = 1:numel(sbj_list)
+line([1.25 1.75], acc_cond(sbj_ix,:),'Parent', ax2, 'Color', 'k', 'Marker', '.');
+end
+set(ax2,'xtick',[])
+set(ax2,'visible','off')
+title('Group Level Accuracy Across Conditions', 'Parent', ax1, 'FontSize', 20)
+ylabel('Accuracy', 'Parent', ax1, 'FontSize', 18)
+fig_name = [root_dir 'PRJ_Error_eeg/results/BHV/accuracy/GRP_accuracy_TT.' fig_type];
 fprintf('Saving %s\n',fig_name);
 saveas(gcf,fig_name);
 
@@ -70,6 +87,6 @@ ax.YLabel.String = 'Accuracy';
 
 set(ax,'FontSize',16');
 
-fig_name = [root_dir 'PRJ_Error_eeg/results/BHV/accuracy/GRP_plot_SBJ_accuracy_TT.png'];
+fig_name = [root_dir 'PRJ_Error_eeg/results/BHV/accuracy/GRP_plot_SBJ_accuracy_TT.' fig_type];
 fprintf('Saving %s\n',fig_name);
 saveas(gcf,fig_name);

@@ -1,4 +1,5 @@
-function SBJs = load_SBJ_file(SBJ_id)
+
+function SBJs = fn_load_SBJ_list(SBJ_id)
 %% Load SBJ list from file
 
 [root_dir, ~] = fn_get_root_dir();

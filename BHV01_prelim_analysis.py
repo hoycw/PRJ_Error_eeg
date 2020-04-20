@@ -23,11 +23,11 @@ SBJ = sys.argv[1]#raw_input('Enter SBJ ID to process:')#'EEG15'
 
 
 # In[44]:
-prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
-#prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
+#prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
 #'/Volumes/hoycw_clust/PRJ_Error/'
 results_dir = prj_dir+'results/'
-fig_type = '.png'
+fig_type = '.svg'
 data_dir = prj_dir+'data/'
 sbj_dir  = data_dir+SBJ+'/'
 
@@ -162,6 +162,7 @@ ax1.plot(data['Tolerance'],'b',label='Tolerance')
 ax1.plot(x,[prdm['tol_lim'][0] for _ in x],'b--')
 ax1.plot(x,[prdm['tol_lim'][1] for _ in x],'b--')
 ax1.set_ylabel('Target Tolerance (s)', color='b')
+ax1.set_xlabel('Trials')
 ax1.tick_params('y', colors='b')
 ax1.set_xlim([0,len(data)])
 ax1.set_ylim([0, 0.41])

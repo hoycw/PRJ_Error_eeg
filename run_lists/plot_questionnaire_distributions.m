@@ -18,10 +18,10 @@ maybe_id = 'maybe';
 bad_id   = 'bad';
 
 root_dir = '/Volumes/hoycw_clust/';
-SBJs = load_SBJ_file(SBJ_id);
-good_SBJs = load_SBJ_file(good_id);
-maybe_SBJs = load_SBJ_file(maybe_id);
-bad_SBJs = load_SBJ_file(bad_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
+good_SBJs = fn_load_SBJ_list(good_id);
+maybe_SBJs = fn_load_SBJ_list(maybe_id);
+bad_SBJs = fn_load_SBJ_list(bad_id);
 
 % SBJs = {'EP06','EP07','EP08','EP09','EP10',...
 %     'EP11','EP14','EP15','EP16','EP17','EP18','EP19',...

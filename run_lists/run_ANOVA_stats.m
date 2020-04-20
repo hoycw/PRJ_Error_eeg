@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 sbj_id = 'goodall';
-SBJs = load_SBJ_file(sbj_id);
+SBJs = fn_load_SBJ_list(sbj_id);
 
 %% Run preprocessing
 proc_id_ica = 'eeg_full_ft';
