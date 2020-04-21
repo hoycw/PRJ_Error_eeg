@@ -10,13 +10,9 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-<<<<<<< HEAD
 SBJ_id = 'good1';%'goodall';
 SBJs = load_SBJ_file(SBJ_id);
-=======
-SBJ_id = 'goodall';
 SBJs = fn_load_SBJ_list(SBJ_id);
->>>>>>> 7503e4fa659c7545565d2b65b92af1aa20f1f3e4
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
@@ -32,9 +28,9 @@ end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Main RL Model
-an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
+an_ids    = {'ERP_Pz_F2t1_dm2t0_fl05t20'};%'ERP_Fz_F2t1_dm2t0_fl05t20'};%
 % stat_ids  = {'RVLM_all_lme_st18t3','sRPE_all_lme_st18t3','RVLMsRPE_all_lme_st18t3'};
-stat_ids = {'RPEsOL_all_lme_st05t5','RLOL_all_lme_st05t5'};
+stat_ids = {'RLOL_all_lme_st05t5'};
 plt_id    = 'ts_F2to1_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st05t5';
 

@@ -18,11 +18,11 @@ conditions = 'All';
 an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
 proc_id    = 'eeg_full_ft';
 
-SBJ03c_ERP_save_grp_ERP_cond(SBJ_id,conditions,proc_id,an_id);
+% SBJ03c_ERP_save_grp_ERP_cond(SBJ_id,conditions,proc_id,an_id);
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
-stat_ids = {'uRPE_all_lme_mn1FRN'};
+stat_ids = {'RLOL_all_lme_st05t5'};
 
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
