@@ -11,7 +11,7 @@ ft_defaults
 
 %% General parameters
 SBJ_id = 'good1';
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Save Group ERP Peak Time
 conditions = 'All';
@@ -22,7 +22,8 @@ proc_id    = 'eeg_full_ft';
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
-stat_ids = {'RLOL_all_lme_st05t5'};
+stat_ids = {'S_all_lme_mn1FRN','V_all_lme_mn1FRN','sRPE_all_lme_mn1FRN'};
+% stat_ids = {'VML_all_lme_mn1FRN','SML_all_lme_mn1FRN','ERPEsL_all_lme_mn1FRN','RPEsL_all_lme_mn1FRN'};
 
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
@@ -31,15 +32,30 @@ for s = 1:numel(SBJs)
     close all;
 end
 
+%% Plot Model Predictions
+proc_id  = 'eeg_full_ft';
+stat_ids = {'RSVPE_all_lme_mn1FRN','VML_all_lme_mn1FRN','ERPEsL_all_lme_mn1FRN'};
+
+plt_id   = 'line_cond';
+save_fig = 1;
+
+for st_ix = 1:numel(stat_ids)
+    SBJ04a_plot_model_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig);
+end
+
 %% ERP: Mean Window LME
 % Main RL Model
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_ids = {'S_all_lme_mn1FRN','V_all_lme_mn1FRN','sRPE_all_lme_mn1FRN'};
+% stat_ids = {'SML_all_lme_mn1FRN','ERPEsL_all_lme_mn1FRN'};
+
 % stat_ids  = {'RV_all_lme_mn1FRN','RVL_all_lme_mn1FRN','RVM_all_lme_mn1FRN','RVLM_all_lme_mn1FRN'};
 % stat_ids  = {'sRPE_all_lme_mn1FRN','uRPE_all_lme_mn1FRN','RPE_all_lme_mn1FRN','RPEOL_all_lme_mn1FRN'};
 % stat_ids  = {'RV_all_lme_mn1FRN','RVL_all_lme_mn1FRN','RVM_all_lme_mn1FRN','RVLM_all_lme_mn1FRN',...
 %     'sRPE_all_lme_mn1FRN','uRPE_all_lme_mn1FRN','RPE_all_lme_mn1FRN','RPEOL_all_lme_mn1FRN'};
 % stat_ids  = {'RVLM_all_lme_mn1FRN','sRPE_all_lme_mn1FRN','RVLMsRPE_all_lme_mn1FRN'};
-stat_ids  = {'RPEsOL_all_lme_mn1FRN','RLOL_all_lme_mn1FRN'};
+% stat_ids  = {'RPEsOL_all_lme_mn1FRN','RLOL_all_lme_mn1FRN'};
+
 plt_id    = 'bar_sigStar';
 null_id   = 'SBJonly_all_lme_mn1FRN';
 
@@ -64,6 +80,9 @@ SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'
 %% ERP: Peak-to-Peak LME
 % Main RL Model
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_ids = {'S_all_lme_p2pFRN','V_all_lme_p2pFRN','sRPE_all_lme_p2pFRN'};
+% stat_ids = {'VML_all_lme_p2pFRN','ERPEsL_all_lme_p2pFRN'};
+
 % stat_ids  = {'RV_all_glm_p2pFRN','RVL_all_glm_p2pFRN','RVM_all_glm_p2pFRN','RVLM_all_glm_p2pFRN'};
 % stat_ids  = {'sRPE_all_glm_p2pFRN','uRPE_all_glm_p2pFRN','RPE_all_glm_p2pFRN','RPEOL_all_glm_p2pFRN'};
 % stat_ids  = {'RV_all_glm_p2pFRN','RVL_all_glm_p2pFRN','RVM_all_glm_p2pFRN','RVLM_all_glm_p2pFRN',...
@@ -71,7 +90,7 @@ an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
 % stat_ids  = {'RV_all_lme_p2pFRN','RVL_all_lme_p2pFRN','RVM_all_lme_p2pFRN','RVLM_all_lme_p2pFRN',...
 %     'sRPE_all_lme_p2pFRN','uRPE_all_lme_p2pFRN','RPE_all_lme_p2pFRN','RPEOL_all_lme_p2pFRN'};
 % stat_ids  = {'RVLM_all_lme_p2pFRN','sRPE_all_lme_p2pFRN','RVLMsRPE_all_lme_p2pFRN'};
-stat_ids = {'RPEsOL_all_lme_p2pFRN','RLOL_all_lme_p2pFRN'};
+% stat_ids = {'RPEsOL_all_lme_p2pFRN','RLOL_all_lme_p2pFRN'};
 plot_peaks= 1;
 plt_id    = 'bar_sigStar';
 
@@ -94,4 +113,19 @@ SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'AIC',
     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
 SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'R2',save_fig,...
     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
+
+%% FRN Metric Comparison: FRN by Condition
+an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_ids  = {'S_all_lme_mn1FRN','S_all_lme_p2pFRN'};
+
+proc_id   = 'eeg_full_ft';
+plt_id    = 'line_cond';
+flip_p2p  = 1;
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'png';
+
+SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_id,stat_ids,plt_id,save_fig,...
+    'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
 

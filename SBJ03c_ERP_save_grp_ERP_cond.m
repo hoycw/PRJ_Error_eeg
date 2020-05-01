@@ -19,7 +19,7 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 
 % Select SBJs
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select conditions (and trials)
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);

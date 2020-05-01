@@ -1,145 +1,131 @@
-%% Model Predictions
-cond_lab = {'Likely Win', 'Unlikely Neutral', 'Unlikely Loss', 'Unlikely Win', 'Unlikely Neutral', 'Likely Loss'};
-% cond_lab = {'Easy Win', 'Easy Neu', 'Easy Loss', 'Hard Win', 'Hard Neu', 'Hard Loss'};
+function SBJ04a_plot_model_predictions(SBJ_id,proc_id,stat_id,plt_id,save_fig,varargin)
+% Plot model predictors by condition
+%   Only for one channel now...
+% INPUTS:
+%   SBJs [cell array] - ID list of subjects to run
+%   proc_id [str] - ID of preprocessing pipeline
+%   stat_id [str] - ID of the stats parameters to use
+% OUTPUTS:
+%   lme [cell array] - LinearMixedModel output class for each time point
 
-% Categorical Reward
-exp_value     = [1 1 1 -1 -1 -1];
-valence_cat   = [1 nan 0 1 nan 0];
-valence       = [1 0 -1 1 0 -1];
-magnitude     = [1 0 1 1 0 1];
-interaction   = exp_value .* valence;
+%% Set up paths
+if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
+elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
+elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
+else; root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
-% Continuous Reward Prediction Error
-rp      = [0.6 0.6 0.6 -0.6 -0.6 -0.6];
-rpe     = valence - rp;
-rpe_mag = abs(rpe);
+addpath([root_dir 'PRJ_Error_eeg/scripts/']);
+addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 
-% Categorical Likelihood
-lik_cat   = [1 0 0 0 0 1];
-% Continuous Likelihood
-lik_cont  = [0.75 0.1 0.15 0.15 0.1 0.75];
-% rare_cont = 1-lik_cont;
-
-%% Plot Models
-cond2_str = ': Win, Loss';
-cond3_str = ': Win, Neutral, Loss';
-fig_name  = 'model_prediction_comparison';
-fig_ftype = 'png';
-figure('Name',fig_name,'units','normalized','OuterPosition',[0 0 1 0.5]);
-
-valence_color = [209 151 105]./255;
-valence_style = '-';
-valence_mark  = 's';
-
-mag_color = [118 160 156]./255;
-mag_style = ':';
-mag_mark  = 'o';
-
-lik_color = [152 78 163]./255;
-lik_style = '--';
-lik_mark  = '*';
-
-alt_color = 'k';    % categorical salience/likelihood/frequency
-odd_color = 'r';    % meaningless interaction
-alt_style = '-.';
-alt_mark  = 's';
-
-cond_idx = 1:6;
-easy_idx = 1:3;
-hard_idx = 4:6;
-
-cond_idx_nn = [1 3 4 6];
-easy_idx_nn = [1 3];
-hard_idx_nn = [4 6];
-
-offset     = 0.08;
-tick_angle = -20;
-width      = 2;
-
-%% --------------------- Categorical Reward Value: Binary Outcomes ---------------------
-ax1 = subplot(1,3,1); hold on;
-title('Categorical, Binary Reward Value');
-set(gca,'FontSize',16);
-set(gca,'XTick',cond_idx_nn);
-set(gca,'XTickLabels',cond_lab(cond_idx_nn));
-xtickangle(tick_angle);
-xlim([0 7]);
-ylim([-0.4 1.3]);
-yticks([0 1]);
-set(gca,'YTickLabels',{'Low','High'})
-
-tmp1 = plot(easy_idx_nn, valence_cat(easy_idx_nn), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
-plot(hard_idx_nn, valence_cat(hard_idx_nn), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
-
-tmp2 = plot(easy_idx_nn+offset, magnitude(easy_idx_nn), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
-plot(hard_idx_nn+offset, magnitude(hard_idx_nn), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
-
-tmp3 = plot(easy_idx_nn+2*offset, lik_cat(easy_idx_nn), 'Color', lik_color, 'LineStyle', lik_style, 'LineWidth', width, 'Marker', lik_mark);
-plot(hard_idx_nn+2*offset, lik_cat(hard_idx_nn), 'Color', lik_color, 'LineStyle', lik_style, 'LineWidth', width, 'Marker', lik_mark);
-
-% tmp4 = plot(easy_idx_nn+3*offset, interaction(easy_idx_nn), 'Color', alt_color, 'LineStyle', alt_style, 'LineWidth', width, 'Marker', alt_mark);
-% plot(hard_idx_nn+3*offset, interaction(hard_idx_nn), 'Color', alt_color, 'LineStyle', alt_style, 'LineWidth', width, 'Marker', alt_mark);
-
-legend([tmp1 tmp2 tmp3], {'Reward Value','Reward Magnitude','Outcome Frequency'}, 'Location','southwest');
-% legend([tmp1 tmp2 tmp3 tmp4], {'Valence','Magnitude','Likelihood','Interaction'}, 'Location','southwest');
-% [~] = fn_min_white_space(gca);
-
-%% --------------------- Reward Value: All Outcomes ---------------------
-ax2 = subplot(1,3,2); hold on;
-title('Reward Value');
-set(gca,'FontSize',16);
-set(gca,'XTick',cond_idx);
-set(gca,'XTickLabels',cond_lab);
-xtickangle(tick_angle);
-xlim([0 7]);
-ylim([-2.0 2.0]);
-yticks([-2:2]);
-
-tmp1 = plot(easy_idx, valence(easy_idx), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
-plot(hard_idx, valence(hard_idx), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
-
-tmp2 = plot(easy_idx+offset, magnitude(easy_idx), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
-plot(hard_idx+offset, magnitude(hard_idx), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
-
-tmp3 = plot(easy_idx+2*offset, lik_cont(easy_idx), 'Color', lik_color, 'LineStyle', lik_style, 'LineWidth', width, 'Marker', lik_mark);
-plot(hard_idx+2*offset, lik_cont(hard_idx), 'Color', lik_color, 'LineStyle', lik_style, 'LineWidth', width, 'Marker', lik_mark);
-
-% tmp4 = plot(easy_idx+3*offset, interaction(easy_idx), 'Color', 'r', 'LineStyle', alt_style, 'LineWidth', width, 'Marker', alt_mark);
-% plot(hard_idx+3*offset, interaction(hard_idx), 'Color', 'r', 'LineStyle', alt_style, 'LineWidth', width, 'Marker', alt_mark);
-
-legend([tmp1 tmp2 tmp3], {'Reward Value','Reward Magnitude','Outcome Frequency'}, 'Location','southeast');
-% legend([tmp1 tmp2 tmp3 tmp4], {'Valence','Magnitude','Likelihood', 'Interaction'}, 'Location','southeast');
-% [~] = fn_min_white_space(gca);
-
-%% --------------------- Reward Prediction Errors: All Outcomes ---------------------
-ax3 = subplot(1,3,3); hold on;
-title('Reward Prediction Error (RPE)');
-set(gca,'FontSize',16);
-set(gca,'XTick',cond_idx);
-set(gca,'XTickLabels',cond_lab);
-xtickangle(tick_angle);
-xlim([0 7]);
-ylim([-2.1 2.1]);
-yticks([-2:1:2]);
-
-tmp1 = plot(easy_idx, rpe(easy_idx), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
-plot(hard_idx, rpe(hard_idx), 'Color', valence_color, 'LineStyle', valence_style, 'LineWidth', width, 'Marker', valence_mark);
-
-tmp2 = plot(easy_idx+offset, rpe_mag(easy_idx), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
-plot(hard_idx+offset, rpe_mag(hard_idx), 'Color', mag_color, 'LineStyle', mag_style, 'LineWidth', width, 'Marker', mag_mark);
-
-tmp3 = plot(easy_idx+2*offset, lik_cont(easy_idx), 'Color', lik_color, 'LineStyle', lik_style, 'LineWidth', width, 'Marker', lik_mark);
-plot(hard_idx+2*offset, lik_cont(hard_idx), 'Color', lik_color, 'LineStyle', lik_style, 'LineWidth', width, 'Marker', lik_mark);
-legend([tmp1 tmp2 tmp3], {'RPE','RPE Magnitude','Outcome Frequency'}, 'Location','southeast');
-% [~] = fn_min_white_space(gca);
-
-%% Save figure
-fig_dir = [root_dir 'PRJ_Error_eeg/results/model_predictions/'];
-if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
+%% Handle Variable Inputs & Defaults
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'fig_vis') && ischar(varargin{v+1})
+            fig_vis = varargin{v+1};
+        elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
+            fig_ftype = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
 end
 
-fig_fname = [fig_dir fig_name '.' fig_ftype];
-% % Commented out because screen ratios aren't right automatically
-fprintf('Saving %s\n',fig_fname);
-saveas(gcf,fig_fname);
+% Define default options
+if ~exist('fig_vis','var');      fig_vis = 'on'; end
+if ~exist('fig_ftype','var');    fig_ftype = 'png'; end
+if ischar(save_fig); save_fig = str2num(save_fig); end
+
+%% Load Data 
+proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
+eval(proc_vars_cmd);
+stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
+eval(stat_vars_cmd);
+plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
+eval(plt_vars_cmd);
+
+% Select SBJs
+SBJs = fn_load_SBJ_list(SBJ_id);
+
+model_id = [st.model_lab '_' st.trial_cond{1}];
+[reg_lab, reg_names, reg_colors, reg_styles, reg_mrkrs] = fn_regressor_label_styles(st.model_lab);
+[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+ez_idx = ~cellfun(@isempty,strfind(cond_lab,'Ez'));
+
+% Plotting Parameters
+
+%% Load Model and Comute Means
+model = zeros([numel(reg_lab) numel(cond_lab) numel(SBJs)]);
+for s = 1:numel(SBJs)
+    % Load RL Model
+    load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
+    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    
+    % Average within condition
+    full_cond_idx = fn_condition_index(cond_lab, bhv);
+    for cond_ix = 1:numel(cond_lab)
+        model(:,cond_ix,s) = mean(tmp.model(full_cond_idx==cond_ix,:),1);
+    end
+end
+
+%% Compute Group Averages
+plot_means = mean(model,3);
+plot_sems  = nan([numel(reg_lab) numel(cond_lab)]);
+for reg_ix = 1:numel(reg_lab)
+    plot_sems(reg_ix,:) = nanstd(model(reg_ix,:,:),[],3)./sqrt(numel(SBJs))';
+end
+
+%% Plot Predictors
+fig_name = [SBJ_id '_' model_id '_predictions'];
+figure('Name',fig_name,'Visible',fig_vis,'units','normalized','OuterPosition',[0 0 0.5 0.5]);
+ax = gca; hold on;
+
+cond_x = 1:numel(cond_lab);
+ez_ix = cond_x(ez_idx);
+hd_ix = cond_x(~ez_idx);
+
+reg_lines = gobjects(size(reg_lab));
+for reg_ix = 1:numel(reg_lab)
+    reg_lines(reg_ix) = plot(ez_ix+plt.x_fudge*(reg_ix-1),plot_means(reg_ix,ez_ix),'Color',reg_colors{reg_ix},...
+        'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width,'Marker',reg_mrkrs{reg_ix});
+    plot(hd_ix+plt.x_fudge*(reg_ix-1),plot_means(reg_ix,hd_ix),'Color',reg_colors{reg_ix},...
+        'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width,'Marker',reg_mrkrs{reg_ix});
+%     errorbar([1:numel(cond_lab)]+plt.x_fudge*(reg_ix-1),plot_means(reg_ix,:),plot_sems(reg_ix,:),...
+%         'Color',reg_colors{reg_ix},'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width);
+end
+
+set(gca,'XTick',1:numel(cond_lab));
+set(gca,'XTickLabels',cond_names);
+% xtickangle(plt.tick_angle);
+xlim([0 numel(cond_lab)+1]);
+% ylim([-0.4 1.3]);
+% yticks([0 1]);
+% set(gca,'YTickLabels',{'Low','High'})
+
+if strcmp(st.model_lab,'RSVPE')
+    model_str = 'Reward Valence vs. Value vs. Prediction Error';
+elseif any(strcmp(st.model_lab,{'VML','SML'}))
+    model_str = 'Outcome Features';
+elseif any(strcmp(st.model_lab,{'ERPEsL','RPEsL'}))
+    model_str = 'Reward Prediction Error (RPE) Features';
+else
+    model_str = model_id;
+end
+title(model_str,'Interpreter','none');
+legend(reg_lines,reg_names,'Location',plt.leg_loc);
+set(gca,'FontSize',16);
+
+%% Save Figure
+if save_fig
+    % Create figure directory
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/model_predictions/' plt_id '/'];
+    if ~exist(fig_dir,'dir')
+        mkdir(fig_dir);
+    end
+    
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
+    % % Commented out because screen ratios aren't right automatically
+    fprintf('Saving %s\n',fig_fname);
+    saveas(gcf,fig_fname);
+end
+
+end

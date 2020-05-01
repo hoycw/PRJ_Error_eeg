@@ -57,7 +57,7 @@ if plot_peaks && ~strcmp(st.measure,'p2p'); error('why plot peaks ifnot using p2
 if strcmp(st.grp_method,'jackknife'); error('jackknife not figrued out for GLM yet!'); end
 
 % Select SBJs
-SBJs = load_SBJ_file(SBJ_id);
+SBJs = fn_load_SBJ_list(SBJ_id);
 
 model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);

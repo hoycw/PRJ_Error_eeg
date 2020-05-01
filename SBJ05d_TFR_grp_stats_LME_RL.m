@@ -101,7 +101,7 @@ for s = 1:numel(SBJs)
                 (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
         end
     else
-        sbj_model = model;
+        sbj_model = tmp.model;
     end
     model(sbj_idx,:) = sbj_model;
     

@@ -1,33 +1,39 @@
-function [labels, names, colors, line_styles] = fn_regressor_label_styles(model_id)
+function [labels, names, colors, line_styles, markers] = fn_regressor_label_styles(model_id)
 %% Converts the name of a model into regressor labels, plotting colors/styles
 % No performance metrics, but no includes categorical outcomes
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 
 %% List of possible regressors and their colors
 regressors  = {...
-    'RVal','RMag','RLik',... % Categorical reward features
-    'pWin','bAcc','rAcc','rAcc10','score',... % Outcome predictors
+    'Sign','Val','Mag',... % Categorical reward features 'RLik',
+    'EV','bAcc','rAcc','rAcc10','score',... % Outcome predictors
     'sRPE','uRPE',... % Reward Feedback
-    'OLik',... % Outcome Likelihood
+    'Lik',... % Outcome Likelihood
     'ITI', ... % preceding inter-trial interval
     'SBJ' ... % SBJ only null model
     };
 regressor_names = {...
-    'Reward Valence','Reward Magnitude','Reward Likelihood',...
-    'Prob(Win)','Block Accuracy','Rolling Accuracy','Rolling Accuracy 10','Total Score',...
-    '+/- Reward Pred Err','abs Reward Pred Err',...
-    'Outcome Likelihood',...
+    'Valence','Value','Magnitude',...%'Reward Likelihood',
+    'Expected Value','Block Accuracy','Rolling Accuracy','Rolling Accuracy 10','Total Score',...
+    'RPE Value','RPE Magnitude',...
+    'Likelihood',...
     'ITI', ...
     'SBJ' ...
     };
-% Colors with just RL model:
 regressor_colors = {...
-    [209 151 105]./255, [118 160 156]./255, [152 78 163]./255,... % tan, teal, purple
+    [209 151 105]./255, [209 151 105]./255, [118 160 156]./255, ... % tan, tan, teal, purple [152 78 163]./255,
     [0 0 0], [0 0 0], [0 0 0], [0 0 0], [0.4 0.4 0.4],... % dark blue, blacks, gray
     [209 151 105]./255, [118 160 156]./255, ... % tan, teal
     [152 78 163]./255,... % purple
     [0.3 0.3 0.3], ...   % dark gray
     [0.3 0.3 0.3] ...   % dark gray
+    };
+regressor_markers = {...
+    's','s','d',...%'*',
+    'x','x','x','x','^',...
+    's','d',...
+    '*',...
+    'v','v'...
     };
 
 % Color options:
@@ -50,44 +56,51 @@ regressor_colors = {...
 %% Convert model_id into set of conditions
 switch model_id
     % Categorical Outcome Features
-    case 'RV'
-        labels = {'RVal'};
-    case 'RVL'
-        labels = {'RVal','RLik'};
-    case 'RVM'
-        labels = {'RVal','RMag'};
-    case 'RVLM'
-        labels = {'RVal','RLik','RMag'};
+    case 'S'
+        labels = {'Sign'};
+    case 'V'
+        labels = {'Val'};
+    case 'VL'
+        labels = {'Val','Lik'};
+    case 'VM'
+        labels = {'Val','Mag'};
+    case 'VML'
+        labels = {'Val','Mag','Lik'};
+    case 'SML'
+        labels = {'Sign','Mag','Lik'};
     
-    % RL models without pWin
+    % RL models without EV
     case 'sRPE'
         labels = {'sRPE'};
     case 'uRPE'
         labels = {'uRPE'};
     case 'RPEs'
         labels = {'sRPE','uRPE'};
-    case 'RPEsOL'
-        labels = {'sRPE','uRPE','OLik'};
+    case 'RPEsL'
+        labels = {'sRPE','uRPE','Lik'};
+        
+    case 'RSVPE'
+        labels = {'Sign','Val','sRPE'};
         
     % RL models with pWin
-    case 'RL'
-        labels = {'pWin','sRPE','uRPE'};
-    case 'sRL'
-        labels = {'pWin','sRPE'};
-    case 'uRL'
-        labels = {'pWin','uRPE'};
-    case 'RLOL'
-        labels = {'pWin','sRPE','uRPE','OLik'};
-    case 'RLiti'
-        labels = {'pWin','sRPE','uRPE','ITI'};
-    case 'RLscr'
-        labels = {'pWin','score','sRPE','uRPE'};
+    case 'ERPEs'
+        labels = {'EV','sRPE','uRPE'};
+    case 'EsRPE'
+        labels = {'EV','sRPE'};
+    case 'EuRPE'
+        labels = {'EV','uRPE'};
+    case 'ERPEsL'
+        labels = {'EV','sRPE','uRPE','Lik'};
+    case 'ERPEsiti'
+        labels = {'EV','sRPE','uRPE','ITI'};
+    case 'ERPEsscr'
+        labels = {'EV','score','sRPE','uRPE'};
         
     % Combinations of Outcome and RL models
-    case 'RVLMsRPE'
-        labels = {'RVal','RLik','RMag','sRPE'};
-    case 'RVLMRLOL'
-        labels = {'RVal','RLik','RMag','pWin','sRPE','uRPE','OLik'};
+    case 'VMLsRPE'
+        labels = {'Val','Lik','Mag','sRPE'};
+    case 'VMLRPEsL'
+        labels = {'Val','Lik','Mag','EV','sRPE','uRPE','Lik'};
     
     % RL models with alternative accuracy
 %     case 'RLbA'
@@ -96,7 +109,7 @@ switch model_id
 %         labels = {'bAcc','pWin','sRPE','uRPE'};
 %     case 'RLrA10'
 %         labels = {'rAcc10','sRPE','uRPE'};
-    case 'RLrA'
+    case 'rARPEs'
         labels = {'rAcc','sRPE','uRPE'};
 %     case 'RLrApW'
 %         labels = {'rAcc','pWin','sRPE','uRPE'};
@@ -106,15 +119,15 @@ switch model_id
         labels = {'SBJ'};
         
     % Previous Trial Regressors:
-    case 'RLpT'
-        error('why running with previous trial regressors?');
-        labels = {'pWin','sRPE','uRPE','sTaEr','psTaEr'};
-    case 'RLpRTlD'
-        error('why running with previous trial regressors?');
-        labels = {'pWin','sRPE','uRPE','sTaEr','psTaEr','sThPr'};
-    case 'RLpRTulD'
-        error('why running with previous trial regressors?');
-        labels = {'pWin','sRPE','uRPE','sTaEr','psTaEr','sThPr','uThPr'};
+%     case 'RLpT'
+%         error('why running with previous trial regressors?');
+%         labels = {'pWin','sRPE','uRPE','sTaEr','psTaEr'};
+%     case 'RLpRTlD'
+%         error('why running with previous trial regressors?');
+%         labels = {'pWin','sRPE','uRPE','sTaEr','psTaEr','sThPr'};
+%     case 'RLpRTulD'
+%         error('why running with previous trial regressors?');
+%         labels = {'pWin','sRPE','uRPE','sTaEr','psTaEr','sThPr','uThPr'};
 %     case 'RLpRTiD'
 %         error('why running with previous trial regressors?');
 %         labels = {'pWin','sRPE','uRPE','sTaEr','psTaEr','iThr'};
@@ -126,9 +139,11 @@ end
 names       = cell(size(labels));
 colors      = cell(size(labels));
 line_styles = cell(size(labels));
+markers     = cell(size(labels));
 for reg_ix = 1:numel(labels)
-    names{reg_ix}  = regressor_names{strcmp(labels{reg_ix},regressors)};
-    colors{reg_ix} = regressor_colors{strcmp(labels{reg_ix},regressors)};
+    names{reg_ix}   = regressor_names{strcmp(labels{reg_ix},regressors)};
+    colors{reg_ix}  = regressor_colors{strcmp(labels{reg_ix},regressors)};
+    markers{reg_ix} = regressor_markers{strcmp(labels{reg_ix},regressors)};
     line_styles{reg_ix} = '-';
 %     if any(strcmp(labels{reg_ix},'psTaEr'))%{'psTaEr','uThPr'} % strcmp(labels{reg_ix}(1),'u') || 
 %         line_styles{reg_ix} = ':';
@@ -143,8 +158,10 @@ end
 unique_colors = unique(vertcat(colors{:}),'rows');
 if size(unique_colors,1)~=numel(labels)
     for reg_ix = 1:numel(labels)
-        if any(strcmp(labels{reg_ix},{'RVal','RLik','RMag'}))
+        if any(strcmp(labels{reg_ix},{'Val','Mag'}))
             line_styles{reg_ix} = ':';
+        elseif strcmp(labels{reg_ix},'Sign')
+            line_styles{reg_ix} = '-.';
         end
     end
 end

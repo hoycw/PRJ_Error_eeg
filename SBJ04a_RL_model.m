@@ -85,37 +85,37 @@ else
 end
 
 %% Compute Reward Value, Likelihood, and Magnitude
-if any(strcmp(reg_lab,'RVal')) || any(strcmp(reg_lab,'RMag')) || any(strcmp(reg_lab,'RLik'))
-    RVal = nan(size(bhv.trl_n));
+if any(strcmp(reg_lab,'Val')) || any(strcmp(reg_lab,'Mag'))% || any(strcmp(reg_lab,'RLik'))
+    Val = nan(size(bhv.trl_n));
     RLik = nan(size(bhv.trl_n));
-    RMag = nan(size(bhv.trl_n));
+    Mag = nan(size(bhv.trl_n));
     for cond_ix = 1:numel(cond_lab)
         idx = logical(fn_condition_index(cond_lab(cond_ix),bhv));
         switch cond_lab{cond_ix}
             case 'EzWn'
-                RVal(idx) = 1;
-                RLik(idx) = 1;
-                RMag(idx) = 1;
+                Val(idx) = 1;
+%                 RLik(idx) = 1;
+                Mag(idx) = 1;
             case 'EzLs'
-                RVal(idx) = -1;
-                RLik(idx) = 0;
-                RMag(idx) = 1;
+                Val(idx) = -1;
+%                 RLik(idx) = 0;
+                Mag(idx) = 1;
             case 'EzSu'
-                RVal(idx) = 0;
-                RLik(idx) = 0;
-                RMag(idx) = 0;
+                Val(idx) = 0;
+%                 RLik(idx) = 0;
+                Mag(idx) = 0;
             case 'HdWn'
-                RVal(idx) = 1;
-                RLik(idx) = 0;
-                RMag(idx) = 1;
+                Val(idx) = 1;
+%                 RLik(idx) = 0;
+                Mag(idx) = 1;
             case 'HdLs'
-                RVal(idx) = -1;
-                RLik(idx) = 1;
-                RMag(idx) = 1;
+                Val(idx) = -1;
+%                 RLik(idx) = 1;
+                Mag(idx) = 1;
             case 'HdSu'
-                RVal(idx) = 0;
-                RLik(idx) = 0;
-                RMag(idx) = 0;
+                Val(idx) = 0;
+%                 RLik(idx) = 0;
+                Mag(idx) = 0;
             otherwise
                 error(['Unknown trial type: ' cond_lab{cond_ix}]);
         end
@@ -123,8 +123,8 @@ if any(strcmp(reg_lab,'RVal')) || any(strcmp(reg_lab,'RMag')) || any(strcmp(reg_
 end
 
 %% Compute Outcome Likelihood
-if any(strcmp(reg_lab,'OLik'))
-    OLik = nan(size(bhv.trl_n));
+if any(strcmp(reg_lab,'Lik'))
+    Lik = nan(size(bhv.trl_n));
     for cond_ix = 1:numel(cond_lab)
         idx = fn_condition_index(cond_lab(cond_ix),bhv);
         if strcmp(cond_lab{cond_ix}(1:2),'Ez')
@@ -134,13 +134,14 @@ if any(strcmp(reg_lab,'OLik'))
         else
             error('Neither Ez nor Hd, what is it?');
         end
-        OLik(logical(idx)) = sum(idx)/n_trls;
+        Lik(logical(idx)) = sum(idx)/n_trls;
     end
 end
 
 %% Compute Win Prediction
 s_idx = fn_condition_index({'Su'},bhv);
-if any(strcmp(reg_lab,'pWin')) || any(strcmp(reg_lab,'sRPE')) || any(strcmp(reg_lab,'uRPE'))
+if any(strcmp(reg_lab,'EV')) || any(strcmp(reg_lab,'Sign')) ...
+        || any(strcmp(reg_lab,'sRPE')) || any(strcmp(reg_lab,'uRPE'))
     % Select Data (fit on everything except surprise since no outcome)
     X = bhv.tol(~s_idx);
     y = double(bhv.hit(~s_idx));
@@ -150,7 +151,7 @@ if any(strcmp(reg_lab,'pWin')) || any(strcmp(reg_lab,'sRPE')) || any(strcmp(reg_
     
     z = betas(1) + (bhv.tol * betas(2));
     pWin = 1 ./ (1+exp(-z));
-    expected_score = pWin*2 - 1;
+    EV = pWin*2 - 1;
 end
 if any(strcmp(reg_lab,'bAcc'))
     % Adjust block numbers for EEG12
@@ -173,7 +174,7 @@ if any(strcmp(reg_lab,'bAcc'))
     for t_ix = 1:numel(bhv.trl_n)
         bAcc(t_ix) = blk_acc(bhv.blk(t_ix)==blks);
     end
-    expected_score = bAcc*2 - 1;
+    EV = bAcc*2 - 1;
 elseif any(strcmp(reg_lab,'rAcc'))
     % Analysis Parameters (to be finalized)
     roll_win = 5;
@@ -205,15 +206,20 @@ elseif any(strcmp(reg_lab,'rAcc'))
         end
     end
     
-    expected_score = rAcc*2 - 1;
+    EV = rAcc*2 - 1;
+end
+
+%% Compute Reward Valence (sign)
+if any(strcmp(reg_lab,'Sign'))
+    Sign = sign(double(bhv.score)/100 - EV);
 end
 
 %% Compute Prediction Errors
 if any(strcmp(reg_lab,'sRPE'))
-    sRPE = double(bhv.score)/100 - expected_score;
+    sRPE = double(bhv.score)/100 - EV;
 end
 if any(strcmp(reg_lab,'uRPE'))
-    uRPE = abs(double(bhv.score)/100 - expected_score);
+    uRPE = abs(double(bhv.score)/100 - EV);
 end
 
 %% Compute total score
