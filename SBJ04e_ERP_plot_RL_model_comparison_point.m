@@ -140,10 +140,10 @@ end
 
 %% Plot Model Comparisons
 if plot_null
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' strjoin(stat_ids,'-')...
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/model_comparisons/' strjoin(stat_ids,'-')...
         '/' null_id '/' plt_id '/'];
 else
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' strjoin(stat_ids,'-') '/' plt_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/model_comparisons/' strjoin(stat_ids,'-') '/' plt_id '/'];
 end
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);

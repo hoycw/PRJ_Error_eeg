@@ -24,7 +24,9 @@ if ~isempty(varargin)
         elseif strcmp(varargin{v},'flip_p2p')
             flip_p2p = varargin{v+1};
         elseif strcmp(varargin{v},'mirror_p2p')
-            flip_p2p = varargin{v+1};
+            mirror_p2p = varargin{v+1};
+        elseif strcmp(varargin{v},'mirror_mean')
+            mirror_mean = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -36,9 +38,11 @@ if ~exist('fig_vis','var');   fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ~exist('flip_mean','var'); flip_mean = 0; end
 if ~exist('flip_p2p','var');  flip_p2p = 0; end
-if ~exist('mirror_p2p','var');  mirror_p2p = 1; end
+if ~exist('mirror_p2p','var');  mirror_p2p = 0; end
+if ~exist('mirror_mean','var');  mirror_mean = 0; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 if mirror_p2p && flip_p2p; error('why flip and mirror p2p?'); end
+if mirror_mean && flip_mean; error('why flip and mirror mean window?'); end
 
 %% Analysis and Plotting Parameters
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
@@ -75,6 +79,13 @@ if mirror_p2p
     p2p_lr = plt.mirror_side;
     p2p_st_idx = ~cellfun(@isempty,strfind(stat_ids,'p2p'));
     st_colors(p2p_st_idx,:) = plt.mirror_color;
+elseif mirror_mean
+    mir_str = '_mirMean';
+    % Set up double axis
+    amp_lr = plt.mirror_side;
+    p2p_lr = plt.nonmirror_side;
+    mean_st_idx = ~cellfun(@isempty,strfind(stat_ids,'mn'));
+    st_colors(mean_st_idx,:) = plt.mirror_color;
 else
     mir_str = '';
 end
@@ -92,8 +103,9 @@ for st_ix = 1:numel(stat_ids)
     tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_ids{st_ix} '_' an_id '.mat']);
     if strcmp(sts{st_ix}.measure,'mean')
         st_lim = sts{st_ix}.stat_lim + tmp.reg_pk_time;
-        measure_str{st_ix} = ['Mean(' num2str(st_lim(1)) '-' num2str(st_lim(2)) ' s)'];
+        measure_str{st_ix} = ['Mean[' num2str(st_lim(1)) '-' num2str(st_lim(2)) ' s]'];
         if flip_mean; measure_str{st_ix} = [measure_str{st_ix} '*-1']; end
+        if mirror_mean; measure_str{st_ix} = [measure_str{st_ix} ' (mirror)']; end
         
         % Compute Mean Window Amplitude
         data{st_ix} = NaN([numel(cond_lab) numel(SBJs)]);
@@ -158,7 +170,7 @@ end
 fig_name = [SBJ_id '_FRN_metric_comparison_' an_id flip_str mir_str];
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
-if mirror_p2p; set(gcf,'defaultAxesColorOrder',[plt.nonmirror_color; plt.mirror_color]); end
+if mirror_p2p || mirror_mean; set(gcf,'defaultAxesColorOrder',[plt.nonmirror_color; plt.mirror_color]); end
 
 cond_x = 1:numel(cond_lab);
 ez_ix = cond_x(ez_idx);
@@ -177,6 +189,18 @@ for st_ix = 1:numel(stat_ids)
             eval(['yyaxis ' amp_lr]);
             ax = gca; hold on;
             ax.YLabel.String = 'ERP Amplitude (uV)';
+        end
+    elseif mirror_mean
+        if mean_st_idx(st_ix)
+            eval(['yyaxis ' amp_lr]);
+            ax2 = gca; hold on;
+            ax2.YLabel.String = 'ERP Amplitude (uV)';
+            set(ax2,'FontSize',16);
+            ax2.YDir = 'reverse';
+        else
+            eval(['yyaxis ' p2p_lr]);
+            ax = gca; hold on;
+            ax.YLabel.String = 'Peak-to-Peak Amplitude (uV)';
         end
     else
         ax = gca; hold on;
@@ -204,7 +228,7 @@ set(gca,'FontSize',16);
 
 %% Save figure
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' strjoin(stat_ids,'-') '/FRN_' plt_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/FRN_point_estimates/' strjoin(stat_ids,'-') '/' plt_id '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end

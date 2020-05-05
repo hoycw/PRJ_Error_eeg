@@ -97,7 +97,10 @@ set(gca,'XTick',1:numel(cond_lab));
 set(gca,'XTickLabels',cond_names);
 % xtickangle(plt.tick_angle);
 xlim([0 numel(cond_lab)+1]);
-% ylim([-0.4 1.3]);
+if any(strcmp(st.model_lab,{'VML','SML'}))
+    ylim([-1.1 1.1]);
+    plt.leg_loc = 'southwest';
+end
 % yticks([0 1]);
 % set(gca,'YTickLabels',{'Low','High'})
 

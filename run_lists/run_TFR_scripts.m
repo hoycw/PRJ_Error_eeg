@@ -16,7 +16,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 %% Compute TFRs
 proc_id    = 'eeg_full_ft';
 an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};
-erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
+erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 conditions = 'DifFB';
 plt_id     = 'ts_F2to1_evnts_sigLine';
 save_fig   = 1;
@@ -25,16 +25,16 @@ fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
-        SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
+%         SBJ05a_TFR_save(SBJs{s}, proc_id, an_ids{an_ix})
 %         SBJ05b_TFR_plot(SBJs{s}, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %         SBJ05b_TFR_ERP_plot(SBJs{s}, conditions, proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-%     SBJ05c_TFR_plot_grp(SBJs, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
+%     SBJ05c_TFR_plot_grp(SBJ_id, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     SBJ05c_TFR_ERP_plot_grp(SBJs, conditions, proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ05c_TFR_ERP_plot_grp(SBJ_id, conditions, proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% Compute Phase
@@ -58,11 +58,11 @@ for an_ix = 1:numel(an_ids)
 %             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
-%     SBJ05c_ITC_plot_grp(SBJs, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
+%     SBJ05c_ITC_plot_grp(SBJ_id, conditions, proc_id, an_ids{an_ix}, plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     SBJ05c_ITC_ERP_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%     SBJ05c_ITC_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...
 %             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     SBJ05c_ITC_ERP_rose_plot_grp(SBJs,conditions,proc_id,an_ids{an_ix},phs_freq_lim,phs_time_lim,erp_ids{an_ix},...
+%     SBJ05c_ITC_ERP_rose_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},phs_freq_lim,phs_time_lim,erp_ids{an_ix},...
 %             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

@@ -85,7 +85,7 @@ for ch_ix = 1:numel(st_tfr.label)
             r2_mat(f_ix,t_ix)     = lme{f_ix,t_ix}.Rsquared.Adjusted;
         end
     end
-    clim = [min(beta_mat(:)) max(beta_mat(:))];
+    clim = [-max(abs(beta_mat(:))) max(abs(beta_mat(:)))];
     
     % Get significance mask
     ns_alpha = 0.4;

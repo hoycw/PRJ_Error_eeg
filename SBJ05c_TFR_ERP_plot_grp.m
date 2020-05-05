@@ -49,7 +49,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select conditions (and trials)
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
-[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
+[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(conditions);
 % if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
@@ -176,7 +176,7 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
                 'LineStyle','-'},'patchSaturation',0.3);
         ylabel('Amplitude (uV)');
         
-        title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_lab{cond_ix} '(n=' num2str(numel(SBJs)) ')']);
+        title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_names{cond_ix}]);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');

@@ -19,6 +19,8 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
+        elseif strcmp(varargin{v},'plot_data')
+            plot_data = varargin{v+1};
         elseif strcmp(varargin{v},'plot_violins')
             plot_violins = varargin{v+1};
         else
@@ -30,6 +32,7 @@ end
 % Define default options
 if ~exist('fig_vis','var');      fig_vis = 'on'; end
 if ~exist('fig_ftype','var');    fig_ftype = 'png'; end
+if ~exist('plot_data','var');      plot_data = 0; end
 if ~exist('plot_violins','var'); plot_violins = 0; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
@@ -52,30 +55,32 @@ load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat']);
 if numel(ch_list)>1; error('only plotting for 1 channel in this script!'); end
 
 %% Load Data and Compute Mean Window
-cfgs = []; cfgs.latency = st.stat_lim+reg_pk_time; cfgs.avgovertime = 'yes';
-data = cell(size(cond_lab));
-for s = 1:numel(SBJs)
-    % Load data
-    fprintf('========================== Processing %s ==========================\n',SBJs{s});
-    load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
-        SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
-    load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',an_id,'.mat'],'roi');
-    
-    % Select time of interest
-    st_roi = ft_selectdata(cfgs, roi);
-    
-    % Load and add data
-    cond_idx = fn_condition_index(cond_lab, bhv);
-    for cond_ix = 1:numel(cond_lab)
-        cond_trl_ix = find(cond_idx==cond_ix);
-        sbj_data = nan([numel(cond_trl_ix) 1]);
-        for t_ix = 1:numel(cond_trl_ix)
-            sbj_data(t_ix) = st_roi.trial{cond_trl_ix(t_ix)};
+if plot_data
+    cfgs = []; cfgs.latency = st.stat_lim+reg_pk_time; cfgs.avgovertime = 'yes';
+    data = cell(size(cond_lab));
+    for s = 1:numel(SBJs)
+        % Load data
+        fprintf('========================== Processing %s ==========================\n',SBJs{s});
+        load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
+            SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
+        load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',an_id,'.mat'],'roi');
+        
+        % Select time of interest
+        st_roi = ft_selectdata(cfgs, roi);
+        
+        % Load and add data
+        cond_idx = fn_condition_index(cond_lab, bhv);
+        for cond_ix = 1:numel(cond_lab)
+            cond_trl_ix = find(cond_idx==cond_ix);
+            sbj_data = nan([numel(cond_trl_ix) 1]);
+            for t_ix = 1:numel(cond_trl_ix)
+                sbj_data(t_ix) = st_roi.trial{cond_trl_ix(t_ix)};
+            end
+            data{cond_ix} = [data{cond_ix}; sbj_data];
         end
-        data{cond_ix} = [data{cond_ix}; sbj_data];
+        
+        clear roi st_roi sbj_data cond_idx bhv cond_trl_ix
     end
-    
-    clear roi st_roi sbj_data cond_idx bhv cond_trl_ix
 end
 
 %% Plot Results
@@ -92,6 +97,8 @@ else
     plot_betas = lme{1}.Coefficients.Estimate(2:end);
 end
 r2 = lme{1}.Rsquared.Adjusted;
+st_lim = st.stat_lim + reg_pk_time;
+measure_str = [st.measure '(' num2str(st_lim(1)) '-' num2str(st_lim(2)) ' s)'];
 
 % Find significant regressors
 sig_reg    = false(size(reg_lab));
@@ -101,72 +108,79 @@ for reg_ix = 1:numel(reg_lab)
     end
 end
 
-if plot_violins
-    for cond_ix = 1:numel(cond_lab)
-        plot_data.(cond_lab{cond_ix}) = data{cond_ix};
-    end
-else
-    plot_means = nan(size(cond_lab));
-    plot_sems  = nan(size(cond_lab));
-    for cond_ix = 1:numel(cond_lab)
-        plot_means(cond_ix) = nanmean(data{cond_ix});
-        plot_sems(cond_ix)  = std(data{cond_ix})./sqrt(numel(data{cond_ix}))';
+if plot_data
+    if plot_violins
+        for cond_ix = 1:numel(cond_lab)
+            plot_data.(cond_lab{cond_ix}) = data{cond_ix};
+        end
+    else
+        plot_means = nan(size(cond_lab));
+        plot_sems  = nan(size(cond_lab));
+        for cond_ix = 1:numel(cond_lab)
+            plot_means(cond_ix) = nanmean(data{cond_ix});
+            plot_sems(cond_ix)  = std(data{cond_ix})./sqrt(numel(data{cond_ix}))';
+        end
     end
 end
 
 %% Plot Mean Window Data
 fig_name = [SBJ_id '_' stat_id '_' ch_list{1}];
+if plot_data
+    fig_name = [fig_name '_violins'];
+end
 if plot_violins
     fig_name = [fig_name '_violins'];
 end
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
-subplot(2,1,1); ax = gca; hold on;
 
-if plot_violins
-    violins = violinplot(plot_data, cond_lab, 'ShowData', false, 'ShowMean', true, 'ViolinAlpha', 0.3);
+if plot_data
+    subplot(2,1,1); ax = gca; hold on;
     
-    for cond_ix = 1:numel(cond_lab)
-        % Fix Mean from population estimate to sample mean
-        violins(cond_ix).MeanPlot.YData = repmat(nanmean(plot_data.(cond_lab{cond_ix})), [1 2]);
-        [~,mean_ix] = min(abs(violins(cond_ix).ViolinPlot.YData - nanmean(plot_data.(cond_lab{cond_ix}))));
-        mean_width  = violins(cond_ix).ViolinPlot.XData(mean_ix)-cond_ix;
-        violins(cond_ix).MeanPlot.XData = [cond_ix-mean_width cond_ix+mean_width];
-        violins(cond_ix).MeanPlot.LineWidth = 3;
+    if plot_violins
+        violins = violinplot(plot_data, cond_lab, 'ShowData', false, 'ShowMean', true, 'ViolinAlpha', 0.3);
         
-        % Change the colors to match condition
-        %   Violin
-        violins(cond_ix).ViolinColor = cond_colors{cond_ix};
-        %   Box plot
-        violins(cond_ix).BoxPlot.FaceColor = cond_colors{cond_ix};
-        violins(cond_ix).EdgeColor = cond_colors{cond_ix};
+        for cond_ix = 1:numel(cond_lab)
+            % Fix Mean from population estimate to sample mean
+            violins(cond_ix).MeanPlot.YData = repmat(nanmean(plot_data.(cond_lab{cond_ix})), [1 2]);
+            [~,mean_ix] = min(abs(violins(cond_ix).ViolinPlot.YData - nanmean(plot_data.(cond_lab{cond_ix}))));
+            mean_width  = violins(cond_ix).ViolinPlot.XData(mean_ix)-cond_ix;
+            violins(cond_ix).MeanPlot.XData = [cond_ix-mean_width cond_ix+mean_width];
+            violins(cond_ix).MeanPlot.LineWidth = 3;
+            
+            % Change the colors to match condition
+            %   Violin
+            violins(cond_ix).ViolinColor = cond_colors{cond_ix};
+            %   Box plot
+            violins(cond_ix).BoxPlot.FaceColor = cond_colors{cond_ix};
+            violins(cond_ix).EdgeColor = cond_colors{cond_ix};
+        end
+    else
+        % Plot Means as bar
+        b = bar(1:numel(cond_lab),plot_means,'BarWidth',plt.bar_width,'FaceColor','flat');
+        for cond_ix = 1:numel(cond_lab)
+            b.CData(cond_ix,:) = cond_colors{cond_ix};
+            
+            % Plot SEM as line
+            line([cond_ix cond_ix],[plot_means(cond_ix)-plot_sems(cond_ix) plot_means(cond_ix)+plot_sems(cond_ix)],...
+                'Color','k','LineWidth',2);
+        end
     end
-else
-    % Plot Means as bar
-    b = bar(1:numel(cond_lab),plot_means,'BarWidth',plt.bar_width,'FaceColor','flat');
-    for cond_ix = 1:numel(cond_lab)
-        b.CData(cond_ix,:) = cond_colors{cond_ix};
-        
-        % Plot SEM as line
-        line([cond_ix cond_ix],[plot_means(cond_ix)-plot_sems(cond_ix) plot_means(cond_ix)+plot_sems(cond_ix)],...
-            'Color','k','LineWidth',2);
-    end
+    
+    % Add label and min RT for perspective
+    ax = gca;
+    ax.YLabel.String = 'FRN Amplitude (uV)';
+    ax.XLim          = [0 numel(cond_lab)+1];
+    ax.XTick         = 1:numel(cond_lab);
+    ax.XTickLabel    = cond_names;
+    ax.XLabel.String = 'Conditions';
+    ax.Title.String  = [ch_list{1} ' ' measure_str ': R2 = ' num2str(r2,'%.3f') ' (n = ' num2str(numel(SBJs)) ')'];
+    set(ax,'FontSize',16');
 end
 
-% Add label and min RT for perspective
-ax = gca;
-ax.YLabel.String = 'FRN Amplitude (uV)';
-ax.XLim          = [0 numel(cond_lab)+1];
-ax.XTick         = 1:numel(cond_lab);
-ax.XTickLabel    = cond_names;
-ax.XLabel.String = 'Conditions';
-st_lim = st.stat_lim + reg_pk_time;
-measure_str     = [st.measure '(' num2str(st_lim(1)) '-' num2str(st_lim(2)) ' s)'];
-ax.Title.String  = [ch_list{1} ' ' measure_str ': R2 = ' num2str(r2,'%.3f') ' (n = ' num2str(numel(SBJs)) ')'];
-set(ax,'FontSize',16');
-
 %% Plot Betas
-subplot(2,1,2); ax = gca; hold on;
+if plot_data; subplot(2,1,2); end
+ax = gca; hold on;
 
 % Find significance marker distance
 sig_y = max(abs(plot_betas))*plt.sig_yfudge;
@@ -200,9 +214,13 @@ ax.XTickLabel    = reg_names;
 ax.XLabel.String = 'Regressors';
 reg_str = cell(size(reg_lab));
 for reg_ix = 1:numel(reg_lab)
-    reg_str{reg_ix} = [reg_lab{reg_ix} ' (q=' num2str(qvals(reg_ix),'%.4f') ')'];
+    reg_str{reg_ix} = [reg_lab{reg_ix} ' (q=' num2str(qvals(reg_ix),'%.3f') ')'];
 end
-ax.Title.String = strjoin(reg_str,', ');
+if plot_data
+    ax.Title.String = strjoin(reg_str,', ');
+else
+    ax.Title.String = [ch_list{1} ' ' measure_str ': R2 = ' num2str(r2,'%.3f') ', ' strjoin(reg_str,', ')];
+end
 if plt.legend
     legend(b,reg_lab,'Location',plt.legend_loc);
 end

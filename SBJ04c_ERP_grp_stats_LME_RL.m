@@ -60,7 +60,7 @@ for s = 1:numel(SBJs)
 end
 
 %% Load Peak Timing Information
-if strcmp(st.measure,'mean') && isfield(st,'pk_an_id')
+if strcmp(st.measure,'mean')
     if all(isfield(st,{'pk_trial_cond','pk_erp_cond','pk_lim','pk_sign'}))    % ERP peak
         % Load ERP
         tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_trial_cond '_' st.pk_an_id '.mat']);
@@ -89,6 +89,8 @@ if strcmp(st.measure,'mean') && isfield(st,'pk_an_id')
         end
         [~,pk_ix] = max(abs(pk_ts));
         reg_pk_time = tmp.time_vec(pk_ix);
+    elseif isfield(st,'pk_center')      % manual peak setting
+        reg_pk_time = st.pk_center;
     end
     st.stat_lim = st.stat_lim+reg_pk_time;
 else
