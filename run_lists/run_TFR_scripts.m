@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'goodall';
+SBJ_id = 'good2';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Compute TFRs
@@ -18,7 +18,7 @@ proc_id    = 'eeg_full_ft';
 an_ids     = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 conditions = 'DifFB';
-plt_id     = 'ts_F2to1_evnts_sigLine';
+plt_id     = 'ts_F2t8_evnts_sigLine';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';

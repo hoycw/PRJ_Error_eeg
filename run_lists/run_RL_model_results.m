@@ -10,12 +10,12 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';%'goodall';
+SBJ_id = 'good2';%'good1';%'goodall';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
-stat_ids = {'sRPE_all_lme_st05t5'};
+stat_ids = {'ERPEsL_all_lme_st05t5'};
 
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
@@ -28,7 +28,7 @@ end
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Main RL Model
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%
-stat_ids  = {'SML_all_lme_st05t5','ERPEsL_all_lme_st05t5'};
+stat_ids  = {'ERPEsL_all_lme_st05t5'};%'SML_all_lme_st05t5',
 % stat_ids = {'S_all_lme_st05t5','V_all_lme_st05t5','sRPE_all_lme_st05t5'};
 plt_id    = 'ts_F2t8_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st05t5';
@@ -38,27 +38,28 @@ save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'png';
 
-for an_ix = 1%:numel(an_ids)
-    for st_ix = 1%:numel(stat_ids)
-      SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+for an_ix = 1:numel(an_ids)
+    for st_ix = 1:numel(stat_ids)
+%       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
       SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
 %     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
     
-%     % Model Comparison Plots (Adjusted R-Squared)
-    SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
-    SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',1);
-    SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
+    % Model Comparison Plots (Adjusted R-Squared)
+%     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
+%     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',1);
+%     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
 end
 
 %% ERP Topographies: Linear Mixed Effects Model (Mean Windows)
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'ERPEsL_all_lme_mn05man1','ERPEsL_all_lme_mn05man225','ERPEsL_all_lme_mn05man325','ERPEsL_all_lme_mn05man375'};
+stat_ids  = {'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
+% stat_ids  = {'ERPEsL_all_lme_mn05man1','ERPEsL_all_lme_mn05man225','ERPEsL_all_lme_mn05man325','ERPEsL_all_lme_mn05man375'};
 % stat_ids  = {'VML_all_lme_mn1FRN','VML_all_lme_mn1P3'};
 plt_id    = 'topo_F18t25';
 save_fig  = 1;
@@ -119,9 +120,9 @@ for an_ix = 1:numel(an_ids)
         
         % Jack-Knife wITPC LME Regression: Group level
         stat_id = [model_ids{st_ix} '_lme_' model_win];
-%         SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
-%         SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+        SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
         
 %         % wITPC: SBJ level z-score, GRP t-test

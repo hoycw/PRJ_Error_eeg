@@ -132,6 +132,7 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
         plt_means(cond_ix,:) = squeeze(mean(means(cond_ix,:,ch_ix,:),2));
         sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
     end
+    erp_ylim = [min(min(plt_means-sems)) max(max(plt_means+sems))];
     
     %% Create plot
     fig_name = [SBJ_id '_' conditions '_' tfr_an_id '_' erp_an_id '_' tfr_avg{1}.label{ch_ix}];
@@ -158,7 +159,7 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
         set(gca,'YDir','normal');
 %         set(gca,'YTick',1:3:numel(tfr_all{cond_ix}.freq));
 %         set(gca,'YTickLabels',yticklab);
-        caxis([min(clim(:,1)) max(clim(:,2))]);
+        caxis([-max(abs(clim(:))) max(abs(clim(:)))]);
         colorbar('northoutside');
         ylabel('Frequency (Hz)');
 
@@ -177,6 +178,7 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
         ylabel('Amplitude (uV)');
         
         title([tfr_avg{cond_ix}.label{ch_ix} ': ' cond_names{cond_ix}]);
+        set(gca,'YLim', erp_ylim);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));
         xlabel('Time (s)');

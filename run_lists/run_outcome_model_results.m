@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';
+SBJ_id = 'good2';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Save Group ERP Peak Time
@@ -26,7 +26,7 @@ stat_ids = {'S_all_lme_mn1FRN','V_all_lme_mn1FRN','sRPE_all_lme_mn1FRN'};
 % stat_ids = {'VML_all_lme_mn1FRN','SML_all_lme_mn1FRN','ERPEsL_all_lme_mn1FRN','RPEsL_all_lme_mn1FRN'};
 
 for s = 1:numel(SBJs)
-    for st_ix = 1:numel(stat_ids)
+    for st_ix = 1%:numel(stat_ids)
         SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
     end
     close all;
@@ -39,7 +39,7 @@ stat_ids = {'RSVPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','VML_all_lme_mn1FRN','ER
 plt_id   = 'line_cond';
 save_fig = 1;
 
-for st_ix = 2:3%1:numel(stat_ids)
+for st_ix = 1:numel(stat_ids)
     SBJ04a_plot_model_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig);
 end
 
@@ -108,7 +108,7 @@ for st_ix = 1:numel(stat_ids)
 %     SBJ04c_ERP_grp_stats_GLM(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_peaks',0);
 %     SBJ04d_ERP_plot_stats_GLM_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_peaks',0);
+    SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
 %     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
@@ -116,10 +116,10 @@ for st_ix = 1:numel(stat_ids)
 end
 
 % Model Comparison Plots (Adjusted R-Squared)
-SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'AIC',save_fig,...
-    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
-SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'R2',save_fig,...
-    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
+% SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'AIC',save_fig,...
+%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
+% SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'R2',save_fig,...
+%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
 
 %% FRN Metric Comparison: FRN by Condition
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';

@@ -91,7 +91,7 @@ for ch_ix = 1:numel(st_tfr.label)
     ns_alpha = 0.4;
     sig_mask = ones([numel(reg_lab) numel(fois) numel(st_time_vec)])*ns_alpha;
     sig_mask(qvals<=st.alpha) = 1;
-
+    
 %     tick_ix = 1:3:numel(fois);
 %     yticklab = cell(size(tick_ix));
 %     for f = 1:numel(tick_ix)
@@ -143,6 +143,19 @@ for ch_ix = 1:numel(st_tfr.label)
     ylabel('Frequency (Hz)');
     colorbar('northoutside');
     set(gca,'FontSize',16);
+    
+    % Report max beta points
+    for reg_ix = 1:numel(reg_lab)
+        max_beta = 0; max_f_ix = 0; max_t_ix = 0;
+        for f = 1:numel(fois)
+            if max(abs(beta_mat(reg_ix,f,:))) > abs(max_beta)
+                [~, max_t_ix] = max(abs(beta_mat(reg_ix,f,:)));
+                max_f_ix = f;
+                max_beta = beta_mat(reg_ix,max_f_ix,max_t_ix);
+            end
+        end
+        fprintf('%s = %.03f at %.03f s, %.02f Hz\n',reg_lab{reg_ix},max_beta,st_time_vec(max_t_ix),fois(max_f_ix));
+    end
     
     % Save figure
     if save_fig

@@ -55,7 +55,7 @@ for st_ix = 1:numel(stat_ids)
     if st_ix>1
         fnames = fieldnames(sts{st_ix});
         for f_ix = 1:numel(fnames)
-            if ~any(strcmp(fnames{f_ix},{'pk_center'}))
+            if ~any(strcmp(fnames{f_ix},{'pk_center','pk_reg_id','pk_an_id'}))
                 if ischar(sts{st_ix}.(fnames{f_ix}))
                     if ~strcmp(sts{1}.(fnames{f_ix}), sts{st_ix}.(fnames{f_ix}))
                         error(['st.' fnames{f_ix} ' not the same!']);
@@ -84,7 +84,8 @@ end
 %% Load Stats
 clim     = zeros([numel(reg_lab) 2]);
 betas    = nan([numel(stat_ids) numel(reg_lab) 64]);
-sig_ch   = nan([numel(stat_ids) numel(reg_lab) 64]);
+orig_qvals    = nan([numel(stat_ids) numel(reg_lab) 64]);
+pvals    = nan([numel(stat_ids) numel(reg_lab) 64]);
 r2       = zeros([numel(stat_ids) 64]);
 pk_times = zeros(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
@@ -93,17 +94,27 @@ for st_ix = 1:numel(stat_ids)
     
     % Get beta values, color limits, and peak times
     pk_times(st_ix) = reg_pk_time;
-    sig_ch(st_ix,:,:) = qvals<=sts{st_ix}.alpha;
+    orig_qvals(st_ix,:,:) = qvals;
     for ch_ix = 1:numel(ch_list)
         for reg_ix = 1:numel(reg_lab)
             betas(st_ix,reg_ix,ch_ix) = lme{ch_ix}.Coefficients.Estimate(reg_ix+1);
             clim(reg_ix,:) = [min([clim(reg_ix,1) betas(st_ix,reg_ix,ch_ix)]) max([clim(reg_ix,2) betas(st_ix,reg_ix,ch_ix)])];
         end
+        pvals(st_ix,:,ch_ix) = lme{ch_ix}.Coefficients.pValue(2:end);
         r2(st_ix,ch_ix) = lme{ch_ix}.Rsquared.Adjusted;
     end
     
     clear lme qvals reg_pk_time
 end
+
+% Recompute significance with multiple comparisons over all regressors and windows
+if strcmp(sts{1}.mcp_method,'FDR')
+    [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2)*size(pvals,3) 1]));
+    qvals = reshape(qvals,[size(pvals,1) size(pvals,2) size(pvals,3)]);
+else
+    error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
+end
+sig_ch = qvals<=sts{1}.alpha;
 
 %% Create dummy dataset for plotting
 load([root_dir 'PRJ_Error_eeg/data/',SBJs{1},'/04_proc/',SBJs{1},'_',an_id,'.mat'],'roi');
@@ -120,23 +131,21 @@ figure('Name',fig_name,'units','normalized',...
 % Set up defatul plotting params
 axes = gobjects([numel(stat_ids) numel(reg_lab)+1]);
 cfgp = [];
-cfgp.layout   = 'biosemi64.lay';
-cfgp.comment  = 'no';
-cfgp.highlight = 'on';
+cfgp.layout          = 'biosemi64.lay';
+cfgp.comment         = 'no';
+cfgp.highlight       = 'on';
 cfgp.highlightsymbol = '*';
-cfgp.parameter = 'avg';
+cfgp.parameter       = 'avg';
 % cfgp.maskparameter = 'mask';
+cfgp.zlim            = [-max(abs(clim(:))) max(abs(clim(:)))];
 
 % Plot topo for each regressor and time
 plot_ix = 0;
 for reg_ix = 1:numel(reg_lab)
-    % Balance color scale
-    plot_clim = [-max(abs(clim(reg_ix,:))) max(abs(clim(reg_ix,:)))];
     for st_ix = 1:numel(stat_ids)
         topo.time   = pk_times(st_ix);
         cfgp.xlim   = [pk_times(st_ix) pk_times(st_ix)];
         plot_ix = plot_ix + 1;
-        cfgp.zlim   = plot_clim;
         subplot(numel(reg_lab)+1,numel(stat_ids),plot_ix);
         axes(st_ix,reg_ix) = gca; hold on;
         if st_ix==numel(stat_ids)
@@ -176,7 +185,26 @@ for st_ix = 1:numel(stat_ids)
 %     topo.mask = zeros(size(topo.avg));
     ft_topoplotER(cfgp, topo);
     title(['Adjusted R2: '  num2str(pk_times(st_ix),'%.3f') ' s']);
-    axis tight
+    axis tight    
+end
+
+% Report peak window and elec per regressor
+for reg_ix = 1:numel(reg_lab)
+    max_beta = 0; max_ch_ix = 0; max_t_ix = 0;
+    for st_ix = 1:numel(stat_ids)
+        if max(abs(betas(st_ix,reg_ix,:))) > abs(max_beta)
+            max_tmp = max(betas(st_ix,reg_ix,:));
+            min_tmp = min(betas(st_ix,reg_ix,:));
+            if abs(max_tmp) > abs(min_tmp)
+                [max_beta, max_ch_ix] = max(betas(st_ix,reg_ix,:));
+            else
+                [max_beta, max_ch_ix] = min(betas(st_ix,reg_ix,:));
+            end
+            max_t_ix = st_ix;
+        end
+    end
+    fprintf('%s max beta = %.03f at %.03f, %s\n',reg_lab{reg_ix},max_beta,...
+        pk_times(max_t_ix),roi.label{max_ch_ix});
 end
 
 %% Save figure
