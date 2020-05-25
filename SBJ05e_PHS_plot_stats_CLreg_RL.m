@@ -119,7 +119,7 @@ for ch_ix = 1:numel(st_tfr.label)
     
     % Save figure
     if save_fig
-        fig_filename = [fig_dir fig_name '.png'];
+        fig_filename = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_filename);
         saveas(gcf,fig_filename);
     end
@@ -155,7 +155,7 @@ for ch_ix = 1:numel(st_tfr.label)
     
     % Save figure
     if save_fig
-        fig_filename = [fig_dir fig_name '.png'];
+        fig_filename = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_filename);
         saveas(gcf,fig_filename);
     end

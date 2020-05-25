@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good2';
+SBJ_id = 'good1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Compute TFRs
@@ -21,7 +21,7 @@ conditions = 'DifFB';
 plt_id     = 'ts_F2t8_evnts_sigLine';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'png';
+fig_ftype  = 'svg';
 
 for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)

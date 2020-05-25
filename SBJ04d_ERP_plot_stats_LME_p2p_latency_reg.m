@@ -1,4 +1,4 @@
-function SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_id,plt_id,save_fig,varargin)
+function SBJ04d_ERP_plot_stats_LME_p2p_latency_reg(SBJ_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots beta weights per regressor for mean window LME analyses
 %   Only for single channel right now...
 %% Set up paths

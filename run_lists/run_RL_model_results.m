@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good2';%'good1';%'goodall';
+SBJ_id = 'good1';%'good2';%'goodall';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
@@ -36,7 +36,7 @@ null_id   = 'SBJonly_all_lme_st05t5';
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'png';
+fig_ftype = 'svg';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
@@ -68,9 +68,9 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-        SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
-        SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_ids{an_ix},stat_ids{st_ix},...
-            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+%         SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_ids{an_ix},stat_ids{st_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Plot Topo time series
@@ -108,19 +108,19 @@ model_win = 'st0t5';
 %plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'png';
+fig_ftype = 'svg';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(model_ids)
 %         % Circular-Linear Regression: Group level, separate for each regressor
         stat_id = [model_ids{st_ix} '_CLreg_' model_win];
-        SBJ05d_PHS_grp_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+%         SBJ05d_PHS_grp_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
         SBJ05e_PHS_plot_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
         % Jack-Knife wITPC LME Regression: Group level
         stat_id = [model_ids{st_ix} '_lme_' model_win];
-        SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+%         SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
         SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         

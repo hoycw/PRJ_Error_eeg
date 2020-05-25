@@ -75,6 +75,8 @@ switch grp_id
         %markers = {'o', 'o'};
     case 'Val'
         labels = {'Pos', 'Neg'};
+    case 'EHSu'
+        labels = {'EzSu','HdSu'};
     case {'OutS','FB'}
         labels = {'Wn', 'Ls', 'Su'};
         %colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};

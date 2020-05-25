@@ -181,7 +181,7 @@ for ch_ix = 1:numel(ch_list)
             'LineStyle',cond_styles{cond_ix}},'patchSaturation',plt.errbar_alpha);
         main_lines(cond_ix) = cond_lines{cond_ix}.mainLine;
     end
-    ylims = ylim;
+    ylims = [-15 30];%ylim;
     if strcmp(plt.sig_type,'line')
         data_lim = [min(min(plot_means-sems)) max(max(plot_means+sems))];
     end
@@ -227,7 +227,7 @@ for ch_ix = 1:numel(ch_list)
     % Plot Extra Features (events, significance)
     for evnt_ix = 1:numel(plt.evnt_lab)
         main_lines(numel(cond_lab)+sum(sig_reg)+evnt_ix) = line(...
-            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],[-15 30],...%ylim,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end    
@@ -246,7 +246,7 @@ for ch_ix = 1:numel(ch_list)
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
-    ylims = ylim;
+    ylims = [-15 30];%ylim;
     set(gca,'FontSize',16);
     axes(1).YLim = ylims;
     
@@ -274,7 +274,7 @@ for ch_ix = 1:numel(ch_list)
     % Plot Extra Features (events, significance)
     for evnt_ix = 1:numel(plt.evnt_lab)
         beta_lines(numel(reg_lab)+evnt_ix) = line(...
-            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],[-4 6],...%ylim,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end    
@@ -289,7 +289,7 @@ for ch_ix = 1:numel(ch_list)
     if plt.legend
         legend(beta_lines,[reg_lab plt.evnt_lab],'Location',plt.legend_loc);
     end
-    ylims = ylim;
+    ylims = [-4 6];%ylim;
     set(gca,'FontSize',16);
     axes(2).YLim = ylims;
     
@@ -299,7 +299,7 @@ for ch_ix = 1:numel(ch_list)
     
     line(st_time_vec, r2, 'Color','k', 'LineWidth',2);
     for evnt_ix = 1:numel(plt.evnt_lab)
-        line([evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+        line([evnt_times(evnt_ix) evnt_times(evnt_ix)],[0 0.4],...%ylim,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end    
