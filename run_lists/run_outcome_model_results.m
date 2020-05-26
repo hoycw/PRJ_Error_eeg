@@ -121,6 +121,24 @@ end
 % SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'R2',save_fig,...
 %     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
 
+%% Peak Latency Regression
+an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_ids  = {'ERPEsL_all_lme_p2pFRN'};%'SML_all_lme_p2pFRN',
+
+proc_id   = 'eeg_full_ft';
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'svg';
+
+for st_ix = 1:numel(stat_ids)
+    SBJ_norm = 0;
+    SBJ04c_ERP_p2p_latency_reg(SBJ_id,proc_id,an_id,stat_ids{st_ix},SBJ_norm,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ_norm = 1;
+    SBJ04c_ERP_p2p_latency_reg(SBJ_id,proc_id,an_id,stat_ids{st_ix},SBJ_norm,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+end
+
 %% FRN Metric Comparison: FRN by Condition
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
 stat_ids  = {'S_all_lme_mn1FRN','S_all_lme_p2pFRN'};
