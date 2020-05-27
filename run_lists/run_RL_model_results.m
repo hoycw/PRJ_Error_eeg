@@ -121,8 +121,8 @@ for an_ix = 1:numel(an_ids)
         % Jack-Knife wITPC LME Regression: Group level
         stat_id = [model_ids{st_ix} '_lme_' model_win];
 %         SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
-        SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
         
 %         % wITPC: SBJ level z-score, GRP t-test

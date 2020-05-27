@@ -137,6 +137,8 @@ for reg_ix = 1:numel(reg_lab)
     
     if SBJ_norm
         ax.XLabel.String = 'Normalized FRN Peak Latency (s)';
+        ax.XLim = [-0.06 0.06];
+        ax.XTick = [-0.05:0.025:0.05];
     else
         ax.XLabel.String = 'FRN Peak Latency (s)';
         ax.XLim = st.pk_lim(2,:);

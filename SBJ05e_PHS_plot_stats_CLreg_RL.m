@@ -80,7 +80,7 @@ end
 % Create a figure for each channel
 for ch_ix = 1:numel(st_tfr.label)
     % Get color lims per condition
-    beta_clim = [min(betas(:)) max(betas(:))];
+    beta_clim = [-max(abs(betas(:))) max(abs(betas(:)))];
     r2_clim   = [min(r2s(:)) max(r2s(:))];
     
     % Get significance mask

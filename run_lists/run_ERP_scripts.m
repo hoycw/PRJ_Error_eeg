@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'goodall';
+SBJ_id = 'good1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Run preprocessing
@@ -60,17 +60,20 @@ for an_ix = 1%:numel(an_ids)
 %     close all;
 end
 
-%% Plot only surprise ERPs
-an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20'};
-conditions = 'EHSu';
+%% Plot ERPs with FRN peaks marked
+an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+cond_list  = {'EHSu'};%{'HdOutS','EzOutS'};%
 proc_id    = 'eeg_full_ft';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'svg';
-plt_id     = 'ts_F1t5_evnts_sigLine';
+plt_id     = 'ts_F0t5_evnts_sigLine';
 
-for an_ix = 1%:numel(an_ids)
-    SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+pk_lim  = [0.18 0.3];
+pk_sign = -1;
+
+for cond_ix = 1:numel(cond_list)
+    SBJ03c_ERP_plot_grp_pkLine(SBJ_id,cond_list{cond_ix},proc_id,an_id,pk_lim,pk_sign,plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
