@@ -124,6 +124,25 @@ for ch_ix = 1:numel(st_tfr.label)
         saveas(gcf,fig_filename);
     end
     
+    %% Report max beta stats
+    for reg_ix = 1:numel(reg_lab)
+        max_beta = 0; max_f_ix = 0; max_t_ix = 0;
+        for f_ix = 1:numel(fois)
+            if max(abs(betas(reg_ix,f_ix,:))) > abs(max_beta)
+                max_tmp = max(betas(reg_ix,f_ix,:));
+                min_tmp = min(betas(reg_ix,f_ix,:));
+                if abs(max_tmp) > abs(min_tmp)
+                    [max_beta, max_t_ix] = max(betas(reg_ix,f_ix,:));
+                else
+                    [max_beta, max_t_ix] = min(betas(reg_ix,f_ix,:));
+                end
+                max_f_ix = f_ix;
+            end
+        end
+        fprintf('%s max beta = %.03f at %.03f s and %.03f Hz; p = %.10f\n',reg_lab{reg_ix},max_beta,...
+            st_time_vec(max_t_ix),fois(max_f_ix),qvals(reg_ix,max_f_ix,max_t_ix));
+    end
+    
     %% Create R2 Plot
     fig_name = [SBJ_id '_' stat_id '_' an_id '_' st_tfr.label{ch_ix} '_R2'];
     figure('Name',fig_name,'units','normalized',...

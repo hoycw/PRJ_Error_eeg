@@ -148,13 +148,28 @@ for ch_ix = 1:numel(st_tfr.label)
     for reg_ix = 1:numel(reg_lab)
         max_beta = 0; max_f_ix = 0; max_t_ix = 0;
         for f = 1:numel(fois)
-            if max(abs(beta_mat(reg_ix,f,:))) > abs(max_beta)
-                [~, max_t_ix] = max(abs(beta_mat(reg_ix,f,:)));
+            if max(beta_mat(reg_ix,f,:)) > max_beta
+                [~, max_t_ix] = max(beta_mat(reg_ix,f,:));
                 max_f_ix = f;
                 max_beta = beta_mat(reg_ix,max_f_ix,max_t_ix);
             end
         end
-        fprintf('%s = %.03f at %.03f s, %.02f Hz\n',reg_lab{reg_ix},max_beta,st_time_vec(max_t_ix),fois(max_f_ix));
+        fprintf('max %s = %.06f at %.03f s, %.02f Hz; p = %.10f\n',reg_lab{reg_ix},...
+            max_beta,st_time_vec(max_t_ix),fois(max_f_ix),qvals(reg_ix,max_f_ix,max_t_ix));
+    end
+    
+    % Report min beta points
+    for reg_ix = 1:numel(reg_lab)
+        min_beta = 0; min_f_ix = 0; min_t_ix = 0;
+        for f = 1:numel(fois)
+            if min(beta_mat(reg_ix,f,:)) < min_beta
+                [~, min_t_ix] = min(beta_mat(reg_ix,f,:));
+                min_f_ix = f;
+                min_beta = beta_mat(reg_ix,min_f_ix,min_t_ix);
+            end
+        end
+        fprintf('min %s = %.06f at %.03f s, %.02f Hz; p = %.10f\n',reg_lab{reg_ix},...
+            min_beta,st_time_vec(min_t_ix),fois(min_f_ix),qvals(reg_ix,min_f_ix,min_t_ix));
     end
     
     % Save figure

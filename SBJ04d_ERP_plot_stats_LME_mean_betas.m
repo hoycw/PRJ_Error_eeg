@@ -228,6 +228,12 @@ ylims = ylim;
 set(gca,'FontSize',16);
 ax.YLim = ylims;
 
+%% Report peak window and elec per regressor
+for reg_ix = 1:numel(reg_lab)
+    fprintf('%s beta = %.03f; p = %.10f\n',reg_lab{reg_ix},plot_betas(reg_ix),...
+        qvals(reg_ix));
+end
+
 %% Save figure
 if save_fig
     fig_fname = [fig_dir fig_name '.' fig_ftype];

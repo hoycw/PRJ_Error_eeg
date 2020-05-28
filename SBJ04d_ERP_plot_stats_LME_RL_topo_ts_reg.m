@@ -203,8 +203,8 @@ for reg_ix = 1:numel(reg_lab)
             max_t_ix = st_ix;
         end
     end
-    fprintf('%s max beta = %.03f at %.03f, %s\n',reg_lab{reg_ix},max_beta,...
-        pk_times(max_t_ix),roi.label{max_ch_ix});
+    fprintf('%s max beta = %.03f at %.03f, %s; p = %.10f\n',reg_lab{reg_ix},max_beta,...
+        pk_times(max_t_ix),roi.label{max_ch_ix},qvals(max_t_ix,reg_ix,max_ch_ix));
 end
 
 %% Save figure

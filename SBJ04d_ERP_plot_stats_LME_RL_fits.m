@@ -250,7 +250,7 @@ for ch_ix = 1:numel(ch_list)
     set(gca,'FontSize',16);
     axes(1).YLim = ylims;
     
-    %% Plot Betas and R2
+    %% Plot Betas
     subplot(6,1,4:5);
     axes(2) = gca; hold on;
     
@@ -313,6 +313,21 @@ for ch_ix = 1:numel(ch_list)
     % axes(3).Title.String  = 'Model Fit';
     set(gca,'FontSize',16);
     axes(3).YLim = ylims;
+    
+    %% Report peak stats per regressor
+    for reg_ix = 1:numel(reg_lab)
+        max_tmp = max(plot_betas(reg_ix,:));
+        min_tmp = min(plot_betas(reg_ix,:));
+        if abs(max_tmp) > abs(min_tmp)
+            [max_beta, max_t_ix] = max(plot_betas(reg_ix,:));
+        else
+            [max_beta, max_t_ix] = min(plot_betas(reg_ix,:));
+        end
+        fprintf('%s max beta = %.03f at %.03f; p = %.10f\n',reg_lab{reg_ix},max_beta,...
+            st_time_vec(max_t_ix),qvals(reg_ix,max_t_ix));
+    end
+    [max_r2, max_t_ix] = max(r2);
+    fprintf('max R2 = %.03f at %.03f\n',max_r2,st_time_vec(max_t_ix));
     
     %% Save figure
     if save_fig

@@ -79,11 +79,11 @@ end
 % SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_id,null_id);
 
 % Model Comparison Plots (Adjusted R-Squared)
-SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'AIC',save_fig,...
-    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
-SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'R2',save_fig,...
-    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
-
+% SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'AIC',save_fig,...
+%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
+% SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'R2',save_fig,...
+%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
+% 
 %% ERP: Peak-to-Peak LME
 % Main RL Model
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
