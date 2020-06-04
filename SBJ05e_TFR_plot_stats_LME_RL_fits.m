@@ -98,6 +98,31 @@ for ch_ix = 1:numel(st_tfr.label)
 %         yticklab{f} = num2str(st_tfr.freq(tick_ix(f)),'%.1f');
 %     end
     
+    % Find max beta points
+    beta_pks = zeros([numel(reg_lab) 2]);
+    beta_pk_f_ix = zeros([numel(reg_lab) 2]);
+    beta_pk_t_ix = zeros([numel(reg_lab) 2]);
+    minmax_ix = zeros(size(reg_lab));
+    for reg_ix = 1:numel(reg_lab)
+        for f = 1:numel(fois)
+            if min(beta_mat(reg_ix,f,:)) < beta_pks(reg_ix,1)
+                [~, beta_pk_t_ix(reg_ix,1)] = min(beta_mat(reg_ix,f,:));
+                beta_pk_f_ix(reg_ix,1) = f;
+                beta_pks(reg_ix,1) = beta_mat(reg_ix,beta_pk_f_ix(reg_ix,1),beta_pk_t_ix(reg_ix,1));
+            end
+            if max(beta_mat(reg_ix,f,:)) > beta_pks(reg_ix,2)
+                [~, beta_pk_t_ix(reg_ix,2)] = max(beta_mat(reg_ix,f,:));
+                beta_pk_f_ix(reg_ix,2) = f;
+                beta_pks(reg_ix,2) = beta_mat(reg_ix,beta_pk_f_ix(reg_ix,2),beta_pk_t_ix(reg_ix,2));
+            end
+        end
+        if abs(beta_pks(reg_ix,1)) > abs(beta_pks(reg_ix,2))
+            minmax_ix(reg_ix) = 1;
+        else
+            minmax_ix(reg_ix) = 2;
+        end
+    end
+    
     %% Create plot
     fig_name = [SBJ_id '_' stat_id '_' an_id '_' st_tfr.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
@@ -111,8 +136,15 @@ for ch_ix = 1:numel(st_tfr.label)
         subplot(num_rc(1),num_rc(2),reg_ix);
         axes(reg_ix) = gca; hold on;
         
+        % Plot Matrix
         im = imagesc(st_time_vec, fois, squeeze(beta_mat(reg_ix,:,:)),clim);
         im.AlphaData = squeeze(sig_mask(reg_ix,:,:));
+        
+        % Plot max/min point
+        scatter(st_time_vec(beta_pk_t_ix(reg_ix,minmax_ix(reg_ix))),...
+            fois(beta_pk_f_ix(reg_ix,minmax_ix(reg_ix))), 100,'r','*');
+        
+        % Plot Properties
         set(axes(reg_ix),'YDir','normal');
 %         set(axes(reg_ix),'YTick',tick_ix);
 %         set(axes(reg_ix),'YTickLabels',yticklab);
@@ -144,32 +176,14 @@ for ch_ix = 1:numel(st_tfr.label)
     colorbar('northoutside');
     set(gca,'FontSize',16);
     
-    % Report max beta points
+    % Report min and max beta points
     for reg_ix = 1:numel(reg_lab)
-        max_beta = 0; max_f_ix = 0; max_t_ix = 0;
-        for f = 1:numel(fois)
-            if max(beta_mat(reg_ix,f,:)) > max_beta
-                [~, max_t_ix] = max(beta_mat(reg_ix,f,:));
-                max_f_ix = f;
-                max_beta = beta_mat(reg_ix,max_f_ix,max_t_ix);
-            end
-        end
-        fprintf('max %s = %.06f at %.03f s, %.02f Hz; p = %.10f\n',reg_lab{reg_ix},...
-            max_beta,st_time_vec(max_t_ix),fois(max_f_ix),qvals(reg_ix,max_f_ix,max_t_ix));
-    end
-    
-    % Report min beta points
-    for reg_ix = 1:numel(reg_lab)
-        min_beta = 0; min_f_ix = 0; min_t_ix = 0;
-        for f = 1:numel(fois)
-            if min(beta_mat(reg_ix,f,:)) < min_beta
-                [~, min_t_ix] = min(beta_mat(reg_ix,f,:));
-                min_f_ix = f;
-                min_beta = beta_mat(reg_ix,min_f_ix,min_t_ix);
-            end
-        end
         fprintf('min %s = %.06f at %.03f s, %.02f Hz; p = %.10f\n',reg_lab{reg_ix},...
-            min_beta,st_time_vec(min_t_ix),fois(min_f_ix),qvals(reg_ix,min_f_ix,min_t_ix));
+            beta_pks(reg_ix,1),st_time_vec(beta_pk_t_ix(reg_ix,1)),...
+            fois(beta_pk_f_ix(reg_ix,1)),qvals(reg_ix,beta_pk_f_ix(reg_ix,1),beta_pk_t_ix(reg_ix,1)));
+        fprintf('max %s = %.06f at %.03f s, %.02f Hz; p = %.10f\n',reg_lab{reg_ix},...
+            beta_pks(reg_ix,2),st_time_vec(beta_pk_t_ix(reg_ix,2)),...
+            fois(beta_pk_f_ix(reg_ix,2)),qvals(reg_ix,beta_pk_f_ix(reg_ix,2),beta_pk_t_ix(reg_ix,2)));
     end
     
     % Save figure

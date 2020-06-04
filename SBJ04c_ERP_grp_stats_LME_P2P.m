@@ -145,6 +145,33 @@ for s = 1:numel(SBJs)
     clear tmp roi st_roi sbj_model trials cond_idx cond_trial_ix
 end
 
+%% Compute and plot correlations between regressors
+reg_corr = corr(model,'rows','complete');
+
+% Create figure directory
+stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
+fig_dir = [stat_out_dir model_id '_erp_plots/'];
+if ~exist(fig_dir,'dir')
+    mkdir(fig_dir);
+end
+
+% Plot design matrix
+fig_name = [SBJ_id '_' model_id '_design'];
+figure('Name',fig_name);
+imagesc(model);
+xticklabels(reg_lab);
+colorbar;
+saveas(gcf,[fig_dir fig_name '.png']);
+
+% Plot regressor correlation matrix
+fig_name = [SBJ_id '_' model_id '_design_corr'];
+figure('Name',fig_name);
+imagesc(reg_corr);
+xticklabels(reg_lab);
+yticklabels(reg_lab);
+colorbar;
+saveas(gcf,[fig_dir fig_name '.png']);
+
 %% Compute Peak-to-Peak Data
 % Jackknife procedure
 if strcmp(st.grp_method,'jackknife')

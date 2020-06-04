@@ -13,7 +13,7 @@ plt.ylim_fudge = 0.1;
 plt.butterfly       = 0;
 plt.butterfly_width = 0.3;
 plt.mean_width      = 2.5;
-plt.errbar_alpha    = 0.2;
+plt.errbar_alpha    = 0.1;
 %plt.main_style = '--';
 
 plt.plot_avg  = 0;

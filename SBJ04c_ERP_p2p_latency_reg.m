@@ -135,14 +135,6 @@ for reg_ix = 1:numel(reg_lab)
     reg_y = lin_fit(1)*reg_x + lin_fit(2);
     reg_line = plot(reg_x,reg_y,'k');
     
-    if SBJ_norm
-        ax.XLabel.String = 'Normalized FRN Peak Latency (s)';
-        ax.XLim = [-0.06 0.06];
-        ax.XTick = [-0.05:0.025:0.05];
-    else
-        ax.XLabel.String = 'FRN Peak Latency (s)';
-        ax.XLim = st.pk_lim(2,:);
-    end
     switch reg_lab{reg_ix}
         case 'EV'
             ax.YLim = [-1 1];
@@ -156,6 +148,15 @@ for reg_ix = 1:numel(reg_lab)
             error(['Unknown reg_lab: ' reg_lab{reg_ix}]);
     end
     ax.YLabel.String = reg_names{reg_ix};
+    if SBJ_norm
+        line([0 0],ylim,'Color','k','LineStyle','--');
+        ax.XLabel.String = 'Normalized FRN Peak Latency (s)';
+        ax.XLim = [-0.06 0.06];
+        ax.XTick = [-0.05:0.025:0.05];
+    else
+        ax.XLabel.String = 'FRN Peak Latency (s)';
+        ax.XLim = st.pk_lim(2,:);
+    end
     ax.Title.String = [ch_list{1} ' ' reg_lab{reg_ix} ': beta=' num2str(glm.Coefficients.Estimate(reg_ix+1),'%.03f')...
         ' (p=' num2str(pvals(reg_ix),'%.03f') ')'];
     legend(scats,cond_names,'Location','best');

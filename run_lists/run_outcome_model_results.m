@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';
+SBJ_id = 'goodall';%'good1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Save Group ERP Peak Time
@@ -48,18 +48,9 @@ end
 
 %% ERP: Mean Window LME
 % Main RL Model
-an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-% stat_ids = {'S_all_lme_mn1FRN','V_all_lme_mn1FRN','sRPE_all_lme_mn1FRN'};
-% stat_ids = {'M_all_lme_mn1FRN','uRPE_all_lme_mn1FRN'};
-stat_ids = {'ERPEsL_all_lme_mn1FRN'};%'SML_all_lme_mn1FRN',
+an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_ids = {'ERPEsL_all_lme_erpmn1FRN'};%'ERPEsL_all_lme_mn1FRN',
 % stat_ids = {'S_all_lme_mn1FRN','V_all_lme_mn1FRN','sRPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','ERPEsL_all_lme_mn1FRN'};
-
-% stat_ids  = {'RV_all_lme_mn1FRN','RVL_all_lme_mn1FRN','RVM_all_lme_mn1FRN','RVLM_all_lme_mn1FRN'};
-% stat_ids  = {'sRPE_all_lme_mn1FRN','uRPE_all_lme_mn1FRN','RPE_all_lme_mn1FRN','RPEOL_all_lme_mn1FRN'};
-% stat_ids  = {'RV_all_lme_mn1FRN','RVL_all_lme_mn1FRN','RVM_all_lme_mn1FRN','RVLM_all_lme_mn1FRN',...
-%     'sRPE_all_lme_mn1FRN','uRPE_all_lme_mn1FRN','RPE_all_lme_mn1FRN','RPEOL_all_lme_mn1FRN'};
-% stat_ids  = {'RVLM_all_lme_mn1FRN','sRPE_all_lme_mn1FRN','RVLMsRPE_all_lme_mn1FRN'};
-% stat_ids  = {'RPEsOL_all_lme_mn1FRN','RLOL_all_lme_mn1FRN'};
 
 plt_id    = 'bar_sigStar';
 null_id   = 'SBJonly_all_lme_mn1FRN';
@@ -70,7 +61,11 @@ fig_vis   = 'on';
 fig_ftype = 'svg';
 
 for st_ix = 1:numel(stat_ids)
-%     SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_ids{st_ix});
+%     if ~isempty(strfind(stat_ids{st_ix},'erpmn'))
+%         SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_ids{st_ix});
+%     else
+%         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_ids{st_ix});
+%     end
     SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %     SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
@@ -105,13 +100,13 @@ plt_id    = 'bar_sigStar';
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for st_ix = 1:numel(stat_ids)
 %     SBJ04c_ERP_grp_stats_GLM(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_peaks',0);
 %     SBJ04d_ERP_plot_stats_GLM_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
+    SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...

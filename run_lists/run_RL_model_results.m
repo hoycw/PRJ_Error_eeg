@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';%'good2';%'goodall';
+SBJ_id = 'goodall';%'good1';%'good2';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
@@ -64,7 +64,7 @@ stat_ids  = {'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme
 plt_id    = 'topo_F18t25';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'png';
+fig_ftype = 'svg';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
@@ -84,7 +84,7 @@ an_ids    = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};%
 stat_ids  = {'ERPEsL_all_lme_st0t5'};%'VML_all_lme_st0t5',
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'png';
+fig_ftype = 'svg';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
@@ -92,11 +92,6 @@ for an_ix = 1:numel(an_ids)
         SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-    
-    % Model Comparison Plots (Adjusted R-Squared)
-%     error('this needs to be a martix version!');
-%     SBJ05f_TFR_plot_RL_model_comparison(SBJ_id,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% PHS TFR: Linear Mixed Effects Model (Over Time-Frequency Phase)
@@ -108,15 +103,15 @@ model_win = 'st0t5';
 %plt_id    = 'ts_F2to1_evnts_sigLine';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(model_ids)
 %         % Circular-Linear Regression: Group level, separate for each regressor
         stat_id = [model_ids{st_ix} '_CLreg_' model_win];
 %         SBJ05d_PHS_grp_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
-%         SBJ05e_PHS_plot_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ05e_PHS_plot_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
         % Jack-Knife wITPC LME Regression: Group level
         stat_id = [model_ids{st_ix} '_lme_' model_win];

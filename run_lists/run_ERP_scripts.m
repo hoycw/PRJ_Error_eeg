@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';
+SBJ_id = 'goodall';%'good1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Run preprocessing
@@ -62,7 +62,7 @@ end
 
 %% Plot ERPs with FRN peaks marked
 an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-cond_list  = {'EHSu'};%{'HdOutS','EzOutS'};%
+cond_list  = {'HdOutS','EzOutS'};%{'EHSu'};%
 proc_id    = 'eeg_full_ft';
 save_fig   = 1;
 fig_vis    = 'on';

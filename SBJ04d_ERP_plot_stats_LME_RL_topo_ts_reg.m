@@ -138,6 +138,7 @@ cfgp.highlightsymbol = '*';
 cfgp.parameter       = 'avg';
 % cfgp.maskparameter = 'mask';
 cfgp.zlim            = [-max(abs(clim(:))) max(abs(clim(:)))];
+cfgp.colormap        = 'jet';
 
 % Plot topo for each regressor and time
 plot_ix = 0;

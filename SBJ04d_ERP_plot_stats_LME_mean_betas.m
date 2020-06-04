@@ -39,7 +39,7 @@ if ischar(save_fig); save_fig = str2num(save_fig); end
 %% Analysis and Plotting Parameters
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
-if ~strcmp(st.measure,'mean'); error('run only for mean window LME analyses!'); end
+if ~any(strcmp(st.measure,{'mean','erp_mean'})); error('run only for mean window LME analyses!'); end
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
