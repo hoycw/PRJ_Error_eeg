@@ -218,37 +218,49 @@ elseif strcmp(st.measure,'p2p')
     for s = 1:numel(SBJs)
         for cond_ix = 1:numel(cond_lab)
             for ch_ix = 1:numel(ch_list)
-                % Find positive and negative peak amplitudes and latencies
+                % Find all possible positive and negative peak amplitudes and latencies
+                tmp_amp = cell([2 1]); tmp_times = cell([2 1]);
                 for pk_ix = 1:2
-                    [tmp_amp, tmp_lat] = findpeaks(st.pk_sign(pk_ix)*...
+                    [tmp_amp{pk_ix}, tmp_lat] = findpeaks(st.pk_sign(pk_ix)*...
                         squeeze(gavg(cond_ix,s,ch_ix,pk_rng(pk_ix,1):pk_rng(pk_ix,2))));
-                    
-                    % Select correct peak
-                    if ~isempty(tmp_amp)
-                        % Remove possible 2nd peaks preceding 1st peak
-                        if pk_ix==2 && any(time_vec(tmp_lat+pk_rng(pk_ix,1)-1)<pk_times(cond_ix,s,ch_ix,1))
-                            tmp_amp(time_vec(tmp_lat+pk_rng(pk_ix,1)-1)<pk_times(cond_ix,s,ch_ix,1)) = [];
-                            tmp_lat(time_vec(tmp_lat+pk_rng(pk_ix,1)-1)<pk_times(cond_ix,s,ch_ix,1)) = [];
-                        end
-                        if numel(tmp_amp)>1
-                            % Multiple peaks detected, take maximum amplitude
-                            %   + peaks: most positive
-                            %   - peaks: most positive of negatives, so lowest non-inverted amplitude
-                            [~, amp_ix] = max(tmp_amp);
-                            mult_pks(cond_ix,s,ch_ix,pk_ix) = true;
-                            fprintf('\tMultiple %s peaks detected for %s %s!\n',...
-                                pk_sign_str{pk_ix},SBJs{s},cond_lab{cond_ix});
-                        else
-                            amp_ix = 1;
-                        end
-                        pk_amp(cond_ix,s,ch_ix,pk_ix) = st.pk_sign(pk_ix)*tmp_amp(amp_ix);
-                        pk_times(cond_ix,s,ch_ix,pk_ix) = time_vec(tmp_lat(amp_ix)+pk_rng(pk_ix,1)-1);
-                    else
-                        % No peak detected
-                        miss_pks(cond_ix,s,ch_ix,pk_ix) = true;
-                        fprintf(2,'\tNo %s peak detected for %s %s!\n',...
-                            pk_sign_str{pk_ix},SBJs{s},cond_lab{cond_ix});
+                    % Convert latencies to time
+                    if ~isempty(tmp_lat)
+                        tmp_times{pk_ix} = time_vec(tmp_lat+pk_rng(pk_ix,1)-1);
                     end
+                end
+                
+                % Check for missing peaks
+                if isempty(tmp_amp{1}) || isempty(tmp_amp{2})
+                    miss_pks(cond_ix,s,ch_ix) = true;
+                    if isempty(tmp_amp{1})
+                        fprintf(2,'\tNo pos peak detected for %s %s!\n',...
+                            SBJs{s},cond_lab{cond_ix});
+                    end
+                    if isempty(tmp_amp{2})
+                        fprintf(2,'\tNo neg peak detected for %s %s!\n',...
+                            SBJs{s},cond_lab{cond_ix});
+                    end
+                else
+                    % Compute all possible peak-to-peak differences
+                    tmp_p2p    = ones(size(tmp_amp{2}))*-999;
+                    p2p_pos_ix = nan(size(tmp_amp{2}));
+                    for neg_pk_ix = 1:numel(tmp_amp{2})
+                        % Only for positive peaks preceding this negative peak
+                        pre_neg_pos_ix = find(tmp_times{1}<tmp_times{2}(neg_pk_ix));
+                        for i = 1:numel(pre_neg_pos_ix)
+                            if tmp_amp{1}(pre_neg_pos_ix(i))+tmp_amp{pk_ix}(neg_pk_ix) > tmp_p2p(neg_pk_ix)
+                                tmp_p2p(neg_pk_ix) = tmp_amp{1}(pre_neg_pos_ix(i))+tmp_amp{pk_ix}(neg_pk_ix);
+                                p2p_pos_ix(neg_pk_ix) = pre_neg_pos_ix(i);
+                            end
+                        end
+                    end
+                    
+                    % Select pair of peaks with max peak-to-peak difference
+                    [~, max_p2p_neg_ix] = max(tmp_p2p);
+                    pk_amp(cond_ix,s,ch_ix,1)   = tmp_amp{1}(p2p_pos_ix(max_p2p_neg_ix));
+                    pk_times(cond_ix,s,ch_ix,1) = tmp_times{1}(p2p_pos_ix(max_p2p_neg_ix));
+                    pk_amp(cond_ix,s,ch_ix,2)   = -tmp_amp{2}(max_p2p_neg_ix);
+                    pk_times(cond_ix,s,ch_ix,2) = tmp_times{2}(max_p2p_neg_ix);
                 end
                 
                 % Compute peak-to-peak amplitude difference
@@ -256,7 +268,7 @@ elseif strcmp(st.measure,'p2p')
                     amp_diff = pk_amp(cond_ix,s,ch_ix,1)-pk_amp(cond_ix,s,ch_ix,2);
                     % Toss differences that go in the wrong direction or order
                     %   This indicates a complex, multi-peak waveform...
-                    if amp_diff > 0 && pk_times(cond_ix,s,ch_ix,1)<pk_times(cond_ix,s,ch_ix,2)
+                    if amp_diff > 0
                         data(cond_ix,s,ch_ix) = amp_diff;
                     else
                         bad_pks(cond_ix,s,ch_ix) = true;
