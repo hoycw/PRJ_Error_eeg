@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good2';%'good1';
+SBJ_id = 'goodall';%'good2';%'good1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Save Group ERP Peak Time
@@ -97,7 +97,7 @@ for st_ix = 1:numel(stat_ids)
 %     SBJ04c_ERP_grp_stats_GLM(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_peaks',0);
 %     SBJ04d_ERP_plot_stats_GLM_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
+%     SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 %     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
@@ -134,7 +134,6 @@ stat_ids  = {'ERPEsL_all_lme_mn1FRN','ERPEsL_all_lme_p2pFRN'};
 
 proc_id   = 'eeg_full_ft';
 plt_id    = 'line_cond';
-flip_p2p  = 1;
 save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'svg';

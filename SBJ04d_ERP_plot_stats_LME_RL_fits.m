@@ -181,7 +181,11 @@ for ch_ix = 1:numel(ch_list)
             'LineStyle',cond_styles{cond_ix}},'patchSaturation',plt.errbar_alpha);
         main_lines(cond_ix) = cond_lines{cond_ix}.mainLine;
     end
-    ylims = [-15 30];%ylim;
+    if any(strcmp(SBJ_id,{'good1','goodall'}))
+        ylims = [-15 30];
+    else
+        ylims = ylim;
+    end
     if strcmp(plt.sig_type,'line')
         data_lim = [min(min(plot_means-sems)) max(max(plot_means+sems))];
     end
@@ -246,7 +250,11 @@ for ch_ix = 1:numel(ch_list)
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
-    ylims = [-15 30];%ylim;
+    if any(strcmp(SBJ_id,{'good1','goodall'}))
+        ylims = [-15 30];
+    else
+        ylims = ylim;
+    end
     set(gca,'FontSize',16);
     axes(1).YLim = ylims;
     
@@ -289,7 +297,13 @@ for ch_ix = 1:numel(ch_list)
     if plt.legend
         legend(beta_lines,[reg_lab plt.evnt_lab],'Location',plt.legend_loc);
     end
-    ylims = [-4 6];%ylim;
+    if strcmp(SBJ_id,'goodall')
+        ylims = [-3 5];
+    elseif strcmp(SBJ_id,'good1')
+        ylims = [-4 6];
+    else
+        ylims = ylim;
+    end
     set(gca,'FontSize',16);
     axes(2).YLim = ylims;
     

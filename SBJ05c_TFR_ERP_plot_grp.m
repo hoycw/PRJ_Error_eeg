@@ -142,12 +142,12 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
     % Get color lims per condition
     clim = zeros([numel(cond_lab) 2]);
     for cond_ix = 1:numel(cond_lab)
-        clim(cond_ix,:) = [min(tfr_all{cond_ix}.powspctrm(:)) max(tfr_all{cond_ix}.powspctrm(:))];
+        clim(cond_ix,:) = [min(tfr_avg{cond_ix}.powspctrm(:)) max(tfr_avg{cond_ix}.powspctrm(:))];
     end
-    tick_ix = 1:3:numel(tfr_all{1}.freq);
+    tick_ix = 1:3:numel(tfr_avg{1}.freq);
     yticklab = cell(size(tick_ix));
     for f = 1:numel(tick_ix)
-        yticklab{f} = num2str(tfr_all{1}.freq(tick_ix(f)),'%.1f');
+        yticklab{f} = num2str(tfr_avg{1}.freq(tick_ix(f)),'%.1f');
     end
     
     % Condition Plots
@@ -155,7 +155,7 @@ for ch_ix = 1:numel(tfr_avg{1}.label)
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
         yyaxis left
-        imagesc(tfr_all{cond_ix}.time, tfr_all{cond_ix}.freq, squeeze(tfr_all{cond_ix}.powspctrm(ch_ix,:,:)));%1:numel(tfr_all{cond_ix}.freq)
+        imagesc(tfr_avg{cond_ix}.time, tfr_avg{cond_ix}.freq, squeeze(tfr_avg{cond_ix}.powspctrm(ch_ix,:,:)));%1:numel(tfr_all{cond_ix}.freq)
         set(gca,'YDir','normal');
 %         set(gca,'YTick',1:3:numel(tfr_all{cond_ix}.freq));
 %         set(gca,'YTickLabels',yticklab);

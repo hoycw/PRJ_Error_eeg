@@ -21,7 +21,7 @@ conditions = 'DifFB';
 plt_id     = 'ts_F2t8_evnts_sigLine';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'png';
+fig_ftype  = 'svg';
 
 for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)

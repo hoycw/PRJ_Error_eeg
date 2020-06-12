@@ -62,11 +62,11 @@ end
 
 %% Plot ERPs with FRN peaks marked
 an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-cond_list  = {'HdOutS','EzOutS'};%{'EHSu'};%
+cond_list  = {'HdOutS','EzOutS','EHSu'};
 proc_id    = 'eeg_full_ft';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'svg';
+fig_ftype  = 'png';
 plt_id     = 'ts_F0t5_evnts_sigLine';
 
 pk_lim  = [0.18 0.3];

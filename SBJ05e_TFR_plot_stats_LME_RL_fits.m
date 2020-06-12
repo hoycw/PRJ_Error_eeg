@@ -86,6 +86,9 @@ for ch_ix = 1:numel(st_tfr.label)
         end
     end
     clim = [-max(abs(beta_mat(:))) max(abs(beta_mat(:)))];
+    if strcmp(SBJ_id,'goodall')
+        clim = [-1.5 1.5]; % Max beta is -1.4 for sRPE in Fz
+    end
     
     % Get significance mask
     ns_alpha = 0.4;

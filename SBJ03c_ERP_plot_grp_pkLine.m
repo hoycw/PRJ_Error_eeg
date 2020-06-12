@@ -147,6 +147,9 @@ for ch_ix = 1:numel(ch_list)
             'LineStyle',cond_styles{cond_ix}},'patchSaturation',plt.errbar_alpha);
         main_lines(cond_ix) = ebars{cond_ix}.mainLine;
     end
+    if strcmp(SBJ_id,'goodall')
+        ax.YLim = [-10 30];
+    end
     
     % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
