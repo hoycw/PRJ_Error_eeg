@@ -13,6 +13,12 @@ ft_defaults
 SBJ_id = 'goodall';%'good1';%'good2';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
+%% Group Accuracy
+conditions = 'Dif';
+fig_ftype  = 'svg';
+
+group_accuracy_plots_TT(SBJ_id, conditions, fig_ftype);
+
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
 stat_ids = {'ERPEsL_all_lme_st05t5'};
