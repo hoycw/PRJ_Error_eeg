@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'goodall';%'good1';
+SBJ_id = 'good1';%'goodall';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Run preprocessing
@@ -78,7 +78,7 @@ for cond_ix = 1:numel(cond_list)
 end
 
 %% ERPs: Full Cap Topography
-an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
+an_id      = 'ERP_all_F2t1_dm2t0_fl05t20';
 
 proc_id    = 'eeg_full_ft';
 conditions = 'DifFB';

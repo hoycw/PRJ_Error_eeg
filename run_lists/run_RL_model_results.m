@@ -62,11 +62,11 @@ for st_ix = 1:numel(stat_ids)
         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
 end
 
-%% ERP Topographies: Linear Mixed Effects Model (Mean Windows)
+%% Beta Topographies: Linear Mixed Effects Model (Mean Windows)
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
 stat_ids  = {'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
-% stat_ids  = {'ERPEsL_all_lme_mn05man1','ERPEsL_all_lme_mn05man225','ERPEsL_all_lme_mn05man325','ERPEsL_all_lme_mn05man375'};
+% stat_ids  = {'ERPEsL_all_lme_mn05man1','ERPEsL_all_lme_mn05man225','ERPEsL_all_lme_mn05man325','ERPEsL_all_lme_mn05man375'};'ERPEsL_all_lme_mn150man375'};%
 % stat_ids  = {'VML_all_lme_mn1FRN','VML_all_lme_mn1P3'};
 plt_id    = 'topo_F18t25';
 save_fig  = 1;
@@ -81,7 +81,12 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Plot Topo time series
-    SBJ04d_ERP_plot_stats_LME_RL_topo_ts_reg(SBJ_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+%     SBJ04d_ERP_plot_stats_LME_RL_topo_ts_reg(SBJ_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+    % ERP Topographies: ERP topo dynamics in model mean windows
+    conditions = 'DifFB';
+    SBJ03c_ERP_plot_grp_topo_ts_cond(SBJ_id,conditions,proc_id,an_ids{an_ix},stat_ids,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
