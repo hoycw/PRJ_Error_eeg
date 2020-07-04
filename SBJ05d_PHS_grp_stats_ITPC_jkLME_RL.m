@@ -1,7 +1,7 @@
-function SBJ05d_PHS_grp_stats_wITPC_jkLME_RL(SBJ_id,proc_id,an_id,stat_id)
-% Run weighted itner-trial pahse coherence for phase at each time-frequency point
-% within SBJ, z-score that value to null distribution, then t-test those
-% z-scored correlation values vs. 0 across SBJ (and FDR correct)
+function SBJ05d_PHS_grp_stats_ITPC_jkLME_RL(SBJ_id,proc_id,an_id,stat_id)
+% Run inter-trial phase clustering for phase at each time-frequency point
+% within SBJ, jackknife to get single trial contributions, then run 
+% run linear mixed effect model across all trials and SBJ (and FDR correct)
 %   Only for one channel now...
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
