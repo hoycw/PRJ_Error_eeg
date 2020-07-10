@@ -69,9 +69,11 @@ end
 
 %% Compute Group Averages
 plot_means = mean(model,3);
-plot_sems  = nan([numel(reg_lab) numel(cond_lab)]);
+plot_stds  = nan([numel(reg_lab) numel(cond_lab)]);
+% plot_sems  = nan([numel(reg_lab) numel(cond_lab)]);
 for reg_ix = 1:numel(reg_lab)
-    plot_sems(reg_ix,:) = nanstd(model(reg_ix,:,:),[],3)./sqrt(numel(SBJs))';
+    plot_stds(reg_ix,:) = nanstd(model(reg_ix,:,:),[],3);
+%     plot_sems(reg_ix,:) = nanstd(model(reg_ix,:,:),[],3)./sqrt(numel(SBJs))';
 end
 
 %% Plot Predictors
@@ -86,11 +88,13 @@ hd_ix = cond_x(~ez_idx);
 reg_lines = gobjects(size(reg_lab));
 for reg_ix = 1:numel(reg_lab)
     reg_lines(reg_ix) = plot(ez_ix+plt.x_fudge*(reg_ix-1),plot_means(reg_ix,ez_ix),'Color',reg_colors{reg_ix},...
-        'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width,'Marker',reg_mrkrs{reg_ix});
+        'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width);%,'Marker',reg_mrkrs{reg_ix});
     plot(hd_ix+plt.x_fudge*(reg_ix-1),plot_means(reg_ix,hd_ix),'Color',reg_colors{reg_ix},...
-        'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width,'Marker',reg_mrkrs{reg_ix});
-%     errorbar([1:numel(cond_lab)]+plt.x_fudge*(reg_ix-1),plot_means(reg_ix,:),plot_sems(reg_ix,:),...
-%         'Color',reg_colors{reg_ix},'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width);
+        'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width);%,'Marker',reg_mrkrs{reg_ix});
+    errorbar(ez_ix+plt.x_fudge*(reg_ix-1),plot_means(reg_ix,ez_ix),plot_stds(reg_ix,ez_ix),...%plot_sems
+        'Color',reg_colors{reg_ix},'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width);
+    errorbar(hd_ix+plt.x_fudge*(reg_ix-1),plot_means(reg_ix,hd_ix),plot_stds(reg_ix,hd_ix),...%plot_sems
+        'Color',reg_colors{reg_ix},'LineStyle',reg_styles{reg_ix},'LineWidth',plt.width);
 end
 
 set(gca,'XTick',1:numel(cond_lab));
