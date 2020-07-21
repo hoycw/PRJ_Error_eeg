@@ -13,6 +13,14 @@ ft_defaults
 SBJ_id = 'goodall';%'good1';%'good2';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
+%% Example SBJ RTs
+SBJ       = 'EEG13';
+proc_id   = 'eeg_full_ft';
+save_fig  = 1;
+fig_ftype = 'svg';
+
+BHV01_plot_RT_hist(SBJ,proc_id,save_fig,'fig_ftype',fig_ftype);
+
 %% Group Accuracy
 conditions = 'Dif';
 fig_ftype  = 'svg';
@@ -34,7 +42,7 @@ end
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Main RL Model
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%
-stat_ids  = {'ERPEsL_all_lme_st05t5'};%'SML_all_lme_st05t5',
+stat_ids  = {'ERPEsL_all_lme_st05t10'};%'ERPEsL_all_lme_st05t5'};%'SML_all_lme_st05t5',
 % stat_ids = {'S_all_lme_st05t5','V_all_lme_st05t5','sRPE_all_lme_st05t5'};
 plt_id    = 'ts_F2t8_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st05t5';
@@ -42,13 +50,13 @@ null_id   = 'SBJonly_all_lme_st05t5';
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
-for an_ix = 1:numel(an_ids)
+for an_ix = 2%1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-%       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
-%       SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+      SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+      SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
 %     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
 
@@ -64,8 +72,8 @@ end
 % Electrode R2 Comparison Plot
 plt_id     = 'ts_F0t5_evnts_sigLine';
 for st_ix = 1:numel(stat_ids)
-    SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
+%     SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
 end
 
 %% Beta Topographies: Linear Mixed Effects Model (Mean Windows)
