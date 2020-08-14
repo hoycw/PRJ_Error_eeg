@@ -1,10 +1,19 @@
-function BHV01_plot_RT_hist(SBJ,proc_id,save_fig,varargin)
-% Plot RT histogram for example SBJ
+function BHV02_plot_RT_hist(SBJ,proc_id,save_fig,varargin)
+% Fig. 1A: Plot RT histogram for example SBJ
+% INPUTS:
+%   SBJ [str] - name of SBJ
+%   proc_id [str] - name of pre-processing variable set
+%   save_fig [0/1] - binary flag to save figure
+%   fig_vis [str] - 'on'/'off' to display figure on screen
+%       default: 'on'
+%   fig_ftype [str] - file extension to save fig (e.g., 'png','svg', etc.)
+%       default: 'png'
+% OUTPUTS:
+%   saves RT histogram figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else; root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -60,7 +69,6 @@ if save_fig
     end
     
     fig_fname = [fig_dir fig_name '.' fig_ftype];
-    % % Commented out because screen ratios aren't right automatically
     fprintf('Saving %s\n',fig_fname);
     saveas(gcf,fig_fname);
 end

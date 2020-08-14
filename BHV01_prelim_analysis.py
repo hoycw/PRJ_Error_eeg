@@ -23,9 +23,7 @@ SBJ = sys.argv[1]#raw_input('Enter SBJ ID to process:')#'EEG15'
 
 
 # In[44]:
-#prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
-prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
-#'/Volumes/hoycw_clust/PRJ_Error/'
+prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.svg'
 data_dir = prj_dir+'data/'
@@ -158,6 +156,7 @@ accuracy_colors = [scat_colors[accuracy.index[ix][1]] for ix in range(len(accura
 #scale = {'Hit Total': np.max(data['Tolerance'])/np.max(data['Hit Total']),
 #         'Score Total': np.max(data['Tolerance'])/np.max(data['Score Total'])}
 
+# Plot Tolerance Over Time
 ax1.plot(data['Tolerance'],'b',label='Tolerance')
 ax1.plot(x,[prdm['tol_lim'][0] for _ in x],'b--')
 ax1.plot(x,[prdm['tol_lim'][1] for _ in x],'b--')
@@ -169,6 +168,7 @@ ax1.set_ylim([0, 0.41])
 ax1.set_facecolor('white')
 ax1.grid(False)
 
+# Plot Accuracy per Block
 ax2 = ax1.twinx()
 # ax2.plot(data['Hit Total']/np.max(data['Hit Total']),'k',label='Hit Total')
 ax2.fill_between(x, 1, 0, where=data['Condition']=='easy',
@@ -358,65 +358,5 @@ plt.savefig(results_dir+'BHV/accuracy/'+SBJ+'_acc_ITI'+fig_type)
 ### plot2.fig.suptitle(SBJ+'_post-short') # can also get the figure from plt.gcf()
 ### 
 ### # plt.savefig(results_dir+'RT_plots/'+SBJ+'_RT_PE_ITI_hit'+fig_type)
-
-
-# # =================================================
-# # OLD SHIT
-# # =================================================
-
-# In[ ]:
-
-# RT_means = {'short': np.empty(2),
-#            'medium': np.empty(2),
-#            'long': np.empty(2)}
-# RT_cnt = {'short': np.empty(2),
-#            'medium': np.empty(2),
-#            'long': np.empty(2)}
-# for ITI_type in ['short','medium','long']:
-#     RT_means[ITI_type][0] = data.loc[(data['PE']==False) & (data['ITI type']==ITI_type),'RT'].mean()
-#     RT_cnt[ITI_type][0] = sum([(data['PE']==False) & (data['ITI type']==ITI_type)]).sum()
-#     RT_means[ITI_type][1] = data.loc[(data['PE']==True) & (data['ITI type']==ITI_type),'RT'].mean()
-#     RT_cnt[ITI_type][1] = sum([(data['PE']==True) & (data['ITI type']==ITI_type)]).sum()
-    
-# print(ITI_type)
-# print('PE: ',data.loc[data['PE']==True,'RT'].mean(),sum(data['PE']==True))
-# print('PC: ',data.loc[data['PE']==False,'RT'].mean(),sum(data['PE']==False))
-
-
-# In[ ]:
-
-# def makeECDF(sample):
-#     def ECDF(x):
-#         N = len(sample)
-#         cumsum = sample<=x
-#         CDF = np.sum(cumsum)/N
-#         return CDF
-#     return ECDF
-
-# ecdf = makeECDF(sample)
-# xs = np.linspace(0,1,len(sample))
-# ys = [ecdf(x) for x in xs]
-# plt.plot(xs,ys)
-# sns.distplot(sample,rug=True,hist=False,kde=False)
-
-
-# In[36]:
-
-# def makeECDF(sample):
-#     def ECDF(x):
-#         N = len(sample)
-#         cumsum = sample<=x
-#         CDF = np.sum(cumsum)/N
-#         return CDF
-#     return ECDF
-
-# ecdf = makeECDF(data['Correct'])
-# xs = np.linspace(0,1,len(data))
-# ys = [ecdf(x) for x in xs]
-# plt.plot(xs,ys)
-
-
-# In[ ]:
-
 
 

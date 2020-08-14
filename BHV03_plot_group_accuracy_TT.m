@@ -1,5 +1,11 @@
-function group_accuracy_plots_TT(SBJ_id, conditions, fig_ftype)
-%% Plots group accuracy for Target Time task as a bar plot with SBJ lines overlay
+function BHV03_plot_group_accuracy_TT(SBJ_id, conditions, fig_ftype)
+%% Fig. 1C: Plots group accuracy for Target Time task as a bar plot with SBJ lines overlay
+% INPUTS:
+%   SBJ_id [str] - name of list of SBJs
+%   conditions [str] - name of group of condition labels to segregate trials
+%   fig_ftype [str] - file extension to save fig (e.g., 'png','svg', etc.)
+% OUTPUTS:
+%   saves group accuracy figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -30,7 +36,7 @@ for sbj_ix = 1:numel(SBJs)
         [bhv] = fn_load_behav_csv([root_dir 'PRJ_Error_eeg/data/' SBJ '/03_events/' SBJ '_behav.csv']);
     end
     
-    % Calculate Subject Level Accuracy
+    % Calculate Subject Level Accuracy (exclude surprise and training trials)
     s_idx = fn_condition_index({'Su'},bhv);
     training_idx = bhv.blk==0;
     
@@ -40,10 +46,10 @@ for sbj_ix = 1:numel(SBJs)
     end
 end
 
-%% Calculate Average across Subjects
+%% Calculate Mean/Variability across Subjects
 avg_cond = nan(size(cond_lab));
 std_cond = nan(size(cond_lab));
-% sem_cond = nan(size(cond_lab));
+% sem_cond = nan(size(cond_lab)); %too small, switched to St.Dev.
 for cond_ix = 1:numel(cond_lab)
     avg_cond(cond_ix) = mean(acc_cond(:,cond_ix));
     std_cond(cond_ix) = std(acc_cond(:,cond_ix));
@@ -78,29 +84,9 @@ ylabel('Accuracy');
 title([SBJ_id ' Accuracy Across Conditions']);
 set(gca,'FontSize',16);
 
+%% Save figure
 fig_fname = [fig_dir fig_name '.' fig_ftype];
 fprintf('Saving %s\n',fig_fname);
 saveas(gcf,fig_fname);
-
-%% Plot Accuracy per Subject
-% figure; hold on;
-% for sbj_ix = 1:numel(SBJs)
-%     line([1 2],acc_cond(sbj_ix,:),'Color',SBJ_colors(sbj_ix,:));
-%     scatter([1 2], acc_cond(sbj_ix,:),30,SBJ_colors(sbj_ix,:));
-% end
-% ax = gca;
-% ax.XLabel.String = 'Condition';
-% ax.XTick = [1 2];
-% ax.XTickLabels = cond_lab;
-% ax.XLim = [0.5 2.5];
-% 
-% ax.YLim = [0 1];
-% ax.YLabel.String = 'Accuracy';
-% 
-% set(ax,'FontSize',16');
-% 
-% fig_name = [root_dir 'PRJ_Error_eeg/results/BHV/accuracy/GRP_plot_SBJ_accuracy_TT.' fig_ftype];
-% fprintf('Saving %s\n',fig_name);
-% %saveas(gcf,fig_name);
 
 end

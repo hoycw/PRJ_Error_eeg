@@ -41,6 +41,7 @@ with open(data_dir+'TT_behav_log_list.txt') as f:
 
 # In[4]:
 
+# Get log names
 log_fname = os.path.join(sbj_dir,'00_raw',logs[SBJ])
 
 log_file = open(log_fname,'r')
@@ -191,6 +192,7 @@ data['ITI type'] = [prdm['ITIs'][np.argmax(np.histogram(data['ITI'][ix],bins=ITI
 # else:               # Errors for anything besides len(ITIs)==3,4
 #     assert len(prdm['ITIs'])==4
             
+# Print stats on bad feedback
 if any(data['bad_fb']):
     bad_ix = [ix for ix in range(len(data)) if data['bad_fb'][ix]]
     tmp = data.ix[bad_ix]
