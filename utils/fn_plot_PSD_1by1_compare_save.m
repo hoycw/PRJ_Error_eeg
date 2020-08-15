@@ -1,6 +1,6 @@
 function fn_plot_PSD_1by1_compare_save(data1, data2, labels1, labels2, sample_freq,...
                                        save_prefix, data_type1, data_type2, save_filetype)
-
+% Compare PSDs between datasets per channel, saving plots
 if numel(labels1)~=numel(labels2)
     fprintf('!!!WARNING!!! different number of channels in data1 (%i) and data2 (%i)\n',...
         numel(labels1),numel(labels2));

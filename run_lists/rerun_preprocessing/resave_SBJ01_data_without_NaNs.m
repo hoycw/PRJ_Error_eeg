@@ -1,3 +1,10 @@
+%% Description:
+% in January 2020, Colin was trying to write TFR code in SBJ05*
+% We wanted to filter the entire time series before cutting to trials to avoid edge artifacts and NaNs
+% The original SBJ01 code replaced bad epcohs with NaNs before ICA, and saved the preprocessed data with NaNs
+% SBJ01 was changed to save the full data without NaNs for filtering, and run ICA on data with NaNs
+% This script was used to re-generate the preprocessed data to save without NaNs, along with the original ICA results
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';

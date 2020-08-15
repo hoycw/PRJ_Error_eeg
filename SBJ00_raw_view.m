@@ -1,15 +1,17 @@
 function SBJ00_raw_view(SBJ,view_previous, proc_id, block)
-%% View raw data and mark epochs to toss
+%% View raw data and mark epochs to exclude from ICA
 % INPUTS:
 %   SBJ [str] - name of the subject to load
 %   view_previous [0/1] - binary no/yes to load previous bad_epochs to view
 %   proc_id [str] - name of processing pipeline
 %   block [int] - which block number to run
+% OUTPUTS:
+%   bad_epochs [Nx2 int] - [start stop] samples for N bad epochs
+%       if previous bad_epochs exists, moves to bad_epochs_bck.mat
 
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);

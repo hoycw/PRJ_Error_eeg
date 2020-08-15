@@ -1,5 +1,5 @@
 function norm_filt = fn_bsln_ft_filtered(filt, bsln_lim, bsln_type, n_boots)
-%% Baseline correct one TFR based on bsln_lim epoch, both from ft_freqanalysis
+%% Baseline correct one filtered dataset based on bsln_lim epoch, both from ft_preproc
 % INPUTS:
 %   filt [ft dataset] - full output of ft_preprocessing (no .powspctrm!)
 %   bsln_lim [int, int]- 2 int array of TIME indices for [start, end] of baseline period
@@ -11,7 +11,7 @@ function norm_filt = fn_bsln_ft_filtered(filt, bsln_lim, bsln_type, n_boots)
 %       'my_relchange' = subtract mean, divide by mean (results in % change)
 %   n_boots [int] - number of bootstrap iterations
 % OUTPUTS:
-%   bslnd_tfr [ft dataset] - same tfr but baseline corrected
+%   norm_filt [ft dataset] - same tfr but baseline corrected
 
 [~, app_dir] = fn_get_root_dir();
 addpath([app_dir 'fieldtrip/']);

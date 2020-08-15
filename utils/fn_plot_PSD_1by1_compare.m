@@ -1,6 +1,6 @@
 function fn_plot_PSD_1by1_compare(data1, data2, labels1, labels2, sample_freq,...
                                        data_type1, data_type2)
-
+% Plot PSD for 2 datasets, overlapping each channel one-by-one
 if numel(labels1)~=numel(labels2)
     fprintf('!!!WARNING!!! different number of channels in data1 (%i) and data2 (%i)\n',...
         numel(labels1),numel(labels2));

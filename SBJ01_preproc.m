@@ -1,8 +1,17 @@
 function SBJ01_preproc(SBJ, proc_id)
-%% Import and preprocess EEG data. Null the bad channels and null the marked bad epochs from SBJ00.  Cut the data into trials and then run ICA.
+%% Preprocess EEG data and run ICA
+%   Import and preprocess EEG data
+%   Null the bad channels and null the marked bad epochs from SBJ00
+%   Cut the data into trials and then run ICA.
 % INPUTS:
 %   SBJ [str] - name of the subject to load
 %   proc_id [str] - name of processing pipeline
+% OUTPUTS:
+%   data [FT struct] - preprocessed and concatenated EEG data
+%   eog [FT struct] - preprocessed and concatenated EOG data
+%   bad_epochs [Nx2 array] - [start stop] indices of bad epochs (concatenated)
+%   icaunmixing [array] - NxN array with ICA mixing matrix for N channels
+%   icatopolabel [cell array] - list of N channel labels for mixing matrix
 
 %% Check which root directory
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
@@ -35,7 +44,7 @@ if isfield(SBJ_vars.ch_lab,'suffix')
     ear_lab2 = [ear_lab2 SBJ_vars.ch_lab.suffix];
 end
 
-% Load and preprocess
+% Load and preprocess each block
 cfg = [];
 cfg.continuous = 'yes'; 
 % cfg.lpfilter   = proc.lp_yn;
@@ -53,6 +62,8 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg.dataset    = SBJ_vars.dirs.raw_filename{b_ix};
     data{b_ix} = ft_preprocessing(cfg);
 end
+
+% Combine blocks
 data = fn_concat_blocks(data);
 
 %% Downsample
@@ -63,19 +74,22 @@ if strcmp(proc.resample_yn,'yes')
 end
 
 %% Fix channel labels
-% Remove bad channels
+% Remove empty channels
 null_neg = cell(size(SBJ_vars.ch_lab.null));
 for null_ix = 1:numel(SBJ_vars.ch_lab.null)
     null_neg{null_ix} = ['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.null{null_ix} SBJ_vars.ch_lab.suffix];
 end
+% Remove bad channels (identified in SBJ00 viewing)
 bad_neg = cell(size(SBJ_vars.ch_lab.bad));
 for bad_ix = 1:numel(SBJ_vars.ch_lab.bad)
     bad_neg{bad_ix} = ['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.bad{bad_ix} SBJ_vars.ch_lab.suffix];
 end
+% Remove channels replaced with externals
 rep_neg = cell(size(SBJ_vars.ch_lab.replace));
 for rep_ix = 1:numel(SBJ_vars.ch_lab.replace)
     rep_neg{rep_ix} = ['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.replace{rep_ix}{1} SBJ_vars.ch_lab.suffix];
 end
+% Remove ears (not needed after re-referencing)
 ears_neg = {['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{1} SBJ_vars.ch_lab.suffix],...
             ['-' SBJ_vars.ch_lab.prefix SBJ_vars.ch_lab.ears{2} SBJ_vars.ch_lab.suffix]};
 
@@ -87,7 +101,7 @@ data = ft_selectdata(cfg,data);
 for ch_ix = 1:numel(data.label)
     data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.prefix,'');
     data.label{ch_ix} = strrep(data.label{ch_ix},SBJ_vars.ch_lab.suffix,'');
-    % Replace label of the externals with actual electrode name
+    % Replace label of the external replacements with actual electrode name
     for x = 1:numel(SBJ_vars.ch_lab.replace)
         if strcmp(SBJ_vars.ch_lab.replace{x}{2},data.label{ch_ix})
             data.label{ch_ix} = SBJ_vars.ch_lab.replace{x}{1};
@@ -127,6 +141,7 @@ cfg.channel = [{'all'}, eog_neg, trig_neg];
 data = ft_selectdata(cfg,data);
 
 %% Cut into trials
+% NOTE: Final pipeline does not cut into trials until after ICA
 % % Must segment before downsampling because trigger channel read from
 % % original file
 % % Need to cut into trials here so that can NaN out bad trials later in
@@ -154,7 +169,7 @@ data = ft_selectdata(cfg,data);
 % Load raw bad epochs to NaN out
 bad_epochs = fn_combine_raw_bad_epochs(SBJ);
 
-% Preprocess data for ICA (NaN bad epochs)
+% Preprocess data for ICA (NaN out bad epochs)
 if ~isempty(bad_epochs)
     cfg = [];
     cfg.artfctdef.visual.artifact = bad_epochs;
@@ -163,6 +178,7 @@ if ~isempty(bad_epochs)
 else
     data_ICA = data;
 end
+% Apply high pass filter before ICA
 if strcmp(proc.ICA_hp_yn,'yes')
     cfg = [];
     cfg.hpfilter = proc.ICA_hp_yn;
@@ -181,4 +197,4 @@ icatopolabel = icomp.topolabel;
 data_fname = [SBJ_vars.dirs.preproc SBJ '_preproc_' proc_id '.mat'];
 save(data_fname, 'icaunmixing', 'icatopolabel','data', 'eog','bad_epochs');
 
-
+end

@@ -60,3 +60,48 @@ conditions = 'Dif';
 BHV03_group_accuracy_plots_TT(SBJ_id, conditions, fig_ftype);
 
 %% Pre-Processing
+% EEG data pre-processing
+%   SBJ00_raw_view.m: view raw data to mark worst epochs
+%       -load, filter, downsample, plot PSDs
+%       -plot data to mark and save worst epochs to exclude from ICA
+%   SBJ01_preproc.m: preprocess the data
+%       -import, preprocess, and concatenate data blocks
+%       -NaN out bad epochs from SBJ00
+%       -run ICA on data with NaNs to avoid artifacts dominating ICs
+%       -save data without NaNs (to allow filtering on whole time series) and ICA results
+%       NOTE: see comments in scripts/run_lists/rerun_preprocessing/resave_SBJ01_data_without_NaNs.m
+%   SBJ02a_artifact_rejection.m
+%       -Segment trials
+%       -Cut out raw bad_epoch, training, and bad RT trials from data and behavior struct
+%       -Identify EOG ICs via correlation
+%       -Generate figures for quality checks on ERPs and ICA components.
+%   SBJ02b_ica_rejection.m
+%   SBJ02c_trail_rejection.m
+
+proc_id                  = 'eeg_full_ft';
+view_previous_bad_epochs = 1;
+generate_figs            = 1;
+fig_vis                  = 'on';
+clear_prev_QA_plots      = 0;
+% odd_proc_id = 'odd_full_ft';  % for Oddball task preprocessing
+
+% NOTE: This was never run cleanly, but SBJ by SBJ and occasionally in a loop
+for s = 1:numel(SBJs)
+    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
+    eval(SBJ_vars_cmd);
+    
+    % View raw data
+    for b_ix = 1:numel(SBJ_vars.block_name)
+        SBJ00_raw_view(SBJs{s},view_previous_bad_epochs,proc_id,b_ix);
+    end
+    % Preprocess data and run ICA
+    SBJ01_preproc(SBJs{s},proc_id);
+    % 
+    SBJ02a_artifact_rejection(SBJs{s}, proc_id, generate_figs, fig_vis, clear_prev_QA_plots);
+    % 
+    SBJ02b_ica_rejection(SBJs{s}, proc_id, reject_visual);
+    % 
+    SBJ02c_trial_rejection(SBJs{s}, proc_id, plot_final_check);
+    
+    clear SBJ_vars b_ix
+end

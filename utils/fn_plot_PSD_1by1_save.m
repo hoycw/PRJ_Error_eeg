@@ -1,5 +1,5 @@
 function fn_plot_PSD_1by1_save(data1, labels, sample_freq, save_prefix, save_filetype)
-% Check noise profile
+% Check noise profile by plotting PSD per channel, saving
 for channel_n = 1:length(labels)
     figure('Visible','off');
     [fft_data,freqs] = pwelch(data1(channel_n,:),2048,0,2048,sample_freq);

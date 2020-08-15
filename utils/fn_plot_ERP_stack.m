@@ -1,5 +1,14 @@
 function fn_plot_ERP_stack(SBJ, proc_id, plt_id, data, fig_vis, save_fig, path)
-%% Plot ERP with stacked single trials for ICA components
+%% Plot ERP with stacked single trials and mean for ICA components
+%   Currently only plots stimulus-locked, full trial data
+% INPUTS:
+%   SBJ [str] - name of the SBJ
+%   proc_id [str] - name of the preprocessing pipeline parameters (e.g., 'egg_full_ft')
+%   plt_id [str] - name of plotting parameter set
+%   data [FT struct] - data to plot (cut into trials)
+%   fig_vis [0/1] - if a data_browser view of the time course of the ICA
+%   save_fig [0/1] - binary flag to save figure
+%   path [str] - path name to directory in which "path/plot/SBJ_chlab_ERP_stack.png" will save
 
 %% Data Preparation
 % Set up paths
@@ -35,7 +44,7 @@ erps = ft_timelockanalysis(cfg, data);
 prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
 
 if ~strcmp(proc.event_type,'S')
-    % !!! improve logic here to look for compatibility between plt events and what's availabel based on trial_lim_s in proc_vars
+    % !!! improve logic here to look for compatibility between plt events and what's available based on trial_lim_s in proc_vars
     error('mismatch in events in plt and proc_vars!');
 end
 
@@ -60,11 +69,11 @@ for ch_ix = 1:numel(data.label)
     for t_ix = 1:numel(data.trial)
         plot_data(t_ix, :) = squeeze(data.trial{t_ix}(ch_ix,:));
     end
+    
     % Get color limits
     %clims = NaN([1 2]);
     %clims(1) = prctile(plot_data(:),5);
     %clims(2) = prctile(plot_data(:),95);
-
     
     % Plot single trial stack
     imagesc(plot_data);
@@ -76,6 +85,7 @@ for ch_ix = 1:numel(data.label)
             'LineWidth',plt.evnt_width(e_ix),'Color',plt.evnt_color{e_ix},'LineStyle',plt.evnt_style{e_ix});
     end
     
+    % Plot Labels and Parameters
     ax = gca;
     ax.YLabel.String = 'Trials';
     ax.XLim          = [0,size(data.trial{1},2)];
