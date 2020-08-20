@@ -76,13 +76,20 @@ BHV03_group_accuracy_plots_TT(SBJ_id, conditions, fig_ftype);
 %       -Identify EOG ICs via correlation
 %       -Generate figures for quality checks on ERPs and ICA components.
 %   SBJ02b_ica_rejection.m
+%       -Reject bad ICs
+%       -repair missing channels
+%       -plot data for trial rejection
 %   SBJ02c_trail_rejection.m
+%       -reject noisy trials from SBJ02b and plot final check
+%       -save final preprocessed data and behavior
 
 proc_id                  = 'eeg_full_ft';
 view_previous_bad_epochs = 1;
 generate_figs            = 1;
 fig_vis                  = 'on';
 clear_prev_QA_plots      = 0;
+reject_visual            = 1;
+plot_final_check         = 1;
 % odd_proc_id = 'odd_full_ft';  % for Oddball task preprocessing
 
 % NOTE: This was never run cleanly, but SBJ by SBJ and occasionally in a loop
@@ -94,13 +101,22 @@ for s = 1:numel(SBJs)
     for b_ix = 1:numel(SBJ_vars.block_name)
         SBJ00_raw_view(SBJs{s},view_previous_bad_epochs,proc_id,b_ix);
     end
-    % Preprocess data and run ICA
+    
+    % Preprocess data, run ICA, plot QA figures
     SBJ01_preproc(SBJs{s},proc_id);
-    % 
+    
+    % Segment trials, cut a priori bad trials, EOG-IC correlation, QA figures
     SBJ02a_artifact_rejection(SBJs{s}, proc_id, generate_figs, fig_vis, clear_prev_QA_plots);
-    % 
+    
+    % VISUALIZE: Manually view QA plots and identify bad ICs for rejection
+    %   Update SBJ_vars.ica_reject list
+    
+    % Reject bad ICs, repair missing channels, plot data for trial rejection
     SBJ02b_ica_rejection(SBJs{s}, proc_id, reject_visual);
-    % 
+    % Noisy trial indices should be manually added to SBJ_vars.trial_reject_ix
+    %   WARNING: These should be indices after rejecting SBJ02a trials!
+    
+    % Reject noisy trials from SBJ02b and save final preprocessed data and behavior
     SBJ02c_trial_rejection(SBJs{s}, proc_id, plot_final_check);
     
     clear SBJ_vars b_ix

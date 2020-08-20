@@ -1,12 +1,18 @@
 function SBJ03c_ERP_save_grp_ERP_cond(SBJ_id,conditions,proc_id,an_id)
 %% Save group ERP per condition
+%   Peaks in group ERPs can provide data-driven window timing for analyses
+%   e.g., used in SBJ04c_ERP_grp_stats_LME_mean_window
 % INPUTS:
+%   SBJ_id [str] - ID of subject list for group
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
+% OUTPUTS:
+%   er_grp [FT struct] - group aligned/averaged ERPs
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);

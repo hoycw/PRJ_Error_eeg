@@ -1,6 +1,10 @@
 function [labels, names, colors, line_styles, markers] = fn_condition_label_styles(grp_id)
 %% Converts the name of a group of conditions into labels, plotting colors/styles
-% condition_name: [str] 'EH'
+%   Mostly for Target Time, but also some Oddball conditions
+%   NOTE: S commonly stands for "surprise", which is now referred to as "neutral"
+% INPUTS:
+%   grp_id [str] - label for group of conditions to select
+%       common options: {'EH'
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 %   light red: [251 154 153]
 %   dark red: [227 26 28]
@@ -10,18 +14,23 @@ function [labels, names, colors, line_styles, markers] = fn_condition_label_styl
 %   dark green: [51 160 44]
 
 %% List of possible labels and their colors
+% Condition codes
 conditions  = {...
-    'Std','Tar','Odd',...
-    'Ez','Hd','Wn','Ls','Su',...
-    'EzWn','EzLs','EzSu','HdWn','HdLs','HdSu',...
-    'All','Pos','Neg',...
-    'Er','Lt','ErQ1','ErQ2','MdQ3','LtQ4','LtQ5'};
+    'Std','Tar','Odd',...                           % Oddball conditions
+    'Ez','Hd','Wn','Ls','Su',...                    % Target Time block and outcome types
+    'EzWn','EzLs','EzSu','HdWn','HdLs','HdSu',...   % Target Time conditions
+    'All','Pos','Neg',...                           % Combinations of Target Time conditions
+    'Er','Lt','ErQ1','ErQ2','MdQ3','LtQ4','LtQ5'};  % Performance-based target time selections
+
+% Condition labels (longer strings for clear plotting legends)
 condition_names = {...
     'Standard','Target','Oddball',...
     'Easy','Hard','Win','Loss','Surprise',...
     'Easy Win','Easy Loss','Easy Neutral','Hard Win','Hard Loss','Hard Neutral',...
     'All Trials', 'Positive', 'Negative',...
     'Early','Late','Early Q1','Early Q2','Middle Q3','Late Q4','Late Q5'};
+
+% Condition Colors ([R G B] scaled to 0/1)
 condition_colors = {...
     [168 180 165]./256, [144 205 229]./256, [142 82 126]./256, ...
     [228,26,28]./256, [55,126,184]./256, [51 160 44]./256, [227 26 28]./256, [31 120 180]./256, ...
@@ -34,100 +43,53 @@ condition_colors = {...
 
 %% Convert grp_id into set of conditions
 switch grp_id
+    % ---------------------------------------------------------------------
     % Oddball Conditions
     case 'Odd'
         labels = {'Std','Tar','Odd'};
-        %colors = {[168 180 165]./256, [144 205 229]./256, [142 82 126]./256};
-        %line_styles = {'-', '-', '-'};
-        %markers = {'o', 'o', 'o'};
     case 'DifOdd_OS'
-        %error('fix color label mismatch');
         labels = {'Odd', 'Std'};
-        %colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        %line_styles = {'-', '-'};
-        %markers = {'o', 'o'};
     case 'DifOdd_TS'
-        %error('fix color label mismatch');
         labels = {'Tar','Std'};
-        %colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        %line_styles = {'-', '-'};
-        %markers = {'o', 'o'};
     case 'DifOdd_OT'
-        %error('fix color label mismatch');
         labels = {'Odd', 'Tar'};
-        %colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        %line_styles = {'-', '-'};
-        %markers = {'o', 'o'};
     
     % ---------------------------------------------------------------------
     % Target Time Conditions
     case 'All'
         labels = {'All'};
-    case 'Dif'
+    case 'Dif'                          % Difficulty
         labels = {'Ez', 'Hd'};
-        %colors = {[228,26,28]./256, [55,126,184]./256};
-        %line_styles = {'-', '-'};    % colors for cond_lab plotting
-        %markers = {'o', 'd'};
-    case 'Out'
-        labels = {'Wn', 'Ls'};
-        %colors = {[31 120 180]./256, [227 26 28]./256};
-        %line_styles = {'-', '-'};    % colors for cond_lab plotting
-        %markers = {'o', 'o'};
-    case 'Val'
-        labels = {'Pos', 'Neg'};
-    case 'EHSu'
-        labels = {'EzSu','HdSu'};
-    case {'OutS','FB'}
+    case {'OutS','FB'}                  % Feedback (includes neutral)
         labels = {'Wn', 'Ls', 'Su'};
-        %colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        %line_styles = {'-', '-', '-'};    % colors for cond_lab plotting
-        %markers = {'o', 'o', 'o'};
-    case {'DifOut','DifOutUE','DifOutWL','DifOutdO','DifOutDO','Holroyd'}
+    case 'Out'                          % Outcome (no neutral)
+        labels = {'Wn', 'Ls'};
+    case 'Val'                          % Valence
+        labels = {'Pos', 'Neg'};
+    
+    % Subsets of Target Time conditions
+    case 'EHSu'                         % Neutral Outcomes in Easy+Hard
+        labels = {'EzSu','HdSu'};
+    case {'DifOut','DifOutUE','DifOutWL','DifOutdO','DifOutDO','Holroyd'}   % Four main conditions
         labels = {'EzWn', 'EzLs', 'HdWn', 'HdLs'};
-        %colors = {[166 206 227]./256, [251 154 153]./256, [31 120 180]./256, [227 26 28]./256};
-        %line_styles = {'-', '-', '--', '--'};
-        %markers = {'o', 'o', 'd', 'd'};
-    case {'DifOutS', 'DifOutSx'}
+    case {'DifOutS', 'DifOutSx'}        % Four main conditions + all neutral outcomes combined
         labels = {'EzWn', 'EzLs', 'HdWn', 'HdLs', 'Su'};
-        %colors = {[166 206 227]./256, [251 154 153]./256, ...
-        %          [31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        %line_styles = {'-', '-', '--', '--', ':'};
-        %markers = {'o', 'o', 'd', 'd', '*'};
-    case {'DifOutSur','DifFB'}
+    case {'DifOutSur','DifFB'}          % All 6 main conditions
         labels = {'EzWn', 'EzSu', 'EzLs', 'HdWn', 'HdSu', 'HdLs'};
-        %colors = {[166 206 227]./256, [251 154 153]./256, [178 223 138]./256, ...
-        %          [31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        %line_styles = {'-', '-','-', '--', '--','--'};
-        %markers = {'o', 'o', 'o', 'd', 'd', 'd'};
-    case 'Tar2'
-        labels = {'Er', 'Lt'};
-%     case 'Tar4'
-%         labels = {'ErQ1','ErQ2','LtQ3','LtQ4'};
-    case 'Tar5'
-        labels = {'ErQ1','ErQ2','MdQ3','LtQ4','LtQ5'};
-        %colors = {[247,104,161]./256, [122,1,119]./256};    % pink and purple
-        %line_styles = {'-', '-'};
-        %markers = {'o', 'o'};
-    case 'EzOut'
+    case 'EzOut'                        % Win/Loss in Easy
         labels = {'EzWn', 'EzLs'};
-        %colors = {[166 206 227]./256, [251 154 153]./256};
-        %line_styles = {'-', '-'};
-        %markers = {'o', 'o'};
-    case 'EzOutS'
+    case 'EzOutS'                       % All outcomes in Easy
         labels = {'EzWn', 'EzLs', 'EzSu'};
-        %colors = {[166 206 227]./256, [251 154 153]./256, [178 223 138]./256};
-        %line_styles = {'-', '-', '-'};
-        %markers = {'o', 'o', 'o'};
-    case 'HdOut'
+    case 'HdOut'                        % Win/Loss in Hard
         labels = {'HdWn', 'HdLs'};
-        %colors = {[31 120 180]./256, [227 26 28]./256};
-        %line_styles = {'-', '-'};
-        %markers = {'d', 'd'};
-    case 'HdOutS'
+    case 'HdOutS'                       % All outcomes in Hard
         labels = {'HdWn', 'HdLs', 'HdSu'};
-        %colors = {[31 120 180]./256, [227 26 28]./256, [51 160 44]./256};
-        %line_styles = {'-', '-', '-'};
-        %markers = {'d', 'd', 'd'};
+    
+    % Performance (RT) based trial selection
+    case 'Tar2'                         % Performance split of early/late
+        labels = {'Er', 'Lt'};
+    case 'Tar5'                         % RT-based split into quintiles
+        labels = {'ErQ1','ErQ2','MdQ3','LtQ4','LtQ5'};
     otherwise
         error(strcat('Only one, unrecognized condition offered: ',grp_id));
 end
@@ -139,12 +101,14 @@ line_styles = cell(size(labels));
 for cond_ix = 1:numel(labels)
     names{cond_ix}  = condition_names{strcmp(labels{cond_ix},conditions)};
     colors{cond_ix} = condition_colors{strcmp(labels{cond_ix},conditions)};
+    
     % Define Line Styles
     if isempty(strfind(labels{cond_ix},'Hd'))
         line_styles{cond_ix} = '-';     % Easy
     else
         line_styles{cond_ix} = '--';%'-.';%    % Hard
     end
+    
     % Define Marker Styles
     if strcmp(labels{cond_ix},'Su')
         markers{cond_ix} = '*';     % Surprise (difficulty agnostic)

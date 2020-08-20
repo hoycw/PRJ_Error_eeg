@@ -1,14 +1,26 @@
 function SBJ03c_ERP_plot_grp_pkLine(SBJ_id,conditions,proc_id,an_id,pk_lim,pk_sign,plt_id,save_fig,varargin)
-%% Plot ERPs for single SBJ, with vertical line through FRN peak
+%% Plot ERPs averaged across group, with vertical line through ERP peak
+%   Peak timing found through search in given window and negative/positive
 % INPUTS:
+%   SBJ_id [str] - ID of subject list for group
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
 %   pk_lim [double] - [start_lim, stop_lim] for peak search limits in seconds
 %   pk_sign [-1/1] - sign of the neak to search for
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist ('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -23,8 +35,6 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-%         elseif strcmp(varargin{v},'write_report')
-%             write_report = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -80,27 +90,10 @@ for s = 1:length(SBJs)
 end
 
 %% Get event timing for plotting
-evnt_times = zeros(size(plt.evnt_lab));
 if strcmp(an.event_type,'S')
-    for evnt_ix = 1:numel(plt.evnt_lab)
-        switch plt.evnt_lab{evnt_ix}
-            case 'S'
-                evnt_times(evnt_ix) = 0;
-            case 'R'
-                evnt_times(evnt_ix) = prdm_vars.target;
-            case {'F','Fon'}
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
-            case 'Foff'
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
-            otherwise
-                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
-        end
-    end
-elseif any(strcmp(an.event_type,{'F','R'}))
-    evnt_times(1) = 0;
-else
-    error('Unknown an.event_type');
+    error('add loading of prdm_vars to plot relative to stim!');
 end
+[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab);
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' conditions '/' plt_id '/'];

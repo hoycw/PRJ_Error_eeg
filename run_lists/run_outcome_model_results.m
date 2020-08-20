@@ -13,13 +13,6 @@ ft_defaults
 SBJ_id = 'goodall';%'good2';%'good1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
-%% Save Group ERP Peak Time
-conditions = 'All';
-an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-proc_id    = 'eeg_full_ft';
-
-% SBJ03c_ERP_save_grp_ERP_cond(SBJ_id,conditions,proc_id,an_id);
-
 %% Single SBJ RL Model
 proc_id  = 'eeg_full_ft';
 stat_ids = {'S_all_lme_mn1FRN','V_all_lme_mn1FRN','sRPE_all_lme_mn1FRN'};

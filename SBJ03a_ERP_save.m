@@ -1,17 +1,17 @@
 function SBJ03a_ERP_save(SBJ,proc_id,an_id)
 % Preprocess data to be averaged as ERPs:
-%   Re-align data to event, select channels and epoch, filter, save
+%   Re-align data to event, select channels and epoch, filter, downsample, save
+%   Optional use of LaPlacian transform (not used in paper)
 % INPUTS:
 %   SBJ [str] - ID of subject to run
 %   proc_id [str] - ID of preprocessing pipeline
 %   an_id [str] - ID of the analysis parameters to use
 % OUTPUTS:
-%   roi [ft struct] - preprocessed data (can be averaged to get ERP)
+%   roi [ft struct] - preprocessed trial data (can be averaged to get ERP)
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -40,7 +40,8 @@ end
 % Realign data to desired event
 if ~strcmp(proc.event_type,an.event_type)
     cfg = [];
-    % Match desired time to closest sample index
+    % Match desired time to closest sample index based on preprocessing
+    %   and analysis event locking
     if strcmp(proc.event_type,'S') && strcmp(an.event_type,'F')
         prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
         cfg.offset = -(prdm_vars.target + prdm_vars.fb_delay)*clean_trials.fsample;

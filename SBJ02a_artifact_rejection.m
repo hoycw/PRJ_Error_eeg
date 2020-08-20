@@ -10,17 +10,17 @@ function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, clear_plot)
 %   gen_figs [0/1] - binary flag to generate QA figures or not
 %   fig_vis [0/1] - if a data_browser view of the time course of the ICA
 %   clear_plot [0/1] - binary flag to delete previous QA plot directory components if desired
-% EEG/ICA/EOG OUTPUTS:
+% OUTPUTS: EEG/ICA/EOG
 %   trials [FT struct] - EEG data cut to good trials
 %   cfg_trl [struct] - FT trl structure used to cut trials from full data
 %   ica [FT struct] - reconstructed ICA data
 %   heog_ics [array] - indices of ICs matched to horizontal EOG
 %   veog_ics [array] - indices of ICs matched to vertical EOG
 %   eog_trials [FT struct] - EOG data cut to good trials
-% BEHAVIOR OUTPUTS:
+% OUTPUTS: BEHAVIOR
 %   bhv [struct] - behavioral data excluding bad trials
 %   bhv_fields [cell array] - list of fields in bhv struct
-% TRIAL EXCLUSION TRACKING OUTPUTS:
+% OUTPUTS: TRIAL EXCLUSION TRACKING
 %   NOTE: saving original trial indices means the correct trials can be tossed when
 %       loading raw data, e.g., in SBJ05 for TFR filtering on whole data
 %   bad_raw_trials [array] - original trial indices tossed for visual artifact marking in SBJ00

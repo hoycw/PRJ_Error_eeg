@@ -3,19 +3,22 @@ function condition_n = fn_condition_index(cond_lab, bhv)
 % INPUTS:
 %   cond_lab [cell array] - strings with names of the set of conditions requested
 %   bhv [struct] - trial info structure containing info for logic sorting
-%       Total_Trial, Block, Feedback, RT, Timestamp, Tolerance, Trial, Hit, Score, bad_fb, Condition, ITI, ITI type
+%       fields: Total_Trial, Block, Feedback, RT, Timestamp, Tolerance, Trial, Hit, Score, bad_fb, Condition, ITI, ITI type
 % OUTPUTS:
 %   condition_n [int vector] - integer assignment of each trial based on conditions
 
+% Split RT data
 if any(strcmp(cond_lab,'LtQ3'))
-    quartiles = quantile(bhv.rt,4);
-elseif any(strcmp(cond_lab,'MdQ3'))
+    quartiles = quantile(bhv.rt,4); % Indicates quartiles
+elseif any(strcmp(cond_lab,'MdQ3')) % Indicates quintiles
     quartiles = quantile(bhv.rt,5);
 end
 
+% Assign index based on condition
 condition_n = zeros(size(bhv.trl_n));
 for cond_ix = 1:numel(cond_lab)
     switch cond_lab{cond_ix}
+        % Target Time block and trial types
         case 'All'
             condition_n = ones(size(condition_n));
         case 'Ez'
@@ -29,6 +32,7 @@ for cond_ix = 1:numel(cond_lab)
         case 'Su'
             condition_n(strcmp(bhv.fb,'S')) = cond_ix;
         
+        % Target Time specific conditions
         case 'EzWn'
             matches = logical(strcmp('easy',bhv.cond)) & strcmp(bhv.fb,'W');
             condition_n(matches) = cond_ix;
@@ -48,6 +52,7 @@ for cond_ix = 1:numel(cond_lab)
             matches = logical(strcmp('hard',bhv.cond)) & strcmp(bhv.fb,'S');
             condition_n(matches) = cond_ix;
             
+        % Target Time conditions based on RPE valence
         case 'Pos'
             matches = fn_condition_index({'EzWn','HdWn','HdSu'}, bhv);
             condition_n(matches~=0) = cond_ix;
@@ -55,6 +60,7 @@ for cond_ix = 1:numel(cond_lab)
             matches = fn_condition_index({'EzLs','HdLs','EzSu'}, bhv);
             condition_n(matches~=0) = cond_ix;
         
+        % Target Time RT performance assignment
         case 'Er'
             warning('WARNING!!! Assuming target_time = 1 sec...');
             condition_n(bhv.rt<1) = cond_ix;
@@ -72,6 +78,7 @@ for cond_ix = 1:numel(cond_lab)
         case 'LtQ5'
             condition_n(bhv.rt>quartiles(4) & bhv.rt<=quartiles(5)) = cond_ix;
         
+        % Oddball task conditions
         case 'Odd'
             matches = logical(strcmp('odd',bhv.cond));
             condition_n(matches) = cond_ix;
@@ -86,6 +93,7 @@ for cond_ix = 1:numel(cond_lab)
     end
 end
 
+% Check if all trials assigned
 if sum(condition_n==0)~=0
     warning(['Not all trials accounted for by conditions: ' strjoin(cond_lab,',')]);
 end

@@ -1,15 +1,18 @@
 function SBJ02b_ica_rejection(SBJ, proc_id, reject_visual)
-%This function does the ICA rejection and repairs the bad channels.  Do visual trial rejection and %record the bad trials in SBJ_vars.trial_reject_ix.
-%SBJ = 'EEG#'
-%Proc_id = 'egg_full_ft' or 'odd_full_ft' for oddball trials
-%gen_figs = 0 (if no, don't generate), 1 (if yes)
-%fig_vis = 1 if a data_browser view of the time course of the ICA
-%components is desired
-%reject_visual = 0 if don't want to do visual trial rejection, 1 if do
+% (1) Reject bad ICs (after manual QA plot inspection)
+% (2) Repair bad channels
+% (3) Run ft_rejectvisual summary mode for visual trial rejection
+%       Manually add index of bad trials to SBJ_vars.trial_reject_ix
+%       WARNING: These should be indices after rejecting SBJ02a trials!
+% INPUTS:
+%   SBJ [str] - name of the SBJ
+%   proc_id [str] - name of the preprocessing pipeline parameters (e.g., 'egg_full_ft')
+%   reject_visual [0/1] - binary flag to run ft_rejectvisual
+% OUTPUTS:
+%   clean_trials [FT struct] - data after rejecting ICs and repairing channels
 
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/', ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -28,7 +31,7 @@ cfg = [];
 cfg.component = unique([SBJ_vars.ica_reject, heog_ics, veog_ics]);
 for ix = 1:numel(cfg.component)
     if cfg.component(ix) > numel(ica.topolabel)
-        warning('Component index is greater than number of components!');
+        error('Component index is greater than number of components!');
     end
 end
 cfg.demean = 'no';
@@ -41,6 +44,7 @@ cfg.method         = 'average';
 cfg.missingchannel = SBJ_vars.ch_lab.bad(:); % not in data (excluded from ica)
 cfg.layout         = 'biosemi64.lay';
 
+% Identify spatial relationships between neighboring channels
 cfgn = [];
 cfgn.channel = 'all';
 cfgn.layout  = 'biosemi64.lay';
@@ -51,15 +55,20 @@ clean_trials = ft_channelrepair(cfg, clean_trials);
 
 %% Visual Trial Rejection
 if reject_visual
+    % Plot preprocessed data
     cfg = [];
     cfg.method = 'summary';  % 'summary' for trials+channels; 'channel' for individual trials
     clean_sum = ft_rejectvisual(cfg, clean_trials);
+    
+    % Plot derivative of preprocessed data (look for jumps)
     cfg = [];
     cfg.derivative = 'yes';
     clean_deriv = ft_preprocessing(cfg, clean_trials);
     cfg = [];
     cfg.method = 'summary';
     clean_summ_deriv = ft_rejectvisual(cfg, clean_deriv);
+    
+    % Plot all data to check results
     cfg_plot.viewmode = 'vertical';
     cfg_plot.ylim = [-15 15];
     ft_databrowser(cfg_plot, clean_trials);

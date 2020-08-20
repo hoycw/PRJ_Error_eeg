@@ -1,12 +1,12 @@
 function SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id)
 %% Plot ERP topography per condition for single window across group
+error('When was this used? ever? maybe a precursor to topo dynamics plotting?');
 % INPUTS:
 %   conditions [str] - group of condition labels to segregate trials
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);

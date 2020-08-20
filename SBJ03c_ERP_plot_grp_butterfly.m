@@ -1,12 +1,24 @@
 function SBJ03c_ERP_plot_grp_butterfly(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,varargin)
 %% Plot ERPs for group, with butterfly plots for SBJ means per condition
+%   Only plots single event at t=0...
 % INPUTS:
+%   SBJ_id [str] - ID of subject list for group
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist ('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -21,8 +33,6 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
-%         elseif strcmp(varargin{v},'write_report')
-%             write_report = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end

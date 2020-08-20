@@ -1,12 +1,25 @@
 function SBJ03c_ERP_plot_grp_topo_ts_cond(SBJ_id,conditions,proc_id,an_id,stat_ids,save_fig,varargin)
-%% Plot ERP topography per condition for single window across group
+%% Plot group ERP topographies per condition across multiple windows (dynamics)
+%   Plotting evoked activity in time window identified as important via
+%   stats, e.g., from SBJ04c_ERP_grp_stats_LME_RL
 % INPUTS:
+%   SBJ_id [str] - ID of subject list for group
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_ids [cell array] - IDs of statistical analyses that provide peak times
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);

@@ -1,12 +1,24 @@
 function SBJ03b_ERP_plot(SBJ,conditions,proc_id,an_id,plt_id,save_fig,varargin)
 %% Plot ERPs for single SBJ
+%   Options: plot butterfly underneath ERP
 % INPUTS:
+%   SBJ [str] - ID of subject to run
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -60,27 +72,7 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Get event timing for plotting
-evnt_times = zeros(size(plt.evnt_lab));
-if strcmp(an.event_type,'S')
-    for evnt_ix = 1:numel(plt.evnt_lab)
-        switch plt.evnt_lab{evnt_ix}
-            case 'S'
-                evnt_times(evnt_ix) = 0;
-            case 'R'
-                evnt_times(evnt_ix) = prdm_vars.target;
-            case {'F','Fon'}
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
-            case 'Foff'
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
-            otherwise
-                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
-        end
-    end
-elseif strcmp(an.event_type,'F')
-    evnt_times(1) = 0;
-else
-    error('Unknown an.event_type');
-end
+[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab,prdm_vars);
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' conditions '/' plt_id '/'];
@@ -103,12 +95,9 @@ for ch_ix = 1:numel(roi.label)
     fig_name = [SBJ '_' conditions '_' an_id '_' roi.label{ch_ix}];    
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
-%     [plot_rc,~] = fn_num_subplots(numel(roi.label));
-%     if plot_rc(1)>1; fig_height=1; else fig_height=0.33; end;
-%     subplot(plot_rc(1),plot_rc(2),ch_ix);
     ax = gca; hold on;
     
-    % Plot individual trials per condition
+    % Plot individual trials per condition (underneath ERP)
     if plt.butterfly
         for cond_ix = 1:numel(cond_lab)
             plot(roi.time{1},squeeze(trials{cond_ix}(ch_ix,:,:)),...
