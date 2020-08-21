@@ -1,12 +1,24 @@
 function SBJ05b_TFR_ERP_plot(SBJ,conditions,proc_id,tfr_an_id,erp_an_id,plt_id,save_fig,varargin)
-%% Plot TFRs for single SBJ
+%% Plot TFRs of power data with ERP overlap per condition for single SBJ
 % INPUTS:
+%   SBJ [str] - ID of subject to plot
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   tfr_an_id [str] - ID of the TFR analysis parameters to use
+%   erp_an_id [str] - ID of the ERP analysis parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -41,7 +53,7 @@ erp_an = an;
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' tfr_an_id '_vars.m'];
 eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
-if ~strcmp(an.event_type,erp_an.event_type); error('itc and erp event mismatch!'); end
+if ~strcmp(an.event_type,erp_an.event_type); error('TFR and erp event mismatch!'); end
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
@@ -53,7 +65,8 @@ load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 % Select conditions (and trials)
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
-% if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
+
+% Group conditions for subplot organization
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
@@ -75,27 +88,10 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Get event timing for plotting
-evnt_times = zeros(size(plt.evnt_lab));
 if strcmp(an.event_type,'S')
-    for evnt_ix = 1:numel(plt.evnt_lab)
-        switch plt.evnt_lab{evnt_ix}
-            case 'S'
-                evnt_times(evnt_ix) = 0;
-            case 'R'
-                evnt_times(evnt_ix) = prdm_vars.target;
-            case {'F','Fon'}
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
-            case 'Foff'
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
-            otherwise
-                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
-        end
-    end
-elseif strcmp(an.event_type,'F')
-    evnt_times(1) = 0;
-else
-    error('Unknown an.event_type');
+    error('add loading of prdm_vars to plot relative to stim!');
 end
+[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab);
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' tfr_an_id '/' conditions '/' erp_an_id '/'];
@@ -105,7 +101,7 @@ end
 
 % Create a figure for each channel
 for ch_ix = 1:numel(tfr.label)
-    %% Compute plotting data    
+    %% Compute ERP plotting data    
     % Compute means and variance
     means = NaN([numel(cond_lab) numel(roi.time{1})]);
     sems  = NaN([numel(cond_lab) numel(roi.time{1})]);
@@ -119,7 +115,7 @@ for ch_ix = 1:numel(tfr.label)
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
-    % Get color lims per condition
+    % Get TFR color lims per condition
     clim = zeros([numel(cond_lab) 2]);
     for cond_ix = 1:numel(cond_lab)
         vals = mean(tfr.powspctrm(cond_idx==cond_ix,1,:,:),1);
@@ -127,13 +123,15 @@ for ch_ix = 1:numel(tfr.label)
     end
     
     % Condition Plots
+    %   Originally used ft_singleplotTFR, but that wasn't as flexible
+    %   Switched to manual plotting with imagesc
 %     cfgplt = [];
 %     cfgplt.zlim = [min(clim(:,1)) max(clim(:,2))];
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
+        
+        % Plot TFR
         yyaxis left
-%         cfgplt.trials = find(cond_idx==cond_ix);
-%         ft_singleplotTFR(cfgplt, tfr);
         imagesc(tfr.time, tfr.freq, squeeze(plt_tfr{cond_ix}.powspctrm(ch_ix,:,:)));% 1:numel(tfr.freq)
         set(gca,'YDir','normal');
 %         set(gca,'YTick',1:3:numel(tfr.freq));
@@ -141,6 +139,8 @@ for ch_ix = 1:numel(tfr.label)
         ylabel('Frequency (Hz)');
         caxis([min(clim(:,1)) max(clim(:,2))]);
         colorbar('northoutside');
+%         cfgplt.trials = find(cond_idx==cond_ix);
+%         ft_singleplotTFR(cfgplt, tfr);
         
         % Plot Events
         for evnt_ix = 1:numel(plt.evnt_lab)
@@ -149,13 +149,14 @@ for ch_ix = 1:numel(tfr.label)
                 'LineStyle',plt.evnt_styles{evnt_ix});
         end
         
-        % Plot Means (and variance)
+        % Plot ERP Means (and variance)
         yyaxis right
         shadedErrorBar(roi.time{1}, means(cond_ix,:), sems(cond_ix,:),...
                 'lineProps',{'Color','k','LineWidth',2,...
                 'LineStyle','-'},'patchSaturation',0.3);
         ylabel('Amplitude (uV)');
         
+        % Axes and parameters
         title([tfr.label{ch_ix} ': ' cond_lab{cond_ix}]);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));

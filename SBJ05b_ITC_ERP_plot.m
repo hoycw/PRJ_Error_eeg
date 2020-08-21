@@ -1,12 +1,24 @@
 function SBJ05b_ITC_ERP_plot(SBJ,conditions,proc_id,itc_an_id,erp_an_id,plt_id,save_fig,varargin)
-%% Compute and plot ITPC matrix for single SBJ; plot ERP on top
+%% Compute and plot ITPC matrix per condition for single SBJ; plot ERP on top
 % INPUTS:
+%   SBJ [str] - ID of subject to plot
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   itc_an_id [str] - ID of the TFR/ITPC analysis parameters to use
+%   erp_an_id [str] - ID of the ERP analysis parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -54,14 +66,15 @@ load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 % Select conditions (and trials)
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
-% if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
+
+% Group conditions for subplot organization
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 cond_idx = fn_condition_index(cond_lab, bhv);
 
-% Get trials for plotting
+% Get trials for ERP plotting
 trials = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
     cond_trial_ix = find(cond_idx==cond_ix);
@@ -71,38 +84,21 @@ for cond_ix = 1:numel(cond_lab)
     end
 end
 
-%% Inter-Trial Phase Coherence
+%% Compute Inter-Trial Phase Coherence
 itpc = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
     % Compute ITPC
     F = tfr.fourierspctrm(cond_idx==cond_ix,:,:,:);
-    itpc{cond_ix} = F./abs(F);       % Normalize to unit circle
-    itpc{cond_ix} = sum(itpc{cond_ix},1);     % Sum phase angles
-    itpc{cond_ix} = abs(itpc{cond_ix})/sum(cond_idx==cond_ix);     % Get mean of angles for consistency
+    itpc{cond_ix} = F./abs(F);                                  % Normalize to unit circle
+    itpc{cond_ix} = sum(itpc{cond_ix},1);                       % Sum phase angles
+    itpc{cond_ix} = abs(itpc{cond_ix})/sum(cond_idx==cond_ix);	% Get mean of angles for consistency
 end
 
 %% Get event timing for plotting
-evnt_times = zeros(size(plt.evnt_lab));
 if strcmp(an.event_type,'S')
-    for evnt_ix = 1:numel(plt.evnt_lab)
-        switch plt.evnt_lab{evnt_ix}
-            case 'S'
-                evnt_times(evnt_ix) = 0;
-            case 'R'
-                evnt_times(evnt_ix) = prdm_vars.target;
-            case {'F','Fon'}
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
-            case 'Foff'
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
-            otherwise
-                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
-        end
-    end
-elseif strcmp(an.event_type,'F')
-    evnt_times(1) = 0;
-else
-    error('Unknown an.event_type');
+    error('add loading of prdm_vars to plot relative to stim!');
 end
+[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab);
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' itc_an_id '/' conditions '/' erp_an_id '/'];
@@ -112,7 +108,7 @@ end
 
 % Create a figure for each channel
 for ch_ix = 1:numel(tfr.label)
-    %% Compute plotting data    
+    %% Compute ERP plotting data    
     % Compute means and variance
     means = NaN([numel(cond_lab) numel(roi.time{1})]);
     sems  = NaN([numel(cond_lab) numel(roi.time{1})]);
@@ -141,6 +137,7 @@ for ch_ix = 1:numel(tfr.label)
     % Condition Plots
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
+        
         % Plot ITC Matrix
         yyaxis left
         %contourf(tfr.time, tfr.freq, squeeze(itpc{cond_ix}(1,ch_ix,:,:)));
@@ -159,13 +156,14 @@ for ch_ix = 1:numel(tfr.label)
                 'LineStyle',plt.evnt_styles{evnt_ix});
         end
         
-        % Plot Means (and variance)
+        % Plot ERP Means (and variance)
         yyaxis right
         shadedErrorBar(roi.time{1}, means(cond_ix,:), sems(cond_ix,:),...
                 'lineProps',{'Color','k','LineWidth',2,...
                 'LineStyle','-'},'patchSaturation',0.3);
         ylabel('Amplitude (uV)');
         
+        % Axes and parameters
         title([tfr.label{ch_ix} ': ' cond_lab{cond_ix}]);
         set(gca,'XLim', [plt.plt_lim(1) plt.plt_lim(2)]);
         set(gca,'XTick', plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2));

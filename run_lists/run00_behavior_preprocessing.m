@@ -1,5 +1,6 @@
 %% Behavior and Pre-Processing for Sequential PE Initial Submission
 % Written 8/14/2020 by Colin Hoy
+% Plots Fig. 1A, 1B, and 1C
 
 %% Set Up
 % Running locally on Colin's MacBookPro; OS 10.13.6; MATLAB R2017b
@@ -40,7 +41,7 @@ SBJ_id = 'goodall';
 %       -plot behavioral checks: RT histogram, RT histogram by ITI, RT
 %       after long vs. short RTs, accuracy by ITI and condition
 %***BHV02_plot_RT_hist.m: plot RT histogram for Fig. 1A
-%***BHV03_plot_group_accuracy_TT.m
+%***BHV03_plot_group_accuracy_TT.m: group accuracy bar plot for Fig. 1C
 
 % Fig. 1B: Call BHV00 and BHV01
 %   usually run on command line, potentially commenting out BHV00/01 in .sh

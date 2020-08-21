@@ -1,7 +1,7 @@
 function bslnd_tfr = fn_bsln_ft_tfr(tfr, bsln_lim, bsln_type, n_boots)
 %% Baseline correct one TFR based on bsln_lim epoch, both from ft_freqanalysis
 % INPUTS:
-%   tfr [ft dataset] - full output of ft_freqanalysis
+%   tfr [FT dataset] - full output of ft_freqanalysis
 %   bsln_lim [int, int]- 2 int array of TIME indices for [start, end] of baseline period
 %   bsln_type [str]   - type of baseline to implement
 %       'zboot'  = pool all baselines, bootstrap means+SDs, z-score all
@@ -9,12 +9,15 @@ function bslnd_tfr = fn_bsln_ft_tfr(tfr, bsln_lim, bsln_type, n_boots)
 %       'zscore' = subtract mean and divide by SD
 %       'demean' = subtract mean
 %       'my_relchange' = subtract mean, divide by mean (results in % change)
+%   n_boots [int] - number of bootstrap iterations if using zboot
 % OUTPUTS:
-%   bslnd_tfr [ft dataset] - same tfr but baseline corrected
+%   bslnd_tfr [FT dataset] - same tfr but baseline corrected
+
 % [~, app_dir] = fn_get_root_dir();
 % addpath([app_dir 'fieldtrip/']);
 % ft_defaults
 
+% Check if power or fourier (complex values for phase data)
 if strcmp(tfr.dimord,'rpt_chan_freq_time')
     field = 'powspctrm';
 elseif strcmp(tfr.dimord,'rpttap_chan_freq_time')

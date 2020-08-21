@@ -1,12 +1,24 @@
-function SBJ05c_ITC_ERP_plot_grp(SBJ_id,conditions,proc_id,itc_an_id,erp_an_id,plt_id,save_fig,varargin)
-%% Compute and plot ITPC matrix for group with ERP on top
+function SBJ05c_ITC_ERP_plot_grp(SBJ_id,conditions,proc_id,phs_an_id,erp_an_id,plt_id,save_fig,varargin)
+%% Compute and plot ITPC matrix per condition for group with ERP on top
 % INPUTS:
+%   SBJ_id [str] - ID of group of subjects to plot
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   phs_an_id [str] - ID of the TFR/ITPC analysis parameters to use
+%   erp_an_id [str] - ID of the ERP analysis parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -36,7 +48,7 @@ if ischar(save_fig); save_fig = str2num(save_fig); end
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' erp_an_id '_vars.m'];
 eval(an_vars_cmd);
 erp_an = an;
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' itc_an_id '_vars.m'];
+an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' phs_an_id '_vars.m'];
 eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
 if ~an.complex; error('why run this without ITPC an_vars?'); end
@@ -51,7 +63,8 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 % Select conditions (and trials)
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
-% if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
+
+% Group conditions for subplot organization
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
@@ -64,7 +77,9 @@ for s = 1:numel(SBJs)
     eval(SBJ_vars_cmd);
     load([SBJ_vars.dirs.events SBJs{s} '_behav_' proc_id '_final.mat']);
     load([SBJ_vars.dirs.proc SBJs{s} '_' erp_an_id '.mat'],'roi');
-    load([SBJ_vars.dirs.proc SBJs{s} '_' proc_id '_' itc_an_id '.mat'],'tfr');
+    load([SBJ_vars.dirs.proc SBJs{s} '_' proc_id '_' phs_an_id '.mat'],'tfr');
+    
+    % Initialize matrices
     if s==1
         time_vec = tfr.time;
         roi_time_vec = roi.time{1};
@@ -82,7 +97,7 @@ for s = 1:numel(SBJs)
         F = tfr.fourierspctrm(cond_trial_ix,:,:,:);
         itpc = F./abs(F);                               % Normalize to unit circle
         itpc = sum(itpc,1);                             % Sum phase angles
-        itpc = abs(itpc)/numel(cond_trial_ix);        % Get mean of angles for consistency
+        itpc = abs(itpc)/numel(cond_trial_ix);          % Get mean of angles for consistency
         % Add to running total
         itpc_all(cond_ix,s,:,:,:) = squeeze(itpc);
         
@@ -101,37 +116,20 @@ itpc_avg = nan([numel(cond_lab) numel(ch_list) numel(fois) numel(time_vec)]);
 itpc_avg(:,:,:,:) = nanmean(itpc_all,2);    % squeeze will take out ch dimension
 
 %% Get event timing for plotting
-evnt_times = zeros(size(plt.evnt_lab));
 if strcmp(an.event_type,'S')
-    for evnt_ix = 1:numel(plt.evnt_lab)
-        switch plt.evnt_lab{evnt_ix}
-            case 'S'
-                evnt_times(evnt_ix) = 0;
-            case 'R'
-                evnt_times(evnt_ix) = prdm_vars.target;
-            case {'F','Fon'}
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
-            case 'Foff'
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
-            otherwise
-                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
-        end
-    end
-elseif strcmp(an.event_type,'F')
-    evnt_times(1) = 0;
-else
-    error('Unknown an.event_type');
+    error('add loading of prdm_vars to plot relative to stim!');
 end
+[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab);
 
 %% Plot Results
-fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' itc_an_id '/' conditions '/' erp_an_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' phs_an_id '/' conditions '/' erp_an_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 % Create a figure for each channel
 for ch_ix = 1:numel(ch_list)
-    %% Compute plotting data    
+    %% Compute ERP plotting data    
     % Compute means and variance
     plt_means = NaN([numel(cond_lab) numel(roi_time_vec)]);
     sems  = NaN([numel(cond_lab) numel(roi_time_vec)]);
@@ -141,7 +139,7 @@ for ch_ix = 1:numel(ch_list)
     end
     
     %% Create plot
-    fig_name = [SBJ_id '_' conditions '_' itc_an_id '_' erp_an_id '_' ch_list{ch_ix}];
+    fig_name = [SBJ_id '_' conditions '_' phs_an_id '_' erp_an_id '_' ch_list{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
@@ -160,6 +158,7 @@ for ch_ix = 1:numel(ch_list)
     % Condition Plots
     for cond_ix = 1:length(cond_lab)
         subplot(numel(grp_cond_lab{1}),numel(grp_cond_lab{2}),cond_ix);
+        
         % Plot ITC Matrix
         yyaxis left
         %contourf(time_vec, fois, squeeze(itpc_avg(cond_ix,ch_ix,:,:)));
@@ -178,7 +177,7 @@ for ch_ix = 1:numel(ch_list)
                 'LineStyle',plt.evnt_styles{evnt_ix});
         end
         
-        % Plot Means (and variance)
+        % Plot ERP Means (and variance)
         yyaxis right
         shadedErrorBar(roi_time_vec, plt_means(cond_ix,:), sems(cond_ix,:),...
                 'lineProps',{'Color','k','LineWidth',2,...

@@ -1,3 +1,7 @@
+%% Reinforcement Learning based modeling and analyses for Sequential PE Initial Submission
+% Developed over time, but editted 8/X/20 by Colin W Hoy
+%   Plots Fig. _____
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';

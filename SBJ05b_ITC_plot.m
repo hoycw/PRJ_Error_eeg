@@ -1,12 +1,22 @@
 function SBJ05b_ITC_plot(SBJ,conditions,proc_id,an_id,save_fig,varargin)
-%% Compute and plot ITPC matrix for single SBJ
+%% Compute and plot ITPC matrix per condition for single SBJ
 % INPUTS:
+%   SBJ [str] - ID of subject to plot
 %   conditions [str] - group of condition labels to segregate trials
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the TFR analysis parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -39,8 +49,6 @@ an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m']
 eval(an_vars_cmd);
 if an.avgoverfreq; error('why run this with only 1 freq in an_vars?'); end
 if ~an.complex; error('why run this without ITPC an_vars?'); end
-%plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
-%eval(plt_vars_cmd);
 
 % Load data
 load([SBJ_vars.dirs.proc SBJ '_' proc_id '_' an_id '.mat']);
@@ -49,21 +57,22 @@ load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat']);
 % Select conditions (and trials)
 [grp_lab, ~, ~, ~] = fn_group_label_styles(conditions);
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(conditions);
-% if ~strcmp(st.model_lab,{'DifOut','Out'}); error('not ready for surprise trials!'); end
+
+% Group conditions for subplot organization
 grp_cond_lab = cell(size(grp_lab));
 for grp_ix = 1:numel(grp_lab)
     [grp_cond_lab{grp_ix}, ~, ~, ~, ~] = fn_condition_label_styles(grp_lab{grp_ix});
 end
 cond_idx = fn_condition_index(cond_lab, bhv);
 
-%% Inter-Trial Phase Coherence
+%% Compute Inter-Trial Phase Coherence
 itpc = cell(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
     % Compute ITPC
     F = tfr.fourierspctrm(cond_idx==cond_ix,:,:,:);
-    itpc{cond_ix} = F./abs(F);       % Normalize to unit circle
-    itpc{cond_ix} = sum(itpc{cond_ix},1);     % Sum phase angles
-    itpc{cond_ix} = abs(itpc{cond_ix})/sum(cond_idx==cond_ix);     % Get mean of angles for consistency
+    itpc{cond_ix} = F./abs(F);                                  % Normalize to unit circle
+    itpc{cond_ix} = sum(itpc{cond_ix},1);                       % Sum phase angles
+    itpc{cond_ix} = abs(itpc{cond_ix})/sum(cond_idx==cond_ix);  % Get mean of angles for consistency
 end
 
 %% Plot Results
@@ -79,7 +88,7 @@ for ch_ix = 1:numel(tfr.label)
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
-    % Get color lims per condition
+    % Get ITPC color lims per condition
     clim = zeros([numel(cond_lab) 2]);
     for cond_ix = 1:numel(cond_lab)
         vals = itpc{cond_ix}(1,ch_ix,:,:);

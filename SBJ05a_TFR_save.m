@@ -1,7 +1,9 @@
 function SBJ05a_TFR_save(SBJ, proc_id, an_id)
 % Filter SBJ data to create time-frequency representation (TFR):
-%   Reconstruct and clean raw data, filter, cut trials to event, select channels, save
-%   If POW (an_avgoverfreq == 1), average across frequencies
+%   Reconstruct and clean raw data, filter, cut trials to event,
+%   baseline correct, select channels, save
+%   All analysis parameters set in an_vars, including filtering cfg_tfr
+%   If POW (an.avgoverfreq == 1), average across frequencies
 % INPUTS:
 %   SBJ [str] - ID of subject to run
 %   proc_id [str] - ID of preprocessing pipeline
@@ -42,6 +44,7 @@ clean_data = fn_load_clean_experiment(SBJ, proc_id);
 %   Also note this padding buffer should be at least 3x the slowest cycle
 %   of interest.
 if strcmp(cfg_tfr.method,'mtmconvol')
+    % Cover at least 3 cycles of slowest frequency
     pad_len = 0.5*max(cfg_tfr.t_ftimwin)*3;
 elseif strcmp(cfg_tfr.method,'wavelet')
     % add 250 ms as a rule of thumb, or longer if necessary
@@ -49,16 +52,18 @@ elseif strcmp(cfg_tfr.method,'wavelet')
 else
     error(['Unknown cfg_tfr.method: ' cfg_tfr.method]);
 end
-% Cut data to bsln_lim to be consistent across S and R locked (confirmed below)
-%   Add extra 10 ms just because trimming back down to trial_lim_s exactly leave
-%   one NaN on the end (smoothing that will NaN out everything)
+
+% Cut data to bsln_lim to be consistent across S and R/F locked (confirmed below)
+%   Add extra 10 ms just because trimming back down to trial_lim_s exactly leaves
+%   one NaN on the end (smoothing across that will NaN out everything)
 trial_lim_s_pad = [min(an.bsln_lim)-pad_len an.trial_lim_s(2)+pad_len+0.01];
 
 % Check that baseline will be included in data cut to trial_lim_s
 if an.trial_lim_s(1) < an.bsln_lim(1)
     error(['ERROR: an.trial_lim_s does not include an.bsln_lim for an_id = ' an_id]);
 end
-% Check that trial_lim_s includes full baseline (e.g., zbtA)
+
+% Check that trial_lim_s includes full baseline (e.g., zbtA: z-score over all data)
 if trial_lim_s_pad(2) < an.bsln_lim(2)+pad_len+0.01
     trial_lim_s_pad(2) = an.bsln_lim(2)+pad_len+0.01;
 end
@@ -70,21 +75,21 @@ for b_ix = 1:numel(SBJ_vars.block_name)
     cfg = [];
     cfg.dataset             = SBJ_vars.dirs.raw_filename{b_ix};
     cfg.blocknum            = b_ix;
-    cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;
-    if strcmp(an.event_type,'S')
+    cfg.trialdef.eventtype  = 'STATUS';%SBJ_vars.ch_lab.trigger;    % Name of channel with triggers
+    if strcmp(an.event_type,'S')                                    % feedback code
         cfg.trialdef.eventvalue = 1;%proc.event_code;
     elseif strcmp(an.event_type,'F')
         cfg.trialdef.eventvalue = 2;
     else
         error(['Unknown an.event_type: ' an.event_type]);
     end
-    cfg.trialdef.prestim    = trial_lim_s_pad(1);
-    cfg.trialdef.poststim   = trial_lim_s_pad(2);
-    cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;
-    cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;
-    cfg.trialfun            = 'tt_trialfun';
+    cfg.trialdef.prestim    = trial_lim_s_pad(1);                   % pre-trigger epoch limit
+    cfg.trialdef.poststim   = trial_lim_s_pad(2);                   % post-trigger epoch limit
+    cfg.tt_trigger_ix       = SBJ_vars.tt_trigger_ix;               % trigger code for start of Target Time
+    cfg.odd_trigger_ix      = SBJ_vars.odd_trigger_ix;              % trigger code for start of Oddball task
+    cfg.trialfun            = 'tt_trialfun';                        % custom trial segmentation function
     if b_ix > 1
-        cfg.endb1 = cfg_trl_unconcat{b_ix - 1}.endb1;
+        cfg.endb1 = cfg_trl_unconcat{b_ix - 1}.endb1;               % end sample of first data recording
     end
     % Add downsample frequency since triggers are loaded from raw file
     cfg.resamp_freq         = proc.resample_freq;
@@ -123,6 +128,7 @@ if round(trial_lim_s_pad(1)+1/trials.fsample,3) < round(trials.time{1}(1),3) || 
 end
 
 %% Remove bad trials
+% Load original behavior and trials tossed in SBJ02a
 [bhv_orig] = fn_load_behav_csv([SBJ_vars.dirs.events SBJ '_behav.csv']);
 load([SBJ_vars.dirs.events SBJ '_' proc_id '_02a_orig_exclude_trial_ix.mat']);
 fprintf(2,'\tWarning: Removing %d trials (%d bad_raw, %d training, %d rts)\n', numel(exclude_trials),...

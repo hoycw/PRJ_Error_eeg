@@ -1,5 +1,11 @@
 function clean_data = fn_load_clean_experiment(SBJ, proc_id)
-% Load, clean, and reconstruct full experiment time series
+%% Load, clean, and reconstruct full experiment time series
+%   Essentially reproduces SBJ02b but without trial segmentation
+% INPUTS:
+%   SBJ [str] - ID of subject
+%   proc_id [str] - ID of preprocessing pipeline
+% OUTPUTS:
+%   clean_data [FT struct] - data after rejecting ICs and repairing channels
 
 %% Load Subject Data
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -31,6 +37,7 @@ cfg.method         = 'average';
 cfg.missingchannel = SBJ_vars.ch_lab.bad(:); % not in data (excluded from ica)
 cfg.layout         = 'biosemi64.lay';
 
+% Identify spatial relationships between neighboring channels
 cfgn = [];
 cfgn.channel = 'all';
 cfgn.layout  = 'biosemi64.lay';

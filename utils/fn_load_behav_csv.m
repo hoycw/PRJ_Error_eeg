@@ -26,15 +26,18 @@ fprintf('\tReading behavioral csv file: %s\n',csv_fname);
 bhv_file = fopen(csv_fname);
 
 % Read field names
-%py_fields  = {'Total_Trial', 'Block', 'Condition', 'Hit', 'RT', 'Timestamp', 'Tolerance', 'Trial', 'Score',  ...
-              % 'ITI', 'ITI type'};
 py_fields  = {'Total_Trial', 'Block', 'Feedback', 'RT', 'Timestamp', 'Tolerance', 'Trial', 'Hit',  ...
               'Score', 'bad_fb', 'Condition', 'ITI', 'ITI type'};
 new_fields = {'trl_n', 'blk', 'fb', 'rt', 'time', 'tol', 'blk_trl_n', 'hit', ...
               'score', 'bad_fb', 'cond', 'ITI', 'ITI_type'};
+bhv_fields = textscan(bhv_file, '%s %s %s %s %s %s %s %s %s %s %s %s %s', 1, 'Delimiter', ',');
+
+% OLD filed formats:
+%py_fields  = {'Total_Trial', 'Block', 'Condition', 'Hit', 'RT', 'Timestamp', 'Tolerance', 'Trial', 'Score',  ...
+              % 'ITI', 'ITI type'};
 %new_fields = {'trl_n', 'blk', 'blk_trl_n', 'fb', 'rt', 'tol', 'time', 'hit', ...
               %'score', 'bad_fb', 'cond', 'ITI', 'ITI_type'};
-bhv_fields = textscan(bhv_file, '%s %s %s %s %s %s %s %s %s %s %s %s %s', 1, 'Delimiter', ',');
+
 % Check that loaded fields match expected py_fields
 if numel(py_fields)~=numel(bhv_fields)
     error('Mismatched fields in behav csv than expected!');
@@ -54,6 +57,9 @@ bhv_data = textscan(bhv_file,'%d %d %s %f %f %f %d %d %d %s %s %f %f',...
 fclose(bhv_file);
 
 % Get list of good trials
+%   Not used here because all trials in log should be in recording
+%   This is leftover from iEEG when sometimes trigger (photodiode) is lost
+%   so that trial must be ignored in the behavioral log
 n_trials = size(bhv_data{1},1);
 fprintf('\t\tFound %d trials in log file\n', n_trials);
 % if ~isempty(ignore_trials)
