@@ -1,6 +1,9 @@
-
 function SBJs = fn_load_SBJ_list(SBJ_id)
 %% Load SBJ list from file
+% INPUTS:
+%   SBJ_id [str] - label of the SBJ list
+% OUTPUTS:
+%   SBJs [cell array] - string list of SBJs
 
 [root_dir, ~] = fn_get_root_dir();
 

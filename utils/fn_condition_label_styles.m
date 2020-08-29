@@ -1,10 +1,18 @@
 function [labels, names, colors, line_styles, markers] = fn_condition_label_styles(grp_id)
 %% Converts the name of a group of conditions into labels, plotting colors/styles
 %   Mostly for Target Time, but also some Oddball conditions
-%   NOTE: S commonly stands for "surprise", which is now referred to as "neutral"
+%   NOTE: S/Su commonly stands for "surprise", which is referred to as "neutral" in the paper
 % INPUTS:
 %   grp_id [str] - label for group of conditions to select
-%       common options: {'EH'
+%       'Dif': {'Ez','Hd'} (difficulty)
+%       'FB': {'Wn','Su','Ls'} (feedback outcomes)
+%       'DifFB': {'EzWn','EzSu','EzLs','HdWn','HdSu','HdLs'} (all outcomes)
+% OUTPUTS:
+%   labels [cell array] - string short-hand labels of specific conditions
+%   names [cell array] - string longer, full labels of specific conditions
+%   colors [cell array] - [R G B] tuples (scaled to 0-1) per condition
+%   line_styles [cell array] - solid ('-') or dotted ('--') per condition
+%   markers [cell array] - {'*','o','d'} markers per condition
 % colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
 %   light red: [251 154 153]
 %   dark red: [227 26 28]

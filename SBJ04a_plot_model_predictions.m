@@ -5,13 +5,13 @@ function SBJ04a_plot_model_predictions(SBJ_id,proc_id,stat_id,plt_id,save_fig,va
 %   SBJs [cell array] - ID list of subjects to run
 %   proc_id [str] - ID of preprocessing pipeline
 %   stat_id [str] - ID of the stats parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
 % OUTPUTS:
-%   lme [cell array] - LinearMixedModel output class for each time point
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else; root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);

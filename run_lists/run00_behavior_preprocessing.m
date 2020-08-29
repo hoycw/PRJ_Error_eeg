@@ -45,7 +45,7 @@ SBJ_id = 'goodall';
 
 % Fig. 1B: Call BHV00 and BHV01
 %   usually run on command line, potentially commenting out BHV00/01 in .sh
-% bhv_cmd = ['bash run_BHV00_01_prelim_analysis.sh << ' SBJ_id];
+bhv_cmd = ['bash run_BHV00_01_prelim_analysis.sh << ' SBJ_id];
 % system(bhv_cmd);
 
 proc_id   = 'eeg_full_ft';
@@ -59,6 +59,15 @@ BHV02_plot_RT_hist(SBJ,proc_id,save_fig,'fig_ftype',fig_ftype);
 % Fig. 1C: Group Accuracy
 conditions = 'Dif';
 BHV03_group_accuracy_plots_TT(SBJ_id, conditions, fig_ftype);
+
+%% Survey Data Analysis
+%   Test neutral trial survey responses for valence
+plot_fig  = 1;
+save_fig  = 0;
+fig_ftype = 'png';
+
+% Run only for 24 good 'EEG' SBJs, which filled out final version of survey
+BHV04_survey_grp_stats('goodEEG', plot_fig, save_fig, fig_ftype);
 
 %% Pre-Processing
 % EEG data pre-processing

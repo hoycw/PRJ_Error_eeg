@@ -1,5 +1,6 @@
 function [regressor] = fn_build_regressor(factor, bhv)%contrast
-%% Build regressors for GLM analysis
+%% Build categorical regressors for ANOVA-style GLM analysis
+%   This was unused in favor of continuous RL model LME analysis
 % INPUTS:
 %   factor [str] - name of the regressor
 %   bhv [struct] - behavioral data to find trial matches

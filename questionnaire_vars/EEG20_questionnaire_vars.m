@@ -14,6 +14,7 @@
     6) How would you feel about this feedback? (Surprise Hard (blue) Response) 1 =
     Terrible, 9 = Great
     %}
+question_conditions = {'EzWn','EzLs','EzSu','HdWn','HdLs','HdSu'};
 question_answers = [6, 3, 5, 7, 3, 5];
 % Response in answer to qustion: does the blue feedback reflect anything
 % about your performance?

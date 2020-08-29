@@ -26,6 +26,7 @@ Terrible, 9 = Great
 12) Does this feedback tell you about your performance 1 = Yes 0 = No 2 = I
 don't know
 %}
+question_conditions = {'EzWn','EzLs','EzSu','HdWn','HdLs','HdSu'};
 question_answers = [9, 1, 1, 9, 2, 1];
 % Response in answer to qustion: does the blue feedback reflect anything
 % about your performance?

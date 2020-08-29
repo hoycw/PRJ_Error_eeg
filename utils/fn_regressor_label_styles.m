@@ -1,19 +1,49 @@
 function [labels, names, colors, line_styles, markers] = fn_regressor_label_styles(model_id)
 %% Converts the name of a model into regressor labels, plotting colors/styles
-% No performance metrics, but no includes categorical outcomes
-% colors from http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=3
+%   ^ = regressors were only used for early model comparison (not in the paper)
+%       Generally, RL features are better than anything else for nearly all analyses
+%   RL Features: expected value (logistic regression), signed/unsigned RPE
+%   Outcome probability/likelihood
+%   ^Categorical Reward/Outcome Features: Valence/Sign, Value, Magnitude
+%   ^Expected Value alternatives: block accuracy, rolling accuracy (5 or 10 trials)
+%   design features: inter-trial interval (ITI)
+%   statistical controls: SBJ (random intercepts in LME)
+% INPUTS:
+%   model_id [str] - format is ['model label' '_' 'cond_lab']
+%       Final paper model: 'ERPEsL_DifFB' ~ EV + sRPE + uRPE + Lik + (1|SBJ)
+% OUTPUTS:
+%   labels [cell array] - string short-hand labels of specific regressors
+%   names [cell array] - string longer, full labels of specific regressors
+%   colors [cell array] - [R G B] tuples (scaled to 0-1) per regressor
+%   line_styles [cell array] - line plotting styles per regressor
+%   markers [cell array] - scatter plot markers per regressor
+% Color options: Taken from colorbrewer2.org, qualitative, 5-class Set1
+%   purple: [152 78 163]
+%   orange: [255 127 0]
+%   brown:  [166 86 40]
+%   yellow: [255 255 51]
+%   pink:   [247 129 191]
+%   red:    [228 26 28]
+%   green:  [55 126 184]
+%   blue:   [77 175 74]
+%   gray:   [0.5 0.5 0.5]
+% Found in Online Image "color_combinations" on Desktop
+%   Antiquated Aqua:    [118 160 156]
+%   Warm Sunglow (tan): [209 151 105]
+%   Tarrazzo Brown:     [97 61 46]
+%   Tomato Tango:       [189 65 45]
 
 %% List of possible regressors and their colors
 regressors  = {...
-    'Sign','Val','Mag',... % Categorical reward features 'RLik',
+    'Sign','Val','Mag',... % Categorical reward features
     'EV','bAcc','rAcc','rAcc10','score',... % Outcome predictors
     'sRPE','uRPE',... % Reward Feedback
     'Lik',... % Outcome Likelihood
     'ITI', ... % preceding inter-trial interval
-    'SBJ' ... % SBJ only null model
+    'SBJ' ... % SBJ only null model (baseline model fit using only SBJ random intercepts)
     };
 regressor_names = {...
-    'Valence','Value','Magnitude',...%'Reward Likelihood',
+    'Valence','Value','Magnitude',...
     'Expected Value','Block Accuracy','Rolling Accuracy','Rolling Accuracy 10','Total Score',...
     'RPE Value','RPE Magnitude',...
     'Likelihood',...
@@ -35,23 +65,6 @@ regressor_markers = {...
     '*',...
     'v','v'...
     };
-
-% Color options:
-% Taken from: colorbrewer2.org, qualitative, 5-class Set1
-%   purple: [152 78 163]
-%   orange: [255 127 0]
-%   brown:  [166 86 40]
-%   yellow: [255 255 51]
-%   pink:   [247 129 191]
-%   red:    [228 26 28]
-%   green:  [55 126 184]
-%   blue:   [77 175 74]
-%   gray:   [0.5 0.5 0.5]
-% Found in Online Image "color_combinations" on Desktop
-%   Antiquated Aqua:    [118 160 156]
-%   Warm Sunglow (tan): [209 151 105]
-%   Tarrazzo Brown:     [97 61 46]
-%   Tomato Tango:       [189 65 45]
 
 %% Convert model_id into set of conditions
 switch model_id
@@ -82,7 +95,7 @@ switch model_id
     case 'RSVPE'
         labels = {'Sign','Val','sRPE'};
         
-    % RL models with pWin
+    % RL models with EV
     case 'ERPEs'
         labels = {'EV','sRPE','uRPE'};
     case 'EsRPE'
