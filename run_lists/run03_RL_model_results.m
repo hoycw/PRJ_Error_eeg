@@ -1,6 +1,8 @@
 %% Reinforcement Learning based modeling and analyses for Sequential PE Initial Submission
 % Developed over time, but editted 8/X/20 by Colin W Hoy
-%   Plots Fig. _____
+% Final model_id = 'ERPEsL_all'
+%   Fig. 1D: SBJ04b_BHV_RL_model_plot and SBJ04b_BHV_RL_model_plot_grp
+%   Fig. 2: 
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -18,15 +20,34 @@ SBJ_id = 'goodall';%'good1';%'good2';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
-proc_id  = 'eeg_full_ft';
-stat_ids = {'ERPEsL_all_lme_st05t5'};
+proc_id   = 'eeg_full_ft';
+stat_ids  = {'ERPEsL_all_lme_st05t5'};
+% Alternative (worse) models: 'RSVPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','VML_all_lme_mn1FRN'
+fig_vis   = 'on';
+save_fig  = 1;
+fig_ftype = 'png';
 
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
+        % Run model
         SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
-        % SBJ04b_BHV_RL_model_plot(SBJs{s},proc_id,stat_ids{st_ix});
+        
+        % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
+        SBJ04b_BHV_RL_model_plot(SBJs{s},proc_id,stat_ids{st_ix},...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     close all;
+end
+
+% Fig. 1D inset: Plot group model fits (overlapping sigmoids without tolerance)
+SBJ04b_BHV_RL_model_plot_grp(SBJ_id,proc_id,stat_id,...
+    'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
+% Sup. Fig. 1A: Plot model predicitons by condition across group
+plt_id    = 'line_cond';
+for st_ix = 1:numel(stat_ids)
+    SBJ04a_plot_model_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
@@ -162,54 +183,4 @@ for an_ix = 1:numel(an_ids)
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
-%% ========================================================================
-%   OLD UNUSED ANALYSES (not going in the paper)
-%  ========================================================================
 
-% %% Pre-Feedback ERP: Linear Mixed Effects Model (Over Time)
-% % Pre-Feedback RL Model
-% an_ids    = {'ERP_Fz_F4t1_dm4t3_fl05t20'};%,'ERP_Pz_F4t1_dm4t3_fl05t20'};
-% stat_ids = {'pWscr4D_all_lme_st3t5','rAscr4D_all_lme_st3t5'};
-% % stat_ids = {'pWTaEr_all_lme_st3t0','pWThPr_all_lme_st3t0','pW4D_all_lme_st3t0','rATaEr_all_lme_st3t0','rAThPr_all_lme_st3t0','rA4D_all_lme_st3t0'};
-% plt_id    = 'ts_F4t1_evnts_sigLine';%'ts_F2to1_evnts_sigLine';
-% null_id   = 'SBJonly_all_lme_st3t5';%'SBJonly_all_lme_st3t5';
-% 
-% proc_id   = 'eeg_full_ft';
-% save_fig  = 1;
-% fig_vis   = 'on';
-% fig_ftype = 'png';
-% 
-% % for an_ix = 1:numel(an_ids)
-% %     for st_ix = 1:numel(stat_ids)
-% %         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
-% %         SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-% %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-% %     end
-% % %     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
-% %     
-% %     % Model Comparison Plots (Adjusted R-Squared)
-% %     SBJ04e_ERP_plot_RL_model_comparison(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-% %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-% % end
-% 
-% %% POW: Linear Mixed Effects Model (Over Time)
-% % proc_id   = 'eeg_full_ft';
-% % an_ids     = {'POW_Fz_F2t1_db2t0_fl4t8','POW_Fz_F2t1_db2t0_fl8t12','POW_Pz_F2t1_db2t0_fl1t4'};
-% % %topo_plt_ids = {'topo_F18t25','topo_F18t25','topo_F3t45'};
-% % stat_ids  = {'RLpRTulD_all_lme_st0t5'};%'RL_all_lme_st0t5','RLRT_all_lme_st0t5','RLpRT_all_lme_st0t5',
-% % plt_id    = 'ts_F2to1_evnts_sigLine';
-% % save_fig  = 1;
-% % fig_vis   = 'on';
-% % fig_ftype = 'png';
-% % 
-% % for an_ix = 1:numel(an_ids)
-% %     for st_ix = 1:numel(stat_ids)
-% %         SBJ05d_TFR_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
-% %         SBJ05e_POW_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-% %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-% %     end
-% %     
-% %     % Model Comparison Plots (Adjusted R-Squared)
-% % %     SBJ05f_POW_plot_RL_model_comparison(SBJ_id,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
-% % %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-% % end

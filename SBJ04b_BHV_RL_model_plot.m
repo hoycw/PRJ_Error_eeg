@@ -1,15 +1,24 @@
 function SBJ04b_BHV_RL_model_plot(SBJ,proc_id,stat_id,varargin)
-% Plot single SBJ tolerance, accuracy, outcomes with RL model fit
+%% Plot single SBJ behavior with RL model fit
+%   Scatter of single trial tolerance and outcomes
+%   Scatter of block accuracy and average tolerance
+%   Sigmoid from logistic regression fit on top
 % INPUTS:
 %   SBJ [str] - ID of subject to run
 %   proc_id [str] - ID of preprocessing pipeline
 %   stat_id [str] - ID of the stats parameters to use
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       save_fig [0/1] - binary flag to save figure; default = 1
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
 % OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else; root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -33,9 +42,9 @@ if ~isempty(varargin)
 end
 
 % Define default options
-if ~exist('fig_vis','var'); fig_vis = 'on'; end
-if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
-if ~exist('save_fig','var'); save_fig = 1; end
+if ~exist('fig_vis','var');     fig_vis = 'on'; end
+if ~exist('fig_ftype','var');   fig_ftype = 'png'; end
+if ~exist('save_fig','var');    save_fig = 1; end
 
 %% Load Data
 SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
@@ -45,19 +54,23 @@ eval(proc_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
 
+% Plotting parameters
+trl_sz = 25;        % scatter size for single trial
+mean_sz = 100;      % scatter size for blocks
+sig_step = 0.001;   % tolerance step size for plotting model fit
+
+% Get model and condition parameters
 model_id = [st.model_lab '_' st.trial_cond{1}];
-[reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, cond_colors, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
-[eh_lab, ~, eh_colors, ~, ~] = fn_condition_label_styles('Dif');
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
 
 %% Load and Select Behavior
-% Load data
+% Load data (should include betas from logistic regression)
 load([SBJ_vars.dirs.proc SBJ '_model_' model_id '.mat']);
 
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat'],'bhv');
 prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
 
-% Select Conditions of Interest
+% Select Trails based on Conditions of Interest
 full_cond_idx = fn_condition_index(cond_lab, bhv);
 bhv_fields = fieldnames(bhv);
 orig_n_trials = numel(bhv.trl_n);
@@ -78,7 +91,7 @@ if strcmp(SBJ,'EEG12')
     end
 end
 
-% Compute stats
+% Compute block level accuracy and tolerance
 blk_ids = unique(bhv.blk);
 blk_ez  = false(size(blk_ids));
 blk_tol = nan(size(blk_ids));
@@ -91,13 +104,10 @@ for b_ix = 1:numel(blk_ids)
     end
 end
 
-%% Plot Tolerance vs. Outcome
+%% Plot Tolerance vs. Outcome with Model Overlay
 fig_name = [SBJ '_BHV_acc_' model_id '_pWin'];
 figure('Name',fig_name,'Visible',fig_vis);
 hold on;
-trl_sz = 25;
-mean_sz = 100;
-sig_step = 0.001;
 
 % Plot Trial and Block Behavior: Easy
 ez_trl_idx = strcmp(bhv.cond,'easy');
@@ -108,7 +118,7 @@ ez_blk = scatter(blk_tol(blk_ez),blk_acc(blk_ez), mean_sz,'k','filled');
 hd_trl = scatter(bhv.tol(~ez_trl_idx), bhv.hit(~ez_trl_idx), trl_sz,'k','d');
 hd_blk = scatter(blk_tol(~blk_ez),blk_acc(~blk_ez), mean_sz,'k','d');
 
-% Plot Model Fit
+% Reconstruct and plot Model Fit
 sig_x = [0:sig_step:0.4];
 sig_y = betas(1) + (sig_x * betas(2));
 sig_y = 1 ./ (1+exp(-sig_y));
