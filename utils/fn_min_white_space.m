@@ -1,5 +1,9 @@
 function [ax] = fn_min_white_space(orig)
 % Minimize the white space on a figure
+% INPUTS:
+%   orig [figure axis] - origianl figure axis
+% OUTPUTS:
+%   ax [figure axis] - adjusted figure axis
 
 ax = orig;
 outerpos = ax.OuterPosition;

@@ -1,18 +1,32 @@
 function SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_id)
-% Run Mixed-Effects Linear model on all SBJ and trials
-%   Only for one channel now...
+% Run Mixed-Effects Linear model on singel-trial EEG from all SBJ and trials
+%   Either a single channel across time or single time point across
+%   channels (e.g., average in time window)
+% COMPUTATIONS:
+%   Select trials for conditions of interest
+%       Optional: Find ERP, beta, or manual peak time to center stat window
+%   Load single-trial ERP data and design matrix (model regressors, SBJ factor)
+%       Optional: z-score model regressors within SBJ
+%   Compute and plot group concatenated model (design matrix) and correlations
+%   Run linear mixed effects model per time point or per electrode
+%   Correct for multiple comparisons
 % INPUTS:
-%   SBJs [cell array] - ID list of subjects to run
+%   SBJ_id [str] - ID of subject list for group
 %   proc_id [str] - ID of preprocessing pipeline
 %   an_id [str] - ID of the analysis parameters to use
 %   stat_id [str] - ID of the stats parameters to use
 % OUTPUTS:
-%   lme [cell array] - LinearMixedModel output class for each time point
+%   lme [cell array] - LinearMixedModel output class, one cell per time point or channel
+%   qvals [float array] - [n_regressors, n_chan/n_time] p values adjusted for multiple comparisons 
+%   SBJs [cell array] - list of SBJs used in this analysis (for double checks)
+%   time_vec [float array] - time points for each model run (same length as lme)
+%   ch_list [cell array] - list of channels in analysis (for double checks)
+%   reg_pk_time [float] - time used to center analysis window
+%       NaN if run across time (st.measure = 'ts')
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else; root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -31,6 +45,7 @@ eval(stat_vars_cmd);
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
+% Get model and condition parameters
 model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
@@ -60,12 +75,17 @@ for s = 1:numel(SBJs)
 end
 
 %% Load Peak Timing Information
+% Can select peak time based on:
+%   (1) positive or negative peak in window of ERP time series
+%   (2) maximum model coefficient (absolute value) from previous model
+%   (3) manually based on stat_vars
 if strcmp(st.measure,'mean')
-    if all(isfield(st,{'pk_trial_cond','pk_erp_cond','pk_lim','pk_sign'}))    % ERP peak
+    if all(isfield(st,{'pk_trial_cond','pk_erp_cond','pk_lim','pk_sign'}))
+        % (1) Find ERP peak
         % Load ERP
         tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_trial_cond '_' st.pk_an_id '.mat']);
         
-        % Select Time Windows
+        % Select Time Windows within Conditions
         [pk_cond_lab] = fn_condition_label_styles(st.pk_trial_cond);
         cfgs = []; cfgs.latency = st.pk_lim;
         st_erp = ft_selectdata(cfgs,tmp.er_grp{strcmp(pk_cond_lab,st.pk_erp_cond)});
@@ -74,9 +94,11 @@ if strcmp(st.measure,'mean')
         pk_ts = st_erp.avg;
         [~,pk_ix] = max(pk_ts*st.pk_sign);
         reg_pk_time = st_erp.time(pk_ix);
-    elseif all(isfield(st,{'pk_reg_id','pk_stat_id'}))   % regression beta peak
+    elseif all(isfield(st,{'pk_reg_id','pk_stat_id'}))
+        % (2) Find regression beta peak
         % Load previous stats
         tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_stat_id '_' st.pk_an_id '.mat']);
+        % Check these stats were run on the same subjects
         if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
             error(['Not same SBJs in ' stat_id ' and ' st.pk_stat_id]);
         end
@@ -89,9 +111,13 @@ if strcmp(st.measure,'mean')
         end
         [~,pk_ix] = max(abs(pk_ts));
         reg_pk_time = tmp.time_vec(pk_ix);
-    elseif isfield(st,'pk_center')      % manual peak setting
+    
+    elseif isfield(st,'pk_center')
+        % (3) Use manual peak setting
         reg_pk_time = st.pk_center;
     end
+    
+    % Adjust stat window based on peak time
     st.stat_lim = st.stat_lim+reg_pk_time;
 else
     reg_pk_time = nan;
@@ -123,6 +149,7 @@ for s = 1:numel(SBJs)
         else; error(['unknown st.measure: ' st.measure]);
         end
         
+        % Create index for this SBJ in group design/data matrix
         sbj_idx = 1:n_trials(s);
     else
         sbj_idx = sum(n_trials(1:s-1))+1:sum(n_trials(1:s));
@@ -130,6 +157,7 @@ for s = 1:numel(SBJs)
     
     % Load RL Model
     tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    
     % Z-score SBJ model regressors
     sbj_model = NaN(size(tmp.model));
     if st.z_reg
@@ -153,7 +181,7 @@ for s = 1:numel(SBJs)
         end
     end
     
-    % Track SBJ
+    % Track SBJ in design matrix
     sbj_factor(sbj_idx) = s*ones([n_trials(s) 1]);
     
     clear roi st_roi
@@ -186,9 +214,10 @@ yticklabels(reg_lab);
 colorbar;
 saveas(gcf,[fig_dir fig_name '.png']);
 
-%% Build table
+%% Run Linear Mixed Effects Model Over Time or Channels
 fprintf('========================== Running Stats ==========================\n');
 tic
+
 % Build Model Table
 tbl = table;
 for reg_ix = 1:numel(reg_lab)
@@ -198,10 +227,11 @@ tbl.SBJ = categorical(sbj_factor);
 
 % Create Model Formula
 reg_formula = strjoin(reg_lab,' + ');
-formula = ['ERP ~ ' reg_formula ' + (1|SBJ)'];
+formula = ['ERP ~ ' reg_formula ' + (1|SBJ)'];  % random intercepts for SBJ
 
 % Run Model
 if strcmp(st.measure,'ts')
+    % Single channel over time
     lme = cell(size(time_vec));
     pvals = nan([numel(reg_lab) numel(time_vec)]);
     for t_ix = 1:numel(time_vec)
@@ -210,12 +240,13 @@ if strcmp(st.measure,'ts')
         pvals(:,t_ix) = lme{t_ix}.Coefficients.pValue(2:end);
     end
 elseif strcmp(st.measure,'mean')
+    % Single time point (mean in window) over channels
     lme = cell(size(ch_list));
     pvals = nan([numel(reg_lab) numel(ch_list)]);
     for ch_ix = 1:numel(ch_list)
         tbl.ERP = data(:,ch_ix);
         lme{ch_ix} = fitlme(tbl,formula);
-        pvals(:,ch_ix) = lme{ch_ix}.Coefficients.pValue(2:end);
+        pvals(:,ch_ix) = lme{ch_ix}.Coefficients.pValue(2:end); % Skip intercept
     end
 else
     error(['Unknown st.measure: ' st.measure]);

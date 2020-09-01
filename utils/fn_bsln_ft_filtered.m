@@ -11,7 +11,7 @@ function norm_filt = fn_bsln_ft_filtered(filt, bsln_lim, bsln_type, n_boots)
 %       'my_relchange' = subtract mean, divide by mean (results in % change)
 %   n_boots [int] - number of bootstrap iterations
 % OUTPUTS:
-%   norm_filt [ft dataset] - same tfr but baseline corrected
+%   norm_filt [ft dataset] - same data but baseline corrected
 
 [~, app_dir] = fn_get_root_dir();
 addpath([app_dir 'fieldtrip/']);
@@ -39,7 +39,7 @@ for ch = 1:numel(filt.label)
         for boot_ix = 1:n_boots
             % Select a random set of trials (sampling WITH REPLACEMENT!)
             shuffle_ix = randi(numel(filt.trial),[1 numel(filt.trial)]);
-            % Select baseline data and compute stats
+            % Pool all baseline data and compute stats
             bsln_data = horzcat(ch_bsln.trial{shuffle_ix});
             sample_means(boot_ix) = nanmean(bsln_data(:));
             sample_stds(boot_ix)  = nanstd(bsln_data(:));

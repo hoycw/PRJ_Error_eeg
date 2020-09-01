@@ -1,4 +1,4 @@
-function SBJ04a_RL_model_plot_grp_predictions(SBJ_id,proc_id,stat_id,plt_id,save_fig,varargin)
+function SBJ04b_RL_model_plot_grp_predictions(SBJ_id,proc_id,stat_id,plt_id,save_fig,varargin)
 %% Plot model predictors across group averaged within condition
 % INPUTS:
 %   SBJs [cell array] - ID list of subjects to run
