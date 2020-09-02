@@ -2,7 +2,8 @@ function SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_id,varargin)
 % Compute linear mixed-effects model on peak-to-peak FRN for condition-averaged ERPs
 %   Only runs for one channel
 %   Early versions used jackknife to deal with waveshape variability, but
-%       DF correction for F stat was unclear
+%       abandoned because DF correction for F stat was unclear, and missing
+%       FRN needed to be zero instead of NaN (couldn't correct with missing data)
 % COMPUTATIONS:
 %   Select trials for conditions of interest
 %   Load and average single-trial ERP and design matrix (model regressors, SBJ factor) within condition
@@ -214,6 +215,8 @@ saveas(gcf,[fig_dir fig_name '.png']);
 % Find Peak Search Range
 pk_rng = zeros([2 2]);
 pk_sign_str = cell([2 1]);
+% If any stat_id changes second peak from negative, check code before running!
+if st.pk_sign(2)~=-1; error('second peak is not negative!'); end
 for pk_ix = 1:2
     for lim_ix = 1:2
         % Match to time vector
@@ -232,7 +235,6 @@ end
 data     = nan([numel(cond_lab) numel(SBJs) numel(ch_list)]);
 pk_amp   = nan([numel(cond_lab) numel(SBJs) numel(ch_list) 2]);
 pk_times = nan([numel(cond_lab) numel(SBJs) numel(ch_list) 2]);
-mult_pks = false([numel(cond_lab) numel(SBJs) numel(ch_list) 2]);
 miss_pks = false([numel(cond_lab) numel(SBJs) numel(ch_list) 2]);
 bad_pks  = false([numel(cond_lab) numel(SBJs) numel(ch_list)]);
 for s = 1:numel(SBJs)
@@ -272,8 +274,8 @@ for s = 1:numel(SBJs)
                         % Compare amplitude differential to find greatest
                         %   After sign flip in findpeaks, addition yields subtraction
                         % !!! should pk_ix here be hard coded as 2???
-                        if tmp_amp{1}(pre_neg_pos_ix(i))+tmp_amp{pk_ix}(neg_pk_ix) > tmp_p2p(neg_pk_ix)
-                            tmp_p2p(neg_pk_ix) = tmp_amp{1}(pre_neg_pos_ix(i))+tmp_amp{pk_ix}(neg_pk_ix);
+                        if tmp_amp{1}(pre_neg_pos_ix(i))+tmp_amp{2}(neg_pk_ix) > tmp_p2p(neg_pk_ix)
+                            tmp_p2p(neg_pk_ix) = tmp_amp{1}(pre_neg_pos_ix(i))+tmp_amp{2}(neg_pk_ix);
                             p2p_pos_ix(neg_pk_ix) = pre_neg_pos_ix(i);
                         end
                     end
@@ -296,14 +298,13 @@ for s = 1:numel(SBJs)
                     data(cond_ix,s,ch_ix) = amp_diff;
                 else
                     bad_pks(cond_ix,s,ch_ix) = true;
-                    fprintf(2,'\tBad %s peak detected for %s %s!\n',...
-                        pk_sign_str{pk_ix},SBJs{s},cond_lab{cond_ix});
+                    fprintf(2,'\tBad peaks detected for %s %s!\n',...
+                        SBJs{s},cond_lab{cond_ix});
                 end
             end
             
             % Plot Peak Detection Errors (missing or bad peaks)
-            if plot_peaks && (any(mult_pks(cond_ix,s,ch_ix,:)) || ...
-                    any(miss_pks(cond_ix,s,ch_ix,:)) || bad_pks(cond_ix,s,ch_ix))
+            if plot_peaks && (any(miss_pks(cond_ix,s,ch_ix,:)) || bad_pks(cond_ix,s,ch_ix))
                 fig_name = ['bad_peaks_' st.grp_method '_' SBJs{s} ...
                     '_' cond_lab{cond_ix} '_' ch_list{ch_ix}];
                 figure('Name',fig_name,'Visible',fig_vis);
@@ -328,9 +329,6 @@ for s = 1:numel(SBJs)
                 
                 % Create error message for plot title
                 bad_str = [];
-                if any(mult_pks(cond_ix,s,ch_ix,:))
-                    bad_str = [bad_str ' mult' num2str(sum(mult_pks(cond_ix,s,ch_ix,:))) ';'];
-                end
                 if bad_pks(cond_ix,s,ch_ix)
                     bad_str = [bad_str ' bad;'];
                 end

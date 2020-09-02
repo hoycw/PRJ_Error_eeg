@@ -103,6 +103,7 @@ if numel(ch_list)>1; error('only plotting for 1 channel in this script!'); end
 %% Comptue latency-predictor regression
 % Build Model Table
 tbl = table;
+if st.pk_sign(2)~=-1; error('second peak is not negative!'); end
 pk_data = squeeze(pk_times(:,:,1,2));   % Take second (negative) peak; assume 1 channel
 
 % Normalize peak latencies within SBJ

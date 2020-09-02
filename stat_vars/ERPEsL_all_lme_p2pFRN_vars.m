@@ -1,7 +1,7 @@
 % Stat Parameters
 st.an_style    = 'lme';
 st.model_lab   = 'ERPEsL';
-st.z_reg       = 0;
+st.z_reg       = 1;
 st.trial_cond  = {'DifFB'};
 st.stat_lim    = [0.05 0.5];            % window in SEC for stats
 st.pk_lim      = [0.1 0.26; 0.18 0.3];

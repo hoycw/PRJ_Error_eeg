@@ -1,10 +1,29 @@
 function SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
-% Plots group ERPs with significance, also beta weights per regressor
-%   Only for single channel right now...
+% Plots group ERPs with significance, model coefficients, and model fit
+%   Grand average ERPs with significant epochs marked underneath
+%       Optional: grand median instead of grand average
+%   Beta weight time series per regressor, bolded for significant epochs
+%   R2 time series for model fit
+% INPUTS:
+%   SBJ_id [str] - ID of subject list for group
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_id [str] - ID of the stats parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+%       plot_median [0/1] - binary flag to plot median ERP instead of mean
+%           default: 0
+% OUTPUTS:
+%   saves figure
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -50,6 +69,8 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Load Stats
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat']);
+
+% Load paradigm variables to plot event timing
 warning('WARNING: Assuming same prdm_vars for all SBJ to get event timing!');
 prdm_vars = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/03_events/' SBJs{1} '_prdm_vars.mat']);
 
@@ -81,6 +102,8 @@ for s = 1:length(SBJs)
         for t_ix = 1:numel(cond_trial_ix)
             trials(:,t_ix,:) = roi.trial{cond_trial_ix(t_ix)};
         end
+        
+        % Average ERP within condition per SBJ
         means(cond_ix,s,:,:) = mean(trials,2);
     end
     
@@ -88,27 +111,7 @@ for s = 1:length(SBJs)
 end
 
 %% Get event timing for plotting
-evnt_times = zeros(size(plt.evnt_lab));
-if strcmp(an.event_type,'S')
-    for evnt_ix = 1:numel(plt.evnt_lab)
-        switch plt.evnt_lab{evnt_ix}
-            case 'S'
-                evnt_times(evnt_ix) = 0;
-            case 'R'
-                evnt_times(evnt_ix) = prdm_vars.target;
-            case {'F','Fon'}
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;
-            case 'Foff'
-                evnt_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay+prdm_vars.fb;
-            otherwise
-                error(['Unknown event type in plt: ' plt.evnt_lab{evnt_ix}]);
-        end
-    end
-elseif strcmp(an.event_type,'F')
-    evnt_times(1) = 0;
-else
-    error('Unknown an.event_type');
-end
+[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab,prdm_vars);
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' stat_id '/' plt_id '/'];
@@ -131,7 +134,7 @@ for ch_ix = 1:numel(ch_list)
         sems(cond_ix,:) = squeeze(std(means(cond_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
     end
     
-    % Obtain Model Parameters
+    % Obtain Model Coefficients and Fit
     r2 = NaN(size(st_time_vec));
     plot_betas = NaN([numel(reg_lab) numel(st_time_vec)]);
     for t_ix = 1:numel(st_time_vec)
@@ -150,9 +153,12 @@ for ch_ix = 1:numel(ch_list)
         if any(qvals(reg_ix,:) <= st.alpha)
             sig_reg(reg_ix) = true;
             if strcmp(st.measure,'ts')
+                % Find consecutive chunks of (non-)significant coefficients
                 sig_chunks{reg_ix} = fn_find_chunks(squeeze(qvals(reg_ix,:))<=st.alpha);
+                % Remove non-significant chunks
                 sig_chunks{reg_ix}(squeeze(qvals(reg_ix,sig_chunks{reg_ix}(:,1))>st.alpha),:) = [];
             elseif strcmp(st.measure,'mean')
+                % Find window edges
                 win_lim = zeros([1 2]);
                 [~, win_lim(1)] = min(abs(time_vec - st.stat_lim(1)));
                 [~, win_lim(2)] = min(abs(time_vec - st.stat_lim(2)));
@@ -172,7 +178,7 @@ for ch_ix = 1:numel(ch_list)
     subplot(6,1,1:3);
     axes(1) = gca; hold on;
     
-    % Plot Means (and variance)
+    % Plot ERP Means (and variance)
     cond_lines = cell(size(cond_lab));
     main_lines = gobjects([numel(cond_lab)+sum(sig_reg)+numel(plt.evnt_lab) 1]);
     for cond_ix = 1:numel(cond_lab)
@@ -181,21 +187,26 @@ for ch_ix = 1:numel(ch_list)
             'LineStyle',cond_styles{cond_ix}},'patchSaturation',plt.errbar_alpha);
         main_lines(cond_ix) = cond_lines{cond_ix}.mainLine;
     end
+    
+    % Fix y limits to be consistent across channels
     if any(strcmp(SBJ_id,{'good1','goodall'}))
         ylims = [-15 30];
     else
         ylims = ylim;
     end
+    
+    % Find min/max error bars to plot significant epochs underneath
     if strcmp(plt.sig_type,'line')
         data_lim = [min(min(plot_means-sems)) max(max(plot_means+sems))];
     end
     
-    % Plot Significance
+    % Plot Significance per Regressor
     sig_reg_ix = find(sig_reg);
     for r = 1:numel(sig_reg_ix)
         reg_ix = sig_reg_ix(r);
         for sig_ix = 1:size(sig_chunks{reg_ix},1)
             if strcmp(plt.sig_type,'line')
+                % Plot horizontal line beneath/above the ERPs
                 sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
                 if strcmp(plt.sig_loc,'below')
                     sig_y = data_lim(1) + reg_ix*data_lim(1)*plt.sig_loc_factor;
@@ -209,12 +220,14 @@ for ch_ix = 1:numel(ch_list)
                     main_lines(numel(cond_lab)+r) = sig_line;
                 end
             elseif strcmp(plt.sig_type,'patch')
+                % Plot rectangular patch over epoch
                 if reg_ix>1; warning('Why use patch sig with more than 1 group???'); end
                 patch(w2.time([sig_chunks{reg_ix}(sig_ix,1) sig_chunks{reg_ix}(sig_ix,1) ...
                     sig_chunks{reg_ix}(sig_ix,2) sig_chunks{reg_ix}(sig_ix,2)]),...
                     [ylims(1) ylims(2) ylims(2) ylims(1)],...
                     plt.sig_color,'FaceAlpha',plt.sig_alpha);
             elseif strcmp(plt.sig_type,'bold')
+                % Bold the ERP time series
                 error('bold sig type not ready');
 %                 sig_times = sig_chunks{grp_ix}(sig_ix,1):sig_chunks{grp_ix}(sig_ix,2);
 %                 for cond_ix = 1:numel(cond_lab)
@@ -228,7 +241,7 @@ for ch_ix = 1:numel(ch_list)
         end
     end
     
-    % Plot Extra Features (events, significance)
+    % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
         main_lines(numel(cond_lab)+sum(sig_reg)+evnt_ix) = line(...
             [evnt_times(evnt_ix) evnt_times(evnt_ix)],[-15 30],...%ylim,...
@@ -250,6 +263,7 @@ for ch_ix = 1:numel(ch_list)
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
+    % Fix y limits to be consistent across channels
     if any(strcmp(SBJ_id,{'good1','goodall'}))
         ylims = [-15 30];
     else
@@ -269,7 +283,7 @@ for ch_ix = 1:numel(ch_list)
             'Color',reg_colors{reg_ix},'LineWidth',plt.mean_width,...
             'LineStyle',reg_styles{reg_ix});
     
-        % Plot Significance
+        % Plot Significance by bolding time series
         for sig_ix = 1:size(sig_chunks{reg_ix},1)
             % Assume: strcmp(plt.sig_type,'bold')
             sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
@@ -279,7 +293,7 @@ for ch_ix = 1:numel(ch_list)
         end
     end
     
-    % Plot Extra Features (events, significance)
+    % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
         beta_lines(numel(reg_lab)+evnt_ix) = line(...
             [evnt_times(evnt_ix) evnt_times(evnt_ix)],[-4 6],...%ylim,...
@@ -297,6 +311,7 @@ for ch_ix = 1:numel(ch_list)
     if plt.legend
         legend(beta_lines,[reg_lab plt.evnt_lab],'Location',plt.legend_loc);
     end
+    % Fix y limits to be consistent across channels
     if strcmp(SBJ_id,'goodall')
         ylims = [-3 5];
     elseif strcmp(SBJ_id,'good1')
@@ -307,11 +322,14 @@ for ch_ix = 1:numel(ch_list)
     set(gca,'FontSize',16);
     axes(2).YLim = ylims;
     
-    %% Plot R2
+    %% Plot Model Fit
     subplot(6,1,6);
     axes(3) = gca; hold on;
     
+    % Plot R2
     line(st_time_vec, r2, 'Color','k', 'LineWidth',2);
+    
+    % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
         line([evnt_times(evnt_ix) evnt_times(evnt_ix)],[0 0.4],...%ylim,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
@@ -329,6 +347,7 @@ for ch_ix = 1:numel(ch_list)
     axes(3).YLim = ylims;
     
     %% Report peak stats per regressor
+    % Prints largest model coefficient, time point, and q value
     for reg_ix = 1:numel(reg_lab)
         max_tmp = max(plot_betas(reg_ix,:));
         min_tmp = min(plot_betas(reg_ix,:));
@@ -340,6 +359,8 @@ for ch_ix = 1:numel(ch_list)
         fprintf('%s max beta = %.03f at %.03f; p = %.10f\n',reg_lab{reg_ix},max_beta,...
             st_time_vec(max_t_ix),qvals(reg_ix,max_t_ix));
     end
+    
+    % Print maximum model fit, time point
     [max_r2, max_t_ix] = max(r2);
     fprintf('max R2 = %.03f at %.03f\n',max_r2,st_time_vec(max_t_ix));
     
