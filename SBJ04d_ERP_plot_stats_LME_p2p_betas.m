@@ -1,5 +1,5 @@
 function SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_id,plt_id,save_fig,varargin)
-% Plots beta weights per regressor for peak-to-peak LME analyses
+%% Plots beta weights per regressor for peak-to-peak LME analyses
 %   Prints betas and q values per regressor
 %   Optional: plot input data as bar plot
 %       WARNING: plotting only does single trial average, not ERP mean,

@@ -1,5 +1,5 @@
 function SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
-% Plots group ERPs with significance, model coefficients, and model fit
+%% Plots group ERPs with significance, model coefficients, and model fit
 %   Grand average ERPs with significant epochs marked underneath
 %       Optional: grand median instead of grand average
 %   Beta weight time series per regressor, bolded for significant epochs

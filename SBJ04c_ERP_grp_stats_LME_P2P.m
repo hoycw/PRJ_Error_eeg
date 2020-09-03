@@ -1,5 +1,5 @@
 function SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_id,varargin)
-% Compute linear mixed-effects model on peak-to-peak FRN for condition-averaged ERPs
+%% Compute linear mixed-effects model on peak-to-peak FRN for condition-averaged ERPs
 %   Only runs for one channel
 %   Early versions used jackknife to deal with waveshape variability, but
 %       abandoned because DF correction for F stat was unclear, and missing
@@ -18,7 +18,7 @@ function SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_id,varargin)
 %   Plot peak detection errors
 %       Optional: Plot ERPs and detected peaks
 %   Run linear mixed effects model per time point or per electrode
-%   Correct for multiple comparisons
+%   Correct for multiple comparisons (FDR for regressors)
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
 %   proc_id [str] - ID of preprocessing pipeline

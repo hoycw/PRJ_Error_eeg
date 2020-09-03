@@ -1,5 +1,5 @@
 function SBJ05a_TFR_save(SBJ, proc_id, an_id)
-% Filter SBJ data to create time-frequency representation (TFR):
+%% Filter SBJ data to create time-frequency representation (TFR):
 %   Reconstruct and clean raw data, filter, cut trials to event,
 %   baseline correct, select channels, save
 %   All analysis parameters set in an_vars, including filtering cfg_tfr

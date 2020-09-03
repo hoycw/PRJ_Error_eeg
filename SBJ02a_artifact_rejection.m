@@ -1,4 +1,5 @@
 function SBJ02a_artifact_rejection(SBJ, proc_id, gen_figs, fig_vis, clear_plot)
+%% Reject EOG artifacts and bad behavior
 % (1) Segment trials
 % (2) Cut out raw bad_epoch, training, and bad RT trials
 % (3) Identify EOG ICs via correlation

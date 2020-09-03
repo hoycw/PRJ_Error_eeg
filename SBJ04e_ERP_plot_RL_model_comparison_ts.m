@@ -1,5 +1,5 @@
 function SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
-% Plots AIC model performance across different RL models for time series
+%% Plots AIC model performance across different RL models for time series
 %   Also adds relatively likelihoods in legend
 %   Only for single channel right now...
 % INPUTS:

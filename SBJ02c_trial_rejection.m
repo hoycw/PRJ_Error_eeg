@@ -1,5 +1,6 @@
 function SBJ02c_trial_rejection(SBJ, proc_id, plot_final_check)
-% This function generates figures for both the ERP stacks and the ICA Plots.  Also cut out the bad trials (training, RT).
+%% Generate figures for both the ERP stacks and the ICA plots
+%   Also cut out the bad trials (training, RT).
 % INPUTS:
 %   SBJ [str] - name of the SBJ
 %   proc_id [str] - name of the preprocessing pipeline parameters (e.g., 'egg_full_ft')

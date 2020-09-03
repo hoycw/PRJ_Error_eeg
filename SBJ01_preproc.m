@@ -1,5 +1,6 @@
 function SBJ01_preproc(SBJ, proc_id)
 %% Preprocess EEG data and run ICA
+% COMPUTATIONS:
 %   Import and preprocess EEG data
 %   Null the bad channels and null the marked bad epochs from SBJ00
 %   Cut the data into trials and then run ICA.

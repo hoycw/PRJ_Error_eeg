@@ -1,5 +1,5 @@
 function SBJ04a_RL_model(SBJ,proc_id,stat_id)
-% Run reinforcement learning (RL) model on single SBJ behavior
+%% Run reinforcement learning (RL) model on single SBJ behavior
 %   for specific combination of model regressors and conditions
 % Plots and saves:
 %   design matrix (SBJ_modelID_design.png)

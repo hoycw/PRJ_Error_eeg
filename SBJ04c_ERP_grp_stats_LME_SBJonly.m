@@ -1,6 +1,6 @@
 function SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_id,stat_id)
-% Run Mixed-Effects Linear model on ERPs from all SBJ and trials
-%   NO MODEL! Only running with SBJ factor (random intercepts) to get
+%% Run Mixed-Effects Linear model on ERPs from all SBJ and trials
+%   NO RL MODEL! Only running with SBJ factor (random intercepts) to get
 %   baseline model performance (R2 and AIC)
 %   Select trials for conditions of interest
 %       Optional: Find ERP, beta, or manual peak time to center stat window

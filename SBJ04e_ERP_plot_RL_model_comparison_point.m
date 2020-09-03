@@ -1,5 +1,5 @@
 function SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,metric,save_fig,varargin)
-% Plots model performance (AIC or R2) across different RL models for point estimates
+%% Plots model performance (AIC or R2) across different RL models for point estimates
 %   For AIC, adds relatively likelihoods in legend
 %   Option: Select original or adjusted R2
 %   Option: If null_id is not empty (''), subtract off R2 for that stat_id

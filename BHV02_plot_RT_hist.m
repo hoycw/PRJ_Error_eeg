@@ -1,5 +1,5 @@
 function BHV02_plot_RT_hist(SBJ,proc_id,save_fig,varargin)
-% Fig. 1A: Plot RT histogram for example SBJ
+%% Fig. 1A: Plot RT histogram for example SBJ
 % INPUTS:
 %   SBJ [str] - name of SBJ
 %   proc_id [str] - name of pre-processing variable set

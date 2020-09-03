@@ -1,5 +1,5 @@
 function SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_id)
-% Run Mixed-Effects Linear model on singel-trial EEG from all SBJ and trials
+%% Run Mixed-Effects Linear model on singel-trial EEG from all SBJ and trials
 %   Either a single channel across time or single time point across
 %   channels (e.g., average in time window)
 % COMPUTATIONS:
@@ -9,7 +9,7 @@ function SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_id)
 %       Optional: z-score model regressors within SBJ
 %   Compute and plot group concatenated model (design matrix) and correlations
 %   Run linear mixed effects model per time point or per electrode
-%   Correct for multiple comparisons
+%   Correct for multiple comparisons (FDR for regressors, time points or channels)
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
 %   proc_id [str] - ID of preprocessing pipeline

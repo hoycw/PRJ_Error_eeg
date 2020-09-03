@@ -1,25 +1,40 @@
 function SBJ05d_PHS_grp_stats_CLcorr_RL(SBJ_id,proc_id,an_id,stat_id)
-% Run Circular-Linear correlation for phase at each time-frequency point
-% across all SBJ (no random effects...), then Fisher z-transformed r values
-% and t-test against 0 (and FDR correct)
-%   Only for one channel now...
+error('Do NOT use this analysis, use SBJ05d_PHS_grp_stats_CLreg_RL instead!');
+%   Correlation only provide a sense of SNR, not the actual relationship
+%   Also, R2 model fit from C-L regression provides teh same info as this anyways!
+%% Run Circular-Linear correlation on single-trial phase at each time-frequency point
+% across all SBJs and trials, separately for each regressor
+%   Uses circ_corrcl.m from Circular Statistics Toolbox for Matlab by Philipp Berens, 2009
+%   No random intercept for SBJ because circular phase data ranges 0 to 2*pi,
+%       and the aim is to see consistent phase across SBJs
+%   Only for one channel
+% COMPUTATIONS:
+%   Select trials for conditions of interest
+%   Load single-trial TFR phase data and design matrix (model regressors, SBJ factor)
+%       Optional: z-score model regressors within SBJ
+%   Run Circular-Linear correlation per model regressor and time-frequency point
+%   Correct for multiple comparisons (FDR for regressors, times, frequencies)
 % INPUTS:
-%   SBJs [cell array] - ID list of subjects to run
+%   SBJ_id [str] - ID of subject list for group
 %   proc_id [str] - ID of preprocessing pipeline
 %   an_id [str] - ID of the analysis parameters to use
 %   stat_id [str] - ID of the stats parameters to use
 % OUTPUTS:
+%   phs_corr [float array] - correlation coefficients per [regressor, freq, time]
+%   qvals [float array] - FDR corrected p values per [regressor, frequency, time]
+%   SBJs [cell array] - list of SBJs used in this analysis (for double checks)
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; ft_dir = 'Users/aasthashah/Applications/fieldtrip';
 else; root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath([app_dir 'fieldtrip/']);
 ft_defaults
+
+% Add circ_corrcl function in CircStat toolbox
 addpath([app_dir 'CircStat/']);
 
 %% Load Data 
@@ -35,7 +50,7 @@ if ~strcmp(st.an_style,'CLcorr'); error('stat_id not using circular-linear corre
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
-% Select conditions (and trials)
+% Get model and condition parameters
 model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
@@ -97,6 +112,7 @@ for s = 1:numel(SBJs)
     
     % Load RL Model
     tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    
     % Z-score SBJ model regressors
     sbj_model = NaN(size(tmp.model));
     if st.z_reg
@@ -111,66 +127,42 @@ for s = 1:numel(SBJs)
     
     % Load and add angle data
     if strcmp(st.measure,'ts')
+        % Take the angle of the complex data
         data(sbj_idx,:,:) = squeeze(angle(st_tfr.fourierspctrm));
     elseif strcmp(st.measure,'mean')
         error('st.measure should not be mean for phase angles!');
     else; error(['unknown st.measure: ' st.measure]);
     end
     
-    % Track SBJ
+    % Track SBJ in design matrix
     sbj_factor(sbj_idx) = s*ones([n_trials(s) 1]);
     
     clear tmp tfr st_tfr sbj_model
 end
 
-%% Build table
+%% Compute Circular-Linear Correlations
 fprintf('========================== Running Stats ==========================\n');
 tic
 % Stats for each regressor and TFR point
 phs_corr  = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
-% phs_zcorr = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
-% phs_null  = nan([numel(reg_lab) numel(fois) numel(time_vec) st.n_boots]);
 pvals     = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
-% zpvals    = nan([numel(reg_lab) numel(fois) numel(time_vec)]);
-% Phase-Model Correlations
-trial_idx_perm = zeros([size(model,1) st.n_boots]);
 for reg_ix = 1:numel(reg_lab)
     fprintf('%s (%d/%d) freq: ',reg_lab{reg_ix},reg_ix,numel(reg_lab));
     for f_ix = 1:numel(fois)
         fprintf('%.3f..',fois(f_ix));
         for t_ix = 1:numel(time_vec)
+            % Compute Circular-Linear correlation
             [phs_corr(reg_ix,f_ix,t_ix), pvals(reg_ix,f_ix,t_ix)] = circ_corrcl(...
                 data(:,f_ix,t_ix), model(:,reg_ix));
-            
-%             % Generate null distribution
-%             for boot_ix = 1:st.n_boots
-%                 if reg_ix==1 && f_ix==1 && t_ix==1
-%                     trial_idx_perm(:,boot_ix) = randperm(size(model,1));
-%                 end
-%                 [phs_null(reg_ix,f_ix,t_ix,boot_ix), ~] = circ_corrcl(data(:,f_ix,t_ix), ...
-%                     model(trial_idx_perm(:,boot_ix),reg_ix));
-%             end
-%             
-%             % Z-score correlation values
-%             phs_zcorr(reg_ix,f_ix,t_ix) = ...
-%                 (phs_corr(reg_ix,f_ix,t_ix)-mean(phs_null(reg_ix,f_ix,t_ix,:),4)) / ...
-%                 std(phs_null(reg_ix,f_ix,t_ix,:),[],4);
-%             zpvals(reg_ix,f_ix,t_ix) = ...
-%                 sum(abs(phs_null(reg_ix,f_ix,t_ix,:))>=abs(phs_corr(reg_ix,f_ix,t_ix)))./st.n_boots;
         end
     end
     fprintf('\n');
 end
-% tmp_zpval = sum(bsxfun(@ge,phs_null,phs_zcorr),4)./st.n_boots; % sum(boots>real)/n_boots
-% % warning: this is not the same as the above version! unclear which is
-% % right, but probably the simpler non-vectorized one...
 
-% Correct for Multiple Comparisons
+% Correct for Multiple Comparisons (regressors, times, frequencies)
 if strcmp(st.mcp_method,'FDR')
     [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2)*size(pvals,3) 1]));
     qvals = reshape(qvals,[size(pvals,1) size(pvals,2) size(pvals,3)]);
-%     [~, ~, ~, zqvals] = fdr_bh(reshape(zpvals,[size(zpvals,1)*size(zpvals,2)*size(zpvals,3) 1]));
-%     zqvals = reshape(zqvals,[size(zpvals,1) size(zpvals,2) size(zpvals,3)]);
 else
     error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
 end
@@ -184,6 +176,6 @@ if ~exist(stat_out_dir,'dir')
 end
 stat_out_fname = [stat_out_dir SBJ_id '_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','phs_corr','qvals','SBJs');%phs_null,'phs_zcorr','zqvals'
+save(stat_out_fname,'-v7.3','phs_corr','qvals','SBJs');
 
 end

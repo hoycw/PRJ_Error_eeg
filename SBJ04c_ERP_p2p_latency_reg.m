@@ -1,11 +1,12 @@
 function SBJ04c_ERP_p2p_latency_reg(SBJ_id,proc_id,an_id,pk_stat_id,SBJ_norm,save_fig,varargin)
-% Run and plot Linear Mixed-Effects Model on FRN peak latency using condition-averaged RL model predictors
+%% Run and plot Linear Mixed-Effects Model on FRN peak latency using condition-averaged RL model predictors
 %   Must run SBJ04c_ERP_grp_stats_LME_P2P first to obtain peak data
 %   Only for single channel
 % COMPUTATIONS:
 %   Load single-trial design matrix (model regressors) and average within condtion
 %   Load peak times identified in peak-to-peak FRN LME analysis
 %   LME multiple regression predicting peak latency using model regressors
+%   Correct for multiple comparisons (FDR for regressors)
 %   Scatter plot of latencies with simple linear fit for visualization
 %       Plotting Option: normalize latencies within SBJ by subtracting mean latency across conditions
 % INPUTS:

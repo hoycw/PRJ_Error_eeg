@@ -1,5 +1,5 @@
 function SBJ03a_ERP_save(SBJ,proc_id,an_id)
-% Preprocess data to be averaged as ERPs:
+%% Preprocess data to be averaged as ERPs:
 %   Re-align data to event, select channels and epoch, filter, downsample, save
 %   Optional use of LaPlacian transform (not used in paper)
 % INPUTS:

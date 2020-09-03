@@ -1,5 +1,5 @@
 function SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_id,stat_ids,plt_id,save_fig,varargin)
-% Plots point estimates for FRN by condition to compare FRN metrics
+%% Plots point estimates for FRN by condition to compare FRN metrics
 %   Should be used to compare mean window and peak-to-peak metrics
 %   Options: for either metric, invert the data or the axis on which it's plotted
 %   WARNING: Flip data is not recommended due to reduced interpretability

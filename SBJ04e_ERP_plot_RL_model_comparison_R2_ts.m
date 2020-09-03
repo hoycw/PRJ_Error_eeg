@@ -1,5 +1,5 @@
 function SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
-% Plots R2 model fits across different RL models for time series
+%% Plots R2 model fits across different RL models for time series
 %   Option: Select original or adjusted R2
 %   Option: If null_id is not empty (''), subtract off R2 for that stat_id
 %   Only for single channel right now...

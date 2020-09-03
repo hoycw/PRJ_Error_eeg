@@ -1,4 +1,5 @@
 function SBJ02b_ica_rejection(SBJ, proc_id, reject_visual)
+%% Reject bad ICs and reconstruct data
 % (1) Reject bad ICs (after manual QA plot inspection)
 % (2) Repair bad channels
 % (3) Run ft_rejectvisual summary mode for visual trial rejection

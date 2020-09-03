@@ -1,5 +1,5 @@
 function SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_id,stat_id,plt_id,save_fig,varargin)
-% Plots group RL beta topographies per regressor for single ERP analysis (time point)
+%% Plots group RL beta topographies per regressor for single ERP analysis (time point)
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
 %   an_id [str] - ID of the analysis parameters to use

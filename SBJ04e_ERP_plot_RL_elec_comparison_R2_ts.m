@@ -1,5 +1,5 @@
 function SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_id,plt_id,save_fig,varargin)
-% Plots Adjusted R2 model fits across different electrodes (same model) for time series
+%% Plots Adjusted R2 model fits across different electrodes (same model) for time series
 %   Option: Select original or adjusted R2
 %   Only for single channel right now...
 % INPUTS:

@@ -1,5 +1,5 @@
 function SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_id)
-% Run Mixed-Effects Linear model on condition-averaged ERPs from all SBJs
+%% Run Mixed-Effects Linear model on condition-averaged ERPs from all SBJs
 %   Averages ERPs (condition averaged data per SBJ) in time window and across channels
 % COMPUTATIONS:
 %   Select trials for conditions of interest
@@ -8,7 +8,7 @@ function SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_id)
 %       Optional: z-score model regressors within SBJ
 %   Compute and plot group concatenated model (design matrix) and correlations
 %   Run linear mixed effects model per time point or per electrode
-%   Correct for multiple comparisons
+%   Correct for multiple comparisons (FDR for regressors)
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
 %   proc_id [str] - ID of preprocessing pipeline

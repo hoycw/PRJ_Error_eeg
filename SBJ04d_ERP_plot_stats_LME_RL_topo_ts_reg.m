@@ -1,7 +1,7 @@
 function SBJ04d_ERP_plot_stats_LME_RL_topo_ts_reg(SBJ_id,an_id,stat_ids,plt_id,save_fig,varargin)
-% Plots group RL beta topographies per regressor across multiple stats run
+%% Plots group RL beta topographies per regressor across multiple stats run
 % at different time points
-%   IMPORTANT: Recomputes FDR correction over all analyses, regressors, and electrodes
+%   IMPORTANT: Recomputes FDR correction over all analyses (times), regressors, and electrodes
 %   Rows are regressors, columns are time points
 %   Prints statistics: max beta and q value per regressor across time points
 %       and electrodes, along with peak electrode and time

@@ -1,10 +1,25 @@
 function SBJ05e_PHS_plot_stats_CLcorr_RL(SBJ_id,proc_id,an_id,stat_id,save_fig,varargin)
-%% Plot group TFRs per regressor: circular-linear correlations outlined by significance
-%   Only for single channel right now...
+error('Use SBJ05e_PHS_plot_stats_CLreg_RL to plot for C-L regression instead!');
+%% Plot group model coeffifient TFR matrix per circular-linear correlation + R2
+%   Correlations are outlined by significance
+%   Only for single channel
+% INPUTS:
+%   SBJ_id [str] - ID of subject list for group
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_id [str] - ID of the stats parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figures
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -17,8 +32,6 @@ if ~isempty(varargin)
     for v = 1:2:numel(varargin)
         if strcmp(varargin{v},'fig_vis') && ischar(varargin{v+1})
             fig_vis = varargin{v+1};
-        elseif strcmp(varargin{v},'plt_id') && ischar(varargin{v+1})
-            plt_id = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
         else
@@ -41,27 +54,25 @@ if ~an.complex; error('why run this without ITPC an_vars?'); end
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
 if ~strcmp(st.an_style,'CLcorr'); error('stat_id not using circular-linear correlation!'); end
-% plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
-% eval(plt_vars_cmd);
 
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select Conditions of Interest
-[reg_lab, reg_names, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
+[reg_lab, reg_names, ~, ~]  = fn_regressor_label_styles(st.model_lab);
 
 %% Load Stats
+% Check stats are run on correct SBJ group
 tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'SBJs');
 if ~all(strcmp(SBJs,tmp.SBJs))
     fprintf(2,'Loaded SBJs: %s\n',strjoin(tmp.SBJs,', '));
     error('Not all SBJs match input SBJ list!');
 end
-warning('WARNING: Assuming same prdm_vars for all SBJ to get event timing!');
-prdm_vars = load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/03_events/' SBJs{1} '_prdm_vars.mat']);
 
+% Load TFR stats
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'phs_corr','qvals');%'phs_zcorr','zqvals'
 
-%% Load TFR for axes
+%% Load Example TFR for Axes
 load([root_dir 'PRJ_Error_eeg/data/' SBJs{1} '/04_proc/' SBJs{1} '_' proc_id '_' an_id '.mat']);
 if numel(tfr.label) > 1; error('only ready for one channel right now!'); end
 
@@ -79,7 +90,7 @@ end
 
 % Create a figure for each channel
 for ch_ix = 1:numel(st_tfr.label)
-    % Get color lims per condition
+    % Get color limits across all regressors
     corr_mat = phs_corr;
     clim = [min(corr_mat(:)) max(corr_mat(:))];
     
@@ -87,20 +98,13 @@ for ch_ix = 1:numel(st_tfr.label)
     ns_alpha = 0.4;
     sig_mask = ones(size(qvals))*ns_alpha;
     sig_mask(qvals<=st.alpha) = 1;
-
-%     tick_ix = 1:3:numel(fois);
-%     yticklab = cell(size(tick_ix));
-%     for f = 1:numel(tick_ix)
-%         yticklab{f} = num2str(st_tfr.freq(tick_ix(f)),'%.1f');
-%     end
     
     %% Create plot
     fig_name = [SBJ_id '_' stat_id '_' an_id '_' st_tfr.label{ch_ix}];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
     
-    % Beta Plots
-    %cfgplt = []; cfgplt.zlim = clim;
+    % Correlation Matrix Plots
     axes = gobjects([numel(reg_lab) 1]);
     [num_rc,~] = fn_num_subplots(numel(reg_lab));
     for reg_ix = 1:numel(reg_lab)
@@ -110,13 +114,10 @@ for ch_ix = 1:numel(st_tfr.label)
         im = imagesc(st_time_vec, fois, squeeze(corr_mat(reg_ix,:,:)),clim);
         im.AlphaData = squeeze(sig_mask(reg_ix,:,:));
         set(axes(reg_ix),'YDir','normal');
-%         set(axes(reg_ix),'YTick',tick_ix);
-%         set(axes(reg_ix),'YTickLabels',yticklab);
         set(axes(reg_ix),'YLim',[min(fois) max(fois)]);
         set(axes(reg_ix),'XLim',[min(st_time_vec) max(st_time_vec)]);
         set(axes(reg_ix),'XTick',[min(st_time_vec):0.1:max(st_time_vec)]);
-        %ft_singleplotTFR(cfgplt, tfr_avg{cond_ix});
-        title([st_tfr.label{ch_ix} ': Phase-' reg_lab{reg_ix} ' Corr (n=' num2str(numel(SBJs)) ')']);
+        title([st_tfr.label{ch_ix} ': Phase-' reg_names{reg_ix} ' Corr (n=' num2str(numel(SBJs)) ')']);
         xlabel('Time (s)');
         ylabel('Frequency (Hz)');
         colorbar('northoutside');
@@ -125,7 +126,7 @@ for ch_ix = 1:numel(st_tfr.label)
     
     % Save figure
     if save_fig
-        fig_filename = [fig_dir fig_name '.png'];
+        fig_filename = [fig_dir fig_name '.' fig_ftype];
         fprintf('Saving %s\n',fig_filename);
         saveas(gcf,fig_filename);
     end
