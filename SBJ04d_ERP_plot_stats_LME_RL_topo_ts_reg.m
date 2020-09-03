@@ -1,12 +1,27 @@
 function SBJ04d_ERP_plot_stats_LME_RL_topo_ts_reg(SBJ_id,an_id,stat_ids,plt_id,save_fig,varargin)
-% Plots group time series of RL beta topographies with significance for ERPs
+% Plots group RL beta topographies per regressor across multiple stats run
+% at different time points
+%   IMPORTANT: Recomputes FDR correction over all analyses, regressors, and electrodes
 %   Rows are regressors, columns are time points
-%   Only for single channel right now...
+%   Prints statistics: max beta and q value per regressor across time points
+%       and electrodes, along with peak electrode and time
+% INPUTS:
+%   SBJ_id [str] - ID of subject list for group
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_ids [cell array] - string IDs of the stats parameters to compare
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -42,9 +57,11 @@ eval(plt_vars_cmd);
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
+% Load stat parameters and check compatibility
 sts        = cell(size(stat_ids));
 model_labs = cell(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
+    % Load stat_id
     stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_ids{st_ix} '_vars.m'];
     eval(stat_vars_cmd);
     sts{st_ix} = st;
@@ -84,7 +101,6 @@ end
 %% Load Stats
 clim     = zeros([numel(reg_lab) 2]);
 betas    = nan([numel(stat_ids) numel(reg_lab) 64]);
-orig_qvals    = nan([numel(stat_ids) numel(reg_lab) 64]);
 pvals    = nan([numel(stat_ids) numel(reg_lab) 64]);
 r2       = zeros([numel(stat_ids) 64]);
 pk_times = zeros(size(stat_ids));
@@ -92,9 +108,8 @@ for st_ix = 1:numel(stat_ids)
     load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_ids{st_ix} '_' an_id '.mat'],'lme','qvals','ch_list','reg_pk_time');
     if numel(ch_list)<64; error('Cannot plot topo without full cap!'); end
     
-    % Get beta values, color limits, and peak times
+    % Get beta values, p values, color limits, and peak times
     pk_times(st_ix) = reg_pk_time;
-    orig_qvals(st_ix,:,:) = qvals;
     for ch_ix = 1:numel(ch_list)
         for reg_ix = 1:numel(reg_lab)
             betas(st_ix,reg_ix,ch_ix) = lme{ch_ix}.Coefficients.Estimate(reg_ix+1);
@@ -117,6 +132,7 @@ end
 sig_ch = qvals<=sts{1}.alpha;
 
 %% Create dummy dataset for plotting
+% This will initialize electrode labels, neighbor structure, etc.
 load([root_dir 'PRJ_Error_eeg/data/',SBJs{1},'/04_proc/',SBJs{1},'_',an_id,'.mat'],'roi');
 topo = {};
 topo.label  = roi.label;
@@ -126,7 +142,7 @@ topo.dimord = 'chan_time';
 % Create plot
 fig_name = [SBJ_id '_topo_ts_' an_id];
 figure('Name',fig_name,'units','normalized',...
-    'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);   %this size is for single plots
+    'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
 
 % Set up defatul plotting params
 axes = gobjects([numel(stat_ids) numel(reg_lab)+1]);
@@ -140,7 +156,7 @@ cfgp.parameter       = 'avg';
 cfgp.zlim            = [-max(abs(clim(:))) max(abs(clim(:)))];
 cfgp.colormap        = 'jet';
 
-% Plot topo for each regressor and time
+% Plot topo for each regressor and time point
 plot_ix = 0;
 for reg_ix = 1:numel(reg_lab)
     for st_ix = 1:numel(stat_ids)
@@ -149,6 +165,8 @@ for reg_ix = 1:numel(reg_lab)
         plot_ix = plot_ix + 1;
         subplot(numel(reg_lab)+1,numel(stat_ids),plot_ix);
         axes(st_ix,reg_ix) = gca; hold on;
+        
+        % Only plot color bar on last column
         if st_ix==numel(stat_ids)
             cfgp.colorbar = 'yes';
         else
@@ -158,16 +176,13 @@ for reg_ix = 1:numel(reg_lab)
         % Plot Beta Topos
         topo.avg  = squeeze(betas(st_ix,reg_ix,:));
         cfgp.highlightchannel = find(sig_ch(st_ix,reg_ix,:));
-%         topo.mask = ones(size(topo.avg))*0.1;%zeros(size(topo.avg));
-%         topo.mask(logical(sig_ch(st_ix,reg_ix,:))) = 1;
-        % cfgp.zlim = [min(betas(reg_ix,:)) max(betas(reg_ix,:))];
         ft_topoplotER(cfgp, topo);
         title([reg_names{reg_ix} ': ' num2str(pk_times(st_ix),'%.3f') ' s']);
         axis tight
     end
 end
 
-% Plot R2
+% Plot R2 as bottom row
 cfgp.zlim = [0 max(r2(:))];
 cfgp.highlight = 'no';
 cfgp.highlightchannel = [];
@@ -175,21 +190,22 @@ for st_ix = 1:numel(stat_ids)
     plot_ix = plot_ix + 1;
     subplot(numel(reg_lab)+1,numel(stat_ids),plot_ix);
     axes(st_ix,numel(reg_ix)+1) = gca; hold on;
+    
+    % Only plot color bar on last column
     if st_ix==numel(stat_ids)
         cfgp.colorbar = 'yes';
     else
         cfgp.colorbar = 'no';
     end
     
-    % Plot Beta Topos
+    % Plot R2 Topos
     topo.avg  = r2(st_ix,:)';
-%     topo.mask = zeros(size(topo.avg));
     ft_topoplotER(cfgp, topo);
     title(['Adjusted R2: '  num2str(pk_times(st_ix),'%.3f') ' s']);
     axis tight    
 end
 
-% Report peak window and elec per regressor
+%% Report peak beta, q value, window, and elec per regressor
 for reg_ix = 1:numel(reg_lab)
     max_beta = 0; max_ch_ix = 0; max_t_ix = 0;
     for st_ix = 1:numel(stat_ids)

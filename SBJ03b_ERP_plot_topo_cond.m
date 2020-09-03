@@ -87,7 +87,7 @@ fig_name = [SBJ '_' conditions '_' an_id '_' plt_id];
 [num_rc,~] = fn_num_subplots(numel(cond_lab));
 if num_rc(1)>1; fig_height = 0.5; else, fig_height = 0.3; end
 figure('Name',fig_name,'units','normalized',...
-    'outerposition',[0 0 0.5 fig_height],'Visible',fig_vis);   %this size is for single plots
+    'outerposition',[0 0 0.5 fig_height],'Visible',fig_vis);
 
 %% Create a figure for each channel
 axes = gobjects(size(cond_lab));

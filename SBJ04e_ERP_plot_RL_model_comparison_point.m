@@ -1,10 +1,31 @@
 function SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,metric,save_fig,varargin)
-% Plots model performance across different RL models for point estimates
+% Plots model performance (AIC or R2) across different RL models for point estimates
+%   For AIC, adds relatively likelihoods in legend
+%   Option: Select original or adjusted R2
+%   Option: If null_id is not empty (''), subtract off R2 for that stat_id
 %   Only for single channel right now...
+% INPUTS:
+%   SBJ_id [str] - ID of subject list for group
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_ids [cell array] - string IDs of the stats parameters to compare
+%   null_id [str] - ID of the SBJonly baseline model to compare
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+%       plot_null [0/1] - binary flag to plot null model with only random intercepts
+%           default: 0
+%       r2_version [str] - {'Adjusted' or 'Ordinary'} version of R2
+%           default: 'Adjusted'
+% OUTPUTS:
+%   saves figure
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -46,6 +67,7 @@ eval(plt_vars_cmd);
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
+% Load stat parameters and check compatibility
 sts        = cell(size(stat_ids));
 model_labs = cell(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
@@ -55,6 +77,7 @@ for st_ix = 1:numel(stat_ids)
     model_labs{st_ix} = sts{st_ix}.model_lab;
     if strcmp(st.measure,'ts'); error('this script is for point estimates!');end
     
+    % Check alignment of time windows and measurements
     if st_ix>1
         fnames = fieldnames(sts{st_ix});
         for f_ix = 1:numel(fnames)
@@ -87,6 +110,7 @@ if plot_null
     eval(stat_vars_cmd);
     null_st = st;
     
+    % Check compatibility of null model
     if any(sts{1}.stat_lim ~= null_st.stat_lim)
         error('null_st.stat_lim not aligned!');
     end
@@ -114,6 +138,8 @@ for st_ix = 1:numel(stat_ids)
     else
         error(['Unknown metric: ' metric]);
     end
+    
+    % Check analysis type
     if st_ix==1
         if strcmp(sts{st_ix}.measure,'mean')
             st_lim = sts{st_ix}.stat_lim + tmp.reg_pk_time;
@@ -166,6 +192,7 @@ if strcmp(metric,'AIC')
         null_comp_leg = ['RL=' num2str(rel_lik_null,'%.2f')];
     end
 elseif strcmp(metric,'R2')
+    % Create legend strings
     for st_ix = 1:numel(stat_ids)
         comp_leg{st_ix} = num2str(data(st_ix),'%.3f');
     end
@@ -180,7 +207,7 @@ if plot_null
     fig_name = [fig_name '_null'];
 end
 figure('Name',fig_name,'units','normalized',...
-    'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
+    'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
 
 %% Plot Model Performance
 ax = gca; hold on;
@@ -202,7 +229,7 @@ end
 rl_fudge = plt.sig_yfudge/2;
 y_range = max(plot_data)-min(plot_data);
 
-% Plot Metric
+% Plot FRN Metric
 b = bar(1:numel(plot_ids),plot_data,'BarWidth',plt.bar_width,'FaceColor',plt.bar_color);%'flat');
 % for st_ix = 1:numel(plot_ids)
 %     b.CData(st_ix,:) = st_colors(st_ix,:);

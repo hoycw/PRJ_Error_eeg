@@ -1,6 +1,6 @@
 %% Time-frequency power and phase analyses for Sequential PE Initial Submission
 % Developed over time, but editted 8/20/20 by Colin W Hoy
-%   Plots Sup. Fig. 4 and 5 (evoked power for Fz, Pz with ERP overlay)
+%   Sup. Fig. 4 and 5: SBJ05c_TFR_ERP_plot_grp
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -88,7 +88,7 @@ for an_ix = 1:numel(an_ids)
     
     % Exploratory rose plot: Compute and plot ITPC with ERP overlay per condition for single SBJ
     %   Also extracts/plots mean phase angle in T-F window across conditions
-    SBJ05c_ITC_ERP_rose_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},phs_freq_lim,phs_time_lim,erp_ids{an_ix},...
-            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ05c_ITC_ERP_rose_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},phs_freq_lim,phs_time_lim,erp_ids{an_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

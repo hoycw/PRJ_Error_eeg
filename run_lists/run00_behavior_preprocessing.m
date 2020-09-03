@@ -1,6 +1,8 @@
 %% Behavior and Pre-Processing for Sequential PE Initial Submission
 % Written 8/14/2020 by Colin Hoy
-% Plots Fig. 1A, 1B, and 1C
+% 	Fig. 1A: BHV02_plot_RT_hist
+%   Fig. 1B: BHV00_01_prelim_analysis.py
+%   Fig. 1C: BHV03_group_accuracy_plots_TT
 
 %% Set Up
 % Running locally on Colin's MacBookPro; OS 10.13.6; MATLAB R2017b

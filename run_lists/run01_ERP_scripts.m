@@ -1,3 +1,9 @@
+%% ERP analysis and plotting for Sequential PE Initial Submission
+% Developed over time, but editted 8/20/20 by Colin W Hoy
+% 	Fig. 1A: BHV02_plot_RT_hist
+%   Fig. 1B: BHV00_01_prelim_analysis.py
+%   Fig. 1C: BHV03_group_accuracy_plots_TT
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';

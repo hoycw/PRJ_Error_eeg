@@ -1,11 +1,22 @@
 function SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_id,stat_id,plt_id,save_fig,varargin)
-% Plots group RL beta topographies with significance for ERPs
-%   Only for single channel right now...
+% Plots group RL beta topographies per regressor for single ERP analysis (time point)
+% INPUTS:
+%   SBJ_id [str] - ID of subject list for group
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_id [str] - ID of the stats parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -52,12 +63,14 @@ if strcmp(st.measure,'ts')
 end
 
 %% Load Stats
+% Check stat analysis was run on correct SBJs
 tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'SBJs');
 if ~all(strcmp(SBJs,tmp.SBJs))
     fprintf(2,'Loaded SBJs: %s\n',strjoin(tmp.SBJs,', '));
     error('Not all SBJs match input SBJ list!');
 end
 
+% Load results
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'],'lme','qvals','ch_list','reg_pk_time');
 if numel(ch_list)<64; error('Cannot plot opo wihtout full cap!'); end
 
@@ -74,6 +87,7 @@ for ch_ix = 1:numel(ch_list)
 end
 
 %% Create dummy dataset for plotting
+% This will initialize electrode labels, neighbor structure, etc.
 load([root_dir 'PRJ_Error_eeg/data/',SBJs{1},'/04_proc/',SBJs{1},'_',an_id,'.mat'],'roi');
 topo = {};
 topo.label  = roi.label;
@@ -89,41 +103,44 @@ end
 % Create plot
 fig_name = [SBJ_id '_' stat_id '_' an_id];
 figure('Name',fig_name,'units','normalized',...
-    'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);   %this size is for single plots
+    'outerposition',[0 0 0.8 0.8],'Visible',fig_vis);
 
-% Create a figure for each regressor
+% Initialize plotting parameters
+cfgp = [];
+cfgp.xlim            = [reg_pk_time reg_pk_time];
+cfgp.zlim            = clim;
+cfgp.layout          = 'biosemi64.lay';
+cfgp.colorbar        = 'yes';
+cfgp.comment         = 'no';
+cfgp.highlight       = 'on';
+cfgp.highlightsymbol = '*';
+cfgp.maskparameter   = 'mask';
+
+% Create a subplot for each regressor
 axes = gobjects([numel(reg_lab)+1 1]);
 [num_rc,~] = fn_num_subplots(numel(reg_lab)+1);
-cfgp = [];
-cfgp.xlim     = [reg_pk_time reg_pk_time];
-cfgp.zlim     = clim;
-cfgp.layout   = 'biosemi64.lay';
-cfgp.colorbar = 'yes';
-cfgp.comment  = 'no';
-cfgp.highlight = 'on';
-cfgp.highlightsymbol = '*';
-cfgp.maskparameter = 'mask';
 for reg_ix = 1:numel(reg_lab)
     subplot(num_rc(1),num_rc(2),reg_ix);
     axes(reg_ix) = gca; hold on;
     
-    % Plot Beta Topos
+    % Insert data and mark significant electrodes
     topo.avg  = betas(reg_ix,:)';
     ch_ix = 1:numel(topo.label);
     cfgp.highlightchannel = ch_ix(qvals(reg_ix,:)'<=st.alpha);
-    topo.mask = ones(size(topo.avg))*0.1;%zeros(size(topo.avg));
+    topo.mask = ones(size(topo.avg))*0.1;
     topo.mask(qvals(reg_ix,:)'<=st.alpha) = 1;
     % cfgp.zlim = [min(betas(reg_ix,:)) max(betas(reg_ix,:))];
+    
+    % Plot Beta Topos
     ft_topoplotER(cfgp, topo);
     title(reg_lab{reg_ix});
     axis tight        
 end
 
-% Plot R2
+% Plot R2 Topo
 subplot(num_rc(1),num_rc(2),numel(reg_lab)+1);
 axes(end) = gca; hold on;
 
-% Plot Beta Topos
 topo.avg  = r2;
 topo.mask = ones(size(topo.avg));
 cfgp.zlim = [min(r2) max(r2)];

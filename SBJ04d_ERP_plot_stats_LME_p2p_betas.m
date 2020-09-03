@@ -1,10 +1,34 @@
 function SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_id,plt_id,save_fig,varargin)
-% Plots beta weights per regressor for mean window LME analyses
-%   Only for single channel right now...
+% Plots beta weights per regressor for peak-to-peak LME analyses
+%   Prints betas and q values per regressor
+%   Optional: plot input data as bar plot
+%       WARNING: plotting only does single trial average, not ERP mean,
+%           so plotted data may not match stat inputs
+%   Optional: violin plot of peak latencies
+% INPUTS:
+%   SBJ_id [str] - ID of subject list for group
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_id [str] - ID of the stats parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       plot_data [0/1] - binary flag for bar plot of mean window FRN data
+%           default: 0
+%       plot_violins [0/1] - binary flag for violin instead of bar plot for FRN data
+%           default: 0
+%       plot_latencies [0/1[ - binary flag to plot peak latencies
+%           default: 0
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -37,7 +61,7 @@ if ~exist('fig_ftype','var');      fig_ftype = 'png'; end
 if ~exist('plot_data','var');      plot_data = 0; end
 if ~exist('plot_violins','var');   plot_violins = 0; end
 if ~exist('plot_latencies','var'); plot_latencies = 0; end
-if ischar(save_fig); save_fig = str2num(save_fig); end
+if ischar(save_fig);               save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
@@ -76,6 +100,7 @@ for reg_ix = 1:numel(reg_lab)
     end
 end
 
+% Determine plotting data and summary metrics if necessary
 if plot_violins
     plot_data = data;
 else
@@ -97,10 +122,13 @@ if plot_violins
 end
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
+
+% Plot peak-to-peak data
 if plot_data
     subplot(2,1,1); hold on;
     
     if plot_violins
+        % Plot full distribution as violins
         violins = violinplot(squeeze(plot_data(:,:))', cond_lab, ...
             'ShowMean', true, 'ViolinAlpha', 0.3);
         
@@ -119,13 +147,7 @@ if plot_data
             violins(cond_ix).BoxPlot.FaceColor = cond_colors{cond_ix};
             violins(cond_ix).EdgeColor = cond_colors{cond_ix};
             % 	Scatter
-            %         scat_colors = zeros([numel(violins(cond_ix).ScatterPlot.XData) 3]);
-            %         for s = 1:numel(SBJs)
-            %             scat_colors(s,:) = cond_colors{cond_ix};
-            %         end
-            %         violins(cond_ix).ScatterPlot.MarkerFaceColor = 'flat';   % Necessary for CData to work
-            %         violins(cond_ix).ScatterPlot.MarkerEdgeColor = 'flat';   % Necessary for CData to work
-            violins(cond_ix).ScatterPlot.CData = cond_colors{cond_ix};%scat_colors;
+            violins(cond_ix).ScatterPlot.CData = cond_colors{cond_ix};
         end
     else
         % Plot Means as bar
@@ -139,7 +161,7 @@ if plot_data
         end
     end
     
-    % Add label and min RT for perspective
+    % Axis and title parameters
     ax = gca;
     ax.YLabel.String = 'FRN Amplitude (uV)';
     ax.XLim          = [0 numel(cond_lab)+1];
@@ -241,19 +263,13 @@ if plot_latencies
         violins(cond_ix).BoxPlot.FaceColor = cond_colors{cond_ix};
         violins(cond_ix).EdgeColor = cond_colors{cond_ix};
         % 	Scatter
-        %         scat_colors = zeros([numel(violins(cond_ix).ScatterPlot.XData) 3]);
-        %         for s = 1:numel(SBJs)
-        %             scat_colors(s,:) = cond_colors{cond_ix};
-        %         end
-        %         violins(cond_ix).ScatterPlot.MarkerFaceColor = 'flat';   % Necessary for CData to work
-        %         violins(cond_ix).ScatterPlot.MarkerEdgeColor = 'flat';   % Necessary for CData to work
-        violins(cond_ix).ScatterPlot.CData = cond_colors{cond_ix};%scat_colors;
+        violins(cond_ix).ScatterPlot.CData = cond_colors{cond_ix};
     end
     
     % Flip Violins horizontal
     view([90 -90]);
     
-    % Add label and min RT for perspective
+    % Axis and label parameters
     ax = gca;
     ax.YLim = st.pk_lim(2,:);
     ax.YLabel.String = 'FRN Peak Latency (s)';

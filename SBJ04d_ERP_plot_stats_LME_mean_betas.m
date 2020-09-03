@@ -1,10 +1,31 @@
 function SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_id,plt_id,save_fig,varargin)
 % Plots beta weights per regressor for mean window LME analyses
-%   Only for single channel right now...
+%   Prints betas and q values per regressor
+%   Optional: plot input data as bar plot
+%       WARNING: plotting only does single trial average, not ERP mean,
+%           so plotted data may not match stat inputs
+% INPUTS:
+%   SBJ_id [str] - ID of subject list for group
+%   proc_id [str] - ID of preprocessing pipeline
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_id [str] - ID of the stats parameters to use
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       plot_data [0/1] - binary flag for bar plot of mean window FRN data
+%           default: 0
+%       plot_violins [0/1] - binary flag for violin instead of bar plot for FRN data
+%           default: 0
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+% OUTPUTS:
+%   saves figure
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -32,9 +53,9 @@ end
 % Define default options
 if ~exist('fig_vis','var');      fig_vis = 'on'; end
 if ~exist('fig_ftype','var');    fig_ftype = 'png'; end
-if ~exist('plot_data','var');      plot_data = 0; end
+if ~exist('plot_data','var');    plot_data = 0; end
 if ~exist('plot_violins','var'); plot_violins = 0; end
-if ischar(save_fig); save_fig = str2num(save_fig); end
+if ischar(save_fig);             save_fig = str2num(save_fig); end
 
 %% Analysis and Plotting Parameters
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
@@ -54,9 +75,13 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat']);
 if numel(ch_list)>1; error('only plotting for 1 channel in this script!'); end
 
-%% Load Data and Compute Mean Window
+%% Load ERPs and Compute Mean Window
 if plot_data
-    cfgs = []; cfgs.latency = st.stat_lim+reg_pk_time; cfgs.avgovertime = 'yes';
+    % Averaging parameters
+    cfgs = [];
+    cfgs.latency     = st.stat_lim+reg_pk_time;
+    cfgs.avgovertime = 'yes';
+    
     data = cell(size(cond_lab));
     for s = 1:numel(SBJs)
         % Load data
@@ -65,7 +90,7 @@ if plot_data
             SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
         load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',an_id,'.mat'],'roi');
         
-        % Select time of interest
+        % Average data in window of interest
         st_roi = ft_selectdata(cfgs, roi);
         
         % Load and add data
@@ -94,7 +119,7 @@ end
 if strcmp(st.model_lab,'SBJonly')
     plot_betas = lme{1}.Coefficients.Estimate;
 else
-    plot_betas = lme{1}.Coefficients.Estimate(2:end);
+    plot_betas = lme{1}.Coefficients.Estimate(2:end);   % skip intercept
 end
 r2 = lme{1}.Rsquared.Adjusted;
 st_lim = st.stat_lim + reg_pk_time;
@@ -108,12 +133,14 @@ for reg_ix = 1:numel(reg_lab)
     end
 end
 
+% Format data for plotting
 if plot_data
     if plot_violins
         for cond_ix = 1:numel(cond_lab)
             plot_data.(cond_lab{cond_ix}) = data{cond_ix};
         end
     else
+        % Compute mean and variance
         plot_means = nan(size(cond_lab));
         plot_sems  = nan(size(cond_lab));
         for cond_ix = 1:numel(cond_lab)
@@ -126,18 +153,19 @@ end
 %% Plot Mean Window Data
 fig_name = [SBJ_id '_' stat_id '_' ch_list{1}];
 if plot_data
-    fig_name = [fig_name '_violins'];
+    fig_name = [fig_name '_bars'];
 end
 if plot_violins
     fig_name = [fig_name '_violins'];
 end
 figure('Name',fig_name,'units','normalized',...
-    'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
+    'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
 
 if plot_data
     subplot(2,1,1); ax = gca; hold on;
     
     if plot_violins
+        % Plot violins of mean window FRN
         violins = violinplot(plot_data, cond_lab, 'ShowData', false, 'ShowMean', true, 'ViolinAlpha', 0.3);
         
         for cond_ix = 1:numel(cond_lab)
@@ -167,7 +195,7 @@ if plot_data
         end
     end
     
-    % Add label and min RT for perspective
+    % Plot parameters
     ax = gca;
     ax.YLabel.String = 'FRN Amplitude (uV)';
     ax.XLim          = [0 numel(cond_lab)+1];
@@ -182,7 +210,7 @@ end
 if plot_data; subplot(2,1,2); end
 ax = gca; hold on;
 
-% Find significance marker distance
+% Adjust significance marker distance
 sig_y = max(abs(plot_betas))*plt.sig_yfudge;
 
 % Plot Betas
@@ -206,7 +234,6 @@ for reg_ix = 1:numel(reg_lab)
 end
 
 % Axes and Labels
-%     ax.YLim          = ylims; %!!! change for plt.sigType=line
 ax.YLabel.String = 'Beta Weight';
 ax.XLim          = [0 numel(reg_lab)+1];
 ax.XTick         = 1:numel(reg_lab);
@@ -228,7 +255,7 @@ ylims = ylim;
 set(gca,'FontSize',16);
 ax.YLim = ylims;
 
-%% Report peak window and elec per regressor
+%% Report beta and q value per regressor
 for reg_ix = 1:numel(reg_lab)
     fprintf('%s beta = %.03f; p = %.10f\n',reg_lab{reg_ix},plot_betas(reg_ix),...
         qvals(reg_ix));

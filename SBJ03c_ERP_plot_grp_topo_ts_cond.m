@@ -1,7 +1,7 @@
 function SBJ03c_ERP_plot_grp_topo_ts_cond(SBJ_id,conditions,proc_id,an_id,stat_ids,save_fig,varargin)
 %% Plot group ERP topographies per condition across multiple windows (dynamics)
 %   Plotting evoked activity in time window identified as important via
-%   stats, e.g., from SBJ04c_ERP_grp_stats_LME_RL
+%   stats, e.g., based on times used in SBJ04c_ERP_grp_stats_LME_RL
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
 %   conditions [str] - group of condition labels to segregate trials
@@ -54,7 +54,7 @@ if ~strcmp(an.ROI{1},'all'); error('run this only for topos with all channels!')
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select conditions (and trials)
-[cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(conditions);
 
 %% Load Plotting Windows from stat_id list
 sts      = cell(size(stat_ids));
@@ -110,7 +110,8 @@ for s = 1:numel(SBJs)
     for cond_ix = 1:numel(cond_lab)
         cond_idx = fn_condition_index(cond_lab(cond_ix),bhv);
         cfg_er.trials = find(cond_idx);
-        for st_ix = 1:numel(stat_ids)            
+        for st_ix = 1:numel(stat_ids)
+            % Average ERP within stat_id window
             cfg_er.latency = sts{st_ix}.stat_lim + pk_times(st_ix);
             er_avg{cond_ix,st_ix,s} = ft_timelockanalysis(cfg_er,roi);
             er_avg{cond_ix,st_ix,s} = ft_selectdata(cfg_avgtime,er_avg{cond_ix,st_ix,s});
@@ -119,12 +120,14 @@ for s = 1:numel(SBJs)
     clear roi bhv
 end
 
-%% Average ERPs for plotting
+%% Compute group Grand Average ERPs for plotting
 er_grp = cell([numel(cond_lab) numel(stat_ids)]);
 clim   = [nan nan];
 for cond_ix = 1:numel(cond_lab)
     for st_ix = 1:numel(stat_ids)
         er_grp{cond_ix,st_ix} = ft_timelockgrandaverage([], er_avg{cond_ix,st_ix,:});
+        
+        % Get color limits for plotting
         clim(1) = min([clim(1); er_avg{cond_ix,st_ix}.avg]);
         clim(2) = max([clim(2); er_avg{cond_ix,st_ix}.avg]);
     end
@@ -159,15 +162,18 @@ for cond_ix = 1:numel(cond_lab)
         plot_ix = plot_ix + 1;
         subplot(numel(cond_lab),numel(stat_ids),plot_ix);
         axes(cond_ix,st_ix) = gca; hold on;
+        
+        % Only plot color bar on last column
         if st_ix==numel(stat_ids)
             cfgp.colorbar = 'yes';
         else
             cfgp.colorbar = 'no';
         end
         
+        % Plot ERP topo
         cfgp.xlim   = [pk_times(st_ix) pk_times(st_ix)];
         tmp = ft_topoplotER(cfgp, er_grp{cond_ix,st_ix});
-        title([cond_lab{cond_ix} ': ' num2str(pk_times(st_ix),'%.3f') ' s']);
+        title([cond_names{cond_ix} ': ' num2str(pk_times(st_ix),'%.3f') ' s']);
         axis tight
     end
 end

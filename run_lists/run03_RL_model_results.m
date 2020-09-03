@@ -1,8 +1,12 @@
 %% Reinforcement Learning based modeling and analyses for Sequential PE Initial Submission
 % Developed over time, but editted 8/X/20 by Colin W Hoy
-% Final model_id = 'ERPEsL_all'
+% Final model_id = 'ERPEsL_all' (all = 'DifFB', which includes all conditions)
 %   Fig. 1D: SBJ04b_BHV_RL_model_plot and SBJ04b_BHV_RL_model_plot_grp
-%   Fig. 2: 
+%   Fig. 2: SBJ04c_ERP_grp_stats_LME_RL and SBJ04d_ERP_plot_stats_LME_RL_fits
+%   Fig. 3: SBJ04c_ERP_grp_stats_LME_RL and SBJ04d_ERP_plot_stats_LME_RL_topo_ts_reg
+%   Sup. Fig. 1A: SBJ04b_plot_model_predictions
+%   Sup. Fig. 2: SBJ04e_ERP_plot_RL_elec_comparison_R2_ts
+%   Sup. Fig. 3: SBJ03c_ERP_plot_grp_topo_ts_cond
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -51,6 +55,7 @@ for st_ix = 1:numel(stat_ids)
 end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
+% Plots Fig. 2 and 3; Sup. Fig. 2
 % Main RL Model
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 stat_ids  = {'ERPEsL_all_lme_st05t5'};
@@ -67,36 +72,40 @@ for an_ix = 1:numel(an_ids)
       % Run LME RL model on ERPs over time
       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
       
-      % Plot model results (ERPs, coefficients, model fit)
+      % Fig. 2: Plot model results (ERPs, coefficients, model fit)
       SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
+    
     % Optional: run SBJ only model (random intercepts, no regressors) for
-    % baseline model performance; not in the paper
+    %   baseline model performance; not in the paper
 %     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
 
-    % Model Comparison Plots (Adjusted R-Squared)
+    % Model Comparison Plots: AIC Performance
 %     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
+
+    % Model Comparison Plots: R2 Fits Relative to SBJonly null model
 %     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',1);
+
+    % Model Comparison Plots: R2 Fits Overall
 %     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
 end
 
-% Electrode R2 Comparison Plot
-plt_id     = 'ts_F0t5_evnts_sigLine';
+% Sup. Fig. 2: Electrode R2 Comparison Plot
+plt_id     = 'ts_F0t5_evnts_sigLine';   % plot only for stat_lim
 for st_ix = 1:numel(stat_ids)
-%     SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_ids{st_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
+    SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_ids{st_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
 end
 
 %% Beta Topographies: Linear Mixed Effects Model (Mean Windows)
+% Plots Fig. 3 and Sup. Fig. 3
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
 stat_ids  = {'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
-% stat_ids  = {'ERPEsL_all_lme_mn05man1','ERPEsL_all_lme_mn05man225','ERPEsL_all_lme_mn05man325','ERPEsL_all_lme_mn05man375'};'ERPEsL_all_lme_mn150man375'};%
-% stat_ids  = {'VML_all_lme_mn1FRN','VML_all_lme_mn1P3'};
 plt_id    = 'topo_F18t25';
 save_fig  = 1;
 fig_vis   = 'on';
@@ -104,16 +113,19 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
+        % Run LME RL model on ERPs averaged in time window for all electrodes
         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        
+        % Plot individual model coefficient topographies
         SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_ids{an_ix},stat_ids{st_ix},...
             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
-    % Plot Topo time series
-%     SBJ04d_ERP_plot_stats_LME_RL_topo_ts_reg(SBJ_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-
-    % ERP Topographies: ERP topo dynamics in model mean windows
+    % Fig. 3: Plot Beta Topo across time points
+    SBJ04d_ERP_plot_stats_LME_RL_topo_ts_reg(SBJ_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    
+    % Sup. Fig. 3: ERP topography dynamics in model averaging windows
     conditions = 'DifFB';
     SBJ03c_ERP_plot_grp_topo_ts_cond(SBJ_id,conditions,proc_id,an_ids{an_ix},stat_ids,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
@@ -121,7 +133,7 @@ end
 
 %% Power TFR: Linear Mixed Effects Model (Over Time-Frequency Power)
 proc_id   = 'eeg_full_ft';
-an_ids    = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};%
+an_ids    = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};
 stat_ids  = {'ERPEsL_all_lme_st0t5'};%'VML_all_lme_st0t5',
 save_fig  = 1;
 fig_vis   = 'on';
@@ -129,7 +141,7 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
-%         SBJ05d_TFR_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ05d_TFR_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
         SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
@@ -180,11 +192,6 @@ for an_ix = 1:numel(an_ids)
 % %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
     end
-    
-    % Model Comparison Plots (Adjusted R-Squared)
-%     error('this needs to be a martix version!');
-%     SBJ05f_TFR_plot_RL_model_comparison(SBJ_id,proc_id,an_ids{an_ix},stat_ids,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 

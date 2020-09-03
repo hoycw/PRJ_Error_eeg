@@ -98,7 +98,7 @@ for ch_ix = 1:numel(roi.label)
     %% Create plot
     fig_name = [SBJ '_' conditions '_' an_id '_' roi.label{ch_ix}];    
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.5 1],'Visible',fig_vis);   %this size is for single plots
+        'outerposition',[0 0 0.5 1],'Visible',fig_vis);
     
     %% Plot Trial Stack
     axes = gobjects([2 1]);

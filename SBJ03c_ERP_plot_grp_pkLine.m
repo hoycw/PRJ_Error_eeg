@@ -125,7 +125,7 @@ for ch_ix = 1:numel(ch_list)
     %% Create plot
     fig_name = [SBJ_id '_' conditions '_' an_id '_' ch_list{ch_ix} '_pkLine'];    
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
+        'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
 %     [plot_rc,~] = fn_num_subplots(numel(w2.label));
 %     if plot_rc(1)>1; fig_height=1; else fig_height=0.33; end;
 %     subplot(plot_rc(1),plot_rc(2),ch_ix);

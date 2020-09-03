@@ -1,11 +1,30 @@
 function SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_id,stat_ids,null_id,plt_id,save_fig,varargin)
-% Plots Adjusted R2 model fits across different RL models for time series
-%   if null_id is not empty (''), subtract off R2 for that stat_id
+% Plots R2 model fits across different RL models for time series
+%   Option: Select original or adjusted R2
+%   Option: If null_id is not empty (''), subtract off R2 for that stat_id
 %   Only for single channel right now...
+% INPUTS:
+%   SBJ_id [str] - ID of subject list for group
+%   an_id [str] - ID of the analysis parameters to use
+%   stat_ids [cell array] - string IDs of the stats parameters to compare
+%   null_id [str] - ID of the SBJonly baseline model to compare
+%   plt_id [str] - ID of the plotting parameters to use
+%   save_fig [0/1] - binary flag to save figure
+%   varargin:
+%       fig_vis [str] - {'on','off'} to visualize figure on desktop
+%           default: 'on'
+%       fig_ftype [str] - file extension for saving fig
+%           default: 'png'
+%       rm_null [0/1] - binary flag to subtract null model R2 as baseline
+%           default: 1
+%       r2_version [str] - {'Adjusted' or 'Ordinary'} version of R2
+%           default: 'Adjusted'
+% OUTPUTS:
+%   saves figure
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Documents/MATLAB/';
-elseif exist('Users/aasthashah/', 'dir'); root_dir = 'Users/aasthashah/Desktop/'; app_dir = 'Users/aasthashah/Applications/';
 else; root_dir='/Volumes/hoycw_clust/'; app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
@@ -32,9 +51,9 @@ if ~isempty(varargin)
 end
 
 % Define default options
-if ~exist('fig_vis','var'); fig_vis = 'on'; end
-if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
-if ~exist('rm_null','var'); rm_null = 1; end
+if ~exist('fig_vis','var');    fig_vis = 'on'; end
+if ~exist('fig_ftype','var');  fig_ftype = 'png'; end
+if ~exist('rm_null','var');    rm_null = 1; end
 if ~exist('r2_version','var'); r2_version = 'Adjusted'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
 
@@ -47,12 +66,14 @@ eval(plt_vars_cmd);
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
+% Load stat parameters and check compatibility
 sts = cell(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
     stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_ids{st_ix} '_vars.m'];
     eval(stat_vars_cmd);
     sts{st_ix} = st;
     
+    % Check alignment of time windows and measurements
     if st_ix>1
         if any(sts{1}.stat_lim ~= sts{st_ix}.stat_lim)
             error('st.stat_lim not aligned!');
@@ -69,6 +90,7 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' null_id '_va
 eval(stat_vars_cmd);
 null_st = st;
 
+% Check compatibility of null model
 if any(sts{1}.stat_lim ~= null_st.stat_lim)
     error('st.stat_lim not aligned!');
 end
@@ -101,7 +123,7 @@ for t_ix = 1:numel(st_time_vec)
 end
 
 %% Plot Model Comparisons
-fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' strjoin(stat_ids,'-') '/' null_id '/' plt_id '/'];
+fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/model_comparisons/' strjoin(stat_ids,'-') '/' null_id '/' plt_id '/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -109,8 +131,8 @@ end
 % Create a figure for each channel
 for ch_ix = 1:numel(ch_list)
     %% Compute plotting data    
-    % Compute means and variance
-    r2s = NaN([numel(stat_ids) numel(st_time_vec)]);
+    % Compute R2 and mean
+    r2s     = NaN([numel(stat_ids) numel(st_time_vec)]);
     mean_r2 = NaN(size(stat_ids));
     st_leg  = cell(size(stat_ids));
     for st_ix = 1:numel(stat_ids)
@@ -124,6 +146,8 @@ for ch_ix = 1:numel(ch_list)
         mean_r2(st_ix) = nanmean(r2s(st_ix,:));
         st_leg{st_ix} = [stat_ids{st_ix} ' (mean=' num2str(mean_r2(st_ix),'%.3f') ')'];
     end
+    
+    % Compute for null model
     mean_r2_null = nanmean(null_r2);
     null_leg = [null_id ' (mean=' num2str(mean_r2_null,'%.3f') ')'];
     
@@ -137,17 +161,19 @@ for ch_ix = 1:numel(ch_list)
         fig_name = [fig_name '_rmnull'];
     end
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);   %this size is for single plots
+        'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
     
     %% Plot R2
     ax = gca; hold on;
     
-    % Plot Means (and variance)
+    % Plot R2 per model
     main_lines = gobjects(size(stat_ids));
     for st_ix = 1:numel(stat_ids)
         main_lines(st_ix) = line(st_time_vec, r2s(st_ix,:),...
             'Color',st_colors(st_ix,:),'LineWidth',2);
     end
+    
+    % Plot null model R2
     if ~rm_null
         main_lines(end+1) = plot(st_time_vec, null_r2,...
             'Color', [0.4 0.4 0.4], 'LineStyle', '--');
@@ -161,7 +187,6 @@ for ch_ix = 1:numel(ch_list)
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';
     if rm_null
-        %title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) '; -' null_id ')'],'Interpreter','none');
         title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) '); SBJ null removed']);
     else
         title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')']);
