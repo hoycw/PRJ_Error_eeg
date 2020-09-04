@@ -2,36 +2,32 @@
 Preprocessing, analysis, and modeling of behavior and EEG data for sequential prediciton error EEG Target Time study.
 The goal of the study is to understand the relationship between different learning-related computations
 are represented in the evoked potentials recorded in scalp electroencephalography (EEG).
-Currently under review (9/3/20)
-Written by Colin W. Hoy
+
+Currently under review (9/3/20); written by Colin W. Hoy
 
 ## Dependencies
-OS: MacBook Pro running OS 10.13.6
-MATLAB Code: uses MATLAB version R2017b
+OS: MacBook Pro running OS 10.13.6; MATLAB version R2017b; Python 2.7
   - External toolboxes:
     - Fieldtrip: <http://www.fieldtriptoolbox.org/>
     - CircStat Toolbox: <https://github.com/circstat/circstat-matlab>
     - FMA Toolbox: <https://github.com/michael-zugaro/FMAToolbox>
-Python code: uses Python 2.7 environment
-  - see environment dependencies in colin_PRJ_Error_py2.7.yml
+  - see colin_PRJ_Error_py2.7.yml for python einvironment dependencies
 
 ## Overview of Code
 Code execution to reproduce all analyses in the paper can be found in run_lists.
 These run scripts contain parameters used to call each function.
 1. run00_behavior_preprocessing.m
-  - BHV scripts preprocess and analyze behavioral log files.
-  - SBJ00, SBJ01, and SBJ02 scripts preprocess EEG data.
+    - BHV scripts preprocess and analyze behavioral log files.
+    - SBJ00, SBJ01, and SBJ02 scripts preprocess EEG data.
 2. run01_ERP_scripts.m
-  - SBJ03 scripts preprocess and plot event-related potentials (ERPs).
+    - SBJ03 scripts preprocess and plot event-related potentials (ERPs).
 3. run02_TFR_scripts.m
-  - SBJ05 scripts preprocess, plot, and model time-frequency representations (TFRs) of EEG data.
+    - SBJ05 scripts preprocess, plot, and model time-frequency representations (TFRs) of EEG data.
 4. run03_RL_model_results.m
-  - SBJ04 scripts model behavioral and ERP data and plot results.
-  - SBJ05 scripts model TFR (power and phase) data and plot results.
+    - SBJ04 scripts model behavioral and ERP data and plot results.
+    - SBJ05 scripts model TFR (power and phase) data and plot results.
 5. run04_RL_mdoel_point_estimates.m
-  - SBJ04 scripts to compute, model, and plot point estimates of FRN:
-    - mean window analysis
-    - peak-to-peak analysis
+    - SBJ04 scripts to compute, model, and plot point estimates of FRN (mean window and peak-to-peak analyses)
 
 ## Execution Parameters
 Specific parameters for different preprocessing and analysis scripts are loaded as options.
