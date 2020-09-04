@@ -44,6 +44,7 @@ and analysis script, which then run the relevant code to load the parameters ins
   - Raw data file names
   - EEG information (e.g., channel labels)
   - Preprocessing information (e.g., bad channels, trials, independent components, etc.)
+- questionnaire_vars: manual coding of survey data for each participant
 - proc_vars: preprocessing parameters for artifact rejection
 - an_vars: analysis parameters for ERP and TFR computations
   - Channel selection, epoching, filtering, baseline correction, etc.
