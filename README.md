@@ -2,8 +2,9 @@
 Preprocessing, analysis, and modeling of behavior and EEG data for sequential prediciton error EEG Target Time study.
 The goal of the study is to understand the relationship between different learning-related computations
 are represented in the evoked potentials recorded in scalp electroencephalography (EEG).
+Dataset includes 32 good EEG datasts (41 total collected).
 
-Currently under review (9/3/20); written by Colin W. Hoy
+Manuscript is currently under review (9/3/20); written by Colin W. Hoy.
 
 ## Dependencies
 OS: MacBook Pro running OS 10.13.6; MATLAB version R2017b; Python 2.7
