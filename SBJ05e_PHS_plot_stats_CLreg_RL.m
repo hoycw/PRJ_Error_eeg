@@ -149,7 +149,7 @@ for ch_ix = 1:numel(st_tfr.label)
                 max_f_ix = f_ix;
             end
         end
-        fprintf('%s max beta = %.03f at %.03f s and %.03f Hz; p = %.10f\n',reg_lab{reg_ix},max_beta,...
+        fprintf('%s max beta = %.03f at %.03f s and %.03f Hz; p = %.20f\n',reg_lab{reg_ix},max_beta,...
             st_time_vec(max_t_ix),fois(max_f_ix),qvals(reg_ix,max_f_ix,max_t_ix));
     end
     

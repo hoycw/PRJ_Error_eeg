@@ -203,7 +203,7 @@ for reg_ix = 1:numel(reg_lab)
     set(ax,'FontSize',16');
     
     % Print multiple regression stats
-    fprintf('%s p = %f\n',reg_lab{reg_ix},qvals(reg_ix));
+    fprintf('%s p = %.20f\n',reg_lab{reg_ix},qvals(reg_ix));
 end
 
 %% Save figure

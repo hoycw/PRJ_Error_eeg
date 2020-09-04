@@ -100,8 +100,8 @@ end
 % Sup. Fig. 2: Electrode R2 Comparison Plot
 plt_id     = 'ts_F0t5_evnts_sigLine';   % plot only for stat_lim
 for st_ix = 1:numel(stat_ids)
-    SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
+%     SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
 end
 
 %% Beta Topographies: Linear Mixed Effects Model (Mean Windows)

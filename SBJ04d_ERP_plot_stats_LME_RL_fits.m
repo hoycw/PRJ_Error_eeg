@@ -111,7 +111,7 @@ for s = 1:length(SBJs)
 end
 
 %% Get event timing for plotting
-[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab,prdm_vars);
+[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab,'prdm_vars',prdm_vars);
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' stat_id '/' plt_id '/'];
@@ -356,7 +356,7 @@ for ch_ix = 1:numel(ch_list)
         else
             [max_beta, max_t_ix] = min(plot_betas(reg_ix,:));
         end
-        fprintf('%s max beta = %.03f at %.03f; p = %.10f\n',reg_lab{reg_ix},max_beta,...
+        fprintf('%s max beta = %.03f at %.03f; p = %.20f\n',reg_lab{reg_ix},max_beta,...
             st_time_vec(max_t_ix),qvals(reg_ix,max_t_ix));
     end
     
