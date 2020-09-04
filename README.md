@@ -7,7 +7,7 @@ Dataset includes 32 good EEG datasts (41 total collected).
 Manuscript is currently under review (9/3/20); written by Colin W. Hoy.
 
 ## Dependencies
-OS: MacBook Pro running OS 10.13.6; MATLAB version R2017b; Python 2.7
+OS: MacBook Pro running OS 10.13.6; MATLAB version R2017b; Python 2.7 (not tested on any other platforms)
   - External toolboxes:
     - Fieldtrip: <http://www.fieldtriptoolbox.org/>
     - CircStat Toolbox: <https://github.com/circstat/circstat-matlab>
@@ -52,3 +52,16 @@ and analysis script, which then run the relevant code to load the parameters ins
   - Model regressors, trials/conditions, regression style, epoching and averaging metrics, etc.
 - plt_vars: plotting parameters
   - Epochs, styles, markers, significance, legends, etc.
+
+## Example Data
+Two sample datasets are provided in the folder demo_data. These two subjects were chosen as representative of good (EEG01) and medium (EEG06) quality data. Upon publication, all datasets will be made available in a public repository.
+
+### Preprocessing Demo Data
+Raw data files are provided in demo_data/EEG**/00_raw/.
+To preprocess these datasets, create new SBJ_vars for them by copying the originals and modifying the file paths. Please note that re-running preprocessing scripts will require changing specific ICA component and trial rejection indices.
+
+### Analyzing Demo Data
+Preprocessed EEG data files (using proc_id = 'eeg_full_ft') are provided in demo_data/EEG**/02_preproc/.
+Corresponding behavioral data are provided in demo_data/EEG**/03_events/.
+These datasets have been cleaned and can be used to run ERP, TFR, and modeling scripts to reproduce analyses. By using both subjects, group scripts can be tested, in which case the SBJ_lists/demo.sbj should be used as SBJ_id when calling analysis scripts.
+Note that path names in analysis and plotting scripts will need to be adjusted depending on directory structure.
