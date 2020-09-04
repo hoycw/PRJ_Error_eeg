@@ -12,11 +12,11 @@ OS: MacBook Pro running OS 10.13.6; MATLAB version R2017b; Python 2.7 (not teste
     - Fieldtrip: <http://www.fieldtriptoolbox.org/>
     - CircStat Toolbox: <https://github.com/circstat/circstat-matlab>
     - FMA Toolbox: <https://github.com/michael-zugaro/FMAToolbox>
-  - see colin_PRJ_Error_py2.7.yml for python einvironment dependencies
+  - see colin_PRJ_Error_py2.7.yml for python environment dependencies, which can be replicated in a Conda (or similar) environment (see <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file>)
 
 ## Overview of Code
 Code execution to reproduce all analyses in the paper can be found in run_lists.
-These run scripts contain parameters used to call each function.
+These run scripts contain parameters used to call each function. All analyses should run in under an hour, depending on computing capacity.
 1. run00_behavior_preprocessing.m
     - BHV scripts preprocess and analyze behavioral log files.
     - SBJ00, SBJ01, and SBJ02 scripts preprocess EEG data.
