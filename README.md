@@ -54,14 +54,4 @@ and analysis script, which then run the relevant code to load the parameters ins
   - Epochs, styles, markers, significance, legends, etc.
 
 ## Example Data
-Two sample datasets are provided in the folder demo_data. These two subjects were chosen as representative of good (EEG01) and medium (EEG06) quality data. Upon publication, all datasets will be made available in a public repository.
-
-### Preprocessing Demo Data
-Raw data files are provided in demo_data/EEG**/00_raw/.
-To preprocess these datasets, create new SBJ_vars for them by copying the originals and modifying the file paths. Please note that re-running preprocessing scripts will require changing specific ICA component and trial rejection indices.
-
-### Analyzing Demo Data
-Preprocessed EEG data files (using proc_id = 'eeg_full_ft') are provided in demo_data/EEG**/02_preproc/.
-Corresponding behavioral data are provided in demo_data/EEG**/03_events/.
-These datasets have been cleaned and can be used to run ERP, TFR, and modeling scripts to reproduce analyses. By using both subjects, group scripts can be tested, in which case the SBJ_lists/demo.sbj should be used as SBJ_id when calling analysis scripts.
-Note that path names in analysis and plotting scripts will need to be adjusted depending on directory structure.
+All raw datasets will be provided upon publication. I originally attempted to provide two example datasets in this repository, but the file sizes were too large and could not be merged. Anyone looking to use the data before publication is welcome to request it from hoycw (at) berkeley (dot) edu.
