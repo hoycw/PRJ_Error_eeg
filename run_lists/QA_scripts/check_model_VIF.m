@@ -8,12 +8,11 @@ eval(stat_vars_cmd);
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
-model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
 
 %%
 for s = 1:numel(SBJs)
-    load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' st.model_id '.mat']);
     vifs = fn_variance_inflation_factor(model);
     fprintf('%s:\n',SBJs{s});
     for r = 1:numel(reg_lab)

@@ -54,8 +54,7 @@ eval(stat_vars_cmd);
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-model_id = [st.model_lab '_' st.trial_cond{1}];
-[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.model_cond);
 
 % Initialize Plotting Variables
 sig_step = 0.001;               % tolerance step size for plotting model fit
@@ -68,7 +67,7 @@ for s = 1: numel(SBJs)
     SBJ = SBJs{s};
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJ '_vars.m'];
     eval(SBJ_vars_cmd);
-    load([SBJ_vars.dirs.proc SBJ '_model_' model_id '.mat']);
+    load([SBJ_vars.dirs.proc SBJ '_model_' st.model_id '.mat']);
     load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat'],'bhv');
 
     % Select Conditions of Interest
@@ -89,7 +88,7 @@ for s = 1: numel(SBJs)
 end
 
 %% Plot All SBJ Level Sigmoids
-fig_name = ['GRP_BHV_acc_' model_id '_pWin'];
+fig_name = ['GRP_BHV_acc_' st.model_id '_pWin'];
 fig = figure('Name',fig_name,'Visible',fig_vis);
 hold on;
 
@@ -107,7 +106,7 @@ set(gca,'FontSize',14);
 
 %% Save Figures
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/BHV/model_fits/' model_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/BHV/model_fits/' st.model_id '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end

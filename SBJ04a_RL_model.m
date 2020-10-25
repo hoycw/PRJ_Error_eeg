@@ -12,7 +12,7 @@ function SBJ04a_RL_model(SBJ,proc_id,stat_id)
 %   proc_id [str] - ID of preprocessing pipeline
 %   stat_id [str] - ID of the stats parameters to use
 %       st.model_lab [str] - selects set of regressors for model
-%       st.trial_cond [cell string] - selects conditions to model
+%       st.model_cond [cell string] - selects conditions to model
 % OUTPUTS:
 % model [float array] - [n_trials, n_regressors] matrix of all regressors
 %   ========== Main RL Model Regressors ==========
@@ -65,9 +65,8 @@ stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_va
 eval(stat_vars_cmd);
 
 % Determine model parameteres and conditions
-model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~] = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, cond_colors, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, ~, cond_colors, ~, ~] = fn_condition_label_styles(st.model_cond);
 
 %% Load and Select Behavior
 % Load data
@@ -437,13 +436,13 @@ end
 reg_corr = corr(model,'rows','complete');
 
 % Create figure directory
-fig_dir = [SBJ_vars.dirs.proc model_id '_plots/'];
+fig_dir = [SBJ_vars.dirs.proc st.model_id '_plots/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 % Plot design matrix
-fig_name = [SBJ '_' model_id '_design'];
+fig_name = [SBJ '_' st.model_id '_design'];
 figure('Name',fig_name);
 imagesc(model);
 xticklabels(reg_lab);
@@ -451,7 +450,7 @@ colorbar;
 saveas(gcf,[fig_dir fig_name '.png']);
 
 % Plot regressor correlation matrix
-fig_name = [SBJ '_' model_id '_design_corr'];
+fig_name = [SBJ '_' st.model_id '_design_corr'];
 figure('Name',fig_name);
 imagesc(reg_corr);
 xticklabels(reg_lab);
@@ -462,7 +461,7 @@ saveas(gcf,[fig_dir fig_name '.png']);
 %% Plot Regressors by Condition
 cond_idx = fn_condition_index(cond_lab, bhv);
 
-fig_name = [SBJ '_' model_id '_reg_cond'];
+fig_name = [SBJ '_' st.model_id '_reg_cond'];
 figure('Name',fig_name,'units','normalized','outerposition',[0 0 1 1]);
 [n_rc,~] = fn_num_subplots(numel(reg_lab));
 
@@ -491,7 +490,7 @@ end
 saveas(gcf,[fig_dir fig_name '.png']);
 
 %% Save Results
-stat_out_fname = [SBJ_vars.dirs.proc SBJ '_model_' model_id '.mat'];
+stat_out_fname = [SBJ_vars.dirs.proc SBJ '_model_' st.model_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
 if any(strcmp(reg_lab,'EV'))
     save(stat_out_fname,'-v7.3','model','betas');

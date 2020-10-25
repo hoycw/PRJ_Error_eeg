@@ -14,6 +14,9 @@ function SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_id)
 %   proc_id [str] - ID of preprocessing pipeline
 %   an_id [str] - ID of the analysis parameters to use
 %   stat_id [str] - ID of the stats parameters to use
+%       st.measure = 'erp_mean' averages across single SBJ ERPs
+%           this is default because it best approximates previous literature
+%                  = 'mean' (depricated) averages across single trial amplitudes 
 % OUTPUTS:
 %   lme [cell array] - LinearMixedModel output class, one cell per channel
 %   qvals [float array] - [n_regressors, n_chan/n_time] p values adjusted for multiple comparisons 
@@ -46,9 +49,8 @@ if ~strcmp(st.measure,'erp_mean') || ~strcmp(st.an_style,'lme'); error('This LME
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.stat_cond);
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));
@@ -80,13 +82,13 @@ end
 %   (2) maximum model coefficient (absolute value) from previous model
 %   (3) manually based on stat_vars
 if any(strcmp(st.measure,{'mean','erp_mean'}))
-    if all(isfield(st,{'pk_trial_cond','pk_erp_cond','pk_lim','pk_sign'}))
+    if all(isfield(st,{'pk_stat_cond','pk_erp_cond','pk_lim','pk_sign'}))
         % (1) Find ERP peak
         % Load ERP
-        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_trial_cond '_' st.pk_an_id '.mat']);
+        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_stat_cond '_' st.pk_an_id '.mat']);
         
         % Select Time Windows within Conditions
-        [pk_cond_lab] = fn_condition_label_styles(st.pk_trial_cond);
+        [pk_cond_lab] = fn_condition_label_styles(st.pk_stat_cond);
         cfgs = []; cfgs.latency = st.pk_lim;
         st_erp = ft_selectdata(cfgs,tmp.er_grp{strcmp(pk_cond_lab,st.pk_erp_cond)});
         
@@ -144,17 +146,18 @@ for s = 1:numel(SBJs)
     end
     
     % Load RL Model
-    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' st.model_id '.mat']);
     
     % Z-score SBJ model regressors
-    sbj_model = NaN(size(tmp.model));
+    sbj_model = NaN([sum(full_cond_idx{s}~=0) size(tmp.model,2)]);
     if st.z_reg
         for reg_ix = 1:numel(reg_lab)
             sbj_model(:,reg_ix) = ...
-                (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
+                (tmp.model(full_cond_idx{s}~=0,reg_ix)-nanmean(tmp.model(full_cond_idx{s}~=0,reg_ix)))./...
+                nanstd(tmp.model(full_cond_idx{s}~=0,reg_ix));
         end
     else
-        sbj_model = tmp.model;
+        sbj_model = tmp.model(full_cond_idx{s}~=0,:);
     end
     
     % Compute ERPs and average model within condition
@@ -184,13 +187,13 @@ reg_corr = corr(model,'rows','complete');
 
 % Create figure directory
 stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
-fig_dir = [stat_out_dir model_id '_erp_plots/'];
+fig_dir = [stat_out_dir st.model_id '_erp_plots/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 % Plot design matrix
-fig_name = [SBJ_id '_' model_id '_design'];
+fig_name = [SBJ_id '_' st.model_id '_design'];
 figure('Name',fig_name);
 imagesc(model);
 xticklabels(reg_lab);
@@ -198,7 +201,7 @@ colorbar;
 saveas(gcf,[fig_dir fig_name '.png']);
 
 % Plot regressor correlation matrix
-fig_name = [SBJ_id '_' model_id '_design_corr'];
+fig_name = [SBJ_id '_' st.model_id '_design_corr'];
 figure('Name',fig_name);
 imagesc(reg_corr);
 xticklabels(reg_lab);

@@ -53,10 +53,10 @@ for cond_ix = 1:numel(cond_lab)
             condition_n(matches) = cond_ix;
             
         % Target Time conditions based on RPE valence
-        case 'Pos'
+        case 'AllPos'
             matches = fn_condition_index({'EzWn','HdWn','HdSu'}, bhv);
             condition_n(matches~=0) = cond_ix;
-        case 'Neg'
+        case 'AllNeg'
             matches = fn_condition_index({'EzLs','HdLs','EzSu'}, bhv);
             condition_n(matches~=0) = cond_ix;
         

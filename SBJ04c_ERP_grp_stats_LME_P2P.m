@@ -98,9 +98,8 @@ if ~strcmp(st.grp_method,'sbj'); error(['Unknown st.grp_method: ' st.grp_method]
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, cond_colors, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, ~, cond_colors, ~, ~] = fn_condition_label_styles(st.stat_cond);
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));
@@ -149,17 +148,18 @@ for s = 1:numel(SBJs)
     end
     
     % Load RL Model
-    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' st.model_id '.mat']);
     
     % Z-score SBJ model regressors
-    sbj_model = NaN(size(tmp.model));
+    sbj_model = NaN([sum(full_cond_idx{s}~=0) size(tmp.model,2)]);
     if st.z_reg
         for reg_ix = 1:numel(reg_lab)
             sbj_model(:,reg_ix) = ...
-                (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
+                (tmp.model(full_cond_idx{s}~=0,reg_ix)-nanmean(tmp.model(full_cond_idx{s}~=0,reg_ix)))./...
+                nanstd(tmp.model(full_cond_idx{s}~=0,reg_ix));
         end
     else
-        sbj_model = tmp.model;
+        sbj_model = tmp.model(full_cond_idx{s}~=0,:);
     end
     
     % Compute ERPs and average model within condition
@@ -189,13 +189,13 @@ reg_corr = corr(model,'rows','complete');
 
 % Create figure directory
 stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
-fig_dir = [stat_out_dir model_id '_erp_plots/'];
+fig_dir = [stat_out_dir st.model_id '_erp_plots/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 % Plot design matrix
-fig_name = [SBJ_id '_' model_id '_design'];
+fig_name = [SBJ_id '_' st.model_id '_design'];
 figure('Name',fig_name);
 imagesc(model);
 xticklabels(reg_lab);
@@ -203,7 +203,7 @@ colorbar;
 saveas(gcf,[fig_dir fig_name '.png']);
 
 % Plot regressor correlation matrix
-fig_name = [SBJ_id '_' model_id '_design_corr'];
+fig_name = [SBJ_id '_' st.model_id '_design_corr'];
 figure('Name',fig_name);
 imagesc(reg_corr);
 xticklabels(reg_lab);

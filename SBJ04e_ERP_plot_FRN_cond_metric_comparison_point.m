@@ -88,15 +88,15 @@ for st_ix = 1:numel(stat_ids)
     
     % Check trial selection is the same
     if st_ix>1
-        if ~strcmp(sts{1}.trial_cond{1},sts{st_ix}.trial_cond{1})
-            error('st.trial_cond does not match!');
+        if ~strcmp(sts{1}.stat_cond,sts{st_ix}.stat_cond)
+            error('st.stat_cond does not match!');
         end
     end
     clear st stat_vars_cmd
 end
 
 % Get Plotting Parameters
-[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(sts{1}.trial_cond{1});
+[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(sts{1}.stat_cond);
 ez_idx = ~cellfun(@isempty,strfind(cond_lab,'Ez'));
 st_colors = repmat([0 0 0],[numel(stat_ids) 1]);    %distinguishable_colors(numel(stat_ids));
 

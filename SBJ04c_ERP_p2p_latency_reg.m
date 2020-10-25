@@ -60,9 +60,8 @@ if ~strcmp(st.measure,'p2p') || ~strcmp(st.an_style,'lme'); error('run only for 
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, reg_names, ~, ~]  = fn_regressor_label_styles(st.model_lab);
-[cond_lab, cond_names, cond_colors, ~, cond_markers] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, cond_names, cond_colors, ~, cond_markers] = fn_condition_label_styles(st.stat_cond);
 
 %% Compute mean regressor per condition
 cond_reg_mean = nan([numel(cond_lab) numel(SBJs) numel(reg_lab)]);
@@ -73,7 +72,7 @@ for s = 1:numel(SBJs)
         SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
     
     % Load RL Model
-    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' st.model_id '.mat']);
     
     % Z-score SBJ model regressors
     plot_model = tmp.model;

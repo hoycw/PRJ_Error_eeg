@@ -1,10 +1,12 @@
 % Stat Parameters
 st.an_style    = 'lme';
 st.model_lab   = 'SBJonly';
+st.model_cond  = 'DifFB';           % trial conditions to model
+st.model_id    = [st.model_lab '_' st.model_cond];
 st.z_reg       = 0;
-st.trial_cond  = {'DifFB'};
+st.stat_cond   = {'DifFB'};
 st.stat_lim    = [-0.05 0.05];            % window in SEC for stats
-st.pk_trial_cond = 'All';                       % Which trial_cond set of ERPs to load
+st.pk_stat_cond = 'All';                       % Which stat_cond set of ERPs to load
 st.pk_erp_cond = 'All';                         % Which condition to take ERP peak from
 st.pk_lim      = [0.18 0.3];                    % Window to search for peak
 st.pk_sign     = -1;                            % Sign of peak to find

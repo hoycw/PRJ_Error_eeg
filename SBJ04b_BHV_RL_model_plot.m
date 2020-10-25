@@ -60,12 +60,11 @@ mean_sz = 100;      % scatter size for blocks
 sig_step = 0.001;   % tolerance step size for plotting model fit
 
 % Get model and condition parameters
-model_id = [st.model_lab '_' st.trial_cond{1}];
-[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.model_cond);
 
 %% Load and Select Behavior
 % Load data (should include betas from logistic regression)
-load([SBJ_vars.dirs.proc SBJ '_model_' model_id '.mat']);
+load([SBJ_vars.dirs.proc SBJ '_model_' st.model_id '.mat']);
 
 load([SBJ_vars.dirs.events SBJ '_behav_' proc_id '_final.mat'],'bhv');
 prdm_vars = load([SBJ_vars.dirs.events SBJ '_prdm_vars.mat']);
@@ -105,7 +104,7 @@ for b_ix = 1:numel(blk_ids)
 end
 
 %% Plot Tolerance vs. Outcome with Model Overlay
-fig_name = [SBJ '_BHV_acc_' model_id '_pWin'];
+fig_name = [SBJ '_BHV_acc_' st.model_id '_pWin'];
 figure('Name',fig_name,'Visible',fig_vis);
 hold on;
 
@@ -138,7 +137,7 @@ set(gca,'FontSize',14);
 
 %% Save Figure
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/BHV/model_fits/' model_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/BHV/model_fits/' st.model_id '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end

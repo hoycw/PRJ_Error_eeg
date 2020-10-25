@@ -44,9 +44,8 @@ if ~strcmp(st.model_lab,'SBJonly'); error('Only model_lab = SBJonly for this scr
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.stat_cond);
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));

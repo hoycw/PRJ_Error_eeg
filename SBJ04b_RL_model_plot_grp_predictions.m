@@ -52,9 +52,8 @@ eval(plt_vars_cmd);
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, reg_names, reg_colors, reg_styles, reg_mrkrs] = fn_regressor_label_styles(st.model_lab);
-[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(st.model_cond);
 ez_idx = ~cellfun(@isempty,strfind(cond_lab,'Ez'));
 
 %% Load Model and Comute Means
@@ -62,7 +61,7 @@ model = nan([numel(reg_lab) numel(cond_lab) numel(SBJs)]);
 for s = 1:numel(SBJs)
     % Load RL Model
     load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
-    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' st.model_id '.mat']);
     
     % Average within condition
     full_cond_idx = fn_condition_index(cond_lab, bhv);
@@ -82,7 +81,7 @@ for reg_ix = 1:numel(reg_lab)
 end
 
 %% Plot Predictors
-fig_name = [SBJ_id '_' model_id '_predictions'];
+fig_name = [SBJ_id '_' st.model_id '_predictions'];
 figure('Name',fig_name,'Visible',fig_vis,'units','normalized','OuterPosition',[0 0 0.5 0.5]);
 ax = gca; hold on;
 
@@ -125,7 +124,7 @@ elseif any(strcmp(st.model_lab,{'VML','SML'}))
 elseif any(strcmp(st.model_lab,{'ERPEsL','RPEsL'}))
     model_str = 'Reward Prediction Error (RPE) Features';
 else
-    model_str = model_id;
+    model_str = st.model_id;
 end
 title(model_str,'Interpreter','none');
 legend(reg_lines,reg_names,'Location',plt.leg_loc);

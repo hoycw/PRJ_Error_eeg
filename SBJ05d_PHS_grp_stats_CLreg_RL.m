@@ -52,9 +52,8 @@ if ~strcmp(st.measure,'ts'); error('st.measure should be time series for phase a
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-model_id = [st.model_lab '_' st.trial_cond{1}];
 [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.stat_cond);
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));
@@ -112,17 +111,18 @@ for s = 1:numel(SBJs)
     end
     
     % Load RL Model
-    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' model_id '.mat']);
+    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' st.model_id '.mat']);
     
     % Z-score SBJ model regressors
-    sbj_model = NaN(size(tmp.model));
+    sbj_model = NaN([sum(full_cond_idx{s}~=0) size(tmp.model,2)]);
     if st.z_reg
         for reg_ix = 1:numel(reg_lab)
             sbj_model(:,reg_ix) = ...
-                (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./nanstd(tmp.model(:,reg_ix));
+                (tmp.model(full_cond_idx{s}~=0,reg_ix)-nanmean(tmp.model(full_cond_idx{s}~=0,reg_ix)))./...
+                nanstd(tmp.model(full_cond_idx{s}~=0,reg_ix));
         end
     else
-        sbj_model = model;
+        sbj_model = tmp.model(full_cond_idx{s}~=0,:);
     end
     model(sbj_idx,:) = sbj_model;
     

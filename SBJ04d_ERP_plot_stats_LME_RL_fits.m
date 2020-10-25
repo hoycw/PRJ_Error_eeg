@@ -65,7 +65,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select Conditions of Interest
 [reg_lab, ~, reg_colors, reg_styles]  = fn_regressor_label_styles(st.model_lab);
-[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.trial_cond{1});
+[cond_lab, ~, cond_colors, cond_styles, ~] = fn_condition_label_styles(st.stat_cond);
 
 %% Load Stats
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat']);
