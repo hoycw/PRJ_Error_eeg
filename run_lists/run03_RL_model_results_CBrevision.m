@@ -108,7 +108,7 @@ end
 % Plots Fig. 3 and Sup. Fig. 3
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
+stat_ids  = {'sRPE_Neg_lme_mn05man216','sRPE_Pos_lme_mn05man216'};%'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
 plt_id    = 'topo_F18t25';
 save_fig  = 1;
 fig_vis   = 'on';
@@ -130,15 +130,15 @@ for an_ix = 1:numel(an_ids)
     
     % Sup. Fig. 3: ERP topography dynamics in model averaging windows
     conditions = 'DifFB';
-    SBJ03c_ERP_plot_grp_topo_ts_cond(SBJ_id,conditions,proc_id,an_ids{an_ix},stat_ids,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ03c_ERP_plot_grp_topo_ts_cond(SBJ_id,conditions,proc_id,an_ids{an_ix},stat_ids,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% Power TFR: Linear Mixed Effects Model (Over Time-Frequency Power)
 % Plots Fig. 4
 proc_id   = 'eeg_full_ft';
-an_ids    = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};
-stat_ids  = {'ERPEsL_all_lme_st0t5'};
+an_ids    = {'TFR_Fz_F2t1_db2t0_fl1t12'};%,'TFR_Pz_F2t1_db2t0_fl1t12'};
+stat_ids  = {'sRPE_Neg_lme_st0t5','sRPE_Pos_lme_st0t5'};%'ERPEsL_all_lme_st0t5'};
 save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'png';
@@ -158,7 +158,7 @@ end
 % Plots Sup. Fig. 6C and 6D
 proc_id   = 'eeg_full_ft';
 an_ids    = {'PHS_Fz_F2t1_fl1t12'};%,'PHS_Pz_F2t1_fl1t12'
-model_ids = {'ERPEsL_all'};
+model_ids = {'sRPE_Neg','sRPE_Pos'};%'ERPEsL_all'};
 model_win = 'st0t5';
 save_fig  = 1;
 fig_vis   = 'on';
