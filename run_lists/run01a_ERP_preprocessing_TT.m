@@ -33,7 +33,7 @@ for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
         % Re-align data to event, select channels and epoch, filter, save
         %   Options to downsample and run LaPlacian transform
-        SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
+%         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
 
         % Plot SBJ ERPs per condition
 %         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...

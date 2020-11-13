@@ -78,7 +78,7 @@ switch grp_id
         labels = {'AllPos', 'AllNeg'};
     
     % Collections of individual Target Time conditions
-    case {'DifOutSur','DifFB'}          % All 6 main conditions
+    case {'DifFB','DifOutSur','Neg-Pos'}          % All 6 main conditions
         labels = {'EzWn', 'EzSu', 'EzLs', 'HdWn', 'HdSu', 'HdLs'};
     case 'EHSu'                         % Neutral Outcomes in Easy+Hard
         labels = {'EzSu','HdSu'};
@@ -98,6 +98,10 @@ switch grp_id
         labels = {'EzWn','HdWn','HdSu'};
     case 'Neg'                          % Conditions with negative RPE valence
         labels = {'EzLs','HdLs','EzSu'};
+    case 'Large-Small'                  % Conditions matched for valence and probability
+        labels = {'EzSu','EzLs','HdWn','HdSu'};
+    case 'Unlik-Lik'                    % Conditions matched for valence and magnitude
+        labels = {'EzWn','EzSu','HdSu','HdLs'};
     
     % Performance (RT) based trial selection
     case 'Tar2'                         % Performance split of early/late
