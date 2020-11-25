@@ -28,6 +28,7 @@ if strcmp(an_event_type,'S')
             case 'S'
                 event_times(evnt_ix) = 0;
             case 'R'
+                error('this looks like a bug, would need to load and add bhv.rt');
                 event_times(evnt_ix) = prdm_vars.target;
             case {'F','Fon'}
                 event_times(evnt_ix) = prdm_vars.target+prdm_vars.fb_delay;

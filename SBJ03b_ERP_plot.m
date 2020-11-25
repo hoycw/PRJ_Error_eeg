@@ -72,7 +72,14 @@ for cond_ix = 1:numel(cond_lab)
 end
 
 %% Get event timing for plotting
-[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab,'prdm_vars',prdm_vars);
+if strcmp(proc_id,'odd_full_ft')
+    if numel(plt.evnt_lab)>1 || ~strcmp(plt.evnt_lab,'S')
+        error('why plot anything but S events in oddball?');
+    end
+    evnt_times = 0;
+else
+    [evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab,'prdm_vars',prdm_vars);
+end
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' conditions '/' plt_id '/'];

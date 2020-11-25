@@ -57,11 +57,7 @@ switch grp_id
     % Oddball Conditions
     case 'Odd'
         labels = {'Std','Tar','Odd'};
-    case 'DifOdd_OS'
-        labels = {'Odd', 'Std'};
-    case 'DifOdd_TS'
-        labels = {'Tar','Std'};
-    case 'DifOdd_OT'
+    case 'rare'
         labels = {'Odd', 'Tar'};
     
     % ---------------------------------------------------------------------

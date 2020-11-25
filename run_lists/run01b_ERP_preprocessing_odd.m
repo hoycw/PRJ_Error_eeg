@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'goodEEG';
+SBJ_id = 'goodEEG1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Run preprocessing
@@ -46,20 +46,20 @@ for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
         plt_id     = 'ts_S2t1_evnts_sigLine';
-%         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Group ERP plot
-%     plt_id     = 'ts_S2t1_evnts_sigLine';
-%     SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    plt_id     = 'ts_S2t1_evnts_sigLine';
+    SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % plt_id = 'ts_F2to13_but_evnts_sigPatch';
     % SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
     %     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
-    %close all;
+    close all;
 end
 
 %% ERPs: Full Cap Topography

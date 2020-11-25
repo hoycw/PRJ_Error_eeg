@@ -88,10 +88,16 @@ for s = 1:length(SBJs)
 end
 
 %% Get event timing for plotting
-if strcmp(an.event_type,'S')
+if strcmp(proc_id,'odd_full_ft')
+    if numel(plt.evnt_lab)>1 || ~strcmp(plt.evnt_lab,'S')
+        error('why plot anything but S events in oddball?');
+    end
+    evnt_times = 0;
+elseif strcmp(an.event_type,'S')
     error('add loading of prdm_vars to plot relative to stim!');
+else
+    [evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab);
 end
-[evnt_times] = fn_get_evnt_times(an.event_type,plt.evnt_lab);
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' conditions '/' plt_id '/'];
