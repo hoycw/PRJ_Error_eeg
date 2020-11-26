@@ -14,8 +14,17 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';%'goodall';%'good2';%
+SBJ_id = 'goodEEG1';%'goodEEG';%'goodEEG2';%
 SBJs = fn_load_SBJ_list(SBJ_id);
+
+%% Oddball ERP feature extraction
+proc_id  = 'odd_full_ft';
+an_id    = 'ERP_all_S2t1_dm2t0_fl05t20';
+feat_id  = 'OB_N2P3';
+
+SBJ06a_OB_ERP_save_features(SBJ_id,proc_id,an_id,feat_id);
+
+SBJ06b_OB_ERP_feature_corr(SBJ_id,proc_id,an_id,feat_id);
 
 %% ERP: Mean Window LME
 % Main RL Model
