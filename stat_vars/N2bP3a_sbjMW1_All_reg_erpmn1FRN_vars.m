@@ -1,10 +1,10 @@
 % Stat Parameters
-st.an_style    = 'lme';
-st.model_lab   = 'ERPEsL';
-st.model_cond  = 'DifFB';           % trial conditions to model
+st.an_style    = 'reg';
+st.model_lab   = 'N2bP3a_sbjMW1';
+st.model_cond  = 'All';           % trial conditions to model
 st.model_id    = [st.model_lab '_' st.model_cond];
 st.z_reg       = 1;                 % 0/1: zscore regressors?
-st.stat_cond   = 'DifFB';
+st.stat_cond   = 'All';
 st.stat_lim    = [-0.05 0.05];            % window in SEC for stats
 st.measure     = 'erp_mean';             % {'ts', 'p2p', 'mean', 'erp_mean'}
 st.n_boots     = 1000;             % Repetitions for non-parametric stats

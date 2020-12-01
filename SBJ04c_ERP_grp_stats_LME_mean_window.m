@@ -82,13 +82,13 @@ end
 %   (2) maximum model coefficient (absolute value) from previous model
 %   (3) manually based on stat_vars
 if any(strcmp(st.measure,{'mean','erp_mean'}))
-    if all(isfield(st,{'pk_stat_cond','pk_erp_cond','pk_lim','pk_sign'}))
+    if all(isfield(st,{'pk_cond_grp','pk_erp_cond','pk_lim','pk_sign'}))
         % (1) Find ERP peak
         % Load ERP
-        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_stat_cond '_' st.pk_an_id '.mat']);
+        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_cond_grp '_' st.pk_an_id '.mat']);
         
         % Select Time Windows within Conditions
-        [pk_cond_lab] = fn_condition_label_styles(st.pk_stat_cond);
+        [pk_cond_lab] = fn_condition_label_styles(st.pk_cond_grp);
         cfgs = []; cfgs.latency = st.pk_lim;
         st_erp = ft_selectdata(cfgs,tmp.er_grp{strcmp(pk_cond_lab,st.pk_erp_cond)});
         

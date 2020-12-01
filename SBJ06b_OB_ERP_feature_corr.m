@@ -70,16 +70,17 @@ for ft_ix1 = 1:numel(ft.name)
         subplot(n_rowcol(1),n_rowcol(2),pair_ix); hold on;
         
         % Compute correlation
-        [r,p] = corrcoef(ft_amp(ft_ix1,:),ft_amp(ft_ix2,:));
+        [r,p] = corrcoef(ft_amp(:,ft_ix1),ft_amp(:,ft_ix2));
         r = r(1,2); p = p(1,2);
         
         % Plot features
-        scatter(ft_amp(ft_ix1,:),ft_amp(ft_ix2,:), 'o', 'k');
+        scatter(ft_amp(:,ft_ix1),ft_amp(:,ft_ix2), 'o', 'k');
         
         % Plot linear fit
-        coeff = polyfit(ft_amp(ft_ix1,:),ft_amp(ft_ix2,:),1);
+        coeff = polyfit(ft_amp(:,ft_ix1),ft_amp(:,ft_ix2),1);
         xbounds = get(gca,'XLim');
-        xdat = [xbounds(1)+1 xbounds(2)-1];
+        xfudge = (xbounds(2)-xbounds(1))*0.1;
+        xdat = [xbounds(1)+xfudge xbounds(2)-xfudge];
         ydat = coeff(1)*xdat + coeff(2);
         line(xdat,ydat);
         
@@ -96,7 +97,7 @@ end
 
 % Save figure
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' ft.an_id '/' feat_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' ft.an_id '/OB_feat_scat/'];
     if ~exist(fig_dir,'dir') && save_fig
         mkdir(fig_dir);
     end
@@ -119,14 +120,14 @@ if ~strcmp(ft.measure,'grpMW')
             subplot(n_rowcol(1),n_rowcol(2),pair_ix); hold on;
             
             % Compute correlation
-            [r,p] = corrcoef(ft_times(ft_ix1,:),ft_times(ft_ix2,:));
+            [r,p] = corrcoef(ft_times(:,ft_ix1),ft_times(:,ft_ix2));
             r = r(1,2); p = p(1,2);
             
             % Plot features
-            scatter(ft_times(ft_ix1,:),ft_times(ft_ix2,:), 'o', 'k');
+            scatter(ft_times(:,ft_ix1),ft_times(:,ft_ix2), 'o', 'k');
             
             % Plot linear fit
-            coeff = polyfit(ft_times(ft_ix1,:),ft_times(ft_ix2,:),1);
+            coeff = polyfit(ft_times(:,ft_ix1),ft_times(:,ft_ix2),1);
             xbounds = get(gca,'XLim');
             xdat = [xbounds(1)+0.01 xbounds(2)-0.01];
             ydat = coeff(1)*xdat + coeff(2);
@@ -152,8 +153,8 @@ if ~strcmp(ft.measure,'grpMW')
 end
 
 %% Compute variance inflation factors
-amp_vifs = fn_variance_inflation_factor(zscore(ft_amp'));
-lat_vifs = fn_variance_inflation_factor(zscore(ft_times'));
+amp_vifs = fn_variance_inflation_factor(zscore(ft_amp));
+lat_vifs = fn_variance_inflation_factor(zscore(ft_times));
 
 for ft_ix = 1:numel(ft.name)
     if amp_vifs(ft_ix)>10

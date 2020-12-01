@@ -55,15 +55,23 @@ condition_colors = {...
 switch grp_id
     % ---------------------------------------------------------------------
     % Oddball Conditions
-    case 'Odd'
+    case 'OB'
         labels = {'Std','Tar','Odd'};
     case 'rare'
         labels = {'Odd', 'Tar'};
+    case 'Odd'
+        labels = {'Odd'};
+    case 'Tar'
+        labels = {'Tar'};
     
     % ---------------------------------------------------------------------
     % Combinations of Target Time Conditions
     case 'All'
         labels = {'All'};
+    case 'AllNeg'
+        labels = {'AllNeg'};
+    case 'AllPos'
+        labels = {'AllPos'};
     case 'Dif'                          % Difficulty
         labels = {'Ez', 'Hd'};
     case {'OutS','FB'}                  % Feedback (includes neutral)
@@ -100,10 +108,10 @@ switch grp_id
         labels = {'EzWn','EzSu','HdSu','HdLs'};
     
     % Performance (RT) based trial selection
-    case 'Tar2'                         % Performance split of early/late
-        labels = {'Er', 'Lt'};
-    case 'Tar5'                         % RT-based split into quintiles
-        labels = {'ErQ1','ErQ2','MdQ3','LtQ4','LtQ5'};
+%     case 'Tar2'                         % Performance split of early/late
+%         labels = {'Er', 'Lt'};
+%     case 'Tar5'                         % RT-based split into quintiles
+%         labels = {'ErQ1','ErQ2','MdQ3','LtQ4','LtQ5'};
     otherwise
         error(strcat('Only one, unrecognized condition offered: ',grp_id));
 end

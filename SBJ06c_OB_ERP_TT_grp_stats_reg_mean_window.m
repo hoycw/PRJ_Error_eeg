@@ -1,6 +1,7 @@
-function SBJ06c_OB_ERP_TT_grp_stats_reg_mean_window(SBJ_id,proc_id,an_id,stat_id)
-%% Run multiple regression using OB ERP features to predict TT mean windows
-%   Averages ERPs (condition averaged data per SBJ) in time window and across channels
+function SBJ06c_OB_ERP_TT_grp_stats_reg_mean_window(SBJ_id,tt_proc_id,ob_proc_id,an_id,stat_id,varargin)
+%% Run multiple regression using OB ERP features to predict TT mean window amplitude
+%   Oddball ERPs only yield one feature per SBJ, so can only predict single TT condition/average
+%   Averages ERPs (averaged within condition, then across conditions per SBJ) in time window
 % COMPUTATIONS:
 %   Select trials for conditions of interest
 %       Optional: Find ERP, beta, or manual peak time to center stat window
@@ -11,7 +12,8 @@ function SBJ06c_OB_ERP_TT_grp_stats_reg_mean_window(SBJ_id,proc_id,an_id,stat_id
 %   Correct for multiple comparisons (FDR for regressors)
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
-%   proc_id [str] - ID of preprocessing pipeline
+%   tt_proc_id [str] - ID of target time preprocessing pipeline
+%   ob_proc_id [str] - ID of oddball preprocessing pipeline
 %   an_id [str] - ID of the analysis parameters to use
 %   stat_id [str] - ID of the stats parameters to use
 %       st.model = oddball feat_id for OB ERP features
@@ -37,24 +39,39 @@ addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
+%% Handle Variable Inputs & Defaults
+if ~isempty(varargin)
+    for v = 1:2:numel(varargin)
+        if strcmp(varargin{v},'fig_vis') && ischar(varargin{v+1})
+            fig_vis = varargin{v+1};
+        elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
+            fig_ftype = varargin{v+1};
+        elseif strcmp(varargin{v},'save_fig')
+            save_fig = varargin{v+1};
+        else
+            error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
+        end
+    end
+end
+
+% Define default options
+if ~exist('fig_vis','var');    fig_vis = 'on'; end
+if ~exist('fig_ftype','var');  fig_ftype = 'png'; end
+if ~exist('save_fig','var');   save_fig = 1; end
+
 %% Load Data 
-proc_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/proc_vars/' proc_id '_vars.m'];
-eval(proc_vars_cmd);
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
-eval(an_vars_cmd);
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
 if ~strcmp(st.measure,'erp_mean') || ~strcmp(st.an_style,'reg'); error('This regression should only be run on mean window!'); end
-if ~contains(st.model_lab,'OB'); error('Model should be oddball ERP features!'); end
 feat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/feat_vars/' st.model_lab '_vars.m'];
 eval(feat_vars_cmd);
+if ~any(strcmp(ft.grp_id,{'rare','Odd','Tar'})); error('Features should be oddball conditions!'); end
 
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.stat_cond);
-feat_lab = ft.name;
 
 %% Load Behavior
 bhvs          = cell(size(SBJs));
@@ -63,7 +80,7 @@ n_trials      = zeros([numel(SBJs) 1]);
 for s = 1:numel(SBJs)
     % Load data
     tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
-        SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
+        SBJs{s} '_behav_' tt_proc_id '_final.mat'],'bhv');
     bhvs{s} = tmp.bhv;
     
     % Select Conditions of Interest
@@ -80,9 +97,16 @@ for s = 1:numel(SBJs)
     clear tmp
 end
 
-%% Load Features
-ob = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' ob_feat_id '_' an_id '.mat']);
-!!!check SBJ
+%% Load Oddball ERP Features
+tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.model_lab '_' ob_proc_id '.mat'],'SBJs');
+if numel(SBJs)~=numel(tmp.SBJs) || ~all(strcmp(SBJs,tmp.SBJs)); error('SBJ mismatch!'); end
+load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.model_lab '_' ob_proc_id '.mat'],'ft_amp','ft_times');
+
+% Z-score feature predictors
+model = ft_amp;
+if st.z_reg
+    model = zscore(model);
+end
 
 %% Load Peak Timing Information
 % Can select peak time based on:
@@ -90,13 +114,13 @@ ob = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' ob_feat_id '_' an_id '.
 %   (2) maximum model coefficient (absolute value) from previous model
 %   (3) manually based on stat_vars
 if any(strcmp(st.measure,{'mean','erp_mean'}))
-    if all(isfield(st,{'pk_stat_cond','pk_erp_cond','pk_lim','pk_sign'}))
+    if all(isfield(st,{'pk_cond_grp','pk_erp_cond','pk_lim','pk_sign'}))
         % (1) Find ERP peak
         % Load ERP
-        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_stat_cond '_' st.pk_an_id '.mat']);
+        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_cond_grp '_' st.pk_an_id '.mat']);
         
         % Select Time Windows within Conditions
-        [pk_cond_lab] = fn_condition_label_styles(st.pk_stat_cond);
+        [pk_cond_lab] = fn_condition_label_styles(st.pk_cond_grp);
         cfgs = []; cfgs.latency = st.pk_lim;
         st_erp = ft_selectdata(cfgs,tmp.er_grp{strcmp(pk_cond_lab,st.pk_erp_cond)});
         
@@ -106,6 +130,9 @@ if any(strcmp(st.measure,{'mean','erp_mean'}))
         reg_pk_time = st_erp.time(pk_ix);
     elseif all(isfield(st,{'pk_reg_id','pk_stat_id'}))
         % (2) Find regression beta peak
+        model_id_strs = strsplit(st.pk_stat_id,'_');
+        [reg_lab, ~, ~, ~]  = fn_regressor_label_styles(model_id_strs{1});
+        
         % Load previous stats
         tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.pk_stat_id '_' st.pk_an_id '.mat']);
         if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
@@ -133,10 +160,7 @@ end
 
 %% Load Data and Build Model
 cfgs  = []; cfgs.latency = st.stat_lim;
-model = zeros([numel(cond_lab)*numel(SBJs) numel(feat_lab)]);
-data  = zeros([numel(cond_lab)*numel(SBJs) 1]);
-sbj_factor  = [];
-full_model_ix = 0;
+data  = zeros([numel(SBJs) 1]);
 for s = 1:numel(SBJs)
     % Load data
     fprintf('========================== Processing %s ==========================\n',SBJs{s});
@@ -153,21 +177,6 @@ for s = 1:numel(SBJs)
         erps  = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
     end
     
-    % Load RL Model
-    tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/04_proc/' SBJs{s} '_model_' st.model_id '.mat']);
-    
-    % Z-score SBJ model regressors
-    sbj_model = NaN([sum(full_cond_idx{s}~=0) size(tmp.model,2)]);
-    if st.z_reg
-        for reg_ix = 1:numel(reg_lab)
-            sbj_model(:,reg_ix) = ...
-                (tmp.model(full_cond_idx{s}~=0,reg_ix)-nanmean(tmp.model(full_cond_idx{s}~=0,reg_ix)))./...
-                nanstd(tmp.model(full_cond_idx{s}~=0,reg_ix));
-        end
-    else
-        sbj_model = tmp.model(full_cond_idx{s}~=0,:);
-    end
-    
     % Compute ERPs and average model within condition
     cond_idx = fn_condition_index(cond_lab, bhvs{s});
     for cond_ix = 1:numel(cond_lab)
@@ -178,74 +187,32 @@ for s = 1:numel(SBJs)
             trials(:,trl_ix,:) = st_roi.trial{cond_trial_ix(trl_ix)};
         end
         
-        % Average data and model
-        full_model_ix = full_model_ix + 1;
-        data(full_model_ix)     = mean(mean(trials,2));
-        model(full_model_ix, :) = mean(sbj_model(cond_trial_ix,:),1);
+        % Average data
+        data(s) = mean(mean(trials,2));
     end
-    
-    % Track SBJ in design matrix
-    sbj_factor = [sbj_factor; s*ones([numel(cond_lab) 1])];
-    
-    clear tmp roi st_roi sbj_model trials cond_idx cond_trial_ix
+        
+    clear tmp roi st_roi trials cond_idx cond_trial_ix
 end
 
-%% Compute and plot correlations between regressors
-reg_corr = corr(model,'rows','complete');
-
-% Create figure directory
-stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
-fig_dir = [stat_out_dir st.model_id '_erp_plots/'];
-if ~exist(fig_dir,'dir')
-    mkdir(fig_dir);
-end
-
-% Plot design matrix
-fig_name = [SBJ_id '_' st.model_id '_design'];
-figure('Name',fig_name);
-imagesc(model);
-xticklabels(reg_lab);
-colorbar;
-saveas(gcf,[fig_dir fig_name '.png']);
-
-% Plot regressor correlation matrix
-fig_name = [SBJ_id '_' st.model_id '_design_corr'];
-figure('Name',fig_name);
-imagesc(reg_corr);
-xticklabels(reg_lab);
-yticklabels(reg_lab);
-colorbar;
-saveas(gcf,[fig_dir fig_name '.png']);
-
-%% Run Linear Mixed Effects Model Over Channels
+%% Run Linear Multiple Regression
 fprintf('========================== Running Stats ==========================\n');
-tic
-
 % Build Model Table
 tbl = table;
-for reg_ix = 1:numel(reg_lab)
-    tbl.(reg_lab{reg_ix}) = model(:,reg_ix);
+for ft_ix = 1:numel(ft.name)
+    tbl.(ft.name{ft_ix}) = model(:,ft_ix);
 end
-tbl.SBJ = categorical(sbj_factor);
 
 % Create Model Formula
-reg_formula = strjoin(reg_lab,' + ');
-formula = ['ERP ~ ' reg_formula ' + (1|SBJ)'];  % random intercepts for SBJ
+reg_formula = strjoin(ft.name,' + ');
+formula = ['ERP ~ ' reg_formula];
 
-% Run Model
-if strcmp(st.measure,'ts')
-    error('must use st.measure = erp_mean for this script!');
-elseif any(strcmp(st.measure,{'mean','erp_mean'}))
-    % Single time point (mean in window) over channels
-    lme = cell(size(ch_list));
-    pvals = nan([numel(reg_lab) numel(ch_list)]);
-    for ch_ix = 1:numel(ch_list)
-        tbl.ERP = data(:,ch_ix);
-        lme{ch_ix} = fitlme(tbl,formula);
-        pvals(:,ch_ix) = lme{ch_ix}.Coefficients.pValue(2:end); % Skip intercept
-    end
-else
-    error(['Unknown st.measure: ' st.measure]);
+% Run Model: Single time point (mean in window) over channels
+glm = cell(size(ch_list));
+pvals = nan([numel(ft.name) numel(ch_list)]);
+for ch_ix = 1:numel(ch_list)
+    tbl.ERP = data(:,ch_ix);
+    glm{ch_ix} = fitlme(tbl,formula);
+    pvals(:,ch_ix) = glm{ch_ix}.Coefficients.pValue(2:end); % Skip intercept
 end
 
 % Correct for Multiple Comparisons
@@ -256,12 +223,54 @@ else
     error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
 end
 
-fprintf('\t\t Stats Complete:');
-toc
+%% Plot Regression results
+fig_name = [SBJ_id '_' stat_id '_' an_id '_amp_fits'];
+figure('Name',fig_name,'units','normalized',...
+        'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
+[n_rowcol,~] = fn_num_subplots(numel(ft.name));
+
+for ft_ix = 1:numel(ft.name)
+    subplot(n_rowcol(1),n_rowcol(2),ft_ix); hold on;
+    
+    % Compute correlation
+    [r,p] = corrcoef(model(:,ft_ix),data);
+    r = r(1,2); p = p(1,2);
+    
+    % Plot features
+    scatter(model(:,ft_ix),data, 'o', 'k');
+    
+    % Plot linear fit
+    coeff = polyfit(model(:,ft_ix),data,1);
+    xbounds = get(gca,'XLim');
+    xfudge = (xbounds(2)-xbounds(1))*0.1;
+    xdat = [xbounds(1)+xfudge xbounds(2)-xfudge];
+    ydat = coeff(1)*xdat + coeff(2);
+    simple_fit = line(xdat,ydat);
+    
+    % Plot parameters
+    legend(simple_fit,['corr r=' num2str(r,'%.3f') '; p=' num2str(p,'%.3f')],...
+        'Location','best');
+    title(['beta=' num2str(glm{1}.Coefficients.Estimate(ft_ix+1)) ...
+        '; q=' num2str(qvals(ft_ix),'%.3f')]);
+    xlabel([ft.name{ft_ix} '(' ft.chan{ft_ix} ', ' ft.cond{ft_ix} ') Amp (uV)']);
+    ylabel('Mean Window Amp (uV)');
+    set(gca,'FontSize',16);
+end
+
+% Save figure
+if save_fig
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/OB_feat/'];
+    if ~exist(fig_dir,'dir') && save_fig
+        mkdir(fig_dir);
+    end
+    fig_fname = [fig_dir fig_name '.' fig_ftype];
+    fprintf('Saving %s\n',fig_fname);
+    saveas(gcf,fig_fname);
+end
 
 %% Save Results
-stat_out_fname = [stat_out_dir SBJ_id '_' stat_id '_' an_id '.mat'];
+stat_out_fname = [root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '_' an_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','lme','qvals','SBJs','time_vec','ch_list','reg_pk_time');
+save(stat_out_fname,'-v7.3','glm','qvals','SBJs','time_vec','ch_list','reg_pk_time');
 
 end

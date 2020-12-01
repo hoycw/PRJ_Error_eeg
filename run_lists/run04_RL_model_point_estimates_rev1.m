@@ -1,6 +1,7 @@
-%% Reinforcement Learning based modeling and analyses for Sequential PE Initial Submission
-% Developed over time, but editted 8/X/20 by Colin W Hoy
-% Final model_id = 'ERPEsL_all' (all = 'DifFB', which includes all conditions)
+%% Reinforcement Learning based modeling and analyses for Sequential PE Revision
+% Developed over time, but last editted 12/X/20 by Colin W Hoy
+% Final model_id = 'ERPEsL_DifFB', which includes all conditions
+%       (no longer 'all', because that implies conditions are combined/averaged)
 %   Sup. Fig. 1B: SBJ04e_ERP_plot_FRN_cond_metric_comparison_point
 %   Sup. Fig. 1C: SBJ04c_ERP_grp_stats_LME_mean_window and SBJ04d_ERP_plot_stats_LME_mean_betas
 %   Sup. Fig. 1D: SBJ04c_ERP_grp_stats_LME_P2P and SBJ04d_ERP_plot_stats_LME_p2p_betas
@@ -24,7 +25,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 %% ERP: Mean Window LME
 % Main RL Model
 an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids = {'ERPEsL_all_lme_erpmn1FRN'};
+stat_ids = {'ERPEsL_DifFB_lme_erpmn1FRN'};
 
 plt_id    = 'bar_sigStar';
 null_id   = 'SBJonly_all_lme_mn1FRN';
@@ -36,10 +37,10 @@ fig_ftype = 'svg';
 
 for st_ix = 1:numel(stat_ids)
     if ~isempty(strfind(stat_ids{st_ix},'erpmn'))
-        % Average across ERPs (e.g., stat_id = 'ERPEsL_all_lme_erpmn1FRN')
+        % Average across ERPs (e.g., stat_id = 'ERPEsL_DifFB_lme_erpmn1FRN')
         SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_ids{st_ix});
     else
-        % Average across single trials (e.g., stat_id = 'ERPEsL_all_lme_mn1FRN')
+        % Average across single trials (e.g., stat_id = 'ERPEsL_DifFB_lme_mn1FRN')
         %   Not used because literature typically averages over ERPs, not
         %   single trials, hence ERP mean
 %         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_ids{st_ix});
@@ -66,7 +67,7 @@ end
 %% ERP: Peak-to-Peak LME
 % Main RL Model
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids  = {'ERPEsL_all_lme_p2pFRN'};
+stat_ids  = {'ERPEsL_DifFB_lme_p2pFRN'};
 
 plot_peaks= 1;
 plt_id    = 'bar_sigStar';
@@ -97,7 +98,7 @@ end
 
 %% Peak Latency Regression
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids  = {'ERPEsL_all_lme_p2pFRN'};
+stat_ids  = {'ERPEsL_DifFB_lme_p2pFRN'};
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
@@ -120,7 +121,7 @@ end
 %% FRN Metric Comparison: FRN by Condition
 % Sup. Fig. 1B
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids  = {'ERPEsL_all_lme_mn1FRN','ERPEsL_all_lme_p2pFRN'};
+stat_ids  = {'ERPEsL_DifFB_lme_mn1FRN','ERPEsL_DifFB_lme_p2pFRN'};
 
 proc_id   = 'eeg_full_ft';
 plt_id    = 'line_cond';

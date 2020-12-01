@@ -2,7 +2,7 @@
 ft.feat_lab    = 'N2bP3a';                      % Overall name of features to extract
 ft.measure     = 'sbjPk';                       % {'sbjPk','sbjMW','grpMW'}
 ft.feat_id     = [ft.feat_lab '_' ft.measure];  % unique ID for this feature set
-ft.grp_id      = 'Odd';                         % select group of conditions needed ('rare','Odd','Tar')
+ft.grp_id      = 'rare';                        % select group of conditions needed ('rare','Odd','Tar')
 ft.an_id       = 'ERP_all_S2t1_dm2t0_fl05t20';  % ERP analysis ID
 
 ft.name        = {'N2b','P3a'};                 % name of each feature

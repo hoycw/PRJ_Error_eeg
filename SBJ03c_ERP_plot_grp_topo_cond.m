@@ -81,14 +81,24 @@ for cond_ix = 1:numel(cond_lab)
     er_grp{cond_ix} = ft_timelockgrandaverage(cfg_gavg, er_avg{cond_ix,:});
 end
 
-% Get color limits
+% Get color limits and max elecs
 cfgat = [];
 cfgat.latency = plt.plt_lim;
 cfgat.avgovertime = 'yes';
 clim = [0 0];
+max_ch  = cell(size(cond_lab));
+max_val = nan(size(cond_lab));
+min_ch  = cell(size(cond_lab));
+min_val = nan(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
     tmp = ft_selectdata(cfgat,er_grp{cond_ix});
     clim = [min([clim(1) min(tmp.avg)]) max([clim(2) max(tmp.avg)])];
+    [min_val(cond_ix), min_ch_ix] = min(tmp.avg);
+    min_ch(cond_ix) = tmp.label(min_ch_ix);
+    fprintf('\t%s Min = %.2f at %s\n',cond_lab{cond_ix},min_val(cond_ix),min_ch{cond_ix});
+    [max_val(cond_ix), max_ch_ix] = max(tmp.avg);
+    max_ch(cond_ix) = tmp.label(max_ch_ix);
+    fprintf('\t%s Max = %.2f at %s\n',cond_lab{cond_ix},max_val(cond_ix),max_ch{cond_ix});
 end
 
 %% Plot Results
@@ -117,7 +127,7 @@ for cond_ix = 1:numel(cond_lab)
     cfgp.colorbar = 'yes';
     cfgp.comment  = 'no';
     tmp = ft_topoplotER(cfgp, er_grp{cond_ix});
-    title([cond_lab{cond_ix} ' (n=' num2str(numel(SBJs)) ')']);
+    title([cond_lab{cond_ix} ' (n=' num2str(numel(SBJs)) '; max:' max_ch{cond_ix} ')']);
     tmp = caxis;
     clim = [min([clim(1) tmp(1)]) max([clim(2) tmp(2)])]; 
     axis tight

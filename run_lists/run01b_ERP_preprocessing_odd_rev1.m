@@ -37,7 +37,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 %% ERPs: Fz and Pz
 proc_id    = 'odd_full_ft';
 an_ids     = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
-conditions = 'Odd';
+conditions = 'OB';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
@@ -65,7 +65,7 @@ end
 %% ERPs: Full Cap Topography
 proc_id    = 'odd_full_ft';
 an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
-conditions = 'Odd';
+conditions = 'OB';
 save_fig   = 1;
 fig_vis    = 'on';
 fig_ftype  = 'png';
@@ -87,7 +87,7 @@ SBJ03c_ERP_plot_grp_topo_cond(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,..
 %% Save topo for CPA prototype selection
 proc_id    = 'odd_full_ft';
 an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
-conditions = 'Odd';
+conditions = 'OB';
 
 SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
 
