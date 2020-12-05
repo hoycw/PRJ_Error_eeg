@@ -1,5 +1,5 @@
-function SBJ06a_OB_ERP_save_features(SBJ_id,proc_id,feat_id,varargin)
-%% Save amplitude and latency of condition-averaged ERP peaks in oddball (OB) task
+function SBJ06c_TT_ERP_save_mean_window(SBJ_id,proc_id,feat_id,varargin)
+%% Save amplitude and latency of condition-averaged ERP peaks or mean window in target time (TT) task
 % COMPUTATIONS:
 %   Select trials for conditions of interest
 %   Load and average single-trial ERP within condition
@@ -11,8 +11,8 @@ function SBJ06a_OB_ERP_save_features(SBJ_id,proc_id,feat_id,varargin)
 %   SBJ_id [str]  - ID of subject list for group
 %   proc_id [str] - ID of oddball preprocessing pipeline
 %   feat_id [str] - ID of the feature extraction parameters to use
-%       ft.an_id  = 'ERP_all_S2t1_dm2t0_fl05t20'
-%       ft.grp_id = conditions to extract features (likely 'Tar','Odd','rare')
+%       ft.an_id  = 'ERP_Fz_F2t1_dm2t0_fl05t20' or 'ERP_Pz_F2t1_dm2t0_fl05t20'
+%       ft.grp_id = conditions to extract features (likely 'DifFB')
 %       ft.measure:
 %           'grpMW'- Mean window amplitude based on group peak and latency
 %           'sbjMW'- Mean window amplitude based on single SBJ peak and latency
@@ -26,8 +26,8 @@ function SBJ06a_OB_ERP_save_features(SBJ_id,proc_id,feat_id,varargin)
 %           default: 'png'
 % OUTPUTS:
 %   SBJs [cell array] - list of SBJs used in this analysis (for double checks)
-%   ft_amp [float] - amplitudes of [positive, negative] features
-%   ft_times [float] - times (in sec) of [positive, negative] features
+%   erp_amp [float] - amplitudes of [positive, negative] ERP features
+%   erp_times [float] - times (in sec) of [positive, negative] ERP features
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -61,15 +61,16 @@ if ~exist('save_fig','var');   save_fig = 1; end
 if ~exist('plot_feat','var');  plot_feat = 1; end
 
 %% Load Data 
-if ~contains(proc_id,'odd'); error('proc_id must be for oddball task!'); end
+if contains(proc_id,'odd'); error('proc_id must be for target time task!'); end
 feat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/feat_vars/' feat_id '_vars.m'];
 eval(feat_vars_cmd);
+if numel(ft.name)>1; error('Should only be one feature for target time!'); end
 
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-[cond_lab, cond_names, cond_colors, ~, ~] = fn_condition_label_styles(ft.grp_id);
+[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(ft.grp_id);
 
 %% Load Behavior and Select Conditions
 bhvs          = cell(size(SBJs));
@@ -103,6 +104,7 @@ for s = 1:numel(SBJs)
     % Load data
     fprintf('========================== Processing %s ==========================\n',SBJs{s});
     load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',ft.an_id,'.mat'],'roi');
+    if numel(roi.label)>1 || ~strcmp(roi.label,ft.chan); error('channel not right!'); end
     
     % Select time and trials of interest
     cfgs.trials  = find(full_cond_idx{s});
@@ -112,19 +114,19 @@ for s = 1:numel(SBJs)
         % Initialize matrices now that we know time axis
         time_vec = ft_roi.time{1};
         ch_list  = ft_roi.label;
-        erps     = nan([numel(cond_lab) numel(SBJs) numel(ch_list) numel(time_vec)]);
-        grp_erps = nan([numel(cond_lab) numel(ch_list) numel(time_vec)]);
+        erps     = nan([numel(cond_lab) numel(SBJs) numel(time_vec)]);
+        grp_erps = nan([numel(cond_lab) numel(time_vec)]);
     end
     
     % Compute ERPs within condition
     cond_idx = fn_condition_index(cond_lab, bhvs{s});
     for cond_ix = 1:numel(cond_lab)
         cond_trial_ix = find(cond_idx==cond_ix);
-        trials = nan([numel(ch_list) numel(cond_trial_ix) numel(time_vec)]);
+        trials = nan([numel(cond_trial_ix) numel(time_vec)]);
         for trl_ix = 1:numel(cond_trial_ix)
-            trials(:,trl_ix,:) = ft_roi.trial{cond_trial_ix(trl_ix)};
+            trials(trl_ix,:) = ft_roi.trial{cond_trial_ix(trl_ix)};
         end
-        erps(cond_ix,s,:,:) = mean(trials,2);
+        erps(cond_ix,s,:) = mean(trials,1);
     end
     
     clear tmp roi ft_roi trials cond_idx cond_trial_ix
@@ -133,48 +135,44 @@ end
 % Compute group (grand-average) ERPs while keeping condition/channel dims
 if strcmp(ft.measure,'grpMW')
     for cond_ix = 1:numel(cond_lab)
-        grp_erps(cond_ix,:,:) = mean(erps(cond_ix,:,:,:),2);
+        grp_erps(cond_ix,:) = mean(erps(cond_ix,:,:),2);
     end
 end
 
 %% Compute Peak Amplitude and Latency
-ft_amp   = nan([numel(SBJs) numel(ft.name)]);
-ft_times = nan([numel(SBJs) numel(ft.name)]);
-miss_fts = false([numel(SBJs) numel(ft.name)]);
-for ft_ix = 1:numel(ft.name)
-    % Select peak feature parameters
-    cond_ix = find(strcmp(cond_lab,ft.cond{ft_ix}));
-    ch_ix = find(strcmp(ch_list,ft.chan{ft_ix}));
-    
-    % Find Peak Search Range
-    ft_rng = zeros([2 1]);
-    for lim_ix = 1:2
-        % Match to time vector
-        [~, ft_rng(lim_ix)] = min(abs(time_vec-ft.lim(ft_ix,lim_ix)));
-    end
-    ft_time_vec = time_vec(ft_rng(1):ft_rng(2));
-    if ft.pk_sign(ft_ix)~=1 && ft.pk_sign(ft_ix)~=-1
-        error('ft.pk_sign not 1/-1!');
-    end
-    
+% Find Peak Search Range
+ft_rng = zeros([2 1]);
+for lim_ix = 1:2
+    % Match to time vector
+    [~, ft_rng(lim_ix)] = min(abs(time_vec-ft.lim(lim_ix)));
+end
+ft_time_vec = time_vec(ft_rng(1):ft_rng(2));
+if ft.pk_sign~=1 && ft.pk_sign~=-1
+    error('ft.pk_sign not 1/-1!');
+end
+
+erp_amp   = nan([numel(SBJs) numel(cond_lab)]);
+erp_times = nan([numel(SBJs) numel(cond_lab)]);
+miss_erps = false([numel(SBJs) numel(cond_lab)]);
+for cond_ix = 1:numel(cond_lab)
     % Detect ERP feature and latency
     if strcmp(ft.measure,'grpMW')
         % Obtain group ERP peak time in window
-        [~,pk_ix] = max(squeeze(grp_erps(cond_ix,ch_ix,ft_rng(1):ft_rng(2)))*ft.pk_sign(ft_ix));
-        ft_times(:,ft_ix) = repmat(ft_time_vec(pk_ix),size(SBJs));
+        [~,pk_ix] = max(squeeze(grp_erps(cond_ix,ft_rng(1):ft_rng(2)))*ft.pk_sign);
+        erp_times(:,cond_ix) = repmat(ft_time_vec(pk_ix),size(SBJs));
         
         % Compute mean window
         for s = 1:numel(SBJs)
-            [~, ft_win_start] = min(abs(time_vec-(ft_times(s,ft_ix)+ft.mn_lim(ft_ix,1))));
-            [~, ft_win_end]   = min(abs(time_vec-(ft_times(s,ft_ix)+ft.mn_lim(ft_ix,2))));
-            ft_amp(s,ft_ix) = mean(erps(cond_ix,s,ch_ix,ft_win_start:ft_win_end));
+            [~, ft_win_start] = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(1))));
+            [~, ft_win_end]   = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(2))));
+            erp_amp(s,cond_ix) = mean(erps(cond_ix,s,ft_win_start:ft_win_end));
         end
     else
         % Detect Single SBJ Peaks
         for s = 1:numel(SBJs)
             % Find all possible peak amplitudes and latencies
-            [tmp_amp, tmp_lat] = findpeaks(ft.pk_sign(ft_ix)*...
-                squeeze(erps(cond_ix,s,ch_ix,ft_rng(1):ft_rng(2))));
+            [tmp_amp, tmp_lat] = findpeaks(ft.pk_sign*...
+                squeeze(erps(cond_ix,s,ft_rng(1):ft_rng(2))));
             % Convert latencies to time
             if ~isempty(tmp_lat)
                 tmp_times = ft_time_vec(tmp_lat);
@@ -182,19 +180,19 @@ for ft_ix = 1:numel(ft.name)
             
             % Check for missing peaks
             if isempty(tmp_amp)
-                miss_fts(cond_ix,s,ch_ix) = true;
+                miss_erps(s,cond_ix) = true;
                 fprintf(2,'\tNo %s peak detected in %s %s!\n',...
-                    ft.name{ft_ix},SBJs{s},cond_lab{cond_ix});
+                    ft.name{1},SBJs{s},cond_lab{cond_ix});
             else
                 % Select largest peak
                 [~, max_ix] = max(tmp_amp);
-                ft_times(s,ft_ix) = tmp_times(max_ix);
+                erp_times(s,cond_ix) = tmp_times(max_ix);
                 if strcmp(ft.measure,'sbjPk')
-                    ft_amp(s,ft_ix) = ft.pk_sign(ft_ix)*tmp_amp(max_ix); % flip sign back if needed
+                    erp_amp(s,cond_ix) = ft.pk_sign*tmp_amp(max_ix); % flip sign back if needed
                 elseif strcmp(ft.measure,'sbjMW')
-                    [~, ft_win_start] = min(abs(time_vec-(ft_times(s,ft_ix)+ft.mn_lim(ft_ix,1))));
-                    [~, ft_win_end]   = min(abs(time_vec-(ft_times(s,ft_ix)+ft.mn_lim(ft_ix,2))));
-                    ft_amp(s,ft_ix) = mean(erps(cond_ix,s,ch_ix,ft_win_start:ft_win_end));
+                    [~, ft_win_start] = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(1))));
+                    [~, ft_win_end]   = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(2))));
+                    erp_amp(s,cond_ix) = mean(erps(cond_ix,s,ft_win_start:ft_win_end));
                 else
                     error(['Unknown ft.measure = ' ft.measure]);
                 end
@@ -207,32 +205,33 @@ end
 if plot_feat
     fig_name = [SBJ_id '_' feat_id '_' proc_id];
     figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 1 0.5],'Visible',fig_vis);
-    [n_rowcol,~] = fn_num_subplots(numel(ft.name));
+        'outerposition',[0 0 1 1],'Visible',fig_vis);
+    [n_rowcol,~] = fn_num_subplots(numel(cond_lab));
     sbj_colors = distinguishable_colors(numel(SBJs));
     
-    for ft_ix = 1:numel(ft.name)
-        subplot(n_rowcol(1),n_rowcol(2),ft_ix); hold on;
-        cond_ix = strcmp(cond_lab,ft.cond{ft_ix});
-        ch_ix   = strcmp(ch_list,ft.chan{ft_ix});
+    for cond_ix = 1:numel(cond_lab)
+        subplot(n_rowcol(1),n_rowcol(2),cond_ix); hold on;
         
         for s = 1:numel(SBJs)
             % Plot ERPs
-            plot(time_vec,squeeze(erps(cond_ix,s,ch_ix,:)),'Color',sbj_colors(s,:));
+            plot(time_vec,squeeze(erps(cond_ix,s,:)),'Color',sbj_colors(s,:));
             
-            if strcmp(ft.measure,'sbjPk')
-                % Plot Peaks
-                scatter(ft_times(s,ft_ix),ft_amp(s,ft_ix), 'o', ...
-                    'MarkerEdgeColor', sbj_colors(s,:));
-            else
-                % Plot mean window as a line
-                line(ft.mn_lim(ft_ix,:)+ft_times(s,ft_ix),repmat(ft_amp(s,ft_ix),[1 2]),...
-                    'Color',sbj_colors(s,:),'LineWidth',2);
+            if ~miss_erps(s,cond_ix)
+                if strcmp(ft.measure,'sbjPk')
+                    % Plot Peaks
+                    scatter(erp_times(s,cond_ix),erp_amp(s,cond_ix), 'o', ...
+                        'MarkerEdgeColor', sbj_colors(s,:));
+                else
+                    % Plot mean window as a line
+                    line(ft.mn_lim(:)+erp_times(s,cond_ix),repmat(erp_amp(s,cond_ix),[1 2]),...
+                        'Color',sbj_colors(s,:),'LineWidth',2);
+                end
             end
         end
         
         % Plot parameters
-        title([ft.name{ft_ix} ': ' ft.cond{ft_ix} ', ' ft.chan{ft_ix}]);
+        title([ft.name{1} ': ' cond_lab{cond_ix} ' (' ...
+            num2str(sum(miss_erps(:,cond_ix))) ' missing)']);
         xlabel('Time (s)'); ylabel('Amplitude (uV)');
         xlim([ft.plot_lim(1) ft.plot_lim(2)]);
         set(gca,'FontSize',16);
@@ -240,7 +239,7 @@ if plot_feat
     
     % Save figure
     if save_fig
-        fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' ft.an_id '/OB_feat_ts/'];
+        fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' ft.an_id '/TT_feat_ts/'];
         if ~exist(fig_dir,'dir') && save_fig
             mkdir(fig_dir);
         end
@@ -258,6 +257,6 @@ if ~exist(feat_out_dir,'dir')
 end
 stat_out_fname = [feat_out_dir SBJ_id '_' feat_id '_' proc_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','SBJs','ft_amp','ft_times');
+save(stat_out_fname,'-v7.3','SBJs','erp_amp','erp_times','miss_erps');
 
 end

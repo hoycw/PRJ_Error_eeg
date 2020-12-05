@@ -13,6 +13,6 @@ st.mcp_method  = 'FDR';
 
 % Peak time selection parameters
 st.pk_reg_id   = 'uRPE';
-st.pk_stat_id  = 'ERPEsL_all_lme_st05t5';            % stat_id from which to get peak time
+st.pk_stat_id  = 'ERPEsL_DifFB_lme_st05t5';            % stat_id from which to get peak time
 st.pk_an_id    = 'ERP_Pz_F2t1_dm2t0_fl05t20';            % an_id from which to get peak time
 

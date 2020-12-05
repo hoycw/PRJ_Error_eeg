@@ -77,6 +77,8 @@ switch model_id
         labels = {'Val','Lik'};
     case 'VM'
         labels = {'Val','Mag'};
+    case 'ML'
+        labels = {'Mag','Lik'};
     case 'VML'
         labels = {'Val','Mag','Lik'};
     case 'SML'

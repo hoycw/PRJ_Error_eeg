@@ -72,7 +72,7 @@ for st_ix = 1:numel(stat_ids)
     if st_ix>1
         fnames = fieldnames(sts{st_ix});
         for f_ix = 1:numel(fnames)
-            if ~any(strcmp(fnames{f_ix},{'pk_center','pk_reg_id','pk_an_id'}))
+            if ~any(strcmp(fnames{f_ix},{'pk_center','pk_reg_id','pk_an_id'}))%,'stat_cond'
                 if ischar(sts{st_ix}.(fnames{f_ix}))
                     if ~strcmp(sts{1}.(fnames{f_ix}), sts{st_ix}.(fnames{f_ix}))
                         error(['st.' fnames{f_ix} ' not the same!']);

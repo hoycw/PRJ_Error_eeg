@@ -28,7 +28,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
 proc_id   = 'eeg_full_ft';
-stat_ids  = {'sRPE_Neg_lme_st05t5'};%'ERPEsL_all_lme_st05t5'};
+stat_ids  = {'ML_Neg_lme_st05t5'};%'ERPEsL_all_lme_st05t5'};
 % Alternative (worse) models: 'RSVPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','VML_all_lme_mn1FRN'
 fig_vis   = 'on';
 save_fig  = 1;
@@ -47,21 +47,21 @@ for s = 1:numel(SBJs)
 end
 
 % Fig. 1D inset: Plot group model fits (overlapping sigmoids without tolerance)
-SBJ04b_BHV_RL_model_plot_grp(SBJ_id,proc_id,stat_id,...
-    'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+% SBJ04b_BHV_RL_model_plot_grp(SBJ_id,proc_id,stat_id,...
+%     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 % Sup. Fig. 1A: Plot model predicitons by condition across group
 plt_id    = 'line_cond';
 for st_ix = 1:numel(stat_ids)
-    SBJ04b_plot_model_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ04b_plot_model_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Plots Fig. 2 and 3; Sup. Fig. 2
 % Main RL Model
-an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'sRPE_Neg_lme_st05t5','sRPE_Pos_lme_st05t5'};%'ERPEsL_DifFB_lme_st05t5'};
+an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%'ERP_Cz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
+stat_ids  = {'sRPE_Neg_lme_st05t5','sRPE_Pos_lme_st05t5'};%'ERPEsL_DifFB_lme_st05t5'};%
 plt_id    = 'ts_F2t8_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st05t5';
 
@@ -73,11 +73,11 @@ fig_ftype = 'png';
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
       % Run LME RL model on ERPs over time
-      SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+%       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
       
       % Fig. 2: Plot model results (ERPs, coefficients, model fit)
-      SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%       SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Optional: run SBJ only model (random intercepts, no regressors) for
@@ -89,12 +89,12 @@ for an_ix = 1:numel(an_ids)
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
 
     % Model Comparison Plots: R2 Fits Relative to SBJonly null model
-%     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',1);
+    SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',1);
 
     % Model Comparison Plots: R2 Fits Overall
-%     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
+    SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
 end
 
 % Sup. Fig. 2: Electrode R2 Comparison Plot
@@ -117,11 +117,11 @@ fig_ftype = 'png';
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
         % Run LME RL model on ERPs averaged in time window for all electrodes
-        SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+%         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
         
         % Plot individual model coefficient topographies
-        SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_ids{an_ix},stat_ids{st_ix},...
-            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_ids{an_ix},stat_ids{st_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Fig. 3: Plot Beta Topo across time points

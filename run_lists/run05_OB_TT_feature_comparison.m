@@ -19,26 +19,49 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Oddball ERP feature extraction
 proc_id  = 'odd_full_ft';
-feat_ids = {'P3aP3b_grpMW1'};%'N2cP3b_sbjPk','N2cP3b_sbjMW1','N2cP3b_grpMW1'};
+feat_ids = {'N2bN2c_grpMW05','N2bN2c_sbjMW05'};%'N2bP3a_sbjMW05','N2bP3a_grpMW05','N2cP3b_sbjMW05','N2cP3b_grpMW05'};
+    %'P3aP3b_grpMW1'};%'N2cP3b_sbjPk','N2cP3b_sbjMW1','N2cP3b_grpMW1'};
+    %'N2sP3s_grpMW05','N2sP3s_sbjMW05','N2sP3s_grpMW1','N2sP3s_sbjMW1','N2sP3s_sbjPk'};
 % feat_ids = {'N2bP3a_sbjPk','N2bP3a_sbjMW1','N2bP3a_grpMW1'};
 %   an_id is specified in the feat struct (always 'ERP_all_S2t1_dm2t0_fl05t20')
 
 for ft_ix = 1:numel(feat_ids)
     % Extract Oddball ERP features
-    SBJ06a_OB_ERP_save_features(SBJ_id,proc_id,feat_ids{ft_ix});
+    if contains(feat_ids{ft_ix},'p2p')
+        error('not ready yet');
+    else
+        SBJ06a_OB_ERP_save_mean_window(SBJ_id,proc_id,feat_ids{ft_ix});
+    end
     
     % Plot correlations between ERP features before using as model predictors
     SBJ06b_OB_ERP_feature_corr(SBJ_id,proc_id,feat_ids{ft_ix});
+end
+
+%% Target Time ERP feature extraction
+proc_id  = 'eeg_full_ft';
+feat_ids = {'FRN_grpMW05','FRN_sbjMW05'};
+%   an_id in ft struct {'ERP_Fz_F2t1_dm2t0_fl05t20', 'ERP_Pz_F2t1_dm2t0_fl05t20'}
+
+for ft_ix = 1:numel(feat_ids)
+    % Extract Target Time ERP features
+    if contains(feat_ids{ft_ix},'p2p')
+        error('not ready yet');
+    else
+        SBJ06c_TT_ERP_save_mean_window(SBJ_id,proc_id,feat_ids{ft_ix});
+    end
 end
 
 %% Oddball vs. Target Time ERP Comparison
 tt_proc_id = 'eeg_full_ft';
 ob_proc_id = 'odd_full_ft';
 
-% % FRN Parameters:
-% an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-% stat_ids   = {...
-%     'P3aP3b_grpMW1_All_reg_mn05Lik'};
+% FRN Parameters:
+stat_ids   = {...
+    'N2bP3a_grpMW05_DifFB_reg_FRNgrpMW05','N2bP3a_sbjMW05_DifFB_reg_FRNsbjMW05'};
+%     'N2cP3b_grpMW05_DifFB_reg_FRNgrpMW05','N2cP3b_sbjMW05_DifFB_reg_FRNsbjMW05'};
+
+% Original stuff:
+%     'P3aP3b_grpMW1_All_reg_mn05LikCz'};
 %     'N2cP3b_grpMW1_AllNeg_reg_erpmn1FRN', 'N2cP3b_sbjMW1_AllNeg_reg_erpmn1FRN'...
 %     'N2cP3b_grpMW1_AllPos_reg_erpmn1FRN', 'N2cP3b_sbjMW1_AllPos_reg_erpmn1FRN'...
 %     };
@@ -47,12 +70,12 @@ ob_proc_id = 'odd_full_ft';
 %     'N2cP3b_grpMW1_All_reg_erpmn1FRN', 'N2cP3b_sbjMW1_All_reg_erpmn1FRN'...
 %     };
 % P3 Parameters:
-an_id      = 'ERP_Pz_F2t1_dm2t0_fl05t20';
-stat_ids   = {...
-    'P3aP3b_grpMW1_All_reg_mn05uRPE'...
+% an_id      = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+% stat_ids   = {...
+%     'P3aP3b_grpMW1_All_reg_mn05uRPE'...
 %     'N2bP3a_grpMW1_All_reg_erpmn1P3', 'N2bP3a_sbjMW1_All_reg_erpmn1P3'...
 %     'N2cP3b_grpMW1_All_reg_erpmn1P3', 'N2cP3b_sbjMW1_All_reg_erpmn1P3',...
-    };
+%     };
 
 % plt_id    = 'bar_sigStar';
 save_fig  = 1;
@@ -60,15 +83,7 @@ fig_vis   = 'on';
 fig_ftype = 'png';
 
 for st_ix = 1:numel(stat_ids)
-%     if ~isempty(strfind(stat_ids{st_ix},'erpmn'))
-        % Average across ERPs (e.g., stat_id = 'ERPEsL_all_lme_erpmn1FRN')
-        SBJ06c_OB_ERP_TT_grp_stats_reg_mean_window(SBJ_id,tt_proc_id,ob_proc_id,...
-            an_id,stat_ids{st_ix},'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-%     else
-        % Average across single trials (e.g., stat_id = 'ERPEsL_all_lme_mn1FRN')
-        %   Not used because literature typically averages over ERPs, not
-        %   single trials, hence ERP mean
-%         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_id,stat_ids{st_ix});
-%     end
+    SBJ06d_OB_TT_ERP_grp_stats_reg(SBJ_id,tt_proc_id,ob_proc_id,...
+        stat_ids{st_ix},'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

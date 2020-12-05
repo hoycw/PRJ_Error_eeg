@@ -50,8 +50,8 @@ for an_ix = 1:numel(an_ids)
     
     % Plot Group ERPs
     %*** plots Fig. 2A (Fz) and 2B (Pz)
-    SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Plot all SBJ ERPs overlapping (butterfly)
 %     plt_id = 'ts_F2to1_but_evnts_sigPatch';
