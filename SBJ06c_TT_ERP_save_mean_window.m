@@ -140,61 +140,92 @@ if strcmp(ft.measure,'grpMW')
 end
 
 %% Compute Peak Amplitude and Latency
-% Find Peak Search Range
-ft_rng = zeros([2 1]);
-for lim_ix = 1:2
-    % Match to time vector
-    [~, ft_rng(lim_ix)] = min(abs(time_vec-ft.lim(lim_ix)));
-end
-ft_time_vec = time_vec(ft_rng(1):ft_rng(2));
-if ft.pk_sign~=1 && ft.pk_sign~=-1
-    error('ft.pk_sign not 1/-1!');
-end
-
 erp_amp   = nan([numel(SBJs) numel(cond_lab)]);
 erp_times = nan([numel(SBJs) numel(cond_lab)]);
 miss_erps = false([numel(SBJs) numel(cond_lab)]);
-for cond_ix = 1:numel(cond_lab)
-    % Detect ERP feature and latency
-    if strcmp(ft.measure,'grpMW')
-        % Obtain group ERP peak time in window
-        [~,pk_ix] = max(squeeze(grp_erps(cond_ix,ft_rng(1):ft_rng(2)))*ft.pk_sign);
-        erp_times(:,cond_ix) = repmat(ft_time_vec(pk_ix),size(SBJs));
-        
-        % Compute mean window
+if all(isfield(ft,{'pk_reg_id','pk_stat_id'}))
+    % (1) Find regression beta peak
+    if ~strcmp(ft.measure,'grpMW'); error('Must use grpMW for regressor peaks!'); end
+    
+    % Load previous stats
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' ft.pk_stat_id '_' ft.pk_an_id '.mat']);
+    if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
+        error(['Not same SBJs in ' stat_id ' and ' ft.pk_stat_id]);
+    end
+    
+    % Obtain peak times for target regressor
+    [reg_lab, ~, ~, ~]     = fn_regressor_label_styles(ft.pk_model_lab);
+    reg_ix = find(strcmp(reg_lab,ft.pk_reg_id));
+    pk_ts = nan(size(tmp.time_vec));
+    for t_ix = 1:numel(tmp.time_vec)
+        pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);
+    end
+    [~,pk_ix] = max(abs(pk_ts));
+    erp_times = repmat(tmp.time_vec(pk_ix),size(erp_times));
+    
+    % Compute mean window
+    [~, ft_win_start] = min(abs(time_vec-(erp_times(1,1)+ft.mn_lim(1))));
+    [~, ft_win_end]   = min(abs(time_vec-(erp_times(1,1)+ft.mn_lim(2))));
+    for cond_ix = 1:numel(cond_lab)
         for s = 1:numel(SBJs)
-            [~, ft_win_start] = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(1))));
-            [~, ft_win_end]   = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(2))));
             erp_amp(s,cond_ix) = mean(erps(cond_ix,s,ft_win_start:ft_win_end));
         end
-    else
-        % Detect Single SBJ Peaks
-        for s = 1:numel(SBJs)
-            % Find all possible peak amplitudes and latencies
-            [tmp_amp, tmp_lat] = findpeaks(ft.pk_sign*...
-                squeeze(erps(cond_ix,s,ft_rng(1):ft_rng(2))));
-            % Convert latencies to time
-            if ~isempty(tmp_lat)
-                tmp_times = ft_time_vec(tmp_lat);
-            end
+    end
+else
+    % (2) Select Peaks in ERP
+    % Find Peak Search Range
+    ft_rng = zeros([2 1]);
+    for lim_ix = 1:2
+        % Match to time vector
+        [~, ft_rng(lim_ix)] = min(abs(time_vec-ft.lim(lim_ix)));
+    end
+    ft_time_vec = time_vec(ft_rng(1):ft_rng(2));
+    if ft.pk_sign~=1 && ft.pk_sign~=-1
+        error('ft.pk_sign not 1/-1!');
+    end
+    
+    for cond_ix = 1:numel(cond_lab)
+        % Detect ERP feature and latency
+        if strcmp(ft.measure,'grpMW')
+            % Obtain group ERP peak time in window
+            [~,pk_ix] = max(squeeze(grp_erps(cond_ix,ft_rng(1):ft_rng(2)))*ft.pk_sign);
+            erp_times(:,cond_ix) = repmat(ft_time_vec(pk_ix),size(SBJs));
             
-            % Check for missing peaks
-            if isempty(tmp_amp)
-                miss_erps(s,cond_ix) = true;
-                fprintf(2,'\tNo %s peak detected in %s %s!\n',...
-                    ft.name{1},SBJs{s},cond_lab{cond_ix});
-            else
-                % Select largest peak
-                [~, max_ix] = max(tmp_amp);
-                erp_times(s,cond_ix) = tmp_times(max_ix);
-                if strcmp(ft.measure,'sbjPk')
-                    erp_amp(s,cond_ix) = ft.pk_sign*tmp_amp(max_ix); % flip sign back if needed
-                elseif strcmp(ft.measure,'sbjMW')
-                    [~, ft_win_start] = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(1))));
-                    [~, ft_win_end]   = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(2))));
-                    erp_amp(s,cond_ix) = mean(erps(cond_ix,s,ft_win_start:ft_win_end));
+            % Compute mean window
+            for s = 1:numel(SBJs)
+                [~, ft_win_start] = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(1))));
+                [~, ft_win_end]   = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(2))));
+                erp_amp(s,cond_ix) = mean(erps(cond_ix,s,ft_win_start:ft_win_end));
+            end
+        else
+            % Detect Single SBJ Peaks
+            for s = 1:numel(SBJs)
+                % Find all possible peak amplitudes and latencies
+                [tmp_amp, tmp_lat] = findpeaks(ft.pk_sign*...
+                    squeeze(erps(cond_ix,s,ft_rng(1):ft_rng(2))));
+                % Convert latencies to time
+                if ~isempty(tmp_lat)
+                    tmp_times = ft_time_vec(tmp_lat);
+                end
+                
+                % Check for missing peaks
+                if isempty(tmp_amp)
+                    miss_erps(s,cond_ix) = true;
+                    fprintf(2,'\tNo %s peak detected in %s %s!\n',...
+                        ft.name{1},SBJs{s},cond_lab{cond_ix});
                 else
-                    error(['Unknown ft.measure = ' ft.measure]);
+                    % Select largest peak
+                    [~, max_ix] = max(tmp_amp);
+                    erp_times(s,cond_ix) = tmp_times(max_ix);
+                    if strcmp(ft.measure,'sbjPk')
+                        erp_amp(s,cond_ix) = ft.pk_sign*tmp_amp(max_ix); % flip sign back if needed
+                    elseif strcmp(ft.measure,'sbjMW')
+                        [~, ft_win_start] = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(1))));
+                        [~, ft_win_end]   = min(abs(time_vec-(erp_times(s,cond_ix)+ft.mn_lim(2))));
+                        erp_amp(s,cond_ix) = mean(erps(cond_ix,s,ft_win_start:ft_win_end));
+                    else
+                        error(['Unknown ft.measure = ' ft.measure]);
+                    end
                 end
             end
         end
