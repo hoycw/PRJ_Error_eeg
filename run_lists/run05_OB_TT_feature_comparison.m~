@@ -19,14 +19,14 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Oddball ERP feature extraction
 proc_id  = 'odd_full_ft';
-feat_ids = {'N2b_p2p','N2c_p2p'};
+feat_ids = {'N2bN2c_p2p'};
 % feat_ids = {'N2bN2c_grpMW05','N2bN2c_sbjMW05'};%'N2bP3a_sbjMW05','N2bP3a_grpMW05','N2cP3b_sbjMW05','N2cP3b_grpMW05'};
     %'P3aP3b_grpMW1'};%'N2cP3b_sbjPk','N2cP3b_sbjMW1','N2cP3b_grpMW1'};
     %'N2sP3s_grpMW05','N2sP3s_sbjMW05','N2sP3s_grpMW1','N2sP3s_sbjMW1','N2sP3s_sbjPk'};
 % feat_ids = {'N2bP3a_sbjPk','N2bP3a_sbjMW1','N2bP3a_grpMW1'};
 %   an_id is specified in the feat struct (always 'ERP_all_S2t1_dm2t0_fl05t20')
 
-for ft_ix = 2%1:numel(feat_ids)
+for ft_ix = 1:numel(feat_ids)
     % Extract Oddball ERP features
     if contains(feat_ids{ft_ix},'p2p')
         SBJ06a_OB_ERP_save_p2p(SBJ_id,proc_id,feat_ids{ft_ix});
@@ -58,9 +58,7 @@ ob_proc_id = 'odd_full_ft';
 
 % FRN Parameters:
 stat_ids   = {...
-    'N2cP3b_grpMW05_DifFB_reg_P3_grpMW05'};
-%     'N2c_p2p_DifFB_reg_FRNp2p','N2b_p2p_DifFB_reg_FRNp2p'};
-%     'N2bN2c_p2p_DifFB_reg_FRNp2p'};
+    'N2bN2c_p2p_DifFB_reg_FRNp2p'};
 %     'N2bP3a_grpMW05_DifFB_reg_FRNgrpMW05','N2bP3a_sbjMW05_DifFB_reg_FRNsbjMW05'};
 %     'N2cP3b_grpMW05_DifFB_reg_FRNgrpMW05','N2cP3b_sbjMW05_DifFB_reg_FRNsbjMW05'};
 

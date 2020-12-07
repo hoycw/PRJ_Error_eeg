@@ -70,7 +70,7 @@ if ~any(strcmp(ft.grp_id,{'rare','Odd','Tar'})); error('Features should be oddba
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Get model and condition parameters
-[cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.stat_cond);
+[cond_lab, cond_names, ~, ~, ~] = fn_condition_label_styles(st.stat_cond);
 
 %% Load Oddball ERP Features
 tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.model_lab '_' ob_proc_id '.mat'],'SBJs');
@@ -86,8 +86,11 @@ end
 %% Load Target Time ERP Features
 tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.measure '_' tt_proc_id '.mat'],'SBJs');
 if numel(SBJs)~=numel(tmp.SBJs) || ~all(strcmp(SBJs,tmp.SBJs)); error('SBJ mismatch!'); end
+
+% Not doing anything with 'erp_times' right now...
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.measure '_' tt_proc_id '.mat'],...
-    'erp_amp','erp_times','miss_erps');
+    'erp_amp','miss_erps');
+
 data = erp_amp;
 
 %% Run Linear Multiple Regression
@@ -131,7 +134,7 @@ for ft_ix = 1:numel(ft.name)
         % Compute correlation
         if any(miss_erps(:,cond_ix))
             fprintf(2,'\tWARNING: %d missing values for %s in %s!\n',...
-                sum(miss_erps(:,cond_ix)),st_ft.measure,cond_lab{cond_ix});
+                sum(miss_erps(:,cond_ix)),st_ft.measure,cond_names{cond_ix});
         end
         [r,p] = corrcoef(model(:,ft_ix),data(:,cond_ix),'Rows','complete');
         r = r(1,2); p = p(1,2);
@@ -151,7 +154,7 @@ for ft_ix = 1:numel(ft.name)
         set(gca,'FontSize',16);
         legend(simple_fit,['r=' num2str(r,'%.2f') '; p=' num2str(p,'%.3f')],...
             'Location','best');
-        title([cond_lab{cond_ix} ': beta=' num2str(glm{cond_ix}.Coefficients.Estimate(ft_ix+1)) ...
+        title([cond_names{cond_ix} ': beta=' num2str(glm{cond_ix}.Coefficients.Estimate(ft_ix+1)) ...
             '; q=' num2str(qvals(ft_ix,cond_ix),'%.3f')]);
         xlabel([ft.name{ft_ix} '(' ft.chan{ft_ix} ', ' ft.cond{ft_ix} ') Amp (uV)']);
         ylabel([st_ft.name{1} ' ' st_ft.measure ' Amp (uv)']);

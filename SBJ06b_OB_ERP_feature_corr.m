@@ -58,13 +58,14 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' feat_id '_' proc_id '.mat']);
 
 %% Compute covariance metrics
-% Compute correlation
+% Compute correlation and variance inflation factors
 [r_amp,p_amp] = corrcoef(ft_amp);
-[r_lat,p_lat] = corrcoef(ft_times);
-
-% Compute variance inflation factors
 amp_vifs = fn_variance_inflation_factor(zscore(ft_amp));
-lat_vifs = fn_variance_inflation_factor(zscore(ft_times));
+
+if any(strcmp(ft.measure,{'sbjPk','sbjMW'}))    % not necessary for grpMW or P2P
+    [r_lat,p_lat] = corrcoef(ft_times);
+    lat_vifs = fn_variance_inflation_factor(zscore(ft_times));
+end
 
 % for ft_ix = 1:numel(ft.name)
 %     if amp_vifs(ft_ix)>10
@@ -85,7 +86,11 @@ fig_name = [SBJ_id '_' feat_id '_amp_corr'];
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 1 1],'Visible',fig_vis);
 % end
-[n_rowcol,~] = fn_num_subplots(nchoosek(numel(ft.name),2)+2);
+if numel(ft.name)==1
+    n_rowcol = [1 1];
+else
+    [n_rowcol,~] = fn_num_subplots(nchoosek(numel(ft.name),2)+2);
+end
 
 pair_ix = 0;
 for ft_ix1 = 1:numel(ft.name)
@@ -177,7 +182,7 @@ if save_fig
 end
 
 %% Compare Latency Features
-if ~strcmp(ft.measure,'grpMW')
+if any(strcmp(ft.measure,{'sbjPk','sbjMW'}))
     fig_name = [SBJ_id '_' feat_id '_lat_corr'];
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 1 1],'Visible',fig_vis);
