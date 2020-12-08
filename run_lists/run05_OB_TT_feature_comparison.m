@@ -54,16 +54,16 @@ for ft_ix = 1:numel(feat_ids)
     end
 end
 
-%% Oddball vs. Target Time ERP Comparison
+%% Oddball vs. Target Time ERP Comparison: Point Estimates
 tt_proc_id = 'eeg_full_ft';
 ob_proc_id = 'odd_full_ft';
 model_id   = 'ERPEsL_DifFB';
 
 % FRN Parameters:
 stat_ids   = {...
-    'N2sP3s_grpMW05_DifFB_reg_sRPE_Fz_grpMW05',...
-    'N2sP3s_grpMW05_DifFB_reg_uRPE_Pz_grpMW05',...
-    'N2sP3s_grpMW05_DifFB_reg_Lik_Fz_grpMW05'};%,'N2sP3s_grpMW05_DifFB_reg_Lik_Cz_grpMW05'};%
+    'N2bN2c_grpMW05_DifFB_reg_sRPE_Fz_grpMW05',...
+    'P3aP3b_grpMW05_DifFB_reg_uRPE_Pz_grpMW05'};%,...
+%     'N2sP3s_grpMW05_DifFB_reg_Lik_Fz_grpMW05'};%,'N2sP3s_grpMW05_DifFB_reg_Lik_Cz_grpMW05'};%
 %     'P3aP3b_grpMW05_DifFB_reg_P3_grpMW05','P3aP3b_sbjMW05_DifFB_reg_P3_sbjMW05'};
 %     'N2c_p2p_DifFB_reg_FRNp2p','N2b_p2p_DifFB_reg_FRNp2p'};
 %     'N2bN2c_p2p_DifFB_reg_FRNp2p'};
@@ -93,10 +93,30 @@ fig_vis   = 'on';
 fig_ftype = 'png';
 
 for st_ix = 1:numel(stat_ids)
-    SBJ06d_OB_TT_ERP_grp_stats_reg(SBJ_id,tt_proc_id,ob_proc_id,...
-        stat_ids{st_ix},'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ06d_OB_TT_ERP_grp_stats_reg(SBJ_id,tt_proc_id,ob_proc_id,...
+%         stat_ids{st_ix},'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     
+%     SBJ06e_OB_TT_ERP_grp_corr_model_comparison(SBJ_id,tt_proc_id,ob_proc_id,...
+%         stat_ids{st_ix},model_id,'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+end
+
+%% Oddball vs. Target Time ERP Comparison: Point Estimates
+tt_proc_id = 'eeg_full_ft';
+ob_proc_id = 'odd_full_ft';
+model_id   = 'ERPEsL_DifFB';
+
+stat_ids   = {...
+    'N2sP3s_grpMW05_DifFB_corr_Fz_ts05t5'};%,...
+
+plt_id    = 'ts_F2t8_evnts_sigLine';
+save_fig  = 1;
+fig_vis   = 'on';
+fig_ftype = 'png';
+
+for st_ix = 1:numel(stat_ids)
+    SBJ06d_OB_TT_ERP_grp_stats_corr_ts(SBJ_id, tt_proc_id, ob_proc_id, stat_ids{st_ix});
     
-    SBJ06e_OB_TT_ERP_grp_corr_model_comparison(SBJ_id,tt_proc_id,ob_proc_id,...
-        stat_ids{st_ix},model_id,'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ06e_OB_TT_ERP_plot_stats_corr_ts(SBJ_id,tt_proc_id,ob_proc_id,...
+%         stat_ids{st_ix},model_id,'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
