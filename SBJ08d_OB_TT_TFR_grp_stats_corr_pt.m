@@ -1,5 +1,6 @@
-function SBJ06d_OB_TT_ERP_grp_stats_reg(SBJ_id,tt_proc_id,ob_proc_id,stat_id,varargin)
-%% Run multiple regression using OB ERP features to predict TT ERP features
+function SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_id,varargin)
+%% Run correlation using point OB ERP features to predict point TT ERP features
+%   "point estimates": mean window or peak-to-peak only
 %   Oddball ERPs only yield one feature per SBJ, so can only predict single TT condition/average
 %   If multiple TT conditions, then predicting each one separately
 % COMPUTATIONS:
@@ -52,7 +53,7 @@ if ~exist('save_fig','var');   save_fig = 1; end
 %% Load Data 
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/OB_TT_feat/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
-if ~strcmp(st.an_style,'reg'); error('This script is for regression'); end
+if ~strcmp(st.an_style,'corr'); error('This script is for correlation'); end
 
 % TT Feature Parameters
 stat_feat_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/feat_vars/' st.measure '_vars.m'];
@@ -79,11 +80,11 @@ tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.model_lab '_' ob_pr
 if numel(SBJs)~=numel(tmp.SBJs) || ~all(strcmp(SBJs,tmp.SBJs)); error('SBJ mismatch!'); end
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.model_lab '_' ob_proc_id '.mat'],'ft_amp','ft_times');
 
-% Z-score feature predictors
-model = ft_amp;
-% if st.z_reg
+ob_amp = ft_amp;
+if st.z_reg
+    error('why zscore for correlation analysis?');
 %     model = zscore(model);
-% end
+end
 
 %% Load Target Time ERP Features
 tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.measure '_' tt_proc_id '.mat'],'SBJs');
@@ -93,35 +94,31 @@ if numel(SBJs)~=numel(tmp.SBJs) || ~all(strcmp(SBJs,tmp.SBJs)); error('SBJ misma
 load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.measure '_' tt_proc_id '.mat'],...
     'erp_amp','miss_erps');
 
-data = erp_amp;
+tt_amp = erp_amp;
 
 %% Run Linear Multiple Regression
-fprintf('========================== Running Stats ==========================\n');
-% Build Model Table
-tbl = table;
+fprintf('========================== Running Correlations ==========================\n');
+cond_corr = nan([numel(ft.name) numel(cond_lab)]);
+cond_pval = nan([numel(ft.name) numel(cond_lab)]);
+cond_qval = nan([numel(ft.name) numel(cond_lab)]);
 for ft_ix = 1:numel(ft.name)
-    tbl.(ft.name{ft_ix}) = model(:,ft_ix);
-end
-
-% Create Model Formula
-reg_formula = strjoin(ft.name,' + ');
-formula = ['ERP ~ ' reg_formula];
-
-% Run Model: Single time point (mean in window) over channels
-glm = cell(size(cond_lab));
-pvals = nan([numel(ft.name) numel(cond_lab)]);
-for cond_ix = 1:numel(cond_lab)
-    tbl.ERP = data(:,cond_ix);
-    glm{cond_ix} = fitglm(tbl,formula);
-    pvals(:,cond_ix) = glm{cond_ix}.Coefficients.pValue(2:end); % Skip intercept
-end
-
-% Correct for Multiple Comparisons
-if strcmp(st.mcp_method,'FDR')
-    [~, ~, ~, qvals] = fdr_bh(reshape(pvals,[size(pvals,1)*size(pvals,2) 1]));
-    qvals = reshape(qvals,[size(pvals,1) size(pvals,2)]);
-else
-    error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
+    for cond_ix = 1:numel(cond_lab)
+        % Compute correlation
+        if any(miss_erps(:,cond_ix))
+            fprintf(2,'\tWARNING: %d missing values for %s in %s!\n',...
+                sum(miss_erps(:,cond_ix)),st_ft.measure,cond_names{cond_ix});
+        end
+        [tmp_r,tmp_p] = corrcoef(tt_amp(:,cond_ix),ob_amp(:,ft_ix),'Rows','complete');
+        cond_corr(ft_ix,cond_ix) = tmp_r(1,2);
+        cond_pval(ft_ix,cond_ix) = tmp_p(1,2);
+    end
+    
+    % Correct for Multiple Comparisons
+    if strcmp(st.mcp_method,'FDR')
+        [~, ~, ~, cond_qval(ft_ix,:)] = fdr_bh(cond_pval(ft_ix,:));
+    else
+        error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
+    end
 end
 
 %% Plot Regression results
@@ -138,14 +135,12 @@ for ft_ix = 1:numel(ft.name)
             fprintf(2,'\tWARNING: %d missing values for %s in %s!\n',...
                 sum(miss_erps(:,cond_ix)),st_ft.measure,cond_names{cond_ix});
         end
-        [r,p] = corrcoef(model(:,ft_ix),data(:,cond_ix),'Rows','complete');
-        r = r(1,2); p = p(1,2);
         
         % Plot features
-        scatter(model(:,ft_ix),data(:,cond_ix), 'o', 'k');
+        scatter(ob_amp(:,ft_ix),tt_amp(:,cond_ix), 'o', 'k');
         
         % Plot linear fit
-        coeff = polyfit(model(:,ft_ix),data(:,cond_ix),1);
+        coeff = polyfit(ob_amp(:,ft_ix),tt_amp(:,cond_ix),1);
         xbounds = get(gca,'XLim');
         xfudge = (xbounds(2)-xbounds(1))*0.1;
         xdat = [xbounds(1)+xfudge xbounds(2)-xfudge];
@@ -154,10 +149,9 @@ for ft_ix = 1:numel(ft.name)
         
         % Plot parameters
         set(gca,'FontSize',16);
-        legend(simple_fit,['r=' num2str(r,'%.2f') '; p=' num2str(p,'%.3f')],...
+        legend(simple_fit,['r=' num2str(cond_corr(ft_ix,cond_ix),'%.2f') '; p=' num2str(cond_pval(ft_ix,cond_ix),'%.3f')],...
             'Location','best');
-        title([cond_names{cond_ix} ': beta=' num2str(glm{cond_ix}.Coefficients.Estimate(ft_ix+1)) ...
-            '; q=' num2str(qvals(ft_ix,cond_ix),'%.3f')]);
+        title([cond_names{cond_ix} ': q=' num2str(cond_qval(ft_ix,cond_ix),'%.3f')]);
         xlabel([ft.name{ft_ix} '(' ft.chan{ft_ix} ', ' ft.cond{ft_ix} ') Amp (uV)']);
         ylabel([st_ft.name{1} ' ' st_ft.measure ' Amp (uv)']);
     end
@@ -177,6 +171,6 @@ end
 %% Save Results
 stat_out_fname = [root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_id '.mat'];
 fprintf('Saving %s\n',stat_out_fname);
-save(stat_out_fname,'-v7.3','glm','qvals','SBJs');
+save(stat_out_fname,'-v7.3','cond_corr','cond_pval','cond_qval','SBJs');
 
 end

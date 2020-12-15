@@ -55,10 +55,10 @@ end
 
 %% Compute Phase for ITPC
 ob_proc_id    = 'eeg_full_ft';
-an_ids     = {'PHS_Fz_S2t1_fl1t12','PHS_Pz_S2t1_fl1t12'};
-erp_ids    = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
+an_ids     = {'PHS_Fz_F2t1_fl1t12','PHS_Pz_F2t1_fl1t12'};
+erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
 conditions = 'DifFB';
-plt_id     = 'ts_S2t8_evnts_sigLine';
+plt_id     = 'ts_F2to1_evnts_sigLine';
 save_fig    = 1;
 fig_vis     = 'on';
 fig_ftype  = 'png';
@@ -71,7 +71,7 @@ for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
         % Reconstruct and clean raw data, filter, cut trials to event,
         %   baseline correct, select channels, save
-%         SBJ05a_TFR_save(SBJs{s}, ob_proc_id, an_ids{an_ix});
+        SBJ05a_TFR_save(SBJs{s}, ob_proc_id, an_ids{an_ix});
         
         % Compute and plot ITPC with ERP overlay per condition for single SBJ
 %         SBJ05b_ITC_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},erp_ids{an_ix},...

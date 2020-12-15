@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'goodEEG1';
+SBJ_id = 'good2';%'goodEEG1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Run preprocessing
@@ -71,7 +71,7 @@ fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for s = 1:numel(SBJs)
-%     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+    SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
 end
 
 % Group Topo Plot: P3

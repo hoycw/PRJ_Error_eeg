@@ -11,14 +11,14 @@ function [grp_labels, grp_names, colors, line_styles] = fn_group_label_styles(mo
 
 %% List of possible labels and their colors
 % Factor codes
-factors  = {'Dif','Tol','Out','OutS','FB','Tim','Dif*Out','Tol*Out','Sur'};
+factors  = {'OB','Dif','Tol','Out','OutS','FB','Tim','Dif*Out','Tol*Out','Sur'};
 
 % Factor labels (longer strings for clear plotting legends)
-factor_names = {'Difficulty', 'Tolerance', 'Outcome', 'Outcome Surprise', 'Feedback', ...
+factor_names = {'Oddball','Difficulty', 'Tolerance', 'Outcome', 'Outcome Surprise', 'Feedback', ...
     'Timing', 'Difficulty*Outcome', 'Tolerance*Outcome', 'Surprise'};
 
 % Factor colors ([R G B] scaled to 0-1)
-factor_colors = {[152 78 163]./255, [152 78 163]./255, [255 127 0]./255, [255 127 0]./255, [255 127 0]./255,...
+factor_colors = {[0.3 0.3 0.3], [152 78 163]./255, [152 78 163]./255, [255 127 0]./255, [255 127 0]./255, [255 127 0]./255,...
     [255 255 51]./255, [166 86 40]./255, [166 86 40]./255, [166 86 40]./255};
 % Newer (different than RGB for 3 feedback conditions:
 %   purple, orange, yellow, brown (brown again for Sur/DO repeat)
@@ -27,6 +27,9 @@ factor_colors = {[152 78 163]./255, [152 78 163]./255, [255 127 0]./255, [255 12
 
 %% Convert model_id into set of conditions
 switch model_id
+    case 'OB'
+        grp_labels = {'OB'};
+        
     case 'Dif'
         grp_labels = {'Dif'};
     case 'Out'
