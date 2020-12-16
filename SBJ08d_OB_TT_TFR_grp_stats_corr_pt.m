@@ -1,13 +1,12 @@
-function SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_id,varargin)
-%% Run correlation using point OB ERP features to predict point TT ERP features
-%   "point estimates": mean window or peak-to-peak only
-%   Oddball ERPs only yield one feature per SBJ, so can only predict single TT condition/average
+function SBJ08d_OB_TT_TFR_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_id,varargin)
+%% Run correlation using point OB TFR features to predict point TT TFR features
+%   "point estimates": mean window only
+%   Oddball TFRs only yield one feature per SBJ, so can only predict single TT condition/average
 %   If multiple TT conditions, then predicting each one separately
 % COMPUTATIONS:
-%   Load OB and TT ERP features
-%       Optional: z-score regressors across group
-%   Run general linear model with OB features predicting each TT condition
-%   Correct for multiple comparisons (FDR for regressors)
+%   Load OB and TT TFR features
+%   Run correlation with OB features predicting each TT condition
+%   Correct for multiple comparisons (FDR for conditions)
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
 %   tt_proc_id [str] - ID of target time preprocessing pipeline
@@ -16,8 +15,9 @@ function SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_id
 %       st.model   = feat_id for OB ERP features
 %       st.measure = feat_id for TT ERP features
 % OUTPUTS:
-%   glm [cell array] - GeneralLinearModel output class, one cell per channel
-%   qvals [float array] - [n_regressors, n_chan/n_time] p values adjusted for multiple comparisons 
+%   corr_cond [float array] - correlations per feature/condition
+%   corr_pval [float array] - [n_regressors, n_chan/n_time] p values adjusted for multiple comparisons 
+%   corr_qval [float array] - [n_regressors, n_chan/n_time] p values adjusted for multiple comparisons 
 %   SBJs [cell array] - list of SBJs used in this analysis (for double checks)
 
 %% Set up paths
@@ -59,8 +59,8 @@ if ~strcmp(st.an_style,'corr'); error('This script is for correlation'); end
 stat_feat_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/feat_vars/' st.measure '_vars.m'];
 eval(stat_feat_cmd);
 st_ft = ft;
-if ~any(strcmp(st_ft.name,{'FRN','P3','sRPE','uRPE','Lik'}))
-    error('This script is only ready for FRN, P3, and reg peaks!');
+if ~any(strcmp(st_ft.name,{'thetaFRN','deltaP3'}))
+    error('This script is only ready for theta FRN and delta P3!');
 end
 if ~any(strcmp(st_ft.grp_id,{'All','DifFB','Pos','Neg'})); error('stat feat should be TT conditions!'); end
 
@@ -78,9 +78,9 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 %% Load Oddball ERP Features
 tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.model_lab '_' ob_proc_id '.mat'],'SBJs');
 if numel(SBJs)~=numel(tmp.SBJs) || ~all(strcmp(SBJs,tmp.SBJs)); error('SBJ mismatch!'); end
-load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.model_lab '_' ob_proc_id '.mat'],'ft_amp','ft_times');
+ob_tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.model_lab '_' ob_proc_id '.mat'],'tfr_amp');
 
-ob_amp = ft_amp;
+ob_amp = ob_tmp.tfr_amp;
 if st.z_reg
     error('why zscore for correlation analysis?');
 %     model = zscore(model);
@@ -91,10 +91,10 @@ tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.measure '_' tt_proc
 if numel(SBJs)~=numel(tmp.SBJs) || ~all(strcmp(SBJs,tmp.SBJs)); error('SBJ mismatch!'); end
 
 % Not doing anything with 'erp_times' right now...
-load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.measure '_' tt_proc_id '.mat'],...
-    'erp_amp','miss_erps');
+tt_tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.measure '_' tt_proc_id '.mat'],...
+    'tfr_amp');
 
-tt_amp = erp_amp;
+tt_amp = tt_tmp.tfr_amp;
 
 %% Run Linear Multiple Regression
 fprintf('========================== Running Correlations ==========================\n');
@@ -104,10 +104,6 @@ cond_qval = nan([numel(ft.name) numel(cond_lab)]);
 for ft_ix = 1:numel(ft.name)
     for cond_ix = 1:numel(cond_lab)
         % Compute correlation
-        if any(miss_erps(:,cond_ix))
-            fprintf(2,'\tWARNING: %d missing values for %s in %s!\n',...
-                sum(miss_erps(:,cond_ix)),st_ft.measure,cond_names{cond_ix});
-        end
         [tmp_r,tmp_p] = corrcoef(tt_amp(:,cond_ix),ob_amp(:,ft_ix),'Rows','complete');
         cond_corr(ft_ix,cond_ix) = tmp_r(1,2);
         cond_pval(ft_ix,cond_ix) = tmp_p(1,2);
@@ -129,12 +125,6 @@ for ft_ix = 1:numel(ft.name)
     [n_rowcol,~] = fn_num_subplots(numel(cond_lab));
     for cond_ix = 1:numel(cond_lab)
         subplot(n_rowcol(1),n_rowcol(2),cond_ix); hold on;
-        
-        % Compute correlation
-        if any(miss_erps(:,cond_ix))
-            fprintf(2,'\tWARNING: %d missing values for %s in %s!\n',...
-                sum(miss_erps(:,cond_ix)),st_ft.measure,cond_names{cond_ix});
-        end
         
         % Plot features
         scatter(ob_amp(:,ft_ix),tt_amp(:,cond_ix), 'o', 'k');
@@ -158,7 +148,7 @@ for ft_ix = 1:numel(ft.name)
     
     % Save figure
     if save_fig
-        fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' st_ft.an_id '/' stat_id '/'];
+        fig_dir = [root_dir 'PRJ_Error_eeg/results/TFR/' st_ft.an_id '/' stat_id '/'];
         if ~exist(fig_dir,'dir') && save_fig
             mkdir(fig_dir);
         end
