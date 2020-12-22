@@ -28,7 +28,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
 proc_id   = 'eeg_full_ft';
-stat_ids  = {'uRPE_Neg_lme_st05t5'};%'ML_Neg_lme_st05t5'};%'ERPEsL_all_lme_st05t5'};
+stat_ids  = {'ERPEs_DifFB_lme_st05t5'};%'uRPE_Neg_lme_st05t5'};%'ML_Neg_lme_st05t5'};%'ERPEsL_all_lme_st05t5'};
 % Alternative (worse) models: 'RSVPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','VML_all_lme_mn1FRN'
 fig_vis   = 'on';
 save_fig  = 1;
@@ -43,7 +43,7 @@ for s = 1:numel(SBJs)
 %         SBJ04b_BHV_RL_model_plot(SBJs{s},proc_id,stat_ids{st_ix},...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-%     close all;
+    close all;
 end
 
 % Fig. 1D inset: Plot group model fits (overlapping sigmoids without tolerance)
@@ -61,7 +61,7 @@ end
 % Plots Fig. 2 and 3; Sup. Fig. 2
 % Main RL Model
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%'ERP_Cz_F2t1_dm2t0_fl05t20',
-stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};%'uRPE_Neg_lme_st05t5','uRPE_Pos_lme_st05t5'};%
+stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};%,'EsRPEL_DifFB_lme_st05t5','ERPEs_DifFB_lme_st05t5'};%'uRPE_Neg_lme_st05t5','uRPE_Pos_lme_st05t5'};%
 plt_id    = 'ts_F2t8_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st05t5';
 
@@ -71,7 +71,7 @@ fig_vis   = 'on';
 fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
-    for st_ix = 1:numel(stat_ids)
+    for st_ix = 1%:numel(stat_ids)
       % Run LME RL model on ERPs over time
       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
       
@@ -85,16 +85,16 @@ for an_ix = 1:numel(an_ids)
 %     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
 
     % Model Comparison Plots: AIC Performance
-%     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
+    SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);
 
     % Model Comparison Plots: R2 Fits Relative to SBJonly null model
-%     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',1);
+    SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',1);
 
     % Model Comparison Plots: R2 Fits Overall
-%     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
+    SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted','rm_null',0);
 end
 
 % Sup. Fig. 2: Electrode R2 Comparison Plot

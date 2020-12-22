@@ -102,6 +102,8 @@ switch model_id
         labels = {'EV','sRPE','uRPE'};
     case 'EsRPE'
         labels = {'EV','sRPE'};
+    case 'EsRPEL'
+        labels = {'EV','sRPE','Lik'};
     case 'EuRPE'
         labels = {'EV','uRPE'};
     case 'ERPEsL'

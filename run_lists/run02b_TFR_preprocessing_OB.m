@@ -14,7 +14,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'goodEEG1';%'goodall';%
+SBJ_id = 'goodOB';%EEG1';%'goodall';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Compute TFRs for Power
@@ -35,8 +35,8 @@ for an_ix = 1:numel(an_ids)
 %         SBJ07a_OB_TFR_save(SBJs{s}, ob_proc_id, tt_proc_id, an_ids{an_ix});
         
         % Plot TFRs of power data per condition for single SBJ
-        SBJ07b_OB_TFR_plot(SBJs{s}, conditions, ob_proc_id, an_ids{an_ix}, plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ07b_OB_TFR_plot(SBJs{s}, conditions, ob_proc_id, an_ids{an_ix}, plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
         % Plot TFRs of power data with ERP overlay per condition for single SBJ
 %         SBJ07b_OB_TFR_ERP_plot(SBJs{s}, conditions, ob_proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
@@ -44,12 +44,12 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Plot TFRs of power data per condition for group
-%     SBJ07c_OB_TFR_plot_grp(SBJ_id, conditions, ob_proc_id, an_ids{an_ix}, plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ07c_OB_TFR_plot_grp(SBJ_id, conditions, ob_proc_id, an_ids{an_ix}, plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Plot TFRs of power data with ERP overlay per condition for group
     %*** Sup. Fig. 4 (Fz) and 5 (Pz)
-%     SBJ07c_OB_TFR_ERP_plot_grp(SBJ_id, conditions, ob_proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ07c_OB_TFR_ERP_plot_grp(SBJ_id, conditions, ob_proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

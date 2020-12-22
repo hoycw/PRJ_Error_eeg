@@ -14,12 +14,12 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good2';%'goodEEG1';
+SBJ_id = 'goodOB';%'goodEEG1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Oddball ERP feature extraction
 proc_id  = 'odd_full_ft';
-feat_ids = {'N2b_grpMW05','N2c_grpMW05','P3a_grpMW05','P3b_grpMW05'};
+feat_ids = {'N2sP3s_grpMW05'};%'N2b_grpMW05','N2c_grpMW05','P3a_grpMW05','P3b_grpMW05'};
     %   'N2b_p2p','N2c_p2p'};
 % feat_ids = {'N2bN2c_grpMW05','N2bN2c_sbjMW05'};%'N2bP3a_sbjMW05','N2bP3a_grpMW05','N2cP3b_sbjMW05','N2cP3b_grpMW05'};
     %'P3aP3b_grpMW1'};%'N2cP3b_sbjPk','N2cP3b_sbjMW1','N2cP3b_grpMW1'};
@@ -36,12 +36,12 @@ for ft_ix = 1:numel(feat_ids)
     end
     
     % Plot correlations between ERP features before using as model predictors
-%     SBJ06b_OB_ERP_feature_corr(SBJ_id,proc_id,feat_ids{ft_ix});
+    SBJ06b_OB_ERP_feature_corr(SBJ_id,proc_id,feat_ids{ft_ix});
 end
 
 %% Target Time ERP feature extraction
 proc_id  = 'eeg_full_ft';
-feat_ids = {'sRPE_Fz_grpMW05','uRPE_Pz_grpMW05','Lik_Fz_grpMW05'};%,'Lik_Cz_grpMW05'};%'P3_grpMW05','P3_sbjMW05'};
+feat_ids = {'FRN_p2p','sRPE_Fz_grpMW05','uRPE_Pz_grpMW05','Lik_Fz_grpMW05'};%,'Lik_Cz_grpMW05'};%'P3_grpMW05','P3_sbjMW05'};
 %     'FRN_p2p'};%'FRN_grpMW05','FRN_sbjMW05'};
 %   an_id in ft struct {'ERP_Fz_F2t1_dm2t0_fl05t20', 'ERP_Pz_F2t1_dm2t0_fl05t20'}
 
@@ -61,15 +61,20 @@ model_id   = 'ERPEsL_DifFB';
 
 % FRN Parameters:
 stat_ids   = {...
-    'N2b_grpMW05_DifFB_corr_sRPE_Fz_grpMW05',...
-    'N2c_grpMW05_DifFB_corr_sRPE_Fz_grpMW05',...
-    'P3a_grpMW05_DifFB_corr_uRPE_Pz_grpMW05',...
-    'P3b_grpMW05_DifFB_corr_uRPE_Pz_grpMW05',...
-    'N2b_grpMW05_DifFB_corr_Lik_Fz_grpMW05',...
-    'N2c_grpMW05_DifFB_corr_Lik_Fz_grpMW05',...
-    'P3a_grpMW05_DifFB_corr_Lik_Fz_grpMW05',...
-    'P3b_grpMW05_DifFB_corr_Lik_Fz_grpMW05'...
+%     'N2sP3s_grpMW05_DifFB_corr_sRPE_Fz_grpMW05'...
+%     'N2sP3s_grpMW05_DifFB_corr_uRPE_Pz_grpMW05'...
+    'N2sP3s_grpMW05_DifFB_corr_Lik_Fz_grpMW05'...
+%     'N2b_grpMW05_DifFB_corr_sRPE_Fz_grpMW05',...
+%     'N2c_grpMW05_DifFB_corr_sRPE_Fz_grpMW05',...
+%     'P3a_grpMW05_DifFB_corr_uRPE_Pz_grpMW05',...
+%     'P3b_grpMW05_DifFB_corr_uRPE_Pz_grpMW05'...
+%     'N2b_grpMW05_DifFB_corr_Lik_Fz_grpMW05',...
+%     'N2c_grpMW05_DifFB_corr_Lik_Fz_grpMW05',...
+%     'P3a_grpMW05_DifFB_corr_Lik_Fz_grpMW05',...
+%     'P3b_grpMW05_DifFB_corr_Lik_Fz_grpMW05'...
     };%,...
+%     'N2b_p2p_DifFB_corr_FRN_p2p',...
+%     'N2c_p2p_DifFB_corr_FRN_p2p'...
 %         'N2c_p2p_DifFB_reg_FRNp2p'};
 %     'N2sP3s_grpMW05_DifFB_reg_Lik_Fz_grpMW05'};%,'N2sP3s_grpMW05_DifFB_reg_Lik_Cz_grpMW05'};%
 %     'P3aP3b_grpMW05_DifFB_reg_P3_grpMW05','P3aP3b_sbjMW05_DifFB_reg_P3_sbjMW05'};
@@ -131,13 +136,13 @@ end
 
 %% Oddball TFR feature extraction
 proc_id  = 'odd_full_ft';
-feat_ids = {'thetaRare_2t4','deltaRare_3t5'};
+feat_ids = {'deltaRare_2t5'};%'thetaRare_2t4','deltaRare_3t5'};
     %,'thetaOdd_2t4','thetaTar_2t4',...'deltaOdd_3t5','deltaTar_3t5'};
 %   an_id is specified in the feat struct (always 'ERP_all_S2t1_dm2t0_fl05t20')
 
 for ft_ix = 1:numel(feat_ids)
     % Extract Oddball TFR features
-%     SBJ08a_OB_TFR_save_mean_window(SBJ_id,proc_id,feat_ids{ft_ix});
+    SBJ08a_OB_TFR_save_mean_window(SBJ_id,proc_id,feat_ids{ft_ix});
     
     % If multiple TFR features, plot correlations before using as model predictors
     if contains(feat_ids{ft_ix},'Rare')
@@ -147,7 +152,7 @@ end
 
 %% Target Time TFR feature extraction
 proc_id  = 'eeg_full_ft';
-feat_ids = {'thetaFRN_2t35','deltaP3_3t45'};
+feat_ids = {'thetaFRN_2t4','deltaP3_2t45'};%'thetaFRN_2t35','deltaP3_3t45'};
 %   an_id is specified in the feat struct (always 'ERP_all_S2t1_dm2t0_fl05t20')
 
 for ft_ix = 1:numel(feat_ids)
@@ -158,8 +163,10 @@ end
 %% OB-TT TFR comparison
 tt_proc_id = 'eeg_full_ft';
 ob_proc_id = 'odd_full_ft';
-stat_ids   = {'thetaRare_2t4_DifFB_corr_thetaFRN_2t35','deltaRare_3t5_DifFB_corr_deltaP3_3t45'};
-
+stat_ids   = {'thetaRare_2t4_DifFB_corr_thetaFRN_2t4'};
+%'thetaRare_2t4_DifFB_corr_thetaFRN_2t35','deltaRare_3t5_DifFB_corr_deltaP3_2t45'};
+    %'deltaRare_2t5_DifFB_corr_deltaP3_2t45'};
+    
 save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'png';

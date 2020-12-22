@@ -44,10 +44,10 @@ fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
-        SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
-        plt_id     = 'ts_S2t1_evnts_sigLine';
-        SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
+%         plt_id     = 'ts_S2t1_evnts_sigLine';
+%         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Group ERP plot
@@ -71,7 +71,7 @@ fig_vis    = 'on';
 fig_ftype  = 'png';
 
 for s = 1:numel(SBJs)
-    SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
+%     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);
 end
 
 % Group Topo Plot: P3
