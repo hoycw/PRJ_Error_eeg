@@ -1,4 +1,4 @@
-%% EEG 00 Processing Variables
+%% colin_test1 Processing Variables
 if exist('/home/knight/','dir');root_dir='/home/knight/';ft_dir=[root_dir 'PRJ_Error_eeg/Apps/fieldtrip/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';ft_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';ft_dir='/Users/colinhoy/Code/Apps/fieldtrip/';end
@@ -10,9 +10,9 @@ ft_defaults
 %--------------------------------------
 % Basics
 %--------------------------------------
-SBJ_vars.SBJ = '';
+SBJ_vars.SBJ = 'colin_test1';
 SBJ_vars.raw_file = {''};
-SBJ_vars.bhv_file = '';
+SBJ_vars.bhv_file = 'colin_full_run2_response_log_20210119155138_wRatingDelay.txt';
 SBJ_vars.oddball_file = {''};
 SBJ_vars.block_name = {''};
 
