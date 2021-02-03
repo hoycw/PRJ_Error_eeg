@@ -78,11 +78,11 @@ switch grp_id
         labels = {'Wn', 'Ls', 'Su'};
     case 'Out'                          % Outcome (no neutral)
         labels = {'Wn', 'Ls'};
-    case 'Val'                          % Valence
+    case {'Val','RewP'}                          % Valence
         labels = {'AllPos', 'AllNeg'};
     
     % Collections of individual Target Time conditions
-    case {'DifFB','DifOutSur','Neg-Pos'}          % All 6 main conditions
+    case {'DifFB','DifOutSur','Pos-Neg'}          % All 6 main conditions
         labels = {'EzWn', 'EzSu', 'EzLs', 'HdWn', 'HdSu', 'HdLs'};
     case 'EHSu'                         % Neutral Outcomes in Easy+Hard
         labels = {'EzSu','HdSu'};

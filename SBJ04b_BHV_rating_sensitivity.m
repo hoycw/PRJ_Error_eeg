@@ -1,11 +1,6 @@
-function SBJ04b_BHV_RL_model_rating_plot(SBJ,proc_id,stat_id,varargin)
-%% Plot single SBJ behavior with RL model fit and ratings
-%   Scatter of single trial tolerance and outcomes
-%   Scatter of block accuracy and average tolerance
-%   Sigmoid from logistic regression fit on top
-%   Scatter of single trial tolerance and ratings
-%   Scatter of block averaged tolerance and ratings
-%   Histograms (w/ t-test stats) for win vs. loss within easy/hard cond.
+function SBJ04b_BHV_rating_sensitivity(SBJ,proc_id,stat_id,varargin)
+%% Plot single SBJ ratings by condition and outcome
+%   Scatter of single trial ratings by outcome for easy/hard conditions
 % INPUTS:
 %   SBJ [str] - ID of subject to run
 %   proc_id [str] - ID of preprocessing pipeline
@@ -17,7 +12,7 @@ function SBJ04b_BHV_RL_model_rating_plot(SBJ,proc_id,stat_id,varargin)
 %       fig_ftype [str] - file extension for saving fig
 %           default: 'png'
 % OUTPUTS:
-%   saves figures
+%   saves figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -165,105 +160,9 @@ hd_rat_leg = ['Hard Ratings (mean = ' ...
 legend([ez_trl, ez_rat, hd_trl, hd_rat, fit_line],{ez_leg,ez_rat_leg,hd_leg,hd_rat_leg,'Model Fit'},'Location','southeast');
 set(gca,'FontSize',14);
 
-%% Save Model Scatter Figure
+%% Save Figure
 if save_fig
     fig_dir = [root_dir 'PRJ_Error_eeg/results/BHV/rating_model_fits/' st.model_id '/'];
-    if ~exist(fig_dir,'dir')
-        mkdir(fig_dir);
-    end
-    
-    fig_fname = [fig_dir fig_name '.' fig_ftype];
-    fprintf('Saving %s\n',fig_fname);
-    % Ensure vector graphics if saving
-    if any(strcmp(fig_ftype,{'svg','eps'}))
-        set(gcf, 'Renderer', 'painters');
-    end
-    saveas(gcf,fig_fname);
-end
-
-%% Statistics for win vs. loss ratings
-% Statistics for win vs. loss within condition
-[~, ez_pval] = ttest2(bhv.rating(ez_trl_idx & bhv.hit==0), bhv.rating(ez_trl_idx & bhv.hit==1));
-[~, hd_pval] = ttest2(bhv.rating(~ez_trl_idx & bhv.hit==0), bhv.rating(~ez_trl_idx & bhv.hit==1));
-
-% Plotting statistics
-mean_ez_ls_rat = nanmean(bhv.rating(ez_trl_idx & bhv.hit==0));
-mean_ez_wn_rat = nanmean(bhv.rating(ez_trl_idx & bhv.hit==1));
-mean_hd_ls_rat = nanmean(bhv.rating(~ez_trl_idx & bhv.hit==0));
-mean_hd_wn_rat = nanmean(bhv.rating(~ez_trl_idx & bhv.hit==1));
-
-% Normalize ratings within condition
-mean_ez_rat = nanmean(bhv.rating(ez_trl_idx));
-std_ez_rat  = nanstd(bhv.rating(ez_trl_idx));
-mean_hd_rat = nanmean(bhv.rating(~ez_trl_idx));
-std_hd_rat  = nanstd(bhv.rating(~ez_trl_idx));
-
-ez_wn_rat_norm = (bhv.rating(ez_trl_idx & bhv.hit==1) - mean_ez_rat)./std_ez_rat;
-ez_ls_rat_norm = (bhv.rating(ez_trl_idx & bhv.hit==0) - mean_ez_rat)./std_ez_rat;
-hd_wn_rat_norm = (bhv.rating(~ez_trl_idx & bhv.hit==1) - mean_hd_rat)./std_hd_rat;
-hd_ls_rat_norm = (bhv.rating(~ez_trl_idx & bhv.hit==0) - mean_hd_rat)./std_hd_rat;
-
-mean_ls_rat_norm = nanmean([ez_ls_rat_norm; hd_ls_rat_norm]);
-mean_wn_rat_norm = nanmean([ez_wn_rat_norm; hd_wn_rat_norm]);
-
-% Stats: win vs. loss combined after normalizing for mean within easy/hard
-[~, norm_pval] = ttest2([ez_wn_rat_norm; hd_wn_rat_norm], [ez_ls_rat_norm; hd_ls_rat_norm]);
-
-%% Plot rating histograms by condition and outcome
-% Set Up histogram plots
-n_bins = 20;
-fig_name = [SBJ '_BHV_ratings_WinVsLoss_cond'];
-figure('Name',fig_name,'units','normalized',...
-        'outerposition',[0 0 1.0 0.5],'Visible',fig_vis);
-
-% Plot Easy histograms
-subplot(1,3,1); hold on;
-histogram(bhv.rating(ez_trl_idx & bhv.hit==1),n_bins,'FaceColor','g','FaceAlpha',0.3);
-histogram(bhv.rating(ez_trl_idx & bhv.hit==0),n_bins,'FaceColor','r','FaceAlpha',0.3);
-ez_ls_line = line([mean_ez_ls_rat mean_ez_ls_rat], ylim, 'Color', 'r', 'LineWidth', 3);
-ez_wn_line = line([mean_ez_wn_rat mean_ez_wn_rat], ylim, 'Color', 'g', 'LineWidth', 3);
-xlabel('Subjective Win % Rating');
-xlim([0 1]);
-ylabel('# Trials');
-legend([ez_wn_line ez_ls_line],{['Easy Wins: n=' num2str(sum(~isnan(bhv.rating(ez_trl_idx & bhv.hit==1)))) ...
-    '; mean=' num2str(mean_ez_wn_rat,'%.3f')], ['Easy Losses: n=' num2str(sum(~isnan(bhv.rating(ez_trl_idx & bhv.hit==0))))...
-    '; mean=' num2str(mean_ez_ls_rat,'%.3f')]},'Location','northwest');
-title(['Easy Win vs. Loss: p = ', num2str(ez_pval,'%.3f')]);
-set(gca,'FontSize',14);
-
-% Plot Hard histograms
-subplot(1,3,2); hold on;
-histogram(bhv.rating(~ez_trl_idx & bhv.hit==0),n_bins,'FaceColor','r','FaceAlpha',0.3);
-histogram(bhv.rating(~ez_trl_idx & bhv.hit==1),n_bins,'FaceColor','g','FaceAlpha',0.3);
-hd_ls_line = line([mean_hd_ls_rat mean_hd_ls_rat], ylim, 'Color', 'r', 'LineWidth', 3);
-hd_wn_line = line([mean_hd_wn_rat mean_hd_wn_rat], ylim, 'Color', 'g', 'LineWidth', 3);
-xlabel('Subjective Win % Rating');
-xlim([0 1]);
-ylabel('# Trials');
-legend([hd_wn_line hd_ls_line],{['Hard Wins: n=' num2str(sum(~isnan(bhv.rating(~ez_trl_idx & bhv.hit==1)))) ...
-    '; mean=' num2str(mean_hd_wn_rat,'%.3f')], ['Hard Losses: n=' num2str(sum(~isnan(bhv.rating(~ez_trl_idx & bhv.hit==0))))...
-    '; mean=' num2str(mean_hd_ls_rat,'%.3f')]},'Location','northeast');
-title(['Hard Win vs. Loss: p = ', num2str(hd_pval,'%.3f')]);
-set(gca,'FontSize',14);
-
-% Plot Normalized histograms
-subplot(1,3,3); hold on;
-histogram([ez_ls_rat_norm; hd_ls_rat_norm],n_bins,'FaceColor','r','FaceAlpha',0.3);
-histogram([ez_wn_rat_norm; hd_wn_rat_norm],n_bins,'FaceColor','g','FaceAlpha',0.3);
-norm_ls_line = line([mean_ls_rat_norm mean_ls_rat_norm], ylim, 'Color', 'r', 'LineWidth', 3);
-norm_wn_line = line([mean_wn_rat_norm mean_wn_rat_norm], ylim, 'Color', 'g', 'LineWidth', 3);
-xlabel('Z-Scored Subjective Win % Rating');
-%xlim([0 1]);
-ylabel('# Trials');
-legend([norm_wn_line norm_ls_line],{['Wins: n=' num2str(sum(~isnan(bhv.rating(bhv.hit==1)))) ...
-    '; mean=' num2str(mean_wn_rat_norm,'%.3f')], ['Losses: n=' num2str(sum(~isnan(bhv.rating(bhv.hit==0))))...
-    '; mean=' num2str(mean_ls_rat_norm,'%.3f')]},'Location','best');
-title(['Normalized Win vs. Loss: p = ', num2str(norm_pval,'%.3f')]);
-set(gca,'FontSize',14);
-
-%% Save Ratings Histogram Figure
-if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/BHV/rating_WvsL/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end

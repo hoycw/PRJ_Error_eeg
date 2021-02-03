@@ -8,13 +8,27 @@ switch factor_name
     %   since those features better explain the neural data. Outcome
     %   feature mismatcvhes are noted in side comments.
     case 'Neg-Pos'
+        error('Subtract negative from positive instead!');
+    case 'RewP'
         % Valence contrast: negative - positive
-        labels   = {{'EzLs','HdWn'},... % lo prob, lg mag (outcome mag = lg)
-                    {'HdLs','EzWn'},... % hi prob, sm mag (outcome mag = lg) 
-                    {'EzSu','HdSu'}};   % lo prob, sm mag (outcome mag = sm)
-        names    = {'EL-HW: loPrb,lgMag',...
-                    'HL-EW: hiPrb,lgMag',...
-                    'ES-HS: loPrb,smMag'};
+        labels   = {{'AllPos','AllNeg'}}; % Positive: 'HdWn','EzWn','HdSu'; Negative: 'EzLs','HdLs','EzSu'
+        names    = {'Pos-Neg'};
+        [cond_lab,~,~,~,~] = fn_condition_label_styles(factor_name);
+        diff_pairs = zeros([numel(labels) 2]);
+        for pair_ix = 1:numel(labels)
+            diff_pairs(pair_ix,1) = find(strcmp(cond_lab,labels{pair_ix}(1)));
+            diff_pairs(pair_ix,2) = find(strcmp(cond_lab,labels{pair_ix}(2)));
+        end
+        colors = {[0 0 0]};
+        line_styles = {'-'};
+    case 'Pos-Neg'
+        % Valence contrast: negative - positive
+        labels   = {{'HdWn','EzLs'},... % lo prob, lg mag (outcome mag = lg)
+                    {'EzWn','HdLs'},... % hi prob, sm mag (outcome mag = lg) 
+                    {'HdSu','EzSu'}};   % lo prob, sm mag (outcome mag = sm)
+        names    = {'HW-EL: loPrb,lgMag',...
+                    'EW-HL: hiPrb,lgMag',...
+                    'HS-ES: loPrb,smMag'};
         [cond_lab,~,~,~,~] = fn_condition_label_styles(factor_name);
         diff_pairs = zeros([numel(labels) 2]);
         for pair_ix = 1:numel(labels)

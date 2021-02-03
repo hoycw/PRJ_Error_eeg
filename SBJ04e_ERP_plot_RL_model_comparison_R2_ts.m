@@ -7,6 +7,8 @@ function SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_id,stat_ids,null_id
 %   SBJ_id [str] - ID of subject list for group
 %   an_id [str] - ID of the analysis parameters to use
 %   stat_ids [cell array] - string IDs of the stats parameters to compare
+%       Try to add the main model last, since it will overlay others
+%       3 model colors: magenta, lime green, black (otherwise R,G,B,etc.)
 %   null_id [str] - ID of the SBJonly baseline model to compare
 %   plt_id [str] - ID of the plotting parameters to use
 %   save_fig [0/1] - binary flag to save figure
@@ -105,7 +107,11 @@ cfgs = []; cfgs.latency = sts{1}.stat_lim;
 st_roi = ft_selectdata(cfgs, roi);
 st_time_vec = st_roi.time{1};
 ch_list = st_roi.label;
-st_colors = distinguishable_colors(numel(stat_ids));
+if numel(stat_ids)==3
+    st_colors = [[231,41,138]./256; [102,166,30]./256; [0 0 0]];    % magenta, lime green, black
+else
+    st_colors = distinguishable_colors(numel(stat_ids));
+end
 
 %% Load Models
 % Load real models

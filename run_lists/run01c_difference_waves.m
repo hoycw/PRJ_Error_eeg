@@ -22,7 +22,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 %% ERPs: Fz and Pz over time
 %   RL Model Analysis:
 an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'
-conditions = {'Neg-Pos','Large-Small','Unlik-Lik'};
+conditions = {'RewP','Pos-Neg','Large-Small','Unlik-Lik'};
 proc_id    = 'eeg_full_ft';
 save_fig   = 1;
 fig_vis    = 'on';
@@ -37,15 +37,15 @@ for an_ix = 1:numel(an_ids)
 %                 'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         end
         
-    % Plot Group difference waves
-    SBJ03c_ERP_plot_diff_grp(SBJ_id,conditions{diff_ix},proc_id,an_ids{an_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    
-    % Plot all SBJ ERPs overlapping (butterfly)
-    %     plt_id = 'ts_F2to1_but_evnts_sigPatch';
-    %     SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-    %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-    %     close all;
+        % Plot Group difference waves
+        SBJ03c_ERP_plot_diff_grp(SBJ_id,conditions{diff_ix},proc_id,an_ids{an_ix},plt_id,save_fig,...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        
+        % Plot all SBJ ERPs overlapping (butterfly)
+        %     plt_id = 'ts_F2to1_but_evnts_sigPatch';
+        %     SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+        %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        %     close all;
     end
 end
 

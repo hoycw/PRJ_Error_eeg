@@ -127,6 +127,22 @@ for ch_ix = 1:numel(ch_list)
         diff_sems(pair_ix,:) = squeeze(std(diff_waves(pair_ix,:,ch_ix,:),[],2))./sqrt(numel(SBJs))';
     end
     
+    %% Print summary stats
+    fprintf('-------- Difference Wave Properties ----------\n');
+    diff_pk_times = NaN(size(diff_lab));
+    diff_pk_vals  = NaN(size(diff_lab));
+    for pair_ix = 1:numel(diff_lab)
+        [~, max_ix] = max(abs(diff_means(pair_ix,:)));
+        diff_pk_times(pair_ix) = time_vec(max_ix);
+        diff_pk_vals(pair_ix) = diff_means(pair_ix,max_ix);
+        fprintf('\t(%d) %s [max, time] = [%.2f at %.3f]\n',pair_ix,diff_names{pair_ix},diff_pk_vals(pair_ix),diff_pk_times(pair_ix));
+    end
+    mean_diff = mean(diff_means,1);
+    [~, max_ix] = max(abs(mean_diff));
+    mn_pk_time = time_vec(max_ix);
+    mn_pk_val = mean_diff(max_ix);
+    fprintf('\t%s Overall (max, time) = [%.2f at %.3f]\n',conditions,mn_pk_val,mn_pk_time);
+
     %% Create ERP plot
     fig_name = [SBJ_id '_' conditions '_' an_id '_' ch_list{ch_ix}];    
     figure('Name',fig_name,'units','normalized',...
@@ -176,14 +192,25 @@ for ch_ix = 1:numel(ch_list)
         main_lines(pair_ix) = ebars{pair_ix}.mainLine;
     end
     
+    % Plot Mean Difference Wave
+    if numel(diff_lab)>1
+        mn_diff_plot = 1;
+        main_lines(numel(diff_lab)+mn_diff_plot) = line(time_vec, mean_diff, ...
+            'Color', 'r', 'LineWidth', 2);
+        leg_lab = [diff_names 'Mean'];
+    else
+        mn_diff_plot = 0;
+        leg_lab = diff_names;
+    end
+    
     % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
-        main_lines(numel(diff_lab)+evnt_ix) = line(...
+        main_lines(numel(diff_lab)+mn_diff_plot+evnt_ix) = line(...
             [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end
-    leg_lab = [diff_names plt.evnt_lab];
+    leg_lab = [leg_lab plt.evnt_lab];
     
     % Add zero line
     plot(xlim,[0 0],'Color',[0 0 0],'LineWidth',0.2);

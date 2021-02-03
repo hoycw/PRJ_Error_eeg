@@ -23,7 +23,7 @@ ft_defaults
 %   -goodEEG1.sbj: cohort 1 (only with oddball)
 %   -goodEEG2.sbj: cohort 2 (only with oddball; same as good2.sbj)
 %   -goodEEG.sbj: cohort 1+2 (only with oddball)
-SBJ_id = 'test_ratings';
+SBJ_id = 'ratings_all';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Pre-Processing
@@ -77,8 +77,9 @@ save_fig  = 1;
 fig_ftype = 'png';
 
 % Fig. 1A: Example RT Histogram
-SBJ       = 'colin_test1';
-BHV02_plot_RT_hist(SBJ,proc_id,save_fig,'fig_ftype',fig_ftype);
+for s = 1:numel(SBJs)
+    BHV02_plot_RT_hist(SBJs{s},proc_id,save_fig,'fig_ftype',fig_ftype);
+end
 
 % Fig. 1C: Group Accuracy
 conditions = 'Dif';
@@ -104,7 +105,7 @@ fig_ftype = 'png';
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         % Run model
-%         SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
+        SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
         
         % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
         SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...

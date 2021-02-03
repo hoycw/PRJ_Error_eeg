@@ -6,6 +6,8 @@ function SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_id,stat_ids,null_id,pl
 %   SBJ_id [str] - ID of subject list for group
 %   an_id [str] - ID of the analysis parameters to use
 %   stat_ids [cell array] - string IDs of the stats parameters to compare
+%       Try to add the main model last, since it will overlay others
+%       3 model colors: magenta, lime green, black (otherwise R,G,B,etc.)
 %   null_id [str] - ID of the SBJonly baseline model to compare
 %   plt_id [str] - ID of the plotting parameters to use
 %   save_fig [0/1] - binary flag to save figure
@@ -14,8 +16,13 @@ function SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_id,stat_ids,null_id,pl
 %           default: 'on'
 %       fig_ftype [str] - file extension for saving fig
 %           default: 'png'
+%       rm_null [0/1] - binary flag to subtract out null model with only random intercepts
+%           default: 0
 %       plot_null [0/1] - binary flag to plot null model with only random intercepts
 %           default: 0
+%       mean_reg [cell array] - {reg_lab, stat_id} to center 50ms win for mean AIC and relative likelihoods
+%       mean_win [2x1 array] - [start, stop] times in sec for averaging AIC and computing relative likelihoods
+%           default: whole time series
 % OUTPUTS:
 %   saves figure
 
@@ -36,6 +43,12 @@ if ~isempty(varargin)
             fig_vis = varargin{v+1};
         elseif strcmp(varargin{v},'fig_ftype') && ischar(varargin{v+1})
             fig_ftype = varargin{v+1};
+        elseif strcmp(varargin{v},'mean_reg')
+            mean_reg = varargin{v+1};
+        elseif strcmp(varargin{v},'mean_win')
+            mean_win = varargin{v+1};
+        elseif strcmp(varargin{v},'rm_null')
+            rm_null = varargin{v+1};
         elseif strcmp(varargin{v},'plot_null')
             plot_null = varargin{v+1};
         else
@@ -47,8 +60,13 @@ end
 % Define default options
 if ~exist('fig_vis','var');   fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
+if ~exist('rm_null','var'); rm_null = 0; end
 if ~exist('plot_null','var'); plot_null = 1; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
+if rm_null && plot_null
+    warning('Removing SBJonly null, so it cannot be plotted');
+    plot_null = 0;
+end
 
 %% Analysis and Plotting Parameters
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
@@ -99,7 +117,19 @@ cfgs = []; cfgs.latency = sts{1}.stat_lim;
 st_roi = ft_selectdata(cfgs, roi);
 st_time_vec = st_roi.time{1};
 ch_list = st_roi.label;
-st_colors = distinguishable_colors(numel(stat_ids));
+if numel(stat_ids)==3
+    % magenta, lime green, black; dark orange = [217,95,2]; mauve purple = [117,112,179]
+    st_colors = [[231,41,138]./256; [102,166,30]./256; [0 0 0]];
+else
+    st_colors = distinguishable_colors(numel(stat_ids));
+end
+if exist('mean_win','var')
+    [~, start_ix] = min(abs(st_time_vec-mean_win(1)));
+    [~, stop_ix] = min(abs(st_time_vec-mean_win(2)));
+    aic_win_idx = start_ix:stop_ix;
+else
+    aic_win_idx = 1:numel(st_time_vec);
+end
 
 %% Load Models
 % Load real models
@@ -114,6 +144,25 @@ null_aic = zeros(size(st_time_vec));
 tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' null_id '_' an_id '.mat']);
 for t_ix = 1:numel(st_time_vec)
     null_aic(t_ix) = tmp.lme{t_ix}.ModelCriterion.AIC;
+end
+
+% Grab peak time
+if exist('mean_reg','var')
+    % Select regressor and stat_id
+    stat_id_ix = strcmp(stat_ids,mean_reg{2});
+    [reg_lab, ~, ~, ~]  = fn_regressor_label_styles(sts{stat_id_ix}.model_lab);
+    reg_ix = find(strcmp(reg_lab,mean_reg{1}));
+    % Select betas
+    beta_ts = nan(size(st_time_vec));
+    for t_ix = 1:numel(st_time_vec)
+        beta_ts(t_ix) = lmes{stat_id_ix,t_ix}.Coefficients.Estimate(reg_ix+1);
+    end
+    % Obtain peak times for target regressor
+    [~,pk_ix] = max(abs(beta_ts));
+    [~,start_ix] = min(abs(st_time_vec-st_time_vec(pk_ix)+0.025));
+    [~,stop_ix]  = min(abs(st_time_vec-st_time_vec(pk_ix)-0.025));
+    aic_win_idx = start_ix:stop_ix;
+    mean_win = [st_time_vec(start_ix) st_time_vec(stop_ix)];
 end
 
 %% Plot Model Comparisons
@@ -132,7 +181,10 @@ for ch_ix = 1:numel(ch_list)
         for t_ix = 1:numel(st_time_vec)
             aics(st_ix,t_ix) = lmes{st_ix,t_ix}.ModelCriterion.AIC;
         end
-        mean_aic(st_ix) = nanmean(aics(st_ix,:));
+        if rm_null
+            aics(st_ix,:) = aics(st_ix,:) - null_aic;
+        end
+        mean_aic(st_ix) = nanmean(aics(st_ix,aic_win_idx));
     end
     
     % Compute relative likelihoods
@@ -153,9 +205,9 @@ for ch_ix = 1:numel(ch_list)
     
     %% Create plot
     fig_name = [SBJ_id '_RL_AIC_comparison_' an_id];
-    if plot_null
-        fig_name = [fig_name '_null'];
-    end
+    if exist('mean_reg','var'); fig_name = [fig_name '_' mean_reg{1} '_' mean_reg{2}]; end
+    if rm_null; fig_name = [fig_name '_rmNull']; end
+    if plot_null; fig_name = [fig_name '_null']; end
     figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
     
@@ -177,12 +229,27 @@ for ch_ix = 1:numel(ch_list)
     end
     ylims = ylim;
     
+    % Plot AIC Stats Window
+    if exist('mean_win','var') 
+        patch([mean_win(1) mean_win(1) mean_win(2) mean_win(2)],...
+            [ylims(1) ylims(2) ylims(2) ylims(1)],[0.5 0.5 0.5],'FaceAlpha',0.2);
+    end
+    
     % Axes and Labels
-    ax.YLabel.String = 'AIC';
+    if rm_null
+        ax.YLabel.String = 'Relative AIC';
+    else
+        ax.YLabel.String = 'AIC';
+    end
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';
-    title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')']);
+    if exist('mean_win','var')
+        title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) '); mean win = [' ...
+            num2str(mean_win(1)) '-' num2str(mean_win(2)) ']']);
+    else
+        title([ch_list{ch_ix} ' (n=' num2str(numel(SBJs)) ')']);
+    end
     if plt.legend
         legend(main_lines,st_leg,'Location','best','Interpreter','none');%plt.legend_loc
     end

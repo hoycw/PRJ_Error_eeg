@@ -12,6 +12,10 @@ function SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_id,stat_id,plt_id,s
 %   plt_id [str] - ID of the plotting parameters to use
 %   save_fig [0/1] - binary flag to save figure
 %   varargin:
+%       erp_win_name [cell array] - names of windows overlaid on ERPs using patch
+%           options: {'N2','P3'}; will be 100 ms
+%       beta_win_name [cell array] - names of windows overlaid on betas using patch
+%           options: reg_labs matching the model; will be 50 ms
 %       fig_vis [str] - {'on','off'} to visualize figure on desktop
 %           default: 'on'
 %       fig_ftype [str] - file extension for saving fig
@@ -40,6 +44,10 @@ if ~isempty(varargin)
             fig_ftype = varargin{v+1};
         elseif strcmp(varargin{v},'plot_median')
             plot_median = varargin{v+1};
+        elseif strcmp(varargin{v},'erp_win_name') && iscell(varargin{v+1})
+            erp_win_name = varargin{v+1};
+        elseif strcmp(varargin{v},'beta_win_name') && iscell(varargin{v+1})
+            beta_win_name = varargin{v+1};
         else
             error(['Unknown varargin ' num2str(v) ': ' varargin{v}]);
         end
@@ -51,6 +59,8 @@ if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ~exist('plot_median','var'); plot_median = 0; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
+if exist('erp_win_name','var'); erp_win_width = 0.1; end
+if exist('beta_win_name','var'); beta_win_width = 0.05; end
 
 %% Analysis and Plotting Parameters
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
@@ -115,6 +125,7 @@ end
 
 %% Plot Results
 fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/' stat_id '/' plt_id '/'];
+if exist('erp_win_name','var') || exist('beta_win_name','var'); fig_dir = [fig_dir 'win_overlay/']; end
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
@@ -167,6 +178,37 @@ for ch_ix = 1:numel(ch_list)
         end
     end
     
+    % Get ERP Windows
+    if exist('erp_win_name','var')
+        erp_pk_time = nan(size(erp_win_name));
+        % Load ERP (averaged across all conditions)
+        tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_All_' an_id '.mat']);
+        for win_ix = 1:numel(erp_win_name)
+            if strcmp(erp_win_name{win_ix},'N2')
+                cfgs = []; cfgs.latency = [0.18 0.3];
+                erp_pk_sign = -1;
+            elseif strcmp(erp_win_name{win_ix},'P3')
+                cfgs = []; cfgs.latency = [0.25 0.5];
+                erp_pk_sign = 1;
+            end
+            
+            % Obtain peak times in window
+            st_erp = ft_selectdata(cfgs,tmp.er_grp{1});
+            [~,pk_ix] = max(st_erp.avg*erp_pk_sign);
+            erp_pk_time(win_ix) = st_erp.time(pk_ix);
+        end
+    end
+    
+    % Get Beta Windows
+    if exist('beta_win_name','var')
+        beta_pk_time = nan(size(beta_win_name));
+        for win_ix = 1:numel(beta_win_name)
+            % Obtain peak times for target regressor
+            [~,pk_ix] = max(abs(plot_betas(strcmp(reg_lab,beta_win_name{win_ix}),:)));
+            beta_pk_time(win_ix) = st_time_vec(pk_ix);
+        end
+    end
+    
     %% Create plot
     fig_name = [SBJ_id '_' stat_id '_' ch_list{ch_ix}];
     if plot_median; fig_name = [fig_name '_med']; end
@@ -180,75 +222,94 @@ for ch_ix = 1:numel(ch_list)
     
     % Plot ERP Means (and variance)
     cond_lines = cell(size(cond_lab));
-    main_lines = gobjects([numel(cond_lab)+sum(sig_reg)+numel(plt.evnt_lab) 1]);
+    if exist('erp_win_name','var')
+        main_lines = gobjects([numel(cond_lab)+numel(plt.evnt_lab) 1]);
+    else
+        main_lines = gobjects([numel(cond_lab)+sum(sig_reg)+numel(plt.evnt_lab) 1]);
+    end
+    main_line_ix = 0;
     for cond_ix = 1:numel(cond_lab)
+        main_line_ix = main_line_ix + 1;
         cond_lines{cond_ix} = shadedErrorBar(time_vec, plot_means(cond_ix,:), sems(cond_ix,:),...
             'lineProps',{'Color',cond_colors{cond_ix},'LineWidth',plt.mean_width,...
             'LineStyle',cond_styles{cond_ix}},'patchSaturation',plt.errbar_alpha);
-        main_lines(cond_ix) = cond_lines{cond_ix}.mainLine;
+        main_lines(main_line_ix) = cond_lines{cond_ix}.mainLine;
     end
     
     % Fix y limits to be consistent across channels
-    if any(strcmp(SBJ_id,{'good1','goodall'}))
+    if exist('erp_win_name','var')
+        ylims = [-10 30];
+    elseif any(strcmp(SBJ_id,{'good1','goodall'}))
         ylims = [-15 30];
     else
         ylims = ylim;
     end
     
-    % Find min/max error bars to plot significant epochs underneath
-    if strcmp(plt.sig_type,'line')
-        data_lim = [min(min(plot_means-sems)) max(max(plot_means+sems))];
-    end
-    
-    % Plot Significance per Regressor
-    sig_reg_ix = find(sig_reg);
-    for r = 1:numel(sig_reg_ix)
-        reg_ix = sig_reg_ix(r);
-        for sig_ix = 1:size(sig_chunks{reg_ix},1)
-            if strcmp(plt.sig_type,'line')
-                % Plot horizontal line beneath/above the ERPs
-                sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
-                if strcmp(plt.sig_loc,'below')
-                    sig_y = data_lim(1) + reg_ix*data_lim(1)*plt.sig_loc_factor;
-                elseif strcmp(plt.sig_loc,'above')
-                    sig_y = data_lim(2) + reg_ix*data_lim(2)*plt.sig_loc_factor;
+    if ~exist('erp_win_name','var')
+        % Find min/max error bars to plot significant epochs underneath
+        if strcmp(plt.sig_type,'line')
+            data_lim = [min(min(plot_means-sems)) max(max(plot_means+sems))];
+        end
+        
+        % Plot Significance per Regressor
+        sig_reg_ix = find(sig_reg);
+        for r = 1:numel(sig_reg_ix)
+            main_line_ix = main_line_ix + 1;
+            reg_ix = sig_reg_ix(r);
+            for sig_ix = 1:size(sig_chunks{reg_ix},1)
+                if strcmp(plt.sig_type,'line')
+                    % Plot horizontal line beneath/above the ERPs
+                    sig_times = st_time_vec(sig_chunks{reg_ix}(sig_ix,1):sig_chunks{reg_ix}(sig_ix,2));
+                    if strcmp(plt.sig_loc,'below')
+                        sig_y = data_lim(1) + reg_ix*data_lim(1)*plt.sig_loc_factor;
+                    elseif strcmp(plt.sig_loc,'above')
+                        sig_y = data_lim(2) + reg_ix*data_lim(2)*plt.sig_loc_factor;
+                    end
+                    sig_line = line(sig_times,repmat(sig_y,size(sig_times)),...
+                        'LineWidth',plt.sig_width,'Color',reg_colors{reg_ix},...
+                        'LineStyle',reg_styles{reg_ix});
+                    if sig_ix==1
+                        main_lines(main_line_ix) = sig_line;
+                    end
+                elseif strcmp(plt.sig_type,'patch')
+                    % Plot rectangular patch over epoch
+                    if reg_ix>1; warning('Why use patch sig with more than 1 group???'); end
+                    patch(w2.time([sig_chunks{reg_ix}(sig_ix,1) sig_chunks{reg_ix}(sig_ix,1) ...
+                        sig_chunks{reg_ix}(sig_ix,2) sig_chunks{reg_ix}(sig_ix,2)]),...
+                        [ylims(1) ylims(2) ylims(2) ylims(1)],...
+                        plt.sig_color,'FaceAlpha',plt.sig_alpha);
+                elseif strcmp(plt.sig_type,'bold')
+                    % Bold the ERP time series
+                    error('bold sig type not ready');
+                    % sig_times = sig_chunks{grp_ix}(sig_ix,1):sig_chunks{grp_ix}(sig_ix,2);
+                    % for cond_ix = 1:numel(cond_lab)
+                    %   line(sig_times,means(ch_ix,sig_chunks{grp_ix}(sig_ix,1):sig_chunks{grp_ix}(sig_ix,2)),...
+                    %       'Color',cond_colors{cond_ix},'LineStyle',plt.sig_style,...
+                    %       'LineWidth',plt.sig_width);
+                    % end
+                else
+                    error('unknown sig_type');
                 end
-                sig_line = line(sig_times,repmat(sig_y,size(sig_times)),...
-                    'LineWidth',plt.sig_width,'Color',reg_colors{reg_ix},...
-                    'LineStyle',reg_styles{reg_ix});
-                if sig_ix==1
-                    main_lines(numel(cond_lab)+r) = sig_line;
-                end
-            elseif strcmp(plt.sig_type,'patch')
-                % Plot rectangular patch over epoch
-                if reg_ix>1; warning('Why use patch sig with more than 1 group???'); end
-                patch(w2.time([sig_chunks{reg_ix}(sig_ix,1) sig_chunks{reg_ix}(sig_ix,1) ...
-                    sig_chunks{reg_ix}(sig_ix,2) sig_chunks{reg_ix}(sig_ix,2)]),...
-                    [ylims(1) ylims(2) ylims(2) ylims(1)],...
-                    plt.sig_color,'FaceAlpha',plt.sig_alpha);
-            elseif strcmp(plt.sig_type,'bold')
-                % Bold the ERP time series
-                error('bold sig type not ready');
-%                 sig_times = sig_chunks{grp_ix}(sig_ix,1):sig_chunks{grp_ix}(sig_ix,2);
-%                 for cond_ix = 1:numel(cond_lab)
-%                     line(sig_times,means(ch_ix,sig_chunks{grp_ix}(sig_ix,1):sig_chunks{grp_ix}(sig_ix,2)),...
-%                         'Color',cond_colors{cond_ix},'LineStyle',plt.sig_style,...
-%                         'LineWidth',plt.sig_width);
-%                 end
-            else
-                error('unknown sig_type');
             end
+        end
+    else
+        % Plot ERP window overlays
+        for win_ix = 1:numel(erp_win_name)
+            patch([erp_pk_time(win_ix)-erp_win_width/2, erp_pk_time(win_ix)-erp_win_width/2 ...
+                erp_pk_time(win_ix)+erp_win_width/2, erp_pk_time(win_ix)+erp_win_width/2], ...
+                [ylims(1) ylims(2) ylims(2) ylims(1)], plt.sig_color, 'FaceAlpha',plt.sig_alpha);
         end
     end
     
     % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
-        main_lines(numel(cond_lab)+sum(sig_reg)+evnt_ix) = line(...
-            [evnt_times(evnt_ix) evnt_times(evnt_ix)],[-15 30],...%ylim,...
+        main_line_ix = main_line_ix + 1;
+        main_lines(main_line_ix) = line(...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylims,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end    
-    if strcmp(plt.sig_type,'line')
+    if strcmp(plt.sig_type,'line') && ~exist('erp_win_name','var')
         leg_lab = [cond_lab reg_lab(sig_reg) plt.evnt_lab];
     else
         leg_lab = [cond_lab plt.evnt_lab];
@@ -263,18 +324,22 @@ for ch_ix = 1:numel(ch_list)
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
-    % Fix y limits to be consistent across channels
-    if any(strcmp(SBJ_id,{'good1','goodall'}))
-        ylims = [-15 30];
-    else
-        ylims = ylim;
-    end
     set(gca,'FontSize',16);
     axes(1).YLim = ylims;
     
     %% Plot Betas
     subplot(6,1,4:5);
     axes(2) = gca; hold on;
+    
+    % Fix y limits to be consistent across channels
+    clear ylims
+    if strcmp(SBJ_id,'goodall') && strcmp(st.model_lab,'ERPEsL')
+        ylims = [-3 5];
+    elseif strcmp(SBJ_id,'good1') && strcmp(st.model_lab,'ERPEsL')
+        ylims = [-4 6];
+    elseif strcmp(SBJ_id,'good2') && strcmp(st.model_lab,'ERPEsL')
+        ylims = [-3 4];
+    end
     
     % Plot Model Betas
     beta_lines = gobjects([numel(reg_lab)+numel(plt.evnt_lab) 1]);
@@ -293,10 +358,21 @@ for ch_ix = 1:numel(ch_list)
         end
     end
     
+    % Plot Window Overlays
+    if ~exist('ylims','var'); ylims = ylim; end
+    if exist('beta_win_name','var')
+        for win_ix = 1:numel(beta_win_name)
+            patch([beta_pk_time(win_ix)-beta_win_width/2, beta_pk_time(win_ix)-beta_win_width/2 ...
+                beta_pk_time(win_ix)+beta_win_width/2, beta_pk_time(win_ix)+beta_win_width/2], ...
+                [ylims(1) ylims(2) ylims(2) ylims(1)], plt.sig_color, 'FaceAlpha',plt.sig_alpha,...
+                'EdgeColor',reg_colors{strcmp(reg_lab,beta_win_name{win_ix})},'LineWidth',2);
+        end
+    end
+    
     % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
         beta_lines(numel(reg_lab)+evnt_ix) = line(...
-            [evnt_times(evnt_ix) evnt_times(evnt_ix)],[-4 6],...%ylim,...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylims,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end    
@@ -310,14 +386,6 @@ for ch_ix = 1:numel(ch_list)
     % axes(2).Title.String  = 'Model Weights';
     if plt.legend
         legend(beta_lines,[reg_lab plt.evnt_lab],'Location',plt.legend_loc);
-    end
-    % Fix y limits to be consistent across channels
-    if strcmp(SBJ_id,'goodall')
-        ylims = [-3 5];
-    elseif strcmp(SBJ_id,'good1')
-        ylims = [-4 6];
-    else
-        ylims = ylim;
     end
     set(gca,'FontSize',16);
     axes(2).YLim = ylims;
