@@ -113,8 +113,6 @@ switch model_id
         labels = {'EV','uRPE'};
     case 'ERPEsL'
         labels = {'EV','sRPE','uRPE','Lik'};
-    case 'ERPEsLA'
-        labels = {'EV','sRPE','uRPE','Lik','ERB','rough','mxS','mnS','mxdS','mndS'};
     case 'ERPEsiti'
         labels = {'EV','sRPE','uRPE','ITI'};
     case 'ERPEsscr'
@@ -133,8 +131,18 @@ switch model_id
         labels = {'rough'};
     case 'ERBr'
         labels = {'ERB','rough'};
+    case 'Kayser'
+        labels = {'mxS','mnS','mxdS','mndS'};
     case 'AudSal'
         labels = {'ERB','rough','mxS','mnS','mxdS','mndS'};
+    case 'ERBsRPE'
+        labels = {'sRPE','ERB'};
+    case 'rsRPE'
+        labels = {'sRPE','rough'};
+    case 'ERBrsRPE'
+        labels = {'sRPE','ERB','rough'};
+    case 'ASsRPE'
+        labels = {'sRPE','ERB','rough','mxS','mnS','mxdS','mndS'};
     
     % RL models with alternative accuracy
 %     case 'RLbA'
