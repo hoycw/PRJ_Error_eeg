@@ -7,6 +7,12 @@ function SBJ04a_RL_model(SBJ,proc_id,stat_id)
 %   violin plots of regressors by condition (SBJ_modelID_reg_cond.png)
 % Expected value computation excludes neutral (surprise) outcomes
 % Accounts for paradigm restarts (e.g., after crash), excludes training
+% -------------------------------------------------------------------------
+% WARNING: bhv.sound was added during revisions, and SBJ02a and SBJ02c
+%   were not re-run to propagate that field to SBJ_behav_final.mat.
+%   Instead, trial sounds are taken directly via fn_load_behav_csv here
+%   when loading the original trial list, then added to the model in the
+%   right order.
 % INPUTS:
 %   SBJ [str] - ID of subject to run
 %   proc_id [str] - ID of preprocessing pipeline
@@ -32,6 +38,14 @@ function SBJ04a_RL_model(SBJ,proc_id,stat_id)
 %   ========== Extra Unused Control Regressors ==========
 %   score: cumulative score across the experiment
 %   ITI: inter-trial interval on the previous trial
+%   ========== Extra Auditory Salience Regressors ==========
+%   ERB: "equivalent rectangular bandwidth", roughly loudness
+%   roughness: Sijia 2019 JNeuro- strongly correlates with subjective
+%       salience and physiological index of saleince (pupil dilation)
+%   maxSalience: max amplitude in Kayser (2006) salience map model
+%   meanSalience: mean amplitude in Kayser (2006) salience map model
+%   maxGradient:  max change in time in Kayser (2006) salience map model
+%   meanGradient: mean change in time in Kayser (2006) salience map model
 %   ========== Unused Performance (RT) Regressors ==========
 %       These are all log transformed since humans perceive distance in log scale
 %       Precision decreases with distance, error = precision^-1
@@ -305,6 +319,54 @@ if any(strcmp(reg_lab,'score'))
     end
 end
 
+%% Compute Auditory Salience Features (via Sijia Zhao)
+% Check if any auditory salience regressors are requested
+if ~isempty(intersect(reg_lab,{'ERB','rough','mxS','mnS','mxdS','mndS'}))
+    % Load auditory salience features
+    aud_sal = fn_load_auditory_salience([root_dir 'PRJ_Error_eeg/scripts/auditory_salience_output.csv']);
+    
+    % Initialize variables
+    sal_reg_lab = intersect(reg_lab,{'ERB','rough','mxS','mnS','mxdS','mndS'});
+    for reg_ix = 1:numel(sal_reg_lab)
+        eval([sal_reg_lab{reg_ix} ' = nan(size(bhv.trl_n));']);
+    end
+    
+    for trl_ix = 1:numel(bhv.trl_n)
+        % Get sound name
+        sound_name = bhv_orig.sound{bhv_orig.trl_n==bhv.trl_n(trl_ix)};
+        
+        % ERB "loudness"
+        if any(strcmp(reg_lab,'ERB'))
+            ERB(trl_ix) = aud_sal.ERB(strcmp(aud_sal.sound,[sound_name '.wav']));
+        end
+        
+        % Roughness
+        if any(strcmp(reg_lab,'rough'))
+            rough(trl_ix) = aud_sal.rough(strcmp(aud_sal.sound,[sound_name '.wav']));
+        end
+        
+        % Max Salience
+        if any(strcmp(reg_lab,'mxS'))
+            mxS(trl_ix) = aud_sal.mxS(strcmp(aud_sal.sound,[sound_name '.wav']));
+        end
+        
+        % Mean Salience
+        if any(strcmp(reg_lab,'mnS'))
+            mnS(trl_ix) = aud_sal.mnS(strcmp(aud_sal.sound,[sound_name '.wav']));
+        end
+        
+        % Max Gradient (delta salience)
+        if any(strcmp(reg_lab,'mxdS'))
+            mxdS(trl_ix) = aud_sal.mxdS(strcmp(aud_sal.sound,[sound_name '.wav']));
+        end
+        
+        % Mean Gradient (delta salience)
+        if any(strcmp(reg_lab,'mndS'))
+            mndS(trl_ix) = aud_sal.mndS(strcmp(aud_sal.sound,[sound_name '.wav']));
+        end
+    end
+end
+
 %% Distance from Target
 % Signed Target Distance (RT - target_time to center for early/late)
 % Unsigned version is just total error without early/late information
@@ -413,7 +475,7 @@ if any(strcmp(reg_lab,'uThPr'))
     uThPr = abs(uThPr);
 end
 
-%% Inter-Trial Interval (from previosu trial
+%% Inter-Trial Interval (from previous trial
 ITI = bhv.ITI_type;
 % Remove ITI on first trial of the block due to extended delay
 ITI(ITI==0) = nan;

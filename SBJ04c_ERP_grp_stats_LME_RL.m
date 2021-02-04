@@ -161,9 +161,19 @@ for s = 1:numel(SBJs)
     sbj_model = NaN([sum(full_cond_idx{s}~=0) size(tmp.model,2)]);
     if st.z_reg
         for reg_ix = 1:numel(reg_lab)
-            sbj_model(:,reg_ix) = ...
-                (tmp.model(full_cond_idx{s}~=0,reg_ix)-nanmean(tmp.model(full_cond_idx{s}~=0,reg_ix)))./...
-                nanstd(tmp.model(full_cond_idx{s}~=0,reg_ix));
+            if strcmp(st.model_cond,'DifFB') && ~strcmp(st.stat_cond,'DifFB')
+                % Model was run on all trials, but using subset here
+                sbj_model(:,reg_ix) = ...
+                    (tmp.model(full_cond_idx{s}~=0,reg_ix)-nanmean(tmp.model(full_cond_idx{s}~=0,reg_ix)))./...
+                    nanstd(tmp.model(full_cond_idx{s}~=0,reg_ix));
+            elseif strcmp(st.model_cond,st.stat_cond)
+                % Model and Stats on same trials, order matches
+                sbj_model(:,reg_ix) = ...
+                    (tmp.model(:,reg_ix)-nanmean(tmp.model(:,reg_ix)))./...
+                    nanstd(tmp.model(:,reg_ix));
+            else
+                error(['Mismatch between st.model_cond ' st.model_cond ' and st.stat_cond ' st.stat_cond]);
+            end
         end
     else
         sbj_model = tmp.model(full_cond_idx{s}~=0,:);

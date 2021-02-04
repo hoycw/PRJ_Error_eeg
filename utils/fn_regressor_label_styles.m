@@ -39,6 +39,7 @@ regressors  = {...
     'EV','bAcc','rAcc','rAcc10','score',... % Outcome predictors
     'sRPE','uRPE',... % Reward Feedback
     'Lik',... % Outcome Likelihood
+    'ERB','rough','mxS','mnS','mxdS','mndS', ... % Auditory salience properties (via Sijia Zhao)
     'ITI', ... % preceding inter-trial interval
     'SBJ' ... % SBJ only null model (baseline model fit using only SBJ random intercepts)
     };
@@ -47,6 +48,7 @@ regressor_names = {...
     'Expected Value','Block Accuracy','Rolling Accuracy','Rolling Accuracy 10','Total Score',...
     'RPE Value','RPE Magnitude',...
     'Likelihood',...
+    'Loudness','Roughness','Max Salience','Mean Salience','Max dSalience','Mean dSalience',...
     'ITI', ...
     'SBJ' ...
     };
@@ -55,6 +57,8 @@ regressor_colors = {...
     [0 0 0], [0 0 0], [0 0 0], [0 0 0], [0.4 0.4 0.4],... % dark blue, blacks, gray
     [209 151 105]./255, [118 160 156]./255, ... % tan, teal
     [152 78 163]./255,... % purple
+    [231,41,138]./255, [102,166,30]./255, ... %magenta, lime green
+    [217,95,2]./255, [217,95,2]./255, [117,112,179]./255, [117,112,179]./255, ... % dark orange, mauve purple
     [0.3 0.3 0.3], ...   % dark gray
     [0.3 0.3 0.3] ...   % dark gray
     };
@@ -63,6 +67,7 @@ regressor_markers = {...
     'x','x','x','x','^',...
     's','d',...
     '*',...
+    '*','*','*','*','*','*',...
     'v','v'...
     };
 
@@ -108,6 +113,8 @@ switch model_id
         labels = {'EV','uRPE'};
     case 'ERPEsL'
         labels = {'EV','sRPE','uRPE','Lik'};
+    case 'ERPEsLA'
+        labels = {'EV','sRPE','uRPE','Lik','ERB','rough','mxS','mnS','mxdS','mndS'};
     case 'ERPEsiti'
         labels = {'EV','sRPE','uRPE','ITI'};
     case 'ERPEsscr'
@@ -118,6 +125,16 @@ switch model_id
         labels = {'Val','Lik','Mag','sRPE'};
     case 'VMLRPEsL'
         labels = {'Val','Lik','Mag','EV','sRPE','uRPE','Lik'};
+        
+    % Auditory Salience Features
+    case 'ERB'
+        labels = {'ERB'};
+    case 'rough'
+        labels = {'rough'};
+    case 'ERBr'
+        labels = {'ERB','rough'};
+    case 'AudSal'
+        labels = {'ERB','rough','mxS','mnS','mxdS','mndS'};
     
     % RL models with alternative accuracy
 %     case 'RLbA'
@@ -175,7 +192,7 @@ end
 unique_colors = unique(vertcat(colors{:}),'rows');
 if size(unique_colors,1)~=numel(labels)
     for reg_ix = 1:numel(labels)
-        if any(strcmp(labels{reg_ix},{'Val','Mag'}))
+        if any(strcmp(labels{reg_ix},{'Val','Mag','mnS','mndS'}))
             line_styles{reg_ix} = ':';
         elseif strcmp(labels{reg_ix},'Sign')
             line_styles{reg_ix} = '-.';

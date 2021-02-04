@@ -119,7 +119,7 @@ st_time_vec = st_roi.time{1};
 ch_list = st_roi.label;
 if numel(stat_ids)==3
     % magenta, lime green, black; dark orange = [217,95,2]; mauve purple = [117,112,179]
-    st_colors = [[231,41,138]./256; [102,166,30]./256; [0 0 0]];
+    st_colors = [[231,41,138]./255; [102,166,30]./255; [0 0 0]];
 else
     st_colors = distinguishable_colors(numel(stat_ids));
 end

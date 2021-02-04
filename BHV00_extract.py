@@ -23,8 +23,8 @@ SBJ = sys.argv[1]#raw_input('Enter SBJ ID to process:')#'EEG01'
 
 
 # In[3]:
-prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
-#prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
+#prj_dir = '/Users/sheilasteiner/Desktop/Knight_Lab/PRJ_Error_eeg/'
+prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
 fig_type = '.png'
 data_dir = prj_dir+'data/'
@@ -140,6 +140,7 @@ print 'tolerance_lim:', prdm['tol_lim']
 # In[8]:
 
 resp_lines = [line for line in log if line.find('Outcome=')!=-1]
+sound_lines = [line for line in log if line.find('SOUND =')!=-1]
 data = pd.DataFrame({'Block': [line[line.find('B')+1] for line in resp_lines],
                      'Trial': [int(line[line.find('_T')+2:line.find(':')]) for line in resp_lines],
                      'Feedback': ['W' if line.count('WIN')>0 else \
@@ -147,10 +148,15 @@ data = pd.DataFrame({'Block': [line[line.find('B')+1] for line in resp_lines],
                                   'S' for line in resp_lines],
                      'RT': [line[line.find('RT')+5:line.find('RT')+5+13].strip() for line in resp_lines],
                      'Tolerance': [float(line[line.find('tol')+12:line.find('\n')]) for line in resp_lines],
-                     'Timestamp': [float(line[:line.find('.')+4]) for line in resp_lines]})
+                     'Timestamp': [float(line[:line.find('.')+4]) for line in resp_lines],
+                     'Sound': [line[line.find('sounds/')+7:line.find('.wav')] for line in sound_lines]
+                     })
 
 # Fix Reversals, Block, and missed RTs
 for ix in range(len(data)):
+    # Fix Surprise sounds
+    if data['Sound'][ix].find('\\')!=-1:
+        data.loc[ix,'Sound'] = data['Sound'][ix][data['Sound'][ix].find('\\')+1:]
     # Fix RTs
     if data['RT'][ix][0:2]=='-1':#No response
         data.loc[ix,'RT'] = -1
