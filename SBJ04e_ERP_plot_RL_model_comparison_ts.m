@@ -117,7 +117,17 @@ cfgs = []; cfgs.latency = sts{1}.stat_lim;
 st_roi = ft_selectdata(cfgs, roi);
 st_time_vec = st_roi.time{1};
 ch_list = st_roi.label;
-if numel(stat_ids)==3
+if all(strcmp(stat_ids,{'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5','EsRPEL_DifFB_lme_st05t5','ERPEs_DifFB_lme_st05t5','ERPEsL_DifFB_lme_st05t5'}))
+    % Special Case for Fig. 2 ERP Model Comparison:
+    st_colors = [[166,86,40]./255; ...     % Solid Brown for value outcome model
+                 [166,86,40]./255; ...     % Dashed Brown for sign outcome model
+                 [152 78 163]./255; ...     % Purple for EV+sRPE+Lik model
+                 [118 160 156]./255; ...    % Teal for EV+sRPE+uRPE model
+                 [0 0 0]                    % Black for main model
+                 ];
+    st_styles = {':','-','-','-','-'};
+    st_widths = [3,3,3,3,2];
+elseif numel(stat_ids)==3
     % magenta, lime green, black; dark orange = [217,95,2]; mauve purple = [117,112,179]
     st_colors = [[231,41,138]./255; [102,166,30]./255; [0 0 0]];
 else
@@ -217,8 +227,13 @@ for ch_ix = 1:numel(ch_list)
     % Plot AIC per model
     main_lines = gobjects(size(stat_ids));
     for st_ix = 1:numel(stat_ids)
-        main_lines(st_ix) = line(st_time_vec, aics(st_ix,:),...
-            'Color',st_colors(st_ix,:),'LineWidth',2);
+        if exist('st_styles','var')
+            main_lines(st_ix) = line(st_time_vec, aics(st_ix,:),...
+                'Color',st_colors(st_ix,:),'LineWidth',st_widths(st_ix),'LineStyle',st_styles{st_ix});
+        else
+            main_lines(st_ix) = line(st_time_vec, aics(st_ix,:),...
+                'Color',st_colors(st_ix,:),'LineWidth',2);
+        end
     end
     
     % Plot null model AIC

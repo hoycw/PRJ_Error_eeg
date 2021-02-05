@@ -73,6 +73,7 @@ regressor_markers = {...
 
 %% Convert model_id into set of conditions
 switch model_id
+    %======================================================================
     % Categorical Outcome Features
     case 'S'
         labels = {'Sign'};
@@ -89,6 +90,7 @@ switch model_id
     case 'SML'
         labels = {'Sign','Mag','Lik'};
     
+    %======================================================================
     % RL models without EV
     case 'sRPE'
         labels = {'sRPE'};
@@ -102,6 +104,7 @@ switch model_id
     case 'RSVPE'
         labels = {'Sign','Val','sRPE'};
         
+    %======================================================================
     % RL models with EV
     case 'ERPEs'
         labels = {'EV','sRPE','uRPE'};
@@ -118,32 +121,37 @@ switch model_id
     case 'ERPEsscr'
         labels = {'EV','score','sRPE','uRPE'};
         
+    %======================================================================
     % Combinations of Outcome and RL models
     case 'VMLsRPE'
         labels = {'Val','Lik','Mag','sRPE'};
     case 'VMLRPEsL'
         labels = {'Val','Lik','Mag','EV','sRPE','uRPE','Lik'};
         
+    %======================================================================
     % Auditory Salience Features
+    %   Only ERB should be used because "loudness" is different across my
+    %   sounds, making the other features uninterpretable (even if they fit)
     case 'ERB'
         labels = {'ERB'};
-    case 'rough'
-        labels = {'rough'};
-    case 'ERBr'
-        labels = {'ERB','rough'};
-    case 'Kayser'
-        labels = {'mxS','mnS','mxdS','mndS'};
-    case 'AudSal'
-        labels = {'ERB','rough','mxS','mnS','mxdS','mndS'};
+%     case 'rough'
+%         labels = {'rough'};
+%     case 'ERBr'
+%         labels = {'ERB','rough'};
+%     case 'Kayser'
+%         labels = {'mxS','mnS','mxdS','mndS'};
+%     case 'AudSal'
+%         labels = {'ERB','rough','mxS','mnS','mxdS','mndS'};
     case 'ERBsRPE'
         labels = {'sRPE','ERB'};
-    case 'rsRPE'
-        labels = {'sRPE','rough'};
-    case 'ERBrsRPE'
-        labels = {'sRPE','ERB','rough'};
-    case 'ASsRPE'
-        labels = {'sRPE','ERB','rough','mxS','mnS','mxdS','mndS'};
+%     case 'rsRPE'
+%         labels = {'sRPE','rough'};
+%     case 'ERBrsRPE'
+%         labels = {'sRPE','ERB','rough'};
+%     case 'ASsRPE'
+%         labels = {'sRPE','ERB','rough','mxS','mnS','mxdS','mndS'};
     
+    %======================================================================
     % RL models with alternative accuracy
 %     case 'RLbA'
 %         labels = {'bAcc','sRPE','uRPE'};
@@ -156,10 +164,12 @@ switch model_id
 %     case 'RLrApW'
 %         labels = {'rAcc','pWin','sRPE','uRPE'};
     
+    %======================================================================
     % Null SBJ only control model
     case 'SBJonly'
         labels = {'SBJ'};
         
+    %======================================================================
     % Previous Trial Regressors:
 %     case 'RLpT'
 %         error('why running with previous trial regressors?');
