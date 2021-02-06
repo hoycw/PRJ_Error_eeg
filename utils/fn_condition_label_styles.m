@@ -72,6 +72,8 @@ switch grp_id
         labels = {'AllNeg'};
     case 'AllPos'
         labels = {'AllPos'};
+    case 'AllLrg'
+        labels = {'AllLrg'};
     case 'Dif'                          % Difficulty
         labels = {'Ez', 'Hd'};
     case {'OutS','FB'}                  % Feedback (includes neutral)

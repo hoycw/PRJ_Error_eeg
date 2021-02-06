@@ -19,13 +19,15 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';%'goodall';%'good2';%
+SBJ_id = 'goodall';%'good1';%'good2';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% ERP: Mean Window LME
 % Main RL Model
+% an_id    = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+% stat_ids = {'ERPEsL_DifFB_lme_erpmn1P3'};%'EsRPEL_DifFB_lme_erpmn1P3','ERPEs_DifFB_lme_erpmn1P3',
 an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids = {'ERPEsL_DifFB_lme_erpmn1FRN'};
+stat_ids = {'ERPEsL_DifFB_lme_erpmn1FRN'};%'SML_DifFB_lme_erpmn1FRN','VML_DifFB_lme_erpmn1FRN',
 
 plt_id    = 'bar_sigStar';
 null_id   = 'SBJonly_all_lme_mn1FRN';
@@ -33,12 +35,12 @@ null_id   = 'SBJonly_all_lme_mn1FRN';
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for st_ix = 1:numel(stat_ids)
     if ~isempty(strfind(stat_ids{st_ix},'erpmn'))
         % Average across ERPs (e.g., stat_id = 'ERPEsL_DifFB_lme_erpmn1FRN')
-        SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_ids{st_ix});
+%         SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_ids{st_ix});
     else
         % Average across single trials (e.g., stat_id = 'ERPEsL_DifFB_lme_mn1FRN')
         %   Not used because literature typically averages over ERPs, not
@@ -47,12 +49,12 @@ for st_ix = 1:numel(stat_ids)
     end
     
     % Sup. Fig. 1C: Plot mean window betas
-    SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Plot mean window betas with data as bar plot
-%     SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_data',1);
+    SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_data',1);
 end
 
 % Run SBJonly null model for baseline model performance
@@ -67,8 +69,7 @@ end
 %% ERP: Peak-to-Peak LME
 % Main RL Model
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids  = {'ERPEsL_DifFB_lme_p2pFRN'};
-
+stat_ids  = {'ERPEsL_DifFB_lme_p2pFRN'};% 'SML_DifFB_lme_p2pFRN','VML_DifFB_lme_p2pFRN',
 plot_peaks= 1;
 plt_id    = 'bar_sigStar';
 
@@ -79,15 +80,15 @@ fig_ftype = 'svg';
 
 for st_ix = 1:numel(stat_ids)
     % Compute peak-to-peak FRN metric and run RL model via LME
-    SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
+%     SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
     
     % Sup. Fig. 1D: Plot RL model coefficients for peak-to-peak FRN metric
-    SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
     % Plot RL model coefficients and data from peak-to-peak FRN metric
-%     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_data',1,'plot_latencies',1);
+    SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_data',1);%,'plot_latencies',1);
 end
 
 % Model Comparison Plots (Adjusted R-Squared) for FRN point estimates

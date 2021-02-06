@@ -81,7 +81,7 @@ for st_ix = 1:numel(stat_ids)
     if st_ix>1
         fnames = fieldnames(sts{st_ix});
         for f_ix = 1:numel(fnames)
-            if ~any(strcmp(fnames{f_ix},{'model_lab','z_reg'}))
+            if ~any(strcmp(fnames{f_ix},{'model_lab','z_reg','model_id'}))
                 if ischar(sts{st_ix}.(fnames{f_ix}))
                     if ~strcmp(sts{1}.(fnames{f_ix}), sts{st_ix}.(fnames{f_ix}))
                         error(['st.' fnames{f_ix} ' not the same!']);
@@ -141,7 +141,7 @@ for st_ix = 1:numel(stat_ids)
     
     % Check analysis type
     if st_ix==1
-        if strcmp(sts{st_ix}.measure,'mean')
+        if any(strcmp(sts{st_ix}.measure,{'mean','erp_mean'}))
             st_lim = sts{st_ix}.stat_lim + tmp.reg_pk_time;
             measure_str = [sts{1}.measure '(' num2str(st_lim(1)) '-' num2str(st_lim(2)) ')'];
         elseif strcmp(sts{st_ix}.measure,'p2p')
