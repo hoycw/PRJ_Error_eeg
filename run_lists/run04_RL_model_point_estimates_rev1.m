@@ -25,9 +25,9 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 %% ERP: Mean Window LME
 % Main RL Model
 % an_id    = 'ERP_Pz_F2t1_dm2t0_fl05t20';
-% stat_ids = {'ERPEsL_DifFB_lme_erpmn1P3'};%'EsRPEL_DifFB_lme_erpmn1P3','ERPEs_DifFB_lme_erpmn1P3',
+% stat_ids = {'EsRPEL_DifFB_lme_erpmn1P3','ERPEs_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
 an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids = {'ERPEsL_DifFB_lme_erpmn1FRN'};%'SML_DifFB_lme_erpmn1FRN','VML_DifFB_lme_erpmn1FRN',
+stat_ids = {'VML_DifFB_lme_erpmn1FRN','SML_DifFB_lme_erpmn1FRN','ERPEsL_DifFB_lme_erpmn1FRN'};%
 
 plt_id    = 'bar_sigStar';
 null_id   = 'SBJonly_all_lme_mn1FRN';
@@ -53,30 +53,35 @@ for st_ix = 1:numel(stat_ids)
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Plot mean window betas with data as bar plot
-    SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_data',1);
+%     SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_data',1);
 end
 
+% Model Comparison Plots (Adjusted R-Squared)
+SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'AIC',save_fig,...
+    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'rm_null',0,'plot_null',0);
+SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'R2',save_fig,...
+    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
+
+%--------------------------------------------------------------------------
+% Not finished! Needs to be adapted to mean window and possibly P2P
 % Run SBJonly null model for baseline model performance
 % SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_id,null_id);
 
-% Model Comparison Plots (Adjusted R-Squared)
-% SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'AIC',save_fig,...
-%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
-% SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'R2',save_fig,...
-%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
-% 
+% % SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id,plt_id,'AIC',save_fig,...
+% %     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'rm_null',1,'plot_null',0);
+
 %% ERP: Peak-to-Peak LME
 % Main RL Model
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids  = {'ERPEsL_DifFB_lme_p2pFRN'};% 'SML_DifFB_lme_p2pFRN','VML_DifFB_lme_p2pFRN',
+stat_ids  = {'VML_DifFB_lme_p2pFRN','SML_DifFB_lme_p2pFRN','ERPEsL_DifFB_lme_p2pFRN'};% 
 plot_peaks= 1;
 plt_id    = 'bar_sigStar';
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for st_ix = 1:numel(stat_ids)
     % Compute peak-to-peak FRN metric and run RL model via LME
@@ -87,15 +92,15 @@ for st_ix = 1:numel(stat_ids)
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
     % Plot RL model coefficients and data from peak-to-peak FRN metric
-    SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_data',1);%,'plot_latencies',1);
+%     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_data',1);%,'plot_latencies',1);
 end
 
 % Model Comparison Plots (Adjusted R-Squared) for FRN point estimates
-% SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'AIC',save_fig,...
-%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
-% SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'R2',save_fig,...
-%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
+SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'AIC',save_fig,...
+    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
+SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'R2',save_fig,...
+    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',0);
 
 %% Peak Latency Regression
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
@@ -121,8 +126,8 @@ end
 
 %% FRN Metric Comparison: FRN by Condition
 % Sup. Fig. 1B
-an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids  = {'ERPEsL_DifFB_lme_mn1FRN','ERPEsL_DifFB_lme_p2pFRN'};
+an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
+stat_ids  = {'ERPEsL_DifFB_lme_erpmn1FRN','ERPEsL_DifFB_lme_p2pFRN','ERPEsL_DifFB_lme_erpmn1P3'};
 
 proc_id   = 'eeg_full_ft';
 plt_id    = 'line_cond';
@@ -131,11 +136,11 @@ fig_vis   = 'on';
 fig_ftype = 'svg';
 
 % Sup. Fig. 1B: Plot mean window and peak-to-peak FRN point estimates
-SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_id,stat_ids,plt_id,save_fig,...
+SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_ids,stat_ids,plt_id,save_fig,...
     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 % Plot peak-to-peak FRN and mean window (with mirrored y axis) point estimates for comparison
-SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_id,stat_ids,plt_id,save_fig,...
-    'fig_vis',fig_vis,'fig_ftype',fig_ftype,'mirror_mean',1);
+% SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_id,stat_ids,plt_id,save_fig,...
+%     'fig_vis',fig_vis,'fig_ftype',fig_ftype,'mirror_mean',1);
 
 

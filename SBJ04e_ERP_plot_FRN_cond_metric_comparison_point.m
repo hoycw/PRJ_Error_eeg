@@ -1,4 +1,4 @@
-function SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_id,stat_ids,plt_id,save_fig,varargin)
+function SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_ids,stat_ids,plt_id,save_fig,varargin)
 %% Plots point estimates for FRN by condition to compare FRN metrics
 %   Should be used to compare mean window and peak-to-peak metrics
 %   Options: for either metric, invert the data or the axis on which it's plotted
@@ -6,7 +6,7 @@ function SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_id,s
 %   Only for single channel
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
-%   an_id [str] - ID of the analysis parameters to use
+%   an_ids [cell array] - string IDs of the analysis parameters to use
 %   stat_ids [cell array] - string IDs of the stats parameters to plot
 %   null_id [str] - ID of the SBJonly baseline model to compare
 %   plt_id [str] - ID of the plotting parameters to use
@@ -70,17 +70,25 @@ if mirror_p2p && flip_p2p; error('why flip and mirror p2p?'); end
 if mirror_mean && flip_mean; error('why flip and mirror mean window?'); end
 
 %% Analysis and Plotting Parameters
-an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
-eval(an_vars_cmd);
 plt_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/plt_vars/' plt_id '_vars.m'];
 eval(plt_vars_cmd);
 
 % Select SBJs
 SBJs = fn_load_SBJ_list(SBJ_id);
 
-% Load stat parameters and check compatibility
-sts        = cell(size(stat_ids));
+% Load analysis and stat parameters and check compatibility
+if numel(an_ids)~=numel(stat_ids); error('Input an_id for each stat_id!'); end
+an_vars = cell(size(an_ids));
+sts     = cell(size(stat_ids));
+ch_list = cell(size(an_ids));
 for st_ix = 1:numel(stat_ids)
+    % Load analysis ID
+    an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_ids{st_ix} '_vars.m'];
+    eval(an_vars_cmd);
+    an_vars{st_ix} = an;
+    ch_list{st_ix} = an_vars{st_ix}.ROI{1};
+    
+    % Load stat ID
     stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' stat_ids{st_ix} '_vars.m'];
     eval(stat_vars_cmd);
     sts{st_ix} = st;
@@ -92,7 +100,8 @@ for st_ix = 1:numel(stat_ids)
             error('st.stat_cond does not match!');
         end
     end
-    clear st stat_vars_cmd
+    
+    clear an st stat_vars_cmd
 end
 
 % Get Plotting Parameters
@@ -119,20 +128,16 @@ end
 st_styles = {'-','--',':'};
 flip_str = '';
 
-% Load example data to initialize channel list
-load([root_dir 'PRJ_Error_EEG/data/' SBJs{1} '/04_proc/' SBJs{1} '_' an_id '.mat'],'roi');
-ch_list = roi.label;
-if numel(ch_list)>1; error('only for 1 channel now...'); end
-
-%% Load FRN Data
+%% Load Point Estimate Data
 data        = cell(size(stat_ids));
 measure_str = cell(size(stat_ids));
 for st_ix = 1:numel(stat_ids)
-    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_ids{st_ix} '_' an_id '.mat']);
-    if strcmp(sts{st_ix}.measure,'mean')
+    tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' stat_ids{st_ix} '_' an_ids{st_ix} '.mat']);
+    if ~strcmp(tmp.ch_list{1},ch_list{st_ix}); error('stat_id and an_id ROI/channel mismatch!'); end
+    if any(strcmp(sts{st_ix}.measure,{'mean','erp_mean'}))
         % Set plotting labels
         st_lim = sts{st_ix}.stat_lim + tmp.reg_pk_time;
-        measure_str{st_ix} = ['Mean[' num2str(st_lim(1)) '-' num2str(st_lim(2)) ' s]'];
+        measure_str{st_ix} = [ch_list{st_ix} ' Mean[' num2str(st_lim(1)) '-' num2str(st_lim(2)) ' s]'];
         if flip_mean; measure_str{st_ix} = [measure_str{st_ix} '*-1']; end
         if mirror_mean; measure_str{st_ix} = [measure_str{st_ix} ' (mirror)']; end
         
@@ -143,10 +148,10 @@ for st_ix = 1:numel(stat_ids)
         cfgs.avgovertime = 'yes';
         for s = 1:numel(SBJs)
             % Load data
-            fprintf('========================== Mean Window: %s ==========================\n',SBJs{s});
+            fprintf('========================== %s Mean Window: %s ==========================\n',tmp.ch_list{1},SBJs{s});
             load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
                 SBJs{s} '_behav_' proc_id '_final.mat'],'bhv');
-            load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',an_id,'.mat'],'roi');
+            load([root_dir 'PRJ_Error_eeg/data/',SBJs{s},'/04_proc/',SBJs{s},'_',an_ids{st_ix},'.mat'],'roi');
             
             % Average data in window of interest
             st_roi = ft_selectdata(cfgs, roi);
@@ -166,7 +171,7 @@ for st_ix = 1:numel(stat_ids)
         end
     elseif strcmp(sts{st_ix}.measure,'p2p')
         % Set plotting labels
-        measure_str{st_ix} = 'Peak-to-Peak';
+        measure_str{st_ix} = [ch_list{st_ix} ' Peak-to-Peak'];
         if flip_p2p; measure_str{st_ix} = [measure_str{st_ix} '*-1']; end
         if mirror_p2p; measure_str{st_ix} = [measure_str{st_ix} ' (mirror)']; end
         data{st_ix} = tmp.data;
@@ -203,7 +208,7 @@ for st_ix = 1:numel(stat_ids)
 end
 
 %% Plot Model Performance
-fig_name = [SBJ_id '_FRN_metric_comparison_' an_id flip_str mir_str];
+fig_name = [SBJ_id '_FRN_metric_comparison_' strjoin(ch_list,'-') flip_str mir_str];
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
 if mirror_p2p || mirror_mean; set(gcf,'defaultAxesColorOrder',[plt.nonmirror_color; plt.mirror_color]); end
@@ -242,7 +247,7 @@ for st_ix = 1:numel(stat_ids)
         end
     else
         ax = gca; hold on;
-        ax.YLabel.String = 'FRN Amplitude (uV)';
+        ax.YLabel.String = 'Amplitude (uV)';
     end
     
     % Plot point estimate data for easy blocks
@@ -262,7 +267,7 @@ ax.XLim          = [0 numel(cond_lab)+1];
 ax.XTick         = 1:numel(cond_lab);
 ax.XTickLabel    = cond_names;
 ax.XLabel.String = 'Conditions';
-ax.Title.String  = ['FRN Metric Comparison (' ch_list{1} '; n = ' num2str(numel(SBJs)) ')'];
+ax.Title.String  = ['Point Metric Comparison (n = ' num2str(numel(SBJs)) ')'];
 set(ax,'FontSize',16');
 
 legend(st_lines,measure_str,'Location',plt.leg_loc,'Interpreter','none');
@@ -270,7 +275,7 @@ set(gca,'FontSize',16);
 
 %% Save figure
 if save_fig
-    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/FRN_point_estimates/' strjoin(stat_ids,'-') '/' plt_id '/'];
+    fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' strjoin(an_ids,'-') '/FRN_point_estimates/' strjoin(stat_ids,'-') '/' plt_id '/'];
     if ~exist(fig_dir,'dir')
         mkdir(fig_dir);
     end

@@ -18,6 +18,8 @@ function SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,null_id
 %           default: 'png'
 %       plot_null [0/1] - binary flag to plot null model with only random intercepts
 %           default: 0
+%       rm_null [0/1] - binary flag to subtract out null model with only random intercepts
+%           default: 0
 %       r2_version [str] - {'Adjusted' or 'Ordinary'} version of R2
 %           default: 'Adjusted'
 % OUTPUTS:
@@ -42,6 +44,8 @@ if ~isempty(varargin)
             fig_ftype = varargin{v+1};
         elseif strcmp(varargin{v},'plot_null')
             plot_null = varargin{v+1};
+        elseif strcmp(varargin{v},'rm_null')
+            rm_null = varargin{v+1};
         elseif strcmp(varargin{v},'r2_version')
             % 'Ordinary' or 'Adjusted' (default)
             r2_version = varargin{v+1};
@@ -55,8 +59,13 @@ end
 if ~exist('fig_vis','var'); fig_vis = 'on'; end
 if ~exist('fig_ftype','var'); fig_ftype = 'png'; end
 if ~exist('plot_null','var'); plot_null = 1; end
+if ~exist('rm_null','var'); rm_null = 0; end
 if ~exist('r2_version','var'); r2_version = 'Adjusted'; end
 if ischar(save_fig); save_fig = str2num(save_fig); end
+if rm_null && plot_null
+    warning('Removing SBJonly null, so it cannot be plotted');
+    plot_null = 0;
+end
 
 %% Analysis and Plotting Parameters
 an_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/an_vars/' an_id '_vars.m'];
@@ -105,7 +114,7 @@ for st_ix = 1:numel(stat_ids)
 end
 
 % Load SBJonly null model
-if plot_null
+if plot_null || rm_null
     stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' null_id '_vars.m'];
     eval(stat_vars_cmd);
     null_st = st;
@@ -153,7 +162,7 @@ for st_ix = 1:numel(stat_ids)
 end
 
 % Load null model
-if plot_null
+if plot_null || rm_null
     tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' null_id '_' an_id '.mat']);
     if strcmp(metric,'AIC')
         null_data = tmp.(sts{1}.an_style){1}.ModelCriterion.AIC;
@@ -164,8 +173,13 @@ if plot_null
     end
 end
 
+% Remove null
+if rm_null
+    data = data - null_data;
+end
+
 %% Plot Model Comparisons
-if plot_null
+if plot_null || rm_null
     fig_dir = [root_dir 'PRJ_Error_eeg/results/ERP/' an_id '/model_comparisons/' strjoin(stat_ids,'-')...
         '/' null_id '/' plt_id '/'];
 else
@@ -205,6 +219,8 @@ end
 fig_name = [SBJ_id '_RL_' metric '_comparison_' an_id];
 if plot_null
     fig_name = [fig_name '_null'];
+elseif rm_null
+    fig_name = [fig_name '_rmNull'];
 end
 figure('Name',fig_name,'units','normalized',...
     'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
@@ -244,7 +260,11 @@ end
 % Axes and Labels
 ax.YLim          = [min(plot_data)-y_range*plt.sig_yfudge...
                     max(plot_data)+y_range*plt.sig_yfudge];
-ax.YLabel.String = metric;
+if rm_null
+    ax.YLabel.String = ['Relative ' metric];
+else
+    ax.YLabel.String = metric;
+end
 ax.XLim          = [0 numel(plot_ids)+1];
 ax.XTick         = 1:numel(plot_ids);
 ax.XTickLabel    = plot_ids;
