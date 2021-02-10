@@ -10,7 +10,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good2';%'goodEEG1';
+SBJ_id = 'goodOB';%'good2';%'goodEEG1';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Run preprocessing
@@ -40,7 +40,7 @@ an_ids     = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
 conditions = 'OB';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'png';
+fig_ftype  = 'svg';
 
 for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
@@ -59,7 +59,7 @@ for an_ix = 1:numel(an_ids)
     % SBJ03c_ERP_plot_grp_butterfly(SBJs,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
     %     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
-    close all;
+%     close all;
 end
 
 %% ERPs: Full Cap Topography
@@ -68,7 +68,7 @@ an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
 conditions = 'OB';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'png';
+fig_ftype  = 'svg';
 
 for s = 1:numel(SBJs)
 %     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);

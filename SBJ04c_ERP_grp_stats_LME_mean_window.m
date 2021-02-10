@@ -105,7 +105,11 @@ if any(strcmp(st.measure,{'mean','erp_mean'}))
         end
         
         % Obtain peak times for target regressor
-        reg_ix = find(strcmp(reg_lab,st.pk_reg_id));
+        real_st = st;
+        eval(['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/' real_st.pk_stat_id '_vars.m']);
+        pk_st = st; st = real_st;
+        [pk_reg_lab, ~, ~, ~] = fn_regressor_label_styles(pk_st.model_lab);
+        reg_ix = find(strcmp(pk_reg_lab,st.pk_reg_id));
         pk_ts = nan(size(tmp.time_vec));
         for t_ix = 1:numel(tmp.time_vec)
             pk_ts(t_ix) = tmp.lme{t_ix}.Coefficients.Estimate(reg_ix+1);

@@ -6,8 +6,8 @@ function SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_id
 % COMPUTATIONS:
 %   Load OB and TT ERP features
 %       Optional: z-score regressors across group
-%   Run general linear model with OB features predicting each TT condition
-%   Correct for multiple comparisons (FDR for regressors)
+%   Run between OB features and each TT condition
+%   Correct for multiple comparisons (FDR for ???)
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
 %   tt_proc_id [str] - ID of target time preprocessing pipeline
@@ -16,8 +16,9 @@ function SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_id
 %       st.model   = feat_id for OB ERP features
 %       st.measure = feat_id for TT ERP features
 % OUTPUTS:
-%   glm [cell array] - GeneralLinearModel output class, one cell per channel
-%   qvals [float array] - [n_regressors, n_chan/n_time] p values adjusted for multiple comparisons 
+%   cond_corr [float array] - [n_OB_features, n_TT_cond] correlation values
+%   cond_pval [float array] - [n_OB_features, n_TT_cond] p values
+%   cond_qval [float array] - [n_OB_features, n_TT_cond] q values (FDR adjusted for n_TT_cond)
 %   SBJs [cell array] - list of SBJs used in this analysis (for double checks)
 
 %% Set up paths
@@ -100,7 +101,6 @@ tt_amp = erp_amp;
 fprintf('========================== Running Correlations ==========================\n');
 cond_corr = nan([numel(ft.name) numel(cond_lab)]);
 cond_pval = nan([numel(ft.name) numel(cond_lab)]);
-cond_qval = nan([numel(ft.name) numel(cond_lab)]);
 for ft_ix = 1:numel(ft.name)
     for cond_ix = 1:numel(cond_lab)
         % Compute correlation
@@ -112,16 +112,17 @@ for ft_ix = 1:numel(ft.name)
         cond_corr(ft_ix,cond_ix) = tmp_r(1,2);
         cond_pval(ft_ix,cond_ix) = tmp_p(1,2);
     end
-    
-    % Correct for Multiple Comparisons
-    if strcmp(st.mcp_method,'FDR')
-        [~, ~, ~, cond_qval(ft_ix,:)] = fdr_bh(cond_pval(ft_ix,:));
-    else
-        error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
-    end
 end
 
-%% Plot Regression results
+% Correct for Multiple Comparisons
+if strcmp(st.mcp_method,'FDR')
+    [~, ~, ~, qvals] = fdr_bh(reshape(cond_pval,[size(cond_pval,1)*size(cond_pval,2) 1]));
+    cond_qval = reshape(qvals,[size(cond_pval,1) size(cond_pval,2)]);
+else
+    error(['Unknown method for multiple comparison correction: ' st.mcp_method]);
+end
+
+%% Plot Correlation results
 for ft_ix = 1:numel(ft.name)
     fig_name = [SBJ_id '_' stat_id '_' ft.name{ft_ix} '_amp_fits'];
     figure('Name',fig_name,'units','normalized',...

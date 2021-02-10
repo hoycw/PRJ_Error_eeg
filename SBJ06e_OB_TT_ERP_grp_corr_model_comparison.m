@@ -1,5 +1,5 @@
 function SBJ06e_OB_TT_ERP_grp_corr_model_comparison(SBJ_id,tt_proc_id,ob_proc_id,stat_id,model_id,varargin)
-%% Plot OB-TT ERP correlations versus model regressors per condition
+%% Plot OB-TT ERP correlations versus TT RL model regressors per condition
 % COMPUTATIONS:
 %   Load OB and TT ERP features
 %   Load model regressors and average within condition

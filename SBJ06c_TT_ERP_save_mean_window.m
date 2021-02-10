@@ -150,7 +150,7 @@ if all(isfield(ft,{'pk_reg_id','pk_stat_id'}))
     % Load previous stats
     tmp = load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' ft.pk_stat_id '_' ft.pk_an_id '.mat']);
     if numel(tmp.SBJs)~=numel(SBJs) || ~all(strcmp(tmp.SBJs,SBJs))
-        error(['Not same SBJs in ' stat_id ' and ' ft.pk_stat_id]);
+        error(['Not same SBJs in ' SBJ_id ' for ' ft.pk_stat_id]);
     end
     
     % Obtain peak times for target regressor

@@ -18,6 +18,7 @@ function SBJ06d_OB_TT_ERP_grp_stats_reg(SBJ_id,tt_proc_id,ob_proc_id,stat_id,var
 %   glm [cell array] - GeneralLinearModel output class, one cell per channel
 %   qvals [float array] - [n_regressors, n_chan/n_time] p values adjusted for multiple comparisons 
 %   SBJs [cell array] - list of SBJs used in this analysis (for double checks)
+error('TT ERPs are too correlated, use SBJ06d_corr_pt instead of this script');
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];

@@ -27,7 +27,8 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 % an_id    = 'ERP_Pz_F2t1_dm2t0_fl05t20';
 % stat_ids = {'EsRPEL_DifFB_lme_erpmn1P3','ERPEs_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
 an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids = {'VML_DifFB_lme_erpmn1FRN','SML_DifFB_lme_erpmn1FRN','ERPEsL_DifFB_lme_erpmn1FRN'};%
+% stat_ids = {'VML_DifFB_lme_erpmn1FRN','SML_DifFB_lme_erpmn1FRN','ERPEsL_DifFB_lme_erpmn1FRN'};%
+stat_ids = {'EsRPEL_DifFB_lme_erpmn05Lik','ERPEs_DifFB_lme_erpmn05Lik','ERPEsL_DifFB_lme_erpmn05Lik'};%
 
 plt_id    = 'bar_sigStar';
 null_id   = 'SBJonly_all_lme_mn1FRN';
@@ -40,7 +41,7 @@ fig_ftype = 'png';
 for st_ix = 1:numel(stat_ids)
     if ~isempty(strfind(stat_ids{st_ix},'erpmn'))
         % Average across ERPs (e.g., stat_id = 'ERPEsL_DifFB_lme_erpmn1FRN')
-%         SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_ids{st_ix});
+        SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_ids{st_ix});
     else
         % Average across single trials (e.g., stat_id = 'ERPEsL_DifFB_lme_mn1FRN')
         %   Not used because literature typically averages over ERPs, not
@@ -49,8 +50,8 @@ for st_ix = 1:numel(stat_ids)
     end
     
     % Sup. Fig. 1C: Plot mean window betas
-%     SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Plot mean window betas with data as bar plot
 %     SBJ04d_ERP_plot_stats_LME_mean_betas(SBJ_id,proc_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
