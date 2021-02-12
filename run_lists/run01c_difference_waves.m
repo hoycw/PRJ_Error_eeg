@@ -16,21 +16,21 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'good1';%'goodall';%
+SBJ_id = 'goodall';%'good1';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% ERPs: Fz and Pz over time
 %   RL Model Analysis:
-an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'
+an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%
 conditions = {'RewP','Pos-Neg','Large-Small','Unlik-Lik'};
 proc_id    = 'eeg_full_ft';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'png';%'svg';%
+fig_ftype  = 'png';%
 
 for an_ix = 1:numel(an_ids)
     for diff_ix = 1:numel(conditions)
-        plt_id     = 'stack_F2t1_evnt_c5';
+%         plt_id     = 'stack_F2t1_evnt_c5';
         for s = 1:numel(SBJs)
             % Plot SBJ difference waves
 %             SBJ03b_ERP_plot_diff(SBJs{s},conditions{diff_ix},proc_id,an_ids{an_ix},plt_id,save_fig,...
@@ -38,6 +38,7 @@ for an_ix = 1:numel(an_ids)
         end
         
         % Plot Group difference waves
+        plt_id = 'ts_F2t8_evnts_sigLine';
         SBJ03c_ERP_plot_diff_grp(SBJ_id,conditions{diff_ix},proc_id,an_ids{an_ix},plt_id,save_fig,...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
@@ -64,8 +65,8 @@ pk_lim  = [0.18 0.3];
 pk_sign = -1;
 
 for cond_ix = 1:numel(cond_list)
-    SBJ03c_ERP_plot_grp_pkLine(SBJ_id,cond_list{cond_ix},proc_id,an_id,pk_lim,pk_sign,...
-        plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ03c_ERP_plot_grp_pkLine(SBJ_id,cond_list{cond_ix},proc_id,an_id,pk_lim,pk_sign,...
+%         plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% Save Group ERPs to get data-driven analysis windows from ERP peak times
@@ -77,7 +78,7 @@ conditions = 'All';
 an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
 proc_id    = 'eeg_full_ft';
 
-SBJ03c_ERP_save_grp_ERP_cond(SBJ_id,conditions,proc_id,an_id);
+% SBJ03c_ERP_save_grp_ERP_cond(SBJ_id,conditions,proc_id,an_id);
 
 % NOTE: SBJ03c_ERP_save_grp_topo_cond does something similar but seems to
 % be unused... maybe it was a precursor to SBJ03c_ERP_plot_grp_topo_ts_cond?

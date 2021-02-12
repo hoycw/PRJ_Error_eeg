@@ -56,6 +56,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 % Select conditions (and trials)
 [cond_lab, cond_names, cond_colors, cond_styles, ~] = fn_condition_label_styles(conditions);
+[reg_lab, ~, reg_colors, ~]  = fn_regressor_label_styles('ERPEsL');
 
 % Create contrast:
 [diff_lab, diff_names, diff_pairs, diff_colors, diff_styles] = fn_condition_diff_label_styles(conditions);
@@ -182,7 +183,23 @@ for ch_ix = 1:numel(ch_list)
     %% Plot Difference Waves
     subplot(2,1,2); ax = gca; hold on;
     
-    % Plot ERP Means (and variance)
+    % Set color to match RL model and ylim for goodall Fz/Pz comparison
+    switch conditions
+        case 'RewP'
+            ylims = [-4 10];
+        case 'Pos-Neg'
+            ylims = [-5 20];
+            mean_color = reg_colors{strcmp(reg_lab,'sRPE')};
+        case 'Large-Small'
+            ylims = [-10 10];
+            mean_color = reg_colors{strcmp(reg_lab,'uRPE')};
+        case 'Unlik-Lik'
+            ylims = [-6 10];
+            mean_color = reg_colors{strcmp(reg_lab,'Lik')};
+    end
+    if ~strcmp(SBJ_id,'goodall'); clear ylims; end
+    
+    % Plot Difference Wave Grand Average (and variance)
     ebars = cell(size(diff_lab));
     main_lines = gobjects([numel(diff_lab)+numel(an.event_type) 1]);
     for pair_ix = 1:numel(diff_lab)
@@ -196,17 +213,18 @@ for ch_ix = 1:numel(ch_list)
     if numel(diff_lab)>1
         mn_diff_plot = 1;
         main_lines(numel(diff_lab)+mn_diff_plot) = line(time_vec, mean_diff, ...
-            'Color', 'r', 'LineWidth', 2);
+            'Color', mean_color, 'LineWidth', 3);
         leg_lab = [diff_names 'Mean'];
     else
         mn_diff_plot = 0;
         leg_lab = diff_names;
     end
+    if ~exist('ylims','var'); ylims = ylim; end
     
     % Plot Events
     for evnt_ix = 1:numel(plt.evnt_lab)
         main_lines(numel(diff_lab)+mn_diff_plot+evnt_ix) = line(...
-            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylims,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end
@@ -217,6 +235,7 @@ for ch_ix = 1:numel(ch_list)
     
     % Axes and Labels
     ax.YLabel.String = 'uV';
+    ax.YLim          = ylims;
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';

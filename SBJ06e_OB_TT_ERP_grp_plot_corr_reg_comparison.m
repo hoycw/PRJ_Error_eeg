@@ -216,6 +216,7 @@ set(gca,'XTickLabel',cond_names);
 set(gca,'YLim',[0.5 numel(ft.name)+0.5]);
 set(gca,'YTick',1:numel(ft.name));
 set(gca,'YTickLabel',ob_ft_names);
+set(gca,'YDir','reverse');
 title([st_ft.chan{1} ': ' st_ft.pk_model_lab ' ' st_ft.feat_lab ' (pFDR = 3*<' num2str(sig_cuts(3),'%.03f') '; 2*<' ...
     num2str(sig_cuts(2),'%.02f') '; *<' num2str(sig_cuts(1),'%.02f') ')'], 'interpreter', 'none');
 set(gca,'FontSize',16);

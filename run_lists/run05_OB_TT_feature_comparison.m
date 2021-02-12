@@ -50,7 +50,7 @@ for ft_ix = 1:numel(feat_ids)
         error('peak to peak is not reliable, so do not run this!');
 %         SBJ06a_OB_ERP_save_p2p(SBJ_id,proc_id,feat_ids{ft_ix});
     else
-        SBJ06a_OB_ERP_save_mean_window(SBJ_id,proc_id,feat_ids{ft_ix});
+%         SBJ06a_OB_ERP_save_mean_window(SBJ_id,proc_id,feat_ids{ft_ix});
     end
     
     % Plot correlations between ERP features before using as model predictors
@@ -91,7 +91,7 @@ stat_ids   = {...
 % plt_id    = 'bar_sigStar';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for st_ix = 1:numel(stat_ids)
 %     SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_ids{st_ix},...
