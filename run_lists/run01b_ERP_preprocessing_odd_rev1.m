@@ -40,7 +40,7 @@ an_ids     = {'ERP_Fz_S2t1_dm2t0_fl05t20','ERP_Pz_S2t1_dm2t0_fl05t20'};
 conditions = 'OB';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'svg';
+fig_ftype  = 'png';
 
 for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
@@ -51,7 +51,7 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Group ERP plot
-    plt_id     = 'ts_S2t1_evnts_sigLine';
+    plt_id     = 'ts_S2t8_evnts_sigLine';
     SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     

@@ -8,6 +8,7 @@ function SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_id
 %       Optional: z-score regressors across group
 %   Run between OB features and each TT condition
 %   Correct for multiple comparisons (FDR for ???)
+%   Plot scatter of OB vs. TT features per OB feature with linear fit
 % INPUTS:
 %   SBJ_id [str] - ID of subject list for group
 %   tt_proc_id [str] - ID of target time preprocessing pipeline
@@ -54,7 +55,7 @@ if ~exist('save_fig','var');   save_fig = 1; end
 %% Load Data 
 stat_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/stat_vars/OB_TT_feat/' stat_id '_vars.m'];
 eval(stat_vars_cmd);
-if ~strcmp(st.an_style,'corr'); error('This script is for correlation'); end
+if ~strcmp(st.an_style,'corr'); error('This script is for OB-TT correlation'); end
 
 % TT Feature Parameters
 stat_feat_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/feat_vars/' st.measure '_vars.m'];
@@ -97,7 +98,7 @@ load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' st.measure '_' tt_proc_id '.
 
 tt_amp = erp_amp;
 
-%% Run Linear Multiple Regression
+%% Run Correlation
 fprintf('========================== Running Correlations ==========================\n');
 cond_corr = nan([numel(ft.name) numel(cond_lab)]);
 cond_pval = nan([numel(ft.name) numel(cond_lab)]);

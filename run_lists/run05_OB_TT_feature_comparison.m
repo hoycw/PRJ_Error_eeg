@@ -91,23 +91,19 @@ stat_ids   = {...
 % plt_id    = 'bar_sigStar';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'png';
+fig_ftype = 'svg';
 
 for st_ix = 1:numel(stat_ids)
-    SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,...
-        stat_ids{st_ix},'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ06d_OB_TT_ERP_grp_stats_corr_pt(SBJ_id,tt_proc_id,ob_proc_id,stat_ids{st_ix},...
+%         'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
-    SBJ06e_OB_TT_ERP_grp_corr_model_comparison(SBJ_id,tt_proc_id,ob_proc_id,...
-        stat_ids{st_ix},model_id,'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ06e_OB_TT_ERP_grp_plot_corr_reg_comparison(SBJ_id,tt_proc_id,stat_ids{st_ix},model_id,...
+        'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
-
-% OLD VERSION:
-%     SBJ06d_OB_TT_ERP_grp_stats_reg(SBJ_id,tt_proc_id,ob_proc_id,...
-%         stat_ids{st_ix},'save_fig',save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 %% Oddball TFR feature extraction
 proc_id  = 'odd_full_ft';
-feat_ids = {'deltaRare_2t5'};%'thetaRare_2t4','deltaRare_3t5'};
+feat_ids = {'deltaRare_2t5','thetaRare_2t4'};%,'deltaRare_3t5'};
     %,'thetaOdd_2t4','thetaTar_2t4',...'deltaOdd_3t5','deltaTar_3t5'};
 %   an_id is specified in the feat struct (always 'ERP_all_S2t1_dm2t0_fl05t20')
 
@@ -134,9 +130,8 @@ end
 %% OB-TT TFR comparison
 tt_proc_id = 'eeg_full_ft';
 ob_proc_id = 'odd_full_ft';
-stat_ids   = {'thetaRare_2t4_DifFB_corr_thetaFRN_2t4'};
+stat_ids   = {'deltaRare_2t5_DifFB_corr_deltaP3_2t45'};%'thetaRare_2t4_DifFB_corr_thetaFRN_2t4'};
 %'thetaRare_2t4_DifFB_corr_thetaFRN_2t35','deltaRare_3t5_DifFB_corr_deltaP3_2t45'};
-    %'deltaRare_2t5_DifFB_corr_deltaP3_2t45'};
     
 save_fig  = 1;
 fig_vis   = 'on';
