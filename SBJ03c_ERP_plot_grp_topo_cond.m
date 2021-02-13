@@ -92,7 +92,11 @@ min_ch  = cell(size(cond_lab));
 min_val = nan(size(cond_lab));
 for cond_ix = 1:numel(cond_lab)
     tmp = ft_selectdata(cfgat,er_grp{cond_ix});
-    clim = [min([clim(1) min(tmp.avg)]) max([clim(2) max(tmp.avg)])];
+    if strcmp(SBJ_id,'goodOB')
+        clim = [-2 12];
+    else
+        clim = [min([clim(1) min(tmp.avg)]) max([clim(2) max(tmp.avg)])];
+    end
     [min_val(cond_ix), min_ch_ix] = min(tmp.avg);
     min_ch(cond_ix) = tmp.label(min_ch_ix);
     fprintf('\t%s Min = %.2f at %s\n',cond_lab{cond_ix},min_val(cond_ix),min_ch{cond_ix});

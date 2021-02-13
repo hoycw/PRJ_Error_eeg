@@ -68,7 +68,7 @@ an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
 conditions = 'OB';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'svg';
+fig_ftype  = 'png';
 
 for s = 1:numel(SBJs)
 %     SBJ03a_ERP_save(SBJs{s},proc_id,an_id);

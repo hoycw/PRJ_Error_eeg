@@ -89,6 +89,8 @@ switch model_id
         labels = {'Val','Mag','Lik'};
     case 'SML'
         labels = {'Sign','Mag','Lik'};
+    case 'VSML'
+        labels = {'Val','Sign','Mag','Lik'};
     
     %======================================================================
     % RL models without EV

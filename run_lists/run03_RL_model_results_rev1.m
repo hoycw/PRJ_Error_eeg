@@ -28,17 +28,18 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
 proc_id   = 'eeg_full_ft';
-stat_ids  = {'rsRPE_EHSu_lme_st05t5'};%'ERBsRPE_EHSu_lme_st05t5','ERBrsRPE_EHSu_lme_st05t5'};%'ERB_EHSu_lme_st0t5','ERBr_EHSu_lme_st0t5','rough_EHSu_lme_st0t5','AudSal_EHSu_lme_st0t5'};
+stat_ids  = {'VSML_DifFB_lme_st05t5'};
+% stat_ids  = {'rsRPE_EHSu_lme_st05t5'};%'ERBsRPE_EHSu_lme_st05t5','ERBrsRPE_EHSu_lme_st05t5'};%'ERB_EHSu_lme_st0t5','ERBr_EHSu_lme_st0t5','rough_EHSu_lme_st0t5','AudSal_EHSu_lme_st0t5'};
 % stat_ids  = {'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5'};%'ERPEs_DifFB_lme_st05t5'};%'uRPE_Neg_lme_st05t5'};%'ML_Neg_lme_st05t5'};%'ERPEsL_all_lme_st05t5'};
 % Alternative (worse) models: 'RSVPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','VML_all_lme_mn1FRN'
 fig_vis   = 'on';
 save_fig  = 1;
-fig_ftype = 'png';
+fig_ftype = 'svg';
 
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         % Run model
-        SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
+%         SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
         
         % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
 %         SBJ04b_BHV_RL_model_plot(SBJs{s},proc_id,stat_ids{st_ix},...
@@ -54,8 +55,8 @@ end
 % Sup. Fig. 1A: Plot model predicitons by condition across group
 plt_id    = 'line_cond';
 for st_ix = 1:numel(stat_ids)
-%     SBJ04b_plot_model_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ04b_RL_model_plot_grp_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
