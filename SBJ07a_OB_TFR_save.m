@@ -1,12 +1,13 @@
 function SBJ07a_OB_TFR_save(SBJ, ob_proc_id, tt_proc_id, an_id)
-%% Filter SBJ data to create time-frequency representation (TFR):
+%% Filter OB task SBJ data to create time-frequency representation (TFR):
 %   Reconstruct and clean raw data, filter, cut trials to event,
 %   baseline correct, select channels, save
 %   All analysis parameters set in an_vars, including filtering cfg_tfr
 %   If POW (an.avgoverfreq == 1), average across frequencies
 % INPUTS:
 %   SBJ [str] - ID of subject to run
-%   proc_id [str] - ID of preprocessing pipeline
+%   ob_proc_id [str] - ID of Oddball preprocessing pipeline
+%   tt_proc_id [str] - ID of Target Time preprocessing pipeline
 %   an_id [str] - ID of the analysis parameters to use
 % OUTPUTS:
 %   tfr [ft struct] - filtered data
