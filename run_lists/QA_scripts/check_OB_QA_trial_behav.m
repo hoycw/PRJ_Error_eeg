@@ -33,6 +33,7 @@ n_rt_out   = nan([numel(SBJs) numel(cond_lab)]);
 n_bad_ics  = nan(size(SBJs));
 n_bad_trl  = nan(size(SBJs));
 accuracy   = nan(size(SBJs));
+mean_rt    = zeros(size(SBJs));
 SBJ_colors = zeros([numel(SBJs) 3]);
 for s = 1:numel(SBJs)
     SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
@@ -62,19 +63,27 @@ for s = 1:numel(SBJs)
         n_rt_out(s,cond_ix) = sum(rts<proc.rt_bounds(1)) + sum(rts>proc.rt_bounds(2));
     end
     accuracy(s) = 1 - sum(n_miss_hit(s,:)+n_false_hit(s,:))/sum(n_trials(s,:));
+    mean_rt(s) = nanmean(bhv.rt(bhv.rt~=-1));
     
     clear SBJ_vars bhv cond_idx
 end
 
-% Compute outliers for bad trial count and accuracy
+%% Compute outliers for bad trial count and accuracy
 avg_bad_trl = nanmean(n_bad_trl);
 std_bad_trl = nanstd(n_bad_trl);
 avg_acc     = nanmean(accuracy);
 std_acc     = nanstd(accuracy);
+avg_rt      = nanmean(mean_rt);
+std_rt      = nanstd(mean_rt);
 for s = 1:numel(SBJs)
     if accuracy(s) <= avg_acc - std_acc*outlier_std_thresh
         fprintf(2,'%s bad for accuracy %.3f\n',SBJs{s},accuracy(s));
         SBJ_colors(s,:) = [1 0 0];
+    end
+    if mean_rt(s) <= avg_rt - std_rt*outlier_std_thresh || ...
+            mean_rt(s) >= avg_rt + std_rt*outlier_std_thresh
+        fprintf(2,'%s bad for mean_rt %.3f\n',SBJs{s},mean_rt(s));
+%         SBJ_colors(s,:) = [1 0 0];
     end
     if n_bad_trl(s) >= avg_bad_trl + std_bad_trl*outlier_std_thresh
         fprintf(2,'%s bad for n_bad_trl %d\n',SBJs{s},n_bad_trl(s));

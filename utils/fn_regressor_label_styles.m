@@ -148,8 +148,8 @@ switch model_id
         labels = {'sRPE','ERB'};
 %     case 'rsRPE'
 %         labels = {'sRPE','rough'};
-%     case 'ERBrsRPE'
-%         labels = {'sRPE','ERB','rough'};
+    case 'ERBrsRPE'
+        labels = {'sRPE','ERB','rough'};
 %     case 'ASsRPE'
 %         labels = {'sRPE','ERB','rough','mxS','mnS','mxdS','mndS'};
     

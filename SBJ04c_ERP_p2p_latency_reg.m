@@ -181,8 +181,8 @@ for reg_ix = 1:numel(reg_lab)
             ax.YLim = [0 2];
         case 'Lik'
             ax.YLim = [0 1];
-        otherwise
-            error(['Unknown reg_lab: ' reg_lab{reg_ix}]);
+%         otherwise
+%             error(['Unknown reg_lab: ' reg_lab{reg_ix}]);
     end
     
     % Plotting parameters

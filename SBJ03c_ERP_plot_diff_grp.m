@@ -130,19 +130,24 @@ for ch_ix = 1:numel(ch_list)
     
     %% Print summary stats
     fprintf('-------- Difference Wave Properties ----------\n');
-    diff_pk_times = NaN(size(diff_lab));
-    diff_pk_vals  = NaN(size(diff_lab));
     for pair_ix = 1:numel(diff_lab)
-        [~, max_ix] = max(abs(diff_means(pair_ix,:)));
-        diff_pk_times(pair_ix) = time_vec(max_ix);
-        diff_pk_vals(pair_ix) = diff_means(pair_ix,max_ix);
-        fprintf('\t(%d) %s [max, time] = [%.2f at %.3f]\n',pair_ix,diff_names{pair_ix},diff_pk_vals(pair_ix),diff_pk_times(pair_ix));
+        % Report max
+        [~, max_ix] = max(diff_means(pair_ix,:));
+        fprintf('\t(%d) %s [max, time] = [%.2f at %.3f]\n',pair_ix,diff_names{pair_ix},...
+            diff_means(pair_ix,max_ix),time_vec(max_ix));
+        
+        % Report min
+        [~, min_ix] = min(diff_means(pair_ix,:));
+        fprintf('\t(%d) %s [min, time] = [%.2f at %.3f]\n',pair_ix,diff_names{pair_ix},...
+            diff_means(pair_ix,min_ix),time_vec(min_ix));
     end
+    
+    % Report max/min for mean across condition pairs
     mean_diff = mean(diff_means,1);
-    [~, max_ix] = max(abs(mean_diff));
-    mn_pk_time = time_vec(max_ix);
-    mn_pk_val = mean_diff(max_ix);
-    fprintf('\t%s Overall (max, time) = [%.2f at %.3f]\n',conditions,mn_pk_val,mn_pk_time);
+    [~, max_ix] = max(mean_diff);
+    [~, min_ix] = min(mean_diff);
+    fprintf('\t%s Overall (max, time) = [%.2f at %.3f]\n',conditions,mean_diff(max_ix),time_vec(max_ix));
+    fprintf('\t%s Overall (min, time) = [%.2f at %.3f]\n',conditions,mean_diff(min_ix),time_vec(min_ix));
 
     %% Create ERP plot
     fig_name = [SBJ_id '_' conditions '_' an_id '_' ch_list{ch_ix}];    
