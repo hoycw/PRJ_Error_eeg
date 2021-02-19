@@ -23,7 +23,7 @@ ft_defaults
 %   -goodEEG1.sbj: cohort 1 (only with oddball)
 %   -goodEEG2.sbj: cohort 2 (only with oddball; same as good2.sbj)
 %   -goodEEG.sbj: cohort 1+2 (only with oddball)
-SBJ_id = 'ratings_all';
+SBJ_id = 'ratings_tmp';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Pre-Processing
