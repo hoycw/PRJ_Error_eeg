@@ -26,11 +26,11 @@ fprintf('\tReading behavioral csv file: %s\n',csv_fname);
 bhv_file = fopen(csv_fname);
 
 % Read field names
-py_fields  = {'Total_Trial', 'Block', 'Feedback', 'RT', 'Rating', 'Rating_RT', 'Timestamp', ...
-              'Tolerance', 'Trial', 'Hit', 'Score', 'bad_fb', 'Condition', 'ITI', 'ITI type'};
-new_fields = {'trl_n', 'blk', 'fb', 'rt', 'rating','rating_rt', 'time', 'tol', 'blk_trl_n', 'hit', ...
+py_fields  = {'Total_Trial', 'Block', 'Feedback', 'RT', 'Rating', 'Rating_RT', 'Rating_time_out', ...
+              'Timestamp', 'Tolerance', 'Trial', 'Hit', 'Score', 'bad_fb', 'Condition', 'ITI', 'ITI type'};
+new_fields = {'trl_n', 'blk', 'fb', 'rt', 'rating','rating_rt', 'rating_time_out', 'time', 'tol', 'blk_trl_n', 'hit', ...
               'score', 'bad_fb', 'cond', 'ITI', 'ITI_type'};
-bhv_fields = textscan(bhv_file, '%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s', 1, 'Delimiter', ',');
+bhv_fields = textscan(bhv_file, '%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s', 1, 'Delimiter', ',');
 
 % OLD filed formats:
 %py_fields  = {'Total_Trial', 'Block', 'Condition', 'Hit', 'RT', 'Timestamp', 'Tolerance', 'Trial', 'Score',  ...
@@ -49,8 +49,7 @@ for f = 1:numel(py_fields)
 end
 
 % Read data
-%   orig version: formatspec = '%d%d%s%d%f%f%f%d%d%f%s';
-bhv_data = textscan(bhv_file,'%d %d %s %f %f %f %f %f %d %d %d %s %s %f %f',...
+bhv_data = textscan(bhv_file,'%d %d %s %f %f %f %s %f %f %d %d %d %s %s %f %f',...
                 'Delimiter',',','HeaderLines',1);
 %bhv_data = textscan(bhv_file,'%d %d %d %s %f %f %f %d %d %s %s %f %f',...
                % 'Delimiter',',','HeaderLines',1);
@@ -71,12 +70,12 @@ fprintf('\t\tFound %d trials in log file\n', n_trials);
 
 % Add data to struct, convert field names with spaces to underscore
 for f_ix = 1:numel(bhv_fields)
+    bhv.(new_fields{f_ix}) = bhv_data{f_ix};
 %     bhv_fields{f_ix} = strrep(bhv_fields{f_ix}{1},' ','_');
-    if numel(bhv_data{f_ix})==n_trials
-        bhv.(new_fields{f_ix}) = bhv_data{f_ix};%(good_trials);
-    else
-        bhv.(new_fields{f_ix}) = bhv_data{f_ix};
-    end
+%     if numel(bhv_data{f_ix})~=n_trials
+%         bhv.(new_fields{f_ix}) = bhv_data{f_ix};%(good_trials);
+%     else
+%     end
 end
 
 % Convert from python to MATLAB indexing
@@ -91,6 +90,11 @@ bhv.rating_rt(no_rating_idx) = nan([sum(no_rating_idx) 1]);
 
 % Convert ratings to percent
 bhv.rating = bhv.rating./100;
+
+% Convert strings to boolean
+to_idx = strcmp(bhv.rating_time_out,'True');
+bhv.rating_time_out = zeros(size(bhv.rating_time_out));
+bhv.rating_time_out(to_idx) = 1;
 
 % Convert bad_fb from string to binary 0/1
 str_bad_fb = bhv.bad_fb;

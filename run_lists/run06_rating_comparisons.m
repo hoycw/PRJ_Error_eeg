@@ -10,6 +10,7 @@ if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
 else root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
+%%
 addpath([root_dir 'PRJ_Error_eeg/scripts/']);
 addpath([root_dir 'PRJ_Error_eeg/scripts/utils/']);
 addpath([app_dir 'fieldtrip/']);
@@ -17,13 +18,11 @@ ft_defaults
 
 %% Subject Lists
 % root_dir/PRJ_Error_EEG/scripts/SBJ_lists contains text files with SBJ IDs
-%   -good1.sbj: cohort 1
-%   -good2.sbj: cohort 2
-%   -goodall.sbj: cohort 1+2
-%   -goodEEG1.sbj: cohort 1 (only with oddball)
-%   -goodEEG2.sbj: cohort 2 (only with oddball; same as good2.sbj)
-%   -goodEEG.sbj: cohort 1+2 (only with oddball)
-SBJ_id = 'ratings_tmp';
+%   -ratings_all.sbj: all data collected, including biased SBJs
+%   -ratings_biased.sbj: biased SBJs
+%   -ratings_good.sbj: good for analyses (no biased, no outliers)
+
+SBJ_id = 'ratings_good';
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Pre-Processing
@@ -34,20 +33,13 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 proc_id                  = 'eeg_full_ft';
 fig_vis                  = 'on';
-% odd_proc_id = 'odd_full_ft';  % for Oddball task preprocessing
 
-% NOTE: This was never run cleanly, but SBJ by SBJ and occasionally in a loop
 for s = 1:numel(SBJs)
-    SBJ_vars_cmd = ['run ' root_dir 'PRJ_Error_eeg/scripts/SBJ_vars/' SBJs{s} '_vars.m'];
-    eval(SBJ_vars_cmd);
-    
     % Toss training and bad RTs
     RATE01_behavior_rejection(SBJs{s}, proc_id);
-    
-    clear SBJ_vars
 end
 
-%% Behavior (Fig. 1B, 1C)
+%% Check Behavior (Fig. 1B, 1C)
 % Behavioral pre-processing and analysis
 %   run_BHV00_01_prelim_analysis.sh: pulls SBJ_list to automatically run BHV00 and BHV01 for those SBJs
 %   runs in PRJ_Error_py2.7 conda env with python 2.7
@@ -105,23 +97,18 @@ fig_ftype = 'png';
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         % Run model
-        SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
+%         SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
         
         % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
-        SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
-    % close all;
+    close all;
 end
 
-% Fig. 1D inset: Plot group model fits (overlapping sigmoids without tolerance)
-% SBJ04b_BHV_RL_model_plot_grp(SBJ_id,proc_id,stat_id,...
-%     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-
-% Sup. Fig. 1A: Plot model predicitons by condition across group
 plt_id    = 'line_cond';
 for st_ix = 1:numel(stat_ids)
-%     SBJ04b_plot_model_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    BHV05_grp_rating_stats(SBJ_id,proc_id,stat_ids{st_ix},...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

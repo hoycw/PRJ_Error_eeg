@@ -43,8 +43,8 @@ training_ix = find(bhv.blk==0);                 % Training block index is 0 here
 rt_low_ix   = find(bhv.rt <= proc.rt_bounds(1));
 rt_high_ix  = find(bhv.rt >= proc.rt_bounds(2));
 exclude_trials = unique(vertcat(training_ix, rt_low_ix, rt_high_ix));
-fprintf(2,'\tWarning: Removing %i trials (%i training, %i rts)\n', numel(exclude_trials),...
-    numel(training_ix), numel(rt_low_ix)+numel(rt_high_ix));
+fprintf(2,'\tWarning: Removing %i trials (%i training, %i slow rts, %i fast rts)\n', numel(exclude_trials),...
+    numel(training_ix), numel(rt_low_ix), numel(rt_high_ix));
 
 % Exclude bad trials
 bhv_fields = fieldnames(bhv);

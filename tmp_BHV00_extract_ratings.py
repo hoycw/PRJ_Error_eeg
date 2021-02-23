@@ -14,12 +14,12 @@ import scipy.io as io
 import pickle
 
 
-# In[28]:
+# In[12]:
 
-SBJ = sys.argv[1]#raw_input('Enter SBJ ID to process:')#'EEG01'
+SBJ = 'RATE20'
 
 
-# In[29]:
+# In[13]:
 
 prj_dir = '/Volumes/hoycw_clust/PRJ_Error_eeg/'
 results_dir = prj_dir+'results/'
@@ -37,7 +37,7 @@ with open(data_dir+'TT_ratings_behav_log_list.txt') as f:
 
 # ### Load SBJ Data
 
-# In[30]:
+# In[14]:
 
 log_fname = os.path.join(sbj_dir,'00_raw',logs[SBJ])
 
@@ -48,7 +48,7 @@ log_file.close()
 
 # ### Process Version-Specific Parameters
 
-# In[31]:
+# In[15]:
 
 prdm = {}
 for line in log:
@@ -109,7 +109,7 @@ prdm['rating_trl_len'] = prdm['target']+prdm['rating_delay']+            prdm['f
 
 # ### Save paradigm parameters
 
-# In[32]:
+# In[16]:
 
 # Python readable
 prdm_fname = os.path.join(sbj_dir,'03_events',SBJ+'_prdm_vars.pkl')
@@ -120,30 +120,30 @@ prdm_fname = os.path.join(sbj_dir,'03_events',SBJ+'_prdm_vars.mat')
 io.savemat(prdm_fname,prdm)
 
 
-# In[33]:
+# In[17]:
 
-## print 'paradigm: ', prdm['prdm_name'], ' v', prdm['prdm_version']
-## print
-## print 'interval: ', prdm['target'], 's'
-## print 'feedback_delay: ', prdm['fb_delay'], 's'
-## print 'rating_delay: ', prdm['rating_delay'], 's'
-## print 'max_rating_time: ', prdm['max_rating_time'], 's'
-## print 'feedback duration: ', prdm['fb'], 's'
-## print 'total trial length: ', prdm['trl_len'], 's'
-## print
-## print 'n_blocks: ', prdm['n_blocks']
-## print 'n_trials/block: ', prdm['n_trials']
-## print 'n_full_vis_examples: ', prdm['n_examples']
-## print 'n_training/condition: ', prdm['n_training']
-## print
-## # ITI_bounds = [np.mean(a,b) for a, b in zip(ITIs[:-1],ITIs[1:])]
-## print 'ITIs:',prdm['ITIs'], ITI_bounds
-## print 'tolerance_lim:', prdm['tol_lim']
+print 'paradigm: ', prdm['prdm_name'], ' v', prdm['prdm_version']
+print
+print 'interval: ', prdm['target'], 's'
+print 'feedback_delay: ', prdm['fb_delay'], 's'
+print 'rating_delay: ', prdm['rating_delay'], 's'
+print 'max_rating_time: ', prdm['max_rating_time'], 's'
+print 'feedback duration: ', prdm['fb'], 's'
+print 'total trial length: ', prdm['trl_len'], 's'
+print
+print 'n_blocks: ', prdm['n_blocks']
+print 'n_trials/block: ', prdm['n_trials']
+print 'n_full_vis_examples: ', prdm['n_examples']
+print 'n_training/condition: ', prdm['n_training']
+print
+# ITI_bounds = [np.mean(a,b) for a, b in zip(ITIs[:-1],ITIs[1:])]
+print 'ITIs:',prdm['ITIs'], ITI_bounds
+print 'tolerance_lim:', prdm['tol_lim']
 
 
 # ### Extract Trial Info
 
-# In[48]:
+# In[18]:
 
 # Extract rating lines
 rating_lines = [line for line in log if line.find('Rating =')!=-1]
@@ -166,7 +166,7 @@ time_out = [r=='Non' for r in ratings]
 ratings = [-1 if time_out[r_ix] else int(r) for r_ix, r in enumerate(ratings)]
 
 
-# In[23]:
+# In[19]:
 
 resp_lines = [line for line in log if line.find('Outcome=')!=-1]
 data = pd.DataFrame({'Block': [line[line.find('B')+1] for line in resp_lines],
@@ -179,7 +179,7 @@ data = pd.DataFrame({'Block': [line[line.find('B')+1] for line in resp_lines],
                      'Timestamp': [float(line[:line.find('.')+4]) for line in resp_lines],
                      'Rating': [-1 for line in resp_lines],
                      'Rating_RT': [-1 for line in resp_lines],
-                     'Rating_time_out': [False for line in resp_lines]
+                     'Rating_time_out': [-1 for line in resp_lines]
                     })
 
 # Fix Reversals, Block, and missed RTs
@@ -256,7 +256,7 @@ if any(data['bad_fb']):
     tmp.ix[:,{'Tolerance','error','WIN','Hit','err-tol'}]
 
 
-# In[24]:
+# In[20]:
 
 # print(SBJ,' n_trials = ',len(data))
 # for cond in data['Condition'].unique():
@@ -269,7 +269,7 @@ if any(data['bad_fb']):
 
 # ### Save Behavioral Data
 
-# In[25]:
+# In[21]:
 
 behav_fname = os.path.join(sbj_dir,'03_events',SBJ+'_behav.csv')
 
@@ -288,10 +288,10 @@ data.to_csv(behav_fname,index_label='Total_Trial')
 #         data['Timestamp'][ix]-data['Timestamp'][ix-1]-prdm['rating_trl_len']-data['Rating_RT'][ix]
 
 
-# In[15]:
+# In[27]:
 
-## pd.set_option('max_rows', 75)
-## data[data['Block']==5]
+pd.set_option('max_rows', 75)
+data[data['Block']==2]
 
 
 # In[ ]:
