@@ -119,14 +119,16 @@ end
 
 if strcmp(st.model_lab,'RSVPE')
     model_str = 'Reward Valence vs. Value vs. Prediction Error';
-elseif any(strcmp(st.model_lab,{'VML','SML'}))
+elseif any(strcmp(st.model_lab,{'VML','SML','VSML'}))
     model_str = 'Outcome Features';
-elseif any(strcmp(st.model_lab,{'ERPEsL','RPEsL'}))
+    plt.leg_loc = 'southwest';
+elseif any(strcmp(st.model_lab,{'ERPEsL','RPEsL','ERPEs'}))
     model_str = 'Reward Prediction Error (RPE) Features';
 else
     model_str = st.model_id;
 end
 title(model_str,'Interpreter','none');
+if strcmp(st.model_id,'ERPEsL_pW25_DifFB'); plt.leg_loc = 'southwest'; end
 legend(reg_lines,reg_names,'Location',plt.leg_loc);
 set(gca,'FontSize',16);
 

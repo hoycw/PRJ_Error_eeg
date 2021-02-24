@@ -19,8 +19,11 @@ function SBJ04a_RL_model(SBJ,proc_id,stat_id)
 %   stat_id [str] - ID of the stats parameters to use
 %       st.model_lab [str] - selects set of regressors for model
 %       st.model_cond [cell string] - selects conditions to model
+%       st.bias_reg [cell array] - str names of regressor to bias
+%       st.bias [array] - amounts to add to biased regressor
+%       st.bias_cond [cell array] - strs selecting which conditions to bias
 % OUTPUTS:
-% model [float array] - [n_trials, n_regressors] matrix of all regressors
+%   model [float array] - [n_trials, n_regressors] matrix of all regressors
 %   ========== Main RL Model Regressors ==========
 %   Lik: likelihood/probability of given outcome in given difficulty context
 %   EV: expected value, linearly scaled from probability to -1:1 reward range
@@ -81,6 +84,22 @@ eval(stat_vars_cmd);
 % Determine model parameteres and conditions
 [reg_lab, ~, ~, ~] = fn_regressor_label_styles(st.model_lab);
 [cond_lab, ~, cond_colors, ~, ~] = fn_condition_label_styles(st.model_cond);
+
+% Check bias parameters
+if isfield(st,'bias') || isfield(st,'bias_reg') || isfield(st,'bias_cond')
+    % Check all necessary fields exist
+    if ~isfield(st,'bias') || ~isfield(st,'bias_reg') || ~isfield(st,'bias_cond')
+        error([stat_id ' is missing some bias fields!']);
+    end
+    % Check all necessary fields are same length
+    if numel(st.bias_reg)~=numel(st.bias) || numel(st.bias_reg)~=numel(st.bias_cond)
+        error([stat_id ' has mismatched number of bias terms!']);
+    end
+    % Only allow bias for pWin for now
+    if any(~strcmp(st.bias_reg,'pWin'))
+        error('Bias is only set up for pWin right now!');
+    end
+end
 
 %% Load and Select Behavior
 % Load data
@@ -209,6 +228,14 @@ if any(strcmp(reg_lab,'EV')) || any(strcmp(reg_lab,'Sign')) ...
     % Generated probability of winning from model
     z = betas(1) + (bhv.tol * betas(2));
     pWin = 1 ./ (1+exp(-z));
+    
+    % Add bias term
+    if isfield(st,'bias_reg') && any(strcmp(st.bias_reg,'pWin'))
+        for b_ix = find(strcmp(st.bias_reg,'pWin'))
+            bias_idx = fn_condition_index(st.bias_cond(b_ix),bhv);
+            pWin(bias_idx~=0) = pWin(bias_idx~=0) + st.bias(b_ix);
+        end
+    end
     
     % Linearly scale from probability (0 to 1) to expected value (-1 to 1)
     EV = pWin*2 - 1;

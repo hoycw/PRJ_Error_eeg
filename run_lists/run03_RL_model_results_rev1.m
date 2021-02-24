@@ -28,18 +28,23 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
 proc_id   = 'eeg_full_ft';
-stat_ids  = {'VSML_DifFB_lme_st05t5'};
+stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};
+
+% Subjective rating bias models:
+% stat_ids  = {'ERPEsL_pW25hd_DifFB_lme_st05t5','ERPEsL_pW25_DifFB_lme_st05t5'};
+% Auditory Salience models:
 % stat_ids  = {'rsRPE_EHSu_lme_st05t5'};%'ERBsRPE_EHSu_lme_st05t5','ERBrsRPE_EHSu_lme_st05t5'};%'ERB_EHSu_lme_st0t5','ERBr_EHSu_lme_st0t5','rough_EHSu_lme_st0t5','AudSal_EHSu_lme_st0t5'};
+% Outcome-based models:
 % stat_ids  = {'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5'};%'ERPEs_DifFB_lme_st05t5'};%'uRPE_Neg_lme_st05t5'};%'ML_Neg_lme_st05t5'};%'ERPEsL_all_lme_st05t5'};
-% Alternative (worse) models: 'RSVPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','VML_all_lme_mn1FRN'
+
 fig_vis   = 'on';
 save_fig  = 1;
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         % Run model
-%         SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
+        SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
         
         % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
 %         SBJ04b_BHV_RL_model_plot(SBJs{s},proc_id,stat_ids{st_ix},...
