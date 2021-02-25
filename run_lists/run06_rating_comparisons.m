@@ -61,7 +61,7 @@ end
 
 % Fig. 1B: Call BHV00 and BHV01
 %   usually run on command line, potentially commenting out BHV00/01 in .sh
-bhv_cmd = ['bash run_BHV00_01_prelim_analysis.sh << ' SBJ_id];
+% bhv_cmd = ['bash run_BHV00_01_prelim_analysis.sh << ' SBJ_id];
 % system(bhv_cmd);
 
 proc_id   = 'eeg_full_ft';
@@ -70,7 +70,7 @@ fig_ftype = 'png';
 
 % Fig. 1A: Example RT Histogram
 for s = 1:numel(SBJs)
-    BHV02_plot_RT_hist(SBJs{s},proc_id,save_fig,'fig_ftype',fig_ftype);
+%     BHV02_plot_RT_hist(SBJs{s},proc_id,save_fig,'fig_ftype',fig_ftype);
 end
 
 % Fig. 1C: Group Accuracy
@@ -97,18 +97,18 @@ fig_ftype = 'png';
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         % Run model
-%         SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
+        SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
         
         % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
-%         SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     close all;
 end
 
 plt_id    = 'line_cond';
 for st_ix = 1:numel(stat_ids)
-    BHV05_grp_rating_stats(SBJ_id,proc_id,stat_ids{st_ix},...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     BHV05_grp_rating_stats(SBJ_id,proc_id,stat_ids{st_ix},...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 

@@ -9,8 +9,10 @@ addpath(genpath('lib\eegvis'))
 % Threshold Free cluster enhancement
 addpath(genpath('lib\unfold\lib\ept_TFCE'))
 addpath(genpath('lib\limo_eeg'))
+
 %% SEREEGA Data Generation
 cfg = struct('debug',0)
+
 %% load headmodel 
 lf = lf_generate_fromnyhead('montage', 'S64');
 
