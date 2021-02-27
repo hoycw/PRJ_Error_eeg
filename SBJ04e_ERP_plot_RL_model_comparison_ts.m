@@ -117,7 +117,8 @@ cfgs = []; cfgs.latency = sts{1}.stat_lim;
 st_roi = ft_selectdata(cfgs, roi);
 st_time_vec = st_roi.time{1};
 ch_list = st_roi.label;
-if all(strcmp(stat_ids,{'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5','EsRPEL_DifFB_lme_st05t5','ERPEs_DifFB_lme_st05t5','ERPEsL_DifFB_lme_st05t5'}))
+fig2_AIC_ts_stat_ids = {'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5','EsRPEL_DifFB_lme_st05t5','ERPEs_DifFB_lme_st05t5','ERPEsL_DifFB_lme_st05t5'};
+if numel(stat_ids)==numel(fig2_AIC_ts_stat_ids) && all(strcmp(stat_ids,fig2_AIC_ts_stat_ids))
     % Special Case for Fig. 2 ERP Model Comparison:
     st_colors = [[166,86,40]./255; ...     % Solid Brown for value outcome model
                  [166,86,40]./255; ...     % Dashed Brown for sign outcome model

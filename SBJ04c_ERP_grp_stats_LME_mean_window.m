@@ -188,16 +188,24 @@ end
 
 %% Compute and plot correlations between regressors
 reg_corr = corr(model,'rows','complete');
+rvals = reshape(triu(reg_corr,1),[numel(reg_corr) 1]);
+[~,max_r_ix] = max(abs(rvals));
+if st.z_reg
+    reg_vifs = fn_variance_inflation_factor(model);
+else
+    reg_vifs = fn_variance_inflation_factor(zscore(model));
+end
+[max_vif,max_vif_ix] = max(reg_vifs);
 
 % Create figure directory
 stat_out_dir = [root_dir 'PRJ_Error_eeg/data/GRP/'];
-fig_dir = [stat_out_dir st.model_id '_erp_plots/'];
+fig_dir = [stat_out_dir st.model_id '_' st.stat_cond '_erpMW_plots/'];
 if ~exist(fig_dir,'dir')
     mkdir(fig_dir);
 end
 
 % Plot design matrix
-fig_name = [SBJ_id '_' st.model_id '_design'];
+fig_name = [SBJ_id '_' st.model_id '_' st.stat_cond '_design'];
 figure('Name',fig_name);
 imagesc(model);
 xticklabels(reg_lab);
@@ -205,12 +213,36 @@ colorbar;
 saveas(gcf,[fig_dir fig_name '.png']);
 
 % Plot regressor correlation matrix
-fig_name = [SBJ_id '_' st.model_id '_design_corr'];
-figure('Name',fig_name);
-imagesc(reg_corr);
-xticklabels(reg_lab);
-yticklabels(reg_lab);
+fig_name = [SBJ_id '_' st.model_id '_' st.stat_cond '_design_corr_VIFs'];
+set(gca,'XLim',[0.5 numel(reg_lab)+0.5]);
+set(gca,'XTick',1:numel(reg_lab));
+set(gca,'XTickLabels',reg_lab);
+set(gca,'YLim',[0.5 numel(reg_lab)+0.5]);
+set(gca,'YTick',1:numel(reg_lab));
+set(gca,'YTickLabels',reg_lab);
 colorbar;
+title(['Max r = ' num2str(rvals(max_r_ix),'%.3f')]);
+set(gca,'FontSize',16);
+
+% Plot VIFs
+subplot(1,2,2);
+bars = bar(1:numel(reg_lab),reg_vifs);
+bars.FaceColor = 'flat';
+bars.CData(2,:) = [.5 0 .5];
+for reg_ix = 1:numel(reg_lab)
+    if reg_vifs(reg_ix) >= 5 && reg_vifs(reg_ix) < 10
+        bars.CData(reg_ix,:) = [1 .5 0];
+    elseif reg_vifs(reg_ix) >= 10
+        bars.CData(reg_ix,:) = [1 0 0];
+    else
+        bars.CData(reg_ix,:) = [0 0 0];
+    end
+end
+set(gca,'XLim',[0.5 numel(reg_lab)+0.5]);
+set(gca,'XTick',1:numel(reg_lab));
+set(gca,'XTickLabels',reg_lab);
+set(gca,'FontSize',16);
+title(['Max VIF: ' reg_lab{max_vif_ix} '=' num2str(max_vif,'%.2f')]);
 saveas(gcf,[fig_dir fig_name '.png']);
 
 %% Run Linear Mixed Effects Model Over Channels

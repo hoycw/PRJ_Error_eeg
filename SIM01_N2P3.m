@@ -4,7 +4,7 @@ elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desk
 else root_dir='/Volumes/hoycw_clust/';app_dir='/Users/colinhoy/Code/Apps/';end
 
 addpath([app_dir 'new_eeglab/eeglab/']);
-p3a_eeglab;
+eeglab;
 addpath(genpath([app_dir 'SEREEGA/']));
 addpath([app_dir 'fieldtrip/']);
 ft_defaults
@@ -59,22 +59,37 @@ noise_white = struct( ...
 noise_white = utl_check_class(noise_white);
 
 %% Draw P3 from template
-p3_comp = utl_get_component_fromtemplate('p300_erp', leadfield);
-% p3a_comp = utl_get_component_fromtemplate('p3a_erp', leadfield);
-% p3b_comp = utl_get_component_fromtemplate('p3b_erp', leadfield);
+p3a_amp    = 20;
+p3a_pk_lat = 380;
 
-% Create [chan, samples, epochs] matrix
-p3_scalpdata = generate_scalpdata(p3_comp, leadfield, epochs);
+p3b_amp    = [14 4];
+p3b_pk_lat = [300 400];
+
+% p3_comp = utl_get_component_fromtemplate('p300_erp', leadfield);
+p3a_comp = utl_get_component_fromtemplate('p3a_erp', leadfield);
+p3b_comp = utl_get_component_fromtemplate('p3b_erp', leadfield);
+
+% Modify template
+p3a_comp.signal{1}.peakAmplitude = p3a_amp;
+p3a_comp.signal{1}.peakLatency   = p3a_pk_lat + bsln_len;
+p3b_comp.signal{1}.peakAmplitude = p3b_amp;
+p3b_comp.signal{1}.peakLatency   = p3b_pk_lat + bsln_len;
+
+plot_signal_fromclass(p3a_comp.signal{1}, epochs);
+plot_signal_fromclass(p3b_comp.signal{1}, epochs);
+
+% % Create [chan, samples, epochs] matrix
+% % p3_scalpdata = generate_scalpdata(p3_comp, leadfield, epochs);
 % p3a_scalpdata = generate_scalpdata(p3a_comp, leadfield, epochs);
 % p3b_scalpdata = generate_scalpdata(p3b_comp, leadfield, epochs);
-
-% Generate data in EEGlab format
-p3_eeglab = utl_create_eeglabdataset(p3_scalpdata, epochs, leadfield);
+% 
+% % Generate data in EEGlab format
+% % p3_eeglab = utl_create_eeglabdataset(p3_scalpdata, epochs, leadfield);
 % p3a_eeglab = utl_create_eeglabdataset(p3a_scalpdata, epochs, leadfield);
 % p3b_eeglab = utl_create_eeglabdataset(p3b_scalpdata, epochs, leadfield);
-
-% Convert to Fieldtrip
-p3_ft = eeglab2fieldtrip(p3_eeglab, 'raw', 'none');
+% 
+% % Convert to Fieldtrip
+% % p3_ft = eeglab2fieldtrip(p3_eeglab, 'raw', 'none');
 % p3a_ft = eeglab2fieldtrip(p3a_eeglab, 'raw', 'none');
 % p3b_ft = eeglab2fieldtrip(p3b_eeglab, 'raw', 'none');
 
@@ -127,14 +142,14 @@ theta_comp.signal = {theta_ersp, theta_ersp};
 theta_comp.source  = [theta_source_r; theta_source_l];
 theta_comp = utl_check_component(theta_comp, leadfield);
 
-% Create [chan, samples, epochs] matrix
-theta_scalpdata = generate_scalpdata(theta_comp, leadfield, epochs);
-
-% Generate data in EEGlab format
-theta_eeglab = utl_create_eeglabdataset(theta_scalpdata, epochs, leadfield);
-
-% Convert to Fieldtrip
-theta_ft = eeglab2fieldtrip(theta_eeglab, 'raw', 'none');
+% % Create [chan, samples, epochs] matrix
+% theta_scalpdata = generate_scalpdata(theta_comp, leadfield, epochs);
+% 
+% % Generate data in EEGlab format
+% theta_eeglab = utl_create_eeglabdataset(theta_scalpdata, epochs, leadfield);
+% 
+% % Convert to Fieldtrip
+% theta_ft = eeglab2fieldtrip(theta_eeglab, 'raw', 'none');
 
 % Plot data
 if debug
@@ -144,18 +159,28 @@ if debug
     ft_databrowser(cfg_plot, theta_ft);
 end
 
-%% Combine Theta, P3a, and P3b
-data = theta_ft;
-for trl_ix = 1:numel(data.trial)
-    data.trial{trl_ix} = mean(cat(3,...
-        theta_ft.trial{trl_ix},p3_ft.trial{trl_ix}),3);
-%         theta_ft.trial{trl_ix},p3a_ft.trial{trl_ix},p3b_ft.trial{trl_ix}),3);
-end
+%% Generate 25 random noise components
+sources = lf_get_source_spaced(lf, 10, 25);
+noise_brown.amplitude = 5;
+noise_comps = utl_create_component(sources, noise_brown, lf);
+noise_comps = utl_add_signal_tocomponent(noise_white,noise_comps);
+
+% Split into 2 conditions
+[comps1, comps2] = deal(noise_comps);
+
+%% Combine Theta, P3a, P3b, and noise
+comps1(end+1) = p3a_comp;
+comps1(end+1) = p3b_comp;
+comps1(end+1) = theta_comp;
+
+data1 = generate_scalpdata(comps1,leadfield, epochs);
+data1_eeglab = utl_create_eeglabdataset(theta_scalpdata, epochs, leadfield);
+data1_ft = eeglab2fieldtrip(data1_eeglab, 'raw', 'none');
 
 % Plot data
 if debug
     cfg_plot = [];
     cfg_plot.viewmode = 'vertical';
     cfg_plot.channel = {'Fz','FCz','Cz','CPz','Pz','Oz'};
-    ft_databrowser(cfg_plot, data);
+    ft_databrowser(cfg_plot, data1_ft);
 end

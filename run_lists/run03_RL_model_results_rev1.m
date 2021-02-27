@@ -28,7 +28,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
 proc_id   = 'eeg_full_ft';
-stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};
+stat_ids  = {'uRPEL_Neg_lme_st05t5'};%'ERPEsL_DifFB_lme_st05t5'};
 
 % Subjective rating bias models:
 % stat_ids  = {'ERPEsL_pW25hd_DifFB_lme_st05t5','ERPEsL_pW25_DifFB_lme_st05t5'};
@@ -60,15 +60,15 @@ end
 % Sup. Fig. 1A: Plot model predicitons by condition across group
 plt_id    = 'line_cond';
 for st_ix = 1:numel(stat_ids)
-    SBJ04b_RL_model_plot_grp_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ04b_RL_model_plot_grp_predictions(SBJ_id,proc_id,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% ERP: Linear Mixed Effects Model (Over Time)
 % Plots Fig. 2 and 3; Sup. Fig. 2
 % Main RL Model
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%,'ERP_Cz_F2t1_dm2t0_fl05t20'};%,
-stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};
+stat_ids  = {'uRPE_Neg_lme_st05t5','uRPEL_Neg_lme_st05t5','uRPE_Pos_lme_st05t5','uRPEL_Pos_lme_st05t5'};%'ERPEsL_DifFB_lme_st05t5'};
 % stat_ids  = {'ERBsRPE_EHSu_lme_st05t5'};%'rsRPE_EHSu_lme_st05t5'};%,'ERBrsRPE_EHSu_lme_st05t5'};'ERB_EHSu_lme_st0t5'
 % stat_ids  = {'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5','EsRPEL_DifFB_lme_st05t5','ERPEs_DifFB_lme_st05t5','ERPEsL_DifFB_lme_st05t5'};
 % stat_ids  = {'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5','ERPEsL_DifFB_lme_st05t5'};
@@ -84,11 +84,12 @@ fig_ftype = 'png';
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
       % Run LME RL model on ERPs over time
-      SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+%       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
       
 %       % Fig. 2: Plot model results (ERPs, coefficients, model fit)
-      SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%       SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+
       % Fig. 2ABCD: Plot model results (ERPs, coefficients, model fit)
       %     with window overlays for N3, P3, sRPE, uRPE, Lik
       if contains(an_ids{an_ix},'Fz')
@@ -111,14 +112,15 @@ for an_ix = 1:numel(an_ids)
 
     % Model Comparison Plots: AIC Performance Relative to SBJonly null model
     if contains(an_ids{an_ix},'Fz')
-        aic_mean_reg = {'sRPE','ERPEsL_DifFB_lme_st05t5'};
-%         aic_mean_win = [-0.025 0.025]+0.216;    % Peak beta for sRPE in goodall
+%         aic_mean_reg = {'sRPE','ERPEsL_DifFB_lme_st05t5'};
+        aic_mean_win = [-0.025 0.025]+0.216;    % Peak beta for sRPE in goodall
     elseif contains(an_ids{an_ix},'Pz')
 % % %         aic_mean_reg = {'uRPE','ERPEsL_DifFB_lme_st05t5'};
-%         aic_mean_win = [-0.025 0.025]+0.308;    % beta peaks in goodall for uRPE (0.308) and Lik (0.38)
+        aic_mean_win = [-0.025 0.025]+0.308;    % beta peaks in goodall for uRPE (0.308) and Lik (0.38)
     end
-%     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'rm_null',1);%,'mean_reg',aic_mean_reg);
+%     aic_mean_win = [-0.025 0.025]+0.380;
+    SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'rm_null',1,'mean_win',aic_mean_win);%'mean_reg',aic_mean_reg);
 
     % Model Comparison Plots: AIC Performance
 %     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
@@ -144,7 +146,10 @@ end
 % Plots Fig. 3 and Sup. Fig. 3
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
-stat_ids  = {'uRPE_Neg_lme_mn05man216','uRPE_Pos_lme_mn05man216','uRPE_Neg_lme_mn05man308','uRPE_Pos_lme_mn05man308'};%'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
+% stat_ids  = {'uRPEL_Neg_lme_mn05man216','uRPEL_Neg_lme_mn05man308','uRPEL_Neg_lme_mn05man380'};
+stat_ids  = {'uRPEL_Pos_lme_mn05man216','uRPEL_Pos_lme_mn05man308','uRPEL_Pos_lme_mn05man380'};
+% stat_ids  = {'uRPE_Neg_lme_mn05man216','uRPE_Pos_lme_mn05man216','uRPE_Neg_lme_mn05man308','uRPE_Pos_lme_mn05man308'};
+% stat_ids = {'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
 plt_id    = 'topo_F18t25';
 save_fig  = 1;
 fig_vis   = 'on';
@@ -153,7 +158,7 @@ fig_ftype = 'png';
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
         % Run LME RL model on ERPs averaged in time window for all electrodes
-%         SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+        SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
         
         % Plot individual model coefficient topographies
 %         SBJ04d_ERP_plot_stats_LME_RL_topo_reg(SBJ_id,an_ids{an_ix},stat_ids{st_ix},...
@@ -174,7 +179,7 @@ end
 % Plots Fig. 4
 proc_id   = 'eeg_full_ft';
 an_ids    = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};
-stat_ids  = {'uRPE_Neg_lme_st0t5','uRPE_Pos_lme_st0t5'};%'ERPEsL_all_lme_st0t5'};
+stat_ids  = {'uRPEL_Neg_lme_st0t5','uRPEL_Pos_lme_st0t5'};%'ERPEsL_all_lme_st0t5'};
 save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'png';
