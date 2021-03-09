@@ -24,11 +24,13 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% ERP: Mean Window LME
 % Main RL Model
-% an_id    = 'ERP_Pz_F2t1_dm2t0_fl05t20';
-% stat_ids = {'EsRPEL_DifFB_lme_erpmn1P3','ERPEs_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
-an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+% an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
 % stat_ids = {'VML_DifFB_lme_erpmn1FRN','SML_DifFB_lme_erpmn1FRN','ERPEsL_DifFB_lme_erpmn1FRN'};%
-stat_ids = {'EsRPEL_DifFB_lme_erpmn05Lik','ERPEs_DifFB_lme_erpmn05Lik','ERPEsL_DifFB_lme_erpmn05Lik'};%
+% stat_ids = {'EsRPEL_DifFB_lme_erpmn05Lik','ERPEs_DifFB_lme_erpmn05Lik','ERPEsL_DifFB_lme_erpmn05Lik'};%
+
+an_id    = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+% stat_ids = {'EsRPEL_DifFB_lme_erpmn1P3','ERPEs_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
+stat_ids = {'VML_DifFB_lme_erpmn1P3','SML_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
 
 plt_id    = 'bar_sigStar';
 null_id   = 'SBJonly_all_lme_mn1FRN';
@@ -36,12 +38,12 @@ null_id   = 'SBJonly_all_lme_mn1FRN';
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'png';
+fig_ftype = 'svg';
 
 for st_ix = 1:numel(stat_ids)
     if ~isempty(strfind(stat_ids{st_ix},'erpmn'))
         % Average across ERPs (e.g., stat_id = 'ERPEsL_DifFB_lme_erpmn1FRN')
-        SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_ids{st_ix});
+%         SBJ04c_ERP_grp_stats_LME_mean_window(SBJ_id,proc_id,an_id,stat_ids{st_ix});
     else
         % Average across single trials (e.g., stat_id = 'ERPEsL_DifFB_lme_mn1FRN')
         %   Not used because literature typically averages over ERPs, not

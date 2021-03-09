@@ -213,6 +213,7 @@ saveas(gcf,[fig_dir fig_name '.png']);
 % Plot regressor correlation matrix
 fig_name = [SBJ_id '_' st.model_id '_' st.stat_cond '_design_corr_VIFs'];
 figure('Name',fig_name);
+subplot(1,2,1);
 imagesc(reg_corr);
 set(gca,'XLim',[0.5 numel(reg_lab)+0.5]);
 set(gca,'XTick',1:numel(reg_lab));

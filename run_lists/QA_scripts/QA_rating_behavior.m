@@ -28,7 +28,7 @@ for s = 1:numel(SBJs)
     
     load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
         SBJs{s} '_' proc_id '_rate01_orig_exclude_trial_ix.mat'],'rt_low_ix','rt_high_ix');
-    out(s) = sum([numel('rt_low_ix') numel(rt_high_ix)]);
+    out(s) = sum([numel(rt_low_ix) numel(rt_high_ix)]);
     
     ez_idx = strcmp(bhvs{s}.cond,'easy');
     
@@ -51,7 +51,7 @@ end
 [~,pts_sort_idx] = sort(pts(:,3),'descend');
 [~,out_sort_idx] = sort(out,'descend');
 
-% Print results
+%% Print results
 fprintf('Best Tolerance:\n');
 for s = 1:numel(SBJs)
     fprintf('\t(%i) %s: %.3f (%.3f easy, %.3f hard)\n',s,SBJ_lab{tol_sort_idx(s)},...
@@ -78,7 +78,21 @@ for s = 1:numel(SBJs)
     fprintf('\t(%i) %s: %.3f\n',s,SBJ_lab{out_sort_idx(s)},out(out_sort_idx(s)));
 end
 
-% Plot results
+%% Plot Outliers
+out_thresh3 = mean(out) + std(out)*3;
+out_thresh2 = mean(out) + std(out)*2;
+figure;
+histogram(out,25);
+xlabel('# RT outliers');
+ylabel('SBJ count');
+avg_line = line([mean(out) mean(out)],ylim,'Color','k','LineWidth',2);
+thresh2_line = line([out_thresh2 out_thresh2],ylim,'Color','r','LineWidth',2);
+thresh3_line = line([out_thresh3 out_thresh3],ylim,'Color','r','LineWidth',2);
+legend([avg_line thresh2_line thresh3_line],{['Mean=' num2str(mean(out))],...
+    ['2SDs=' num2str(out_thresh2)],['3SDs=' num2str(out_thresh3)]});
+set(gca,'FontSize',16);
+
+%% Plot results
 figure('units','normalized','OuterPosition',[0 0 1 1]);
 subplot(4,1,1); hold on;
 bar(tol(tol_sort_idx,3));

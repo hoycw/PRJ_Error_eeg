@@ -26,6 +26,7 @@ function SBJ04a_RL_model(SBJ,proc_id,stat_id)
 %   model [float array] - [n_trials, n_regressors] matrix of all regressors
 %   ========== Main RL Model Regressors ==========
 %   Lik: likelihood/probability of given outcome in given difficulty context
+%       rLik: same but residualized (against uRPE)
 %   EV: expected value, linearly scaled from probability to -1:1 reward range
 %       pWin: win probabilty from logistic regression
 %       bAcc: block level accuracy
@@ -98,6 +99,19 @@ if isfield(st,'bias') || isfield(st,'bias_reg') || isfield(st,'bias_cond')
     % Only allow bias for pWin for now
     if any(~strcmp(st.bias_reg,'pWin'))
         error('Bias is only set up for pWin right now!');
+    end
+end
+
+% Check residualization parameters
+if isfield(st,'resid')
+    error('Decided to not residualize for now, so do not use this!');
+    % Avoid order effects by limiting to one residalization
+    if numel(st.resid)>1; error('Only allowing one variable to be residualized for now'); end
+    % Check both regressors exist
+    for r_ix = 1:numel(st.resid)
+        if ~any(strcmp(reg_lab,st.resid{r_ix}{1})) || ~any(strcmp(reg_lab,st.resid{r_ix}{2}))
+            error(['residualize regressor missing: ' strjoin(st.resid{r_ix},',')]);
+        end
     end
 end
 
@@ -193,7 +207,7 @@ end
 % Outcome likelihood (Lik) = proportion of trials for given outcome in
 %   given difficulty context over the whole experiment (except training)
 % This regressor is referred to as 'probability' in the paper
-if any(strcmp(reg_lab,'Lik'))
+if any(strcmp(reg_lab,'Lik')) || any(strcmp(reg_lab,'rLik'))
     Lik = nan(size(bhv.trl_n));
     for cond_ix = 1:numel(cond_lab)
         idx = fn_condition_index(cond_lab(cond_ix),bhv);
@@ -206,6 +220,9 @@ if any(strcmp(reg_lab,'Lik'))
             error('Neither Ez nor Hd, what is it?');
         end
         Lik(logical(idx)) = sum(idx)/n_trls;
+    end
+    if any(strcmp(reg_lab,'rLik'))
+        rLik = Lik;
     end
 end
 
@@ -513,12 +530,23 @@ end
 %% Load Data and Build Model
 % Concatenate all regressors into one design matrix
 model = nan([sum(n_trials) numel(reg_lab)]);
-for r_ix = 1:numel(reg_lab)
-    model(:,r_ix) = eval(reg_lab{r_ix});
+for reg_ix = 1:numel(reg_lab)
+    model(:,reg_ix) = eval(reg_lab{reg_ix});
 end
 % Report missing values
 if any(isnan(model(:)))
     fprintf(2,'\tWARNING: %d NaNs detected in model!\n',sum(isnan(model(:))));
+end
+
+%% Residualize regressors
+if isfield(st,'resid')
+    for r_ix = 1:numel(st.resid)
+        x_ix = find(strcmp(reg_lab,st.resid{r_ix}{1}));
+        y_ix = find(strcmp(reg_lab,st.resid{r_ix}{2}));
+        betas = polyfit(model(:,x_ix),model(:,y_ix),1);
+        y_fit = polyval(betas,model(:,x_ix));
+        model(:,x_ix) = model(:,y_ix) - y_fit;
+    end
 end
 
 %% Compute and plot correlations between regressors

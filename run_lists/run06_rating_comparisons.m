@@ -41,41 +41,28 @@ end
 
 %% Check Behavior (Fig. 1B, 1C)
 % Behavioral pre-processing and analysis
-%   run_BHV00_01_prelim_analysis.sh: pulls SBJ_list to automatically run BHV00 and BHV01 for those SBJs
+%   run_BHV00_01_ratings.sh: pulls SBJ_list to automatically run BHV00_rating and BHV01_rating for those SBJs
 %   runs in PRJ_Error_py2.7 conda env with python 2.7
 %       -colin_PRJ_error_py2.7.yml: contains conda env package list
-%   BHV00_extract.ipynb (and corresponding .py): 
+%   BHV00_extract_ratings.ipynb (and corresponding .py): 
 %       -root_dir/PRJ_Error_eeg/data/TT_bheav_log_list.txt: text file containing names of behavioral logs per SBJ
 %       -read, save, print paradigm parameters (python and MATLAB readable)
 %       -read, pre-process, QA check, and save behavioral data as CSV
-%   BHV01_prelim_analysis.ipynb (and corresponding .py): 
+%   BHV01_ratings_prelim_analysis.ipynb (and corresponding .py): 
 %       -load behavioral data
 %       -correct idiosyncracies (block numbers, extra training, missing trials, etc.)
 %       -compute accuracy
-%***    -plot Fig. 1B SBJ performance over time  
-%       -plot QA checks: ITI histogram
-%       -plot behavioral checks: RT histogram, RT histogram by ITI, RT
-%       after long vs. short RTs, accuracy by ITI and condition
-%***BHV02_plot_RT_hist.m: plot RT histogram for Fig. 1A
-%***BHV03_plot_group_accuracy_TT.m: group accuracy bar plot for Fig. 1C
-
-% Fig. 1B: Call BHV00 and BHV01
-%   usually run on command line, potentially commenting out BHV00/01 in .sh
-% bhv_cmd = ['bash run_BHV00_01_prelim_analysis.sh << ' SBJ_id];
-% system(bhv_cmd);
 
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_ftype = 'png';
 
-% Fig. 1A: Example RT Histogram
+% Plot RT distribution of rating SBJs
 for s = 1:numel(SBJs)
-%     BHV02_plot_RT_hist(SBJs{s},proc_id,save_fig,'fig_ftype',fig_ftype);
+    BHV02_plot_RT_hist(SBJs{s},proc_id,save_fig,'fig_ftype',fig_ftype);
 end
 
-% Fig. 1C: Group Accuracy
-conditions = 'Dif';
-% BHV03_plot_group_accuracy_TT(SBJ_id, conditions, fig_ftype);
+% run QA_rating_behavior
 
 %% Survey Data Analysis
 %   Test neutral trial survey responses for valence
@@ -97,18 +84,18 @@ fig_ftype = 'png';
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         % Run model
-        SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
+%         SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
         
         % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
-        SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     close all;
 end
 
 plt_id    = 'line_cond';
 for st_ix = 1:numel(stat_ids)
-%     BHV05_grp_rating_stats(SBJ_id,proc_id,stat_ids{st_ix},...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    BHV05_grp_rating_stats(SBJ_id,proc_id,stat_ids{st_ix},...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
