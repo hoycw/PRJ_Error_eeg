@@ -79,7 +79,7 @@ stat_ids  = {'ERPEs_DifFB_lme_st05t5'};%'uRPE_Neg_lme_st05t5'};%'ML_Neg_lme_st05
 % Alternative (worse) models: 'RSVPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','VML_all_lme_mn1FRN'
 fig_vis   = 'on';
 save_fig  = 1;
-fig_ftype = 'png';
+fig_ftype = 'svg';
 
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
@@ -87,8 +87,8 @@ for s = 1:numel(SBJs)
 %         SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
         
         % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
-%         SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     close all;
 end

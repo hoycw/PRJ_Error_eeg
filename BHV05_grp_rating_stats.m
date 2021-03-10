@@ -62,6 +62,9 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 [cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.model_cond);
 ev_ix = strcmp(reg_lab,'EV');
 
+win_color  = [51 160 44]./256;
+loss_color = [227 26 28]./256;
+
 %% Load Behavior
 bhvs          = cell(size(SBJs));
 full_cond_idx = cell(size(SBJs));
@@ -84,7 +87,7 @@ for s = 1:numel(SBJs)
     rate_rt_thresh(s) = nanmean(bhvs{s}.rating_rt(~time_out_idx))+nanstd(bhvs{s}.rating_rt(~time_out_idx))*3;
     rt_out_idx = bhvs{s}.rating_rt >= rate_rt_thresh(s);
     full_cond_idx{s}(non_rating_idx | time_out_idx | rt_out_idx) = 0;
-    fprintf('\t%s removed %i trials: %i non-ratings, %i outliers (mean=%.2f), %i time outs\n',SBJs{s},...
+    fprintf('\t%s removed %i trials: %i non-ratings, %i rt outliers (mean=%.2f), %i time outs\n',SBJs{s},...
         sum(non_rating_idx)+sum(rt_out_idx)+sum(time_out_idx),sum(non_rating_idx),sum(rt_out_idx),...
         mean(bhvs{s}.rating_rt(rt_out_idx)),sum(time_out_idx));
     
@@ -183,44 +186,46 @@ lin_fit_x  = [0.1:sig_step:0.9];
 
 % Plot pWin: Easy Trials
 subplot(2,2,1); hold on;
-scatter(data.rating(data.ez==1 & data.hit==1),data.pWin(data.ez==1 & data.hit==1),trl_rat_sz,'g','o');
-scatter(data.rating(data.ez==1 & data.hit==0),data.pWin(data.ez==1 & data.hit==0),trl_rat_sz,'r','*');
+win_scat  = scatter(data.rating(data.ez==1 & data.hit==1),data.pWin(data.ez==1 & data.hit==1),trl_rat_sz,win_color,'o');
+loss_scat = scatter(data.rating(data.ez==1 & data.hit==0),data.pWin(data.ez==1 & data.hit==0),trl_rat_sz,loss_color,'*');
 
 lin_fit = polyfit(data.rating(data.ez==1),data.pWin(data.ez==1),1);
 lin_fit_y = lin_fit(1)*lin_fit_x + lin_fit(2);
-plot(lin_fit_x,lin_fit_y,'k');
+plot(lin_fit_x,lin_fit_y,'k','LineWidth',2);
 
 xlabel('Subjective Rating');
 ylabel('Model Win %');
 xlim([0 1]);
 ylim([0 1]);
+legend([win_scat loss_scat],{'Win Ratings','Loss Ratings'},'Location','southwest');
 title(['Easy Rating Correlations: r=' num2str(ez_corr,'%.2f') '; p=' num2str(ez_pval,'%.3f')]);
 set(gca,'FontSize',14);
 
 % Plot pWin: Hard Trials
 subplot(2,2,2); hold on;
-scatter(data.rating(data.ez==0 & data.hit==1),data.pWin(data.ez==0 & data.hit==1),trl_rat_sz,'g','o');
-scatter(data.rating(data.ez==0 & data.hit==0),data.pWin(data.ez==0 & data.hit==0),trl_rat_sz,'r','*');
+win_scat  = scatter(data.rating(data.ez==0 & data.hit==1),data.pWin(data.ez==0 & data.hit==1),trl_rat_sz,win_color,'o');
+loss_scat = scatter(data.rating(data.ez==0 & data.hit==0),data.pWin(data.ez==0 & data.hit==0),trl_rat_sz,loss_color,'*');
 
 lin_fit = polyfit(data.rating(data.ez==0),data.pWin(data.ez==0),1);
 lin_fit_y = lin_fit(1)*lin_fit_x + lin_fit(2);
-plot(lin_fit_x,lin_fit_y,'k');
+plot(lin_fit_x,lin_fit_y,'k','LineWidth',2);
 
 xlabel('Subjective Rating');
 ylabel('Model Win %');
 xlim([0 1]);
 ylim([0 1]);
+legend([win_scat loss_scat],{'Win Ratings','Loss Ratings'},'Location','northeast');
 title(['Hard Rating Correlations: r=' num2str(hd_corr,'%.2f') '; p=' num2str(hd_pval,'%.3f')]);
 set(gca,'FontSize',14);
 
 % Plot pWin: All Trials
 subplot(2,2,3); hold on;
-scatter(data.rating(data.hit==1),data.pWin(data.hit==1),trl_rat_sz,'g','o');
-scatter(data.rating(data.hit==0),data.pWin(data.hit==0),trl_rat_sz,'r','*');
+scatter(data.rating(data.hit==1),data.pWin(data.hit==1),trl_rat_sz,win_color,'o');
+scatter(data.rating(data.hit==0),data.pWin(data.hit==0),trl_rat_sz,loss_color,'*');
 
 lin_fit = polyfit(data.rating,data.pWin,1);
 lin_fit_y = lin_fit(1)*lin_fit_x + lin_fit(2);
-plot(lin_fit_x,lin_fit_y,'k');
+plot(lin_fit_x,lin_fit_y,'k','LineWidth',2);
 
 xlabel('Subjective Rating');
 ylabel('Model Win %');
@@ -231,8 +236,8 @@ set(gca,'FontSize',14);
 
 % Plot Block Accuracy: All Trials
 subplot(2,2,4); hold on;
-scatter(data.rating(data.hit==1),data.blk_acc(data.hit==1),trl_rat_sz,'g','o');
-scatter(data.rating(data.hit==0),data.blk_acc(data.hit==0),trl_rat_sz,'r','*');
+scatter(data.rating(data.hit==1),data.blk_acc(data.hit==1),trl_rat_sz,win_color,'o');
+scatter(data.rating(data.hit==0),data.blk_acc(data.hit==0),trl_rat_sz,loss_color,'*');
 
 lin_fit = polyfit(data.rating,data.blk_acc,1);
 lin_fit_y = lin_fit(1)*lin_fit_x + lin_fit(2);
@@ -366,10 +371,10 @@ figure('Name',fig_name,'units','normalized',...
 
 % Plot Easy histograms
 subplot(1,3,1); hold on;
-histogram(data.zrating(data.ez==1 & data.hit==1),n_bins,'FaceColor','g','FaceAlpha',0.3);
-histogram(data.zrating(data.ez==1 & data.hit==0),n_bins,'FaceColor','r','FaceAlpha',0.3);
-ez_ls_line = line([mean_ez_ls_rat mean_ez_ls_rat], ylim, 'Color', 'r', 'LineWidth', 3);
-ez_wn_line = line([mean_ez_wn_rat mean_ez_wn_rat], ylim, 'Color', 'g', 'LineWidth', 3);
+histogram(data.zrating(data.ez==1 & data.hit==1),n_bins,'FaceColor',win_color,'FaceAlpha',0.3);
+histogram(data.zrating(data.ez==1 & data.hit==0),n_bins,'FaceColor',loss_color,'FaceAlpha',0.3);
+ez_ls_line = line([mean_ez_ls_rat mean_ez_ls_rat], ylim, 'Color', loss_color, 'LineWidth', 3);
+ez_wn_line = line([mean_ez_wn_rat mean_ez_wn_rat], ylim, 'Color', win_color, 'LineWidth', 3);
 xlabel('Z-Scored Subjective Win % Rating');
 ylabel('# Trials');
 legend([ez_wn_line ez_ls_line],{['Easy Wins: n=' num2str(sum(data.ez==1 & data.hit==1)) ...
@@ -380,10 +385,10 @@ set(gca,'FontSize',14);
 
 % Plot Hard histograms
 subplot(1,3,2); hold on;
-histogram(data.zrating(data.ez==0 & data.hit==1),n_bins,'FaceColor','g','FaceAlpha',0.3);
-histogram(data.zrating(data.ez==0 & data.hit==0),n_bins,'FaceColor','r','FaceAlpha',0.3);
-hd_ls_line = line([mean_hd_ls_rat mean_hd_ls_rat], ylim, 'Color', 'r', 'LineWidth', 3);
-hd_wn_line = line([mean_hd_wn_rat mean_hd_wn_rat], ylim, 'Color', 'g', 'LineWidth', 3);
+histogram(data.zrating(data.ez==0 & data.hit==1),n_bins,'FaceColor',win_color,'FaceAlpha',0.3);
+histogram(data.zrating(data.ez==0 & data.hit==0),n_bins,'FaceColor',loss_color,'FaceAlpha',0.3);
+hd_ls_line = line([mean_hd_ls_rat mean_hd_ls_rat], ylim, 'Color', loss_color, 'LineWidth', 3);
+hd_wn_line = line([mean_hd_wn_rat mean_hd_wn_rat], ylim, 'Color', win_color, 'LineWidth', 3);
 xlabel('Z-Scored Subjective Win % Rating');
 ylabel('# Trials');
 legend([hd_wn_line hd_ls_line],{['Hard Wins: n=' num2str(sum(data.ez==0 & data.hit==1)) ...
@@ -394,10 +399,10 @@ set(gca,'FontSize',14);
 
 % Plot All Trial histograms
 subplot(1,3,3); hold on;
-histogram(data.zrating(data.hit==1),n_bins,'FaceColor','g','FaceAlpha',0.3);
-histogram(data.zrating(data.hit==0),n_bins,'FaceColor','r','FaceAlpha',0.3);
-norm_ls_line = line([mean_fl_ls_rat mean_fl_ls_rat], ylim, 'Color', 'r', 'LineWidth', 3);
-norm_wn_line = line([mean_fl_wn_rat mean_fl_wn_rat], ylim, 'Color', 'g', 'LineWidth', 3);
+histogram(data.zrating(data.hit==1),n_bins,'FaceColor',win_color,'FaceAlpha',0.3);
+histogram(data.zrating(data.hit==0),n_bins,'FaceColor',loss_color,'FaceAlpha',0.3);
+norm_ls_line = line([mean_fl_ls_rat mean_fl_ls_rat], ylim, 'Color', loss_color, 'LineWidth', 3);
+norm_wn_line = line([mean_fl_wn_rat mean_fl_wn_rat], ylim, 'Color', win_color, 'LineWidth', 3);
 xlabel('Z-Scored Subjective Win % Rating');
 %xlim([0 1]);
 ylabel('# Trials');

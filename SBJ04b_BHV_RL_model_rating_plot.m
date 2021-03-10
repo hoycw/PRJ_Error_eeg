@@ -63,6 +63,9 @@ mean_sz     = 100;      % scatter size for blocks
 trl_rat_sz  = 15;       % scatter size for single trial ratings
 mean_rat_sz = 75;      % scatter size for block ratings
 sig_step    = 0.001;    % tolerance step size for plotting model fit
+win_color  = [51 160 44]./256;
+loss_color = [227 26 28]./256;
+blue_color = [31 120 180]./256;
 
 % Get model and condition parameters
 [reg_lab, ~, ~, ~] = fn_regressor_label_styles(st.model_lab);
@@ -130,17 +133,17 @@ hold on;
 
 % Plot Trial and Block Behavior: Easy
 ez_trl = scatter(bhv.tol(ez_trl_idx), bhv.hit(ez_trl_idx), trl_sz,'k','filled');
-ez_rat = scatter(bhv.tol(ez_trl_idx & bhv.hit==1), bhv.rating(ez_trl_idx & bhv.hit==1), trl_rat_sz,'g','*');
-ez_rat = scatter(bhv.tol(ez_trl_idx & bhv.hit==0), bhv.rating(ez_trl_idx & bhv.hit==0), trl_rat_sz,'r','*');
+ez_rat = scatter(bhv.tol(ez_trl_idx & bhv.hit==1), bhv.rating(ez_trl_idx & bhv.hit==1), trl_rat_sz,win_color,'*');
+ez_rat = scatter(bhv.tol(ez_trl_idx & bhv.hit==0), bhv.rating(ez_trl_idx & bhv.hit==0), trl_rat_sz,loss_color,'*');
 ez_blk = scatter(blk_tol(blk_ez),blk_acc(blk_ez), mean_sz,'k','filled');
-ez_rat_blk = scatter(blk_tol(blk_ez),blk_rat(blk_ez), mean_rat_sz,'b','filled','MarkerEdgeColor','k');
+ez_rat_blk = scatter(blk_tol(blk_ez),blk_rat(blk_ez), mean_rat_sz,blue_color,'filled','MarkerEdgeColor','k');
 
 % Plot Trial and Block Behavior: Hard
 hd_trl = scatter(bhv.tol(~ez_trl_idx), bhv.hit(~ez_trl_idx), trl_sz,'k','d');
-hd_rat = scatter(bhv.tol(~ez_trl_idx & bhv.hit==1), bhv.rating(~ez_trl_idx & bhv.hit==1), trl_rat_sz,'g','+');
-hd_rat = scatter(bhv.tol(~ez_trl_idx & bhv.hit==0), bhv.rating(~ez_trl_idx & bhv.hit==0), trl_rat_sz,'r','+');
+hd_rat = scatter(bhv.tol(~ez_trl_idx & bhv.hit==1), bhv.rating(~ez_trl_idx & bhv.hit==1), trl_rat_sz,win_color,'+');
+hd_rat = scatter(bhv.tol(~ez_trl_idx & bhv.hit==0), bhv.rating(~ez_trl_idx & bhv.hit==0), trl_rat_sz,loss_color,'+');
 hd_blk = scatter(blk_tol(~blk_ez),blk_acc(~blk_ez), mean_sz,'k','d');
-hd_rat_blk = scatter(blk_tol(~blk_ez),blk_rat(~blk_ez), mean_rat_sz,'b','d','filled','MarkerEdgeColor','k');
+hd_rat_blk = scatter(blk_tol(~blk_ez),blk_rat(~blk_ez), mean_rat_sz,blue_color,'d','filled','MarkerEdgeColor','k');
 
 % Reconstruct and plot Model Fit
 sig_x = [0:sig_step:0.4];
