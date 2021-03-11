@@ -1,5 +1,5 @@
-plt.evnt_lab    = {'F'};
-plt.evnt_styles = {'-'};
+plt.evnt_lab    = {};
+plt.evnt_styles = {};
 
 plt.plt_lim  = [0 0.6];
 plt.x_step_sz  = 0.1;

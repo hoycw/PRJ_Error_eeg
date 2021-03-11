@@ -333,8 +333,14 @@ for ch_ix = 1:numel(ch_list)
     
     % Fix y limits to be consistent across channels
     clear ylims
-    if strcmp(SBJ_id,'goodall') && strcmp(st.model_lab,'ERPEsL')
+    if strcmp(SBJ_id,'goodall') && any(strcmp(st.model_id,{'ERPEsL_DifFB','ERPEsL_pW25hd_DifFB','EsRPEL_DifFB','ERPEs_DifFB'}))
         ylims = [-3 5];
+    elseif strcmp(SBJ_id,'goodall') && any(strcmp(st.model_id,{'VML_DifFB','SML_DifFB'}))
+        ylims = [-15 10];
+    elseif strcmp(SBJ_id,'goodall') && any(strcmp(st.model_id,{'uRPEL_Neg','uRPEL_Pos'}))
+        ylims = [-4 4];
+    elseif strcmp(SBJ_id,'goodall') && strcmp(st.model_id,'ERBsRPE_EHSu')
+        ylims = [-2 4];
     elseif strcmp(SBJ_id,'good1') && strcmp(st.model_lab,'ERPEsL')
         ylims = [-4 6];
     elseif strcmp(SBJ_id,'good2') && strcmp(st.model_lab,'ERPEsL')
