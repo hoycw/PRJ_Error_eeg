@@ -89,6 +89,10 @@ switch grp_id
     % Collections of individual Target Time conditions
     case {'DifFB','DifOutSur','Pos-Neg'}          % All 6 main conditions
         labels = {'EzWn', 'EzSu', 'EzLs', 'HdWn', 'HdSu', 'HdLs'};
+    case 'EzSu'                         % Neutral Outcomes in Easy
+        labels = {'EzSu'};
+    case 'HdSu'                         % Neutral Outcomes in Hard
+        labels = {'HdSu'};
     case 'EHSu'                         % Neutral Outcomes in Easy+Hard
         labels = {'EzSu','HdSu'};
     case {'DifOut','DifOutUE','DifOutWL','DifOutdO','DifOutDO','Holroyd'}   % Four main conditions

@@ -337,9 +337,9 @@ for ch_ix = 1:numel(ch_list)
         ylims = [-3 5];
     elseif strcmp(SBJ_id,'goodall') && any(strcmp(st.model_id,{'VML_DifFB','SML_DifFB'}))
         ylims = [-15 10];
-    elseif strcmp(SBJ_id,'goodall') && any(strcmp(st.model_id,{'uRPEL_Neg','uRPEL_Pos'}))
+    elseif strcmp(SBJ_id,'goodall') && strcmp(st.model_lab,'uRPEL')
         ylims = [-4 4];
-    elseif strcmp(SBJ_id,'goodall') && strcmp(st.model_id,'ERBsRPE_EHSu')
+    elseif strcmp(SBJ_id,'goodall') && strcmp(st.model_lab,'ERBsRPE')
         ylims = [-2 4];
     elseif strcmp(SBJ_id,'good1') && strcmp(st.model_lab,'ERPEsL')
         ylims = [-4 6];

@@ -87,8 +87,8 @@ for s = 1:numel(SBJs)
 %         SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
         
         % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
-        SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     close all;
 end

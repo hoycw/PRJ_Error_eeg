@@ -20,6 +20,8 @@ tol = nan([numel(SBJs) 3]);
 acc = nan([numel(SBJs) 3]);
 pts = nan([numel(SBJs) 3]);
 out = nan([numel(SBJs) 1]);
+n_rate = nan([numel(SBJs) 1]);
+n_trl  = nan([numel(SBJs) 1]);
 for s = 1:numel(SBJs)
     % Load data
     tmp = load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
@@ -31,6 +33,9 @@ for s = 1:numel(SBJs)
     out(s) = sum([numel(rt_low_ix) numel(rt_high_ix)]);
     
     ez_idx = strcmp(bhvs{s}.cond,'easy');
+    
+    n_rate(s) = sum(~isnan(bhvs{s}.rating));
+    n_trl(s)  = numel(bhvs{s}.trl_n);
     
     tol(s,1) = nanmean(bhvs{s}.tol(ez_idx));
     tol(s,2) = nanmean(bhvs{s}.tol(~ez_idx));

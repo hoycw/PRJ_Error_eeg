@@ -31,7 +31,7 @@ proc_id   = 'eeg_full_ft';
 % stat_ids  = {'uRPEL_Neg_lme_st05t5'};%'ERPEsL_DifFB_lme_st05t5'};
 
 % Subjective rating bias models:
-stat_ids  = {'VSML_DifFB_lme_st05t5'};%'ERPEsL_pW25hd_DifFB_lme_st05t5','ERPEsL_pW25_DifFB_lme_st05t5'};
+stat_ids  = {'ERBuRPE_EzSu_lme_st05t5'};%'ERPEsL_pW25hd_DifFB_lme_st05t5','ERPEsL_pW25_DifFB_lme_st05t5'};
 % Auditory Salience models:
 % stat_ids  = {'rsRPE_EHSu_lme_st05t5'};%'ERBsRPE_EHSu_lme_st05t5','ERBrsRPE_EHSu_lme_st05t5'};%'ERB_EHSu_lme_st0t5','ERBr_EHSu_lme_st0t5','rough_EHSu_lme_st0t5','AudSal_EHSu_lme_st0t5'};
 % Outcome-based models:
@@ -40,9 +40,9 @@ stat_ids  = {'VSML_DifFB_lme_st05t5'};%'ERPEsL_pW25hd_DifFB_lme_st05t5','ERPEsL_
 
 fig_vis   = 'on';
 save_fig  = 1;
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
-for s = 5%1:numel(SBJs)
+for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         % Run model
         SBJ04a_RL_model(SBJs{s},proc_id,stat_ids{st_ix});
@@ -71,7 +71,7 @@ end
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%,'ERP_Cz_F2t1_dm2t0_fl05t20'};%,
 
 % Main RL model:
-% stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};
+stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};
 % Split negative and positive outcomes:
 % stat_ids  = {'uRPEL_Neg_lme_st05t5','uRPEL_Pos_lme_st05t5'};%'uRPE_Neg_lme_st05t5','uRPE_Pos_lme_st05t5'};
 % hard subjective bias:
@@ -89,10 +89,10 @@ null_id   = 'SBJonly_all_lme_st05t5';
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
-    for st_ix = 9%1:numel(stat_ids)
+    for st_ix = 1:numel(stat_ids)
       % Run LME RL model on ERPs over time
 %       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
       

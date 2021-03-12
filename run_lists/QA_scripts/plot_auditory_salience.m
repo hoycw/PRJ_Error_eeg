@@ -13,6 +13,38 @@ n_bins     = 25;
 face_alpha = 0.6;
 fig_ftype  = 'png';
 
+%% Plot sound waveforms
+sound_dir = '/Users/colinhoy/Code/PRJ_Error/target_time_scripts/surprise_sounds/';
+sound_types = {'breaks','cymbols','horns','oddball','smash','snares','squeaks','stabs','valves'};
+
+sounds = {};
+sound_names = {};
+sound_ix = 0;
+for type_ix = 1:numel(sound_types)
+    file_list = dir([sound_dir sound_types{type_ix} '/*.wav']);
+    
+    for s_ix = 1:numel(file_list)
+        % Load sound
+        filename = fullfile(file_list(s_ix).folder,file_list(s_ix).name);
+        if ~contains(filename,'._')
+            sound_ix = sound_ix+1;
+            sound_names{sound_ix} = file_list(s_ix).name;
+            [signal, fs] = audioread(filename);
+            
+            % Average across channels
+            sounds{sound_ix} = mean(signal,2);
+        end
+    end
+end
+
+figure;
+num_rc = fn_num_subplots(numel(sounds));
+for s_ix = 1:numel(sounds)
+    subplot(num_rc(1),num_rc(2),s_ix);
+    plot(sounds{s_ix});
+    title(sound_names{s_ix});
+end
+
 %% Load data and set up stats
 [reg_lab, reg_names, ~, ~, ~] = fn_regressor_label_styles('AudSal');
 

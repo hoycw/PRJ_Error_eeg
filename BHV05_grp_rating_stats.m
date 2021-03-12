@@ -313,20 +313,26 @@ end
 
 %% Plot and Print Bias between pWin and Ratings
 % Average pWin and Ratings within easy and hard
-blk_pwin = nan([numel(SBJs) 2]);
-blk_rate = nan([numel(SBJs) 2]);
+mean_eh_pwin = nan([numel(SBJs) 2]);
+mean_eh_rate = nan([numel(SBJs) 2]);
+% trl_bias = nan([numel(SBJs) 2]);  % this was to subtract single-trial
+% then average, but that gives the exact same result
 for s = 1:numel(SBJs)
     for ez_ix = [0 1]
-        blk_pwin(s,ez_ix+1) = mean(data.pWin(data.sbj==s & data.ez==ez_ix));
-        blk_rate(s,ez_ix+1) = mean(data.rating(data.sbj==s & data.ez==ez_ix));
+        mean_eh_pwin(s,ez_ix+1) = mean(data.pWin(data.sbj==s & data.ez==ez_ix));
+        mean_eh_rate(s,ez_ix+1) = mean(data.rating(data.sbj==s & data.ez==ez_ix));
+        
+%         trl_bias(s,ez_ix+1) = mean(data.pWin(data.sbj==s & data.ez==ez_ix) - ...
+%                                    data.rating(data.sbj==s & data.ez==ez_ix));
     end
 end
-pwin_rate_diff = blk_pwin-blk_rate;
+pwin_rate_diff = mean_eh_pwin-mean_eh_rate;
 
 fig_name = [SBJ_id '_BHV_ratings_pWin_bias'];
 figure('Name',fig_name,'units','normalized',...
         'outerposition',[0 0 0.5 0.5],'Visible',fig_vis);
 
+% subplot(1,2,1); hold on;
 violins = violinplot(pwin_rate_diff, {'Hard','Easy'}, 'ShowData', true, 'ShowMean', true, 'ViolinAlpha', 0.3);
 violins(1).ViolinColor = eh_colors{2};
 violins(2).ViolinColor = eh_colors{1};
@@ -334,7 +340,19 @@ ylabel('Bias: (pWin - Rating)');
 legend([violins(1).ViolinPlot violins(2).ViolinPlot],...
     {['Hard mean = ' num2str(mean(pwin_rate_diff(:,1)),'%.2f')],...
     ['Easy mean = ' num2str(mean(pwin_rate_diff(:,2)),'%.2f')]},'Location','best');
+title('Average bias');
 set(gca,'FontSize',14);
+
+% subplot(1,2,2); hold on;
+% violins = violinplot(trl_bias, {'Hard','Easy'}, 'ShowData', true, 'ShowMean', true, 'ViolinAlpha', 0.3);
+% violins(1).ViolinColor = eh_colors{2};
+% violins(2).ViolinColor = eh_colors{1};
+% ylabel('Bias: (pWin - Rating)');
+% legend([violins(1).ViolinPlot violins(2).ViolinPlot],...
+%     {['Hard mean = ' num2str(mean(pwin_rate_diff(:,1)),'%.2f')],...
+%     ['Easy mean = ' num2str(mean(pwin_rate_diff(:,2)),'%.2f')]},'Location','best');
+% title('Single-trial mean bias')
+% set(gca,'FontSize',14);
 
 % Save Ratings Histogram Figure
 if save_fig
