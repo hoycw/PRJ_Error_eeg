@@ -66,6 +66,7 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 %% Compute mean regressor per condition
 cond_reg_mean = nan([numel(cond_lab) numel(SBJs) numel(reg_lab)]);
 plot_reg_mean = nan([numel(cond_lab) numel(SBJs) numel(reg_lab)]);
+sbj_factor    = nan([numel(cond_lab) numel(SBJs)]);
 for s = 1:numel(SBJs)
     % Load data
     load([root_dir 'PRJ_Error_eeg/data/' SBJs{s} '/03_events/' ...
@@ -96,11 +97,23 @@ for s = 1:numel(SBJs)
         end
     end
     
+    % Track SBJ
+    sbj_factor(:,s) = s*ones([numel(cond_lab) 1]);
+    
     clear tmp
 end
 
 %% Load Peak Times
-load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' pk_stat_id '_' an_id '.mat']);
+% Can't load P2P results from only easy/hard surprise, so select
+%   conditions after loading full DifFB results
+if contains(pk_stat_id,'_EHSu_lme_p2pFRN')
+    pk_times_id = strrep(pk_stat_id,'EHSu','DifFB');
+else
+    pk_times_id = pk_stat_id;
+end
+
+% Load P2P results (peak times)
+load([root_dir 'PRJ_Error_eeg/data/GRP/' SBJ_id '_' pk_times_id '_' an_id '.mat']);
 if numel(ch_list)>1; error('only plotting for 1 channel in this script!'); end
 if st.pk_sign(2)~=-1; error('second peak is not negative!'); end
 
@@ -113,6 +126,13 @@ if SBJ_norm
     norm_str = '_SBJnorm';
 else
     norm_str = '';
+end
+
+% Subselect conditions after normalizing across all
+if contains(pk_stat_id,'_EHSu_lme_p2pFRN')
+    [gen_cond_lab, ~, ~, ~, ~] = fn_condition_label_styles(st.model_cond);
+    cond_idx = contains(gen_cond_lab,cond_lab);
+    pk_data = pk_data(cond_idx,:);
 end
 
 %% Comptue latency-predictor regression
@@ -128,8 +148,17 @@ end
 reg_formula = strjoin(reg_lab,' + ');
 formula = ['latency ~ ' reg_formula];
 
-glm = fitglm(tbl,formula);
+if SBJ_norm
+    glm = fitglm(tbl,formula);
+else
+    % Linear mixed effects for SBJ since latencies aren't normalized
+    tbl.SBJ = categorical(reshape(sbj_factor,numel(cond_lab)*numel(SBJs),1));
+    formula = [formula ' + (1|SBJ)']; % random intercepts for SBJ
+    glm = fitlme(tbl,formula);
+end
+
 pvals = glm.Coefficients.pValue(2:end); % Skip intercept
+
 
 % Correct for Multiple Comparisons
 if strcmp(st.mcp_method,'FDR')
@@ -202,7 +231,7 @@ for reg_ix = 1:numel(reg_lab)
     set(ax,'FontSize',16');
     
     % Print multiple regression stats
-    fprintf('%s p = %.20f\n',reg_lab{reg_ix},qvals(reg_ix));
+    fprintf('%s B = %.5f; q = %.20f\n',reg_lab{reg_ix},glm.Coefficients.Estimate(reg_ix+1),qvals(reg_ix));
 end
 
 %% Save figure

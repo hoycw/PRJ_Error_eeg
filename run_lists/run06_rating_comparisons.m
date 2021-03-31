@@ -79,7 +79,7 @@ stat_ids  = {'ERPEs_DifFB_lme_st05t5'};%'uRPE_Neg_lme_st05t5'};%'ML_Neg_lme_st05
 % Alternative (worse) models: 'RSVPE_all_lme_mn1FRN','SML_all_lme_mn1FRN','VML_all_lme_mn1FRN'
 fig_vis   = 'on';
 save_fig  = 1;
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)

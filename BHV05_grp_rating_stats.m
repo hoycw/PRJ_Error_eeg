@@ -368,9 +368,9 @@ end
 
 %% Statistics for win vs. loss ratings
 % Statistics for win vs. loss within condition
-[~, ez_pval] = ttest2(data.zrating(data.ez==1 & data.hit==0), data.zrating(data.ez==1 & data.hit==1));
-[~, hd_pval] = ttest2(data.zrating(data.ez==0 & data.hit==0), data.zrating(data.ez==0 & data.hit==1));
-[~, full_pval] = ttest2(data.zrating(data.hit==0), data.zrating(data.hit==1));
+[~, ez_pval, ~, ez_stats] = ttest2(data.zrating(data.ez==1 & data.hit==0), data.zrating(data.ez==1 & data.hit==1));
+[~, hd_pval, ~, hd_stats] = ttest2(data.zrating(data.ez==0 & data.hit==0), data.zrating(data.ez==0 & data.hit==1));
+[~, full_pval, ~, full_stats] = ttest2(data.zrating(data.hit==0), data.zrating(data.hit==1));
 
 % Plotting statistics
 mean_ez_ls_rat = nanmean(data.zrating(data.ez==1 & data.hit==0));

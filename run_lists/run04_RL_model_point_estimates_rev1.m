@@ -88,7 +88,7 @@ fig_ftype = 'png';
 
 for st_ix = 1:numel(stat_ids)
     % Compute peak-to-peak FRN metric and run RL model via LME
-%     SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
+    SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
     
     % Sup. Fig. 1D: Plot RL model coefficients for peak-to-peak FRN metric
 %     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
@@ -107,25 +107,30 @@ SBJ04e_ERP_plot_RL_model_comparison_point(SBJ_id,an_id,stat_ids,'',plt_id,'R2',s
 
 %% Peak Latency Regression
 an_id     = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-stat_ids  = {'ERBrsRPE_EHSu_lme_p2pFRN'};%'ERPEsL_DifFB_lme_p2pFRN'};
+stat_ids  = {'ERPEsL_DifFB_lme_p2pFRN'};
 
 proc_id   = 'eeg_full_ft';
-save_fig  = 1;
+save_fig  = 0;
 fig_vis   = 'on';
 fig_ftype = 'png';
 
 for st_ix = 1:numel(stat_ids)
     % Run LME RL model on peak latencies from peak-to-peak FRN metric and plot latencies
     SBJ_norm = 0;
-    SBJ04c_ERP_p2p_latency_reg(SBJ_id,proc_id,an_id,stat_ids{st_ix},SBJ_norm,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ04c_ERP_p2p_latency_reg(SBJ_id,proc_id,an_id,stat_ids{st_ix},SBJ_norm,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
-    % Sup. Fig. 6B: Run LME RL model on peak latencies from peak-to-peak FRN metric
-    %   also plot latencies after normalizing to mean peak latency within SBJ
-    SBJ_norm = 1;
-    SBJ04c_ERP_p2p_latency_reg(SBJ_id,proc_id,an_id,stat_ids{st_ix},SBJ_norm,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     % Sup. Fig. 6B: Run LME RL model on peak latencies from peak-to-peak FRN metric
+%     %   also plot latencies after normalizing to mean peak latency within SBJ
+%     SBJ_norm = 1;
+%     SBJ04c_ERP_p2p_latency_reg(SBJ_id,proc_id,an_id,stat_ids{st_ix},SBJ_norm,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
+
+stat_id  = 'ERPEsL_EHSu_lme_p2pFRN';
+% Run LME RL model on peak latencies from peak-to-peak FRN metric and plot latencies
+SBJ_norm = 0;
+SBJ04c_ERP_p2p_latency_ttest(SBJ_id,an_id,stat_id,SBJ_norm);
 
 %% FRN Metric Comparison: FRN by Condition
 % Sup. Fig. 1B
