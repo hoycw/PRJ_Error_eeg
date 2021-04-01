@@ -73,7 +73,7 @@ an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%,'ERP_Cz_
 % Main RL model:
 % stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};
 % Split negative and positive outcomes:
-stat_ids  = {'EuRPEL_Neg_lme_st05t5','EuRPEL_Pos_lme_st05t5'};%'uRPE_Neg_lme_st05t5','uRPE_Pos_lme_st05t5'};
+% stat_ids  = {'uRPEL_Neg_lme_st05t5','uRPEL_Pos_lme_st05t5'};%'uRPE_Neg_lme_st05t5','uRPE_Pos_lme_st05t5'};
 % hard subjective bias:
 % stat_ids  = {'ERPEsL_pW25hd_DifFB_lme_st05t5'};
 % Auditory Salience:
@@ -82,23 +82,25 @@ stat_ids  = {'EuRPEL_Neg_lme_st05t5','EuRPEL_Pos_lme_st05t5'};%'uRPE_Neg_lme_st0
 % stat_ids  = {'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5'};%,'ERPEsL_DifFB_lme_st05t5'};
 % RL models without uRPE or Lik:
 % stat_ids  = {'EsRPEL_DifFB_lme_st05t5','ERPEs_DifFB_lme_st05t5'};%,'ERPEsL_DifFB_lme_st05t5'};
+% All models:
+stat_ids  = {'VML_DifFB_lme_st05t5','SML_DifFB_lme_st05t5','EsRPEL_DifFB_lme_st05t5','ERPEs_DifFB_lme_st05t5','ERPEsL_DifFB_lme_st05t5'};
 
 plt_id    = 'ts_F2t8_evnts_sigLine';%'ts_F0t6_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st05t5';
 
 proc_id   = 'eeg_full_ft';
-save_fig  = 1;
+save_fig  = 0;
 fig_vis   = 'on';
 fig_ftype = 'png';
 
-for an_ix = 1:numel(an_ids)
+for an_ix = 1%1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
       % Run LME RL model on ERPs over time
-      SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
+%       SBJ04c_ERP_grp_stats_LME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix});
       
 %       % Fig. 2: Plot model results (ERPs, coefficients, model fit)
-      SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%       SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
       % Fig. 2ABCD: Plot model results (ERPs, coefficients, model fit)
       %     with window overlays for N3, P3, sRPE, uRPE, Lik
@@ -129,12 +131,19 @@ for an_ix = 1:numel(an_ids)
         aic_mean_win = [-0.025 0.025]+0.308;    % beta peaks in goodall for uRPE (0.308) and Lik (0.38)
     end
 %     aic_mean_win = [-0.025 0.025]+0.380;
-    SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'rm_null',1,'mean_win',aic_mean_win);%'mean_reg',aic_mean_reg);
+%     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'rm_null',1,'mean_win',aic_mean_win);%'mean_reg',aic_mean_reg);
 
     % Model Comparison Plots: AIC Performance
 %     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'plot_null',1);%,'mean_reg',aic_mean_reg);
+
+    % Print model comparisons: AIC Performance
+    aic_mean_win = [-0.025 0.025]+[0.216 0.308 0.380]';
+    for mw_ix = 1:size(aic_mean_win,1)
+        SBJ04e_ERP_print_RL_model_comparison_win(SBJ_id,an_ids{an_ix},stat_ids,null_id,...
+            aic_mean_win(mw_ix,:),'rm_null',1);
+    end
 
     % Model Comparison Plots: R2 Fits Relative to SBJonly null model
 %     SBJ04e_ERP_plot_RL_model_comparison_R2_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
@@ -156,12 +165,12 @@ end
 % Plots Fig. 3 and Sup. Fig. 3
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
-% stat_ids  = {'uRPEL_Neg_lme_mn05man216','uRPEL_Neg_lme_mn05man308','uRPEL_Neg_lme_mn05man380'};
-stat_ids  = {'uRPEL_Pos_lme_mn05man216','uRPEL_Pos_lme_mn05man308','uRPEL_Pos_lme_mn05man380'};
+stat_ids  = {'uRPEL_Neg_lme_mn05man216','uRPEL_Neg_lme_mn05man308','uRPEL_Neg_lme_mn05man380'};
+% stat_ids  = {'uRPEL_Pos_lme_mn05man216','uRPEL_Pos_lme_mn05man308','uRPEL_Pos_lme_mn05man380'};
 % stat_ids  = {'uRPE_Neg_lme_mn05man216','uRPE_Pos_lme_mn05man216','uRPE_Neg_lme_mn05man308','uRPE_Pos_lme_mn05man308'};
 % stat_ids = {'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
 plt_id    = 'topo_F18t25';
-save_fig  = 1;
+save_fig  = 0;
 fig_vis   = 'on';
 fig_ftype = 'svg';
 
