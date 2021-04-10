@@ -165,6 +165,13 @@ end
 % all cfg_tfr options are specified in the an_vars
 tfr_full = ft_freqanalysis(cfg_tfr, clean_trials);
 
+% Output FWHM in ms
+fwhm = fn_compute_wavelet_fwhm(-pad_len:1/clean_trials.fsample:pad_len,tfr_full.freq,cfg_tfr.width);
+fprintf('Full-Width @ Half-Max per freq:\n');
+for f_ix = 1:numel(cfg_tfr.foi)
+    fprintf('\t%.2f Hz: %.4f sec\n',tfr_full.freq(f_ix),fwhm(f_ix));
+end
+
 % Trim padding off
 cfgs = [];
 cfgs.latency = an.trial_lim_s;

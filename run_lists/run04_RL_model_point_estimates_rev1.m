@@ -24,13 +24,13 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% ERP: Mean Window LME
 % Main RL Model
-% an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
-% stat_ids = {'VML_DifFB_lme_erpmn1FRN','SML_DifFB_lme_erpmn1FRN','ERPEsL_DifFB_lme_erpmn1FRN'};%
+an_id    = 'ERP_Fz_F2t1_dm2t0_fl05t20';
+stat_ids = {'VML_DifFB_lme_erpmn1FRN','SML_DifFB_lme_erpmn1FRN','ERPEsL_DifFB_lme_erpmn1FRN'};%
 % stat_ids = {'EsRPEL_DifFB_lme_erpmn05Lik','ERPEs_DifFB_lme_erpmn05Lik','ERPEsL_DifFB_lme_erpmn05Lik'};%
 
-an_id    = 'ERP_Pz_F2t1_dm2t0_fl05t20';
-% stat_ids = {'EsRPEL_DifFB_lme_erpmn1P3','ERPEs_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
-stat_ids = {'VML_DifFB_lme_erpmn1P3','SML_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
+% an_id    = 'ERP_Pz_F2t1_dm2t0_fl05t20';
+% % stat_ids = {'EsRPEL_DifFB_lme_erpmn1P3','ERPEs_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
+% stat_ids = {'VML_DifFB_lme_erpmn1P3','SML_DifFB_lme_erpmn1P3','ERPEsL_DifFB_lme_erpmn1P3'};%
 
 plt_id    = 'bar_sigStar';
 null_id   = 'SBJonly_all_lme_mn1FRN';
@@ -91,8 +91,8 @@ for st_ix = 1:numel(stat_ids)
     SBJ04c_ERP_grp_stats_LME_P2P(SBJ_id,proc_id,an_id,stat_ids{st_ix},'plot_erps',1,'plot_peaks',1);
     
     % Sup. Fig. 1D: Plot RL model coefficients for peak-to-peak FRN metric
-%     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
     % Plot RL model coefficients and data from peak-to-peak FRN metric
 %     SBJ04d_ERP_plot_stats_LME_p2p_betas(SBJ_id,an_id,stat_ids{st_ix},plt_id,save_fig,...
