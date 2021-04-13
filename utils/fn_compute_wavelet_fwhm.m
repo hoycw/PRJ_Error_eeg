@@ -33,6 +33,15 @@ end
 % Find center of the window
 win_center = dsearchn(time_vec',0);
 
+if plot_fig
+    cmap = colormap;
+    figure; hold on;
+    subplot(1,2,1); hold on;
+    f_lines  = gobjects(size(freqs));
+    f_leg    = cell(size(freqs));
+    cmap_idx = zeros(size(freqs));
+end
+
 %% Compute FWHM
 fwhm  = zeros(size(freqs));
 std_freq = zeros(size(freqs));
@@ -57,28 +66,25 @@ for f_ix = 1:length(freqs)
     fwhm_start = time_vec(dsearchn(gauss_win(1:win_center)',.5));
     fwhm_end   = time_vec(win_center-1+dsearchn(gauss_win(win_center:end)',.5));
     fwhm(f_ix) = fwhm_end - fwhm_start;
-end
-
-%% Plot Results
-if plot_fig
-    figure; hold on;
-    f_lines  = gobjects(size(freqs));
-    f_leg    = cell(size(freqs));
-    cmap_idx = zeros(size(freqs));
-    for f_ix = 1:numel(freqs)
-        % Plot Gaussian window
-        subplot(1,2,1); hold on;
+    
+    % Plot Gaussian window
+    if plot_fig
         cmap_idx(f_ix) = f_ix*floor(size(cmap,1)/numel(freqs));%dsearchn([1:size(cmap,1)]'./numel(freqs),f_ix);
         f_lines(f_ix) = plot(time_vec,gauss_win,'Color',cmap(cmap_idx(f_ix),:));
         f_leg{f_ix} = [num2str(freqs(f_ix)) ' Hz: ' num2str(fwhm(f_ix))];
     end
+end
+
+%% Plot Results
+if plot_fig
+    % Finish legend on Windows
     legend(f_lines,f_leg);
     
     % Plot FWHM metrics
     subplot(1,2,2); hold on;
     mxc = scatter(freqs,fwhm,50,'r');
     ft = scatter(freqs,ft_fwhm,50,'b');
-    legend([mxc mxc_h ft], {'Cohen', 'Cohen H', 'FT'});
+    legend([mxc ft], {'Cohen', 'FT'});
 end
 
 %%
@@ -89,5 +95,10 @@ end
 % legend({'Using FWHM';'Using n-cycles'})
 % set(gca,'xlim',[freqs(1)-1 freqs(end)+1])
 
+% function [h] = fn_MXCohen_wavelet_FWHM(freqs,n_cycles)
+% 
+% h = n_cycles*sqrt(2*log(2)) / pi*freqs;
+% 
+% end
 
 end
