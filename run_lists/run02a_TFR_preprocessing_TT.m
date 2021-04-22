@@ -1,6 +1,6 @@
-%% Time-frequency power and phase analyses for Sequential PE Initial Submission
-% Developed over time, but editted 8/20/20 by Colin W Hoy
-%   Sup. Fig. 4 and 5: SBJ05c_TFR_ERP_plot_grp
+%% Time-frequency power and phase analyses for Target Time task in Sequential PE Revision 1 Submission
+% Developed over time, but editted 4/16/21 by Colin W Hoy
+%   Sup. Fig. 7 and 8: SBJ05c_TFR_ERP_plot_grp
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -47,7 +47,7 @@ for an_ix = 1:numel(an_ids)
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Plot TFRs of power data with ERP overlay per condition for group
-    %*** Sup. Fig. 4 (Fz) and 5 (Pz)
+    %*** Sup. Fig. 7 (Fz) and 8 (Pz)
     SBJ05c_TFR_ERP_plot_grp(SBJ_id, conditions, proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end

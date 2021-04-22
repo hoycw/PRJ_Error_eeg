@@ -14,6 +14,7 @@ function SBJ06e_OB_TT_ERP_grp_plot_corr_reg_comparison(SBJ_id,tt_proc_id,stat_id
 %       st.measure = feat_id for TT ERP features
 % OUTPUTS:
 %   saves OB-TT corr vs. RL model reg scatter plot figure
+%   saves correlation matrix summary figure
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];

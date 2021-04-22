@@ -1,5 +1,5 @@
-%% Behavior and Pre-Processing for Sequential PE Initial Submission
-% Written 8/14/2020 by Colin Hoy
+%% Behavior and Pre-Processing for Sequential PE Inital and Revision 1 Submission
+% Developed over time, but editted 4/21/21 by Colin W Hoy
 % 	Fig. 1A: BHV02_plot_RT_hist
 %   Fig. 1B: BHV00_01_prelim_analysis.py
 %   Fig. 1C: BHV03_group_accuracy_plots_TT

@@ -1,6 +1,6 @@
-%% Time-frequency power and phase preprocessing for Sequential PE revision
-% Developed over time, but editted 12/XX/20 by Colin W Hoy
-%   Sup. Fig. 4 and 5: SBJ05c_TFR_ERP_plot_grp
+%% Time-frequency power and phase analyses for Target Time task in Sequential PE Revision 1 Submission
+% Developed over time, but editted 4/16/21 by Colin W Hoy
+% Oddball TFRs were not included in the revision 1 manuscript
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -44,13 +44,12 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Plot TFRs of power data per condition for group
-    SBJ07c_OB_TFR_plot_grp(SBJ_id, conditions, ob_proc_id, an_ids{an_ix}, plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ07c_OB_TFR_plot_grp(SBJ_id, conditions, ob_proc_id, an_ids{an_ix}, plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Plot TFRs of power data with ERP overlay per condition for group
-    %*** Sup. Fig. 4 (Fz) and 5 (Pz)
-    SBJ07c_OB_TFR_ERP_plot_grp(SBJ_id, conditions, ob_proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ07c_OB_TFR_ERP_plot_grp(SBJ_id, conditions, ob_proc_id, an_ids{an_ix},erp_ids{an_ix}, plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% Compute Phase for ITPC
@@ -81,8 +80,8 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Compute and plot ITPC with ERP overlay per condition for group
-    SBJ07c_OB_ITC_ERP_plot_grp(SBJ_id,conditions,ob_proc_id,an_ids{an_ix},erp_ids{an_ix},...
-            plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ07c_OB_ITC_ERP_plot_grp(SBJ_id,conditions,ob_proc_id,an_ids{an_ix},erp_ids{an_ix},...
+%             plt_id,save_fig,'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Exploratory rose plot: Compute and plot ITPC with ERP overlay per condition for single SBJ
     %   Also extracts/plots mean phase angle in T-F window across conditions

@@ -1,3 +1,8 @@
+%% ERP analysis and plotting  of Oddball task for Sequential PE Revision 1 Submission
+% Developed over time, but editted 4/21/21 by Colin W Hoy
+%   Fig. 5A and 5B: SBJ03c_ERP_plot_grp
+%   Fig. 5C: SBJ03c_ERP_plot_grp_topo_cond
+
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
 elseif exist('/Users/sheilasteiner/','dir'); root_dir='/Users/sheilasteiner/Desktop/Knight_Lab/';app_dir='/Users/sheilasteiner/Downloads/fieldtrip-master/';
@@ -51,6 +56,7 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Group ERP plot
+    %*** plots Fig. 5A and 5B
     plt_id     = 'ts_S2t8_evnts_sigLine';
     SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
@@ -75,11 +81,13 @@ for s = 1:numel(SBJs)
 end
 
 % Group Topo Plot: P3
+%*** plots Fig. 5C
 plt_id = 'topo_F3t45';
 SBJ03c_ERP_plot_grp_topo_cond(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,...
     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 % Group Topo Plot: N2
+%*** plots Fig. 5C
 plt_id = 'topo_F2t3';
 SBJ03c_ERP_plot_grp_topo_cond(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,...
     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
@@ -89,5 +97,5 @@ proc_id    = 'odd_full_ft';
 an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
 conditions = 'OB';
 
-SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
+%SBJ03c_ERP_save_grp_topo_cond(SBJ_id,conditions,proc_id,an_id);
 

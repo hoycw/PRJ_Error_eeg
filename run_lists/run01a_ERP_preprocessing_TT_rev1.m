@@ -1,8 +1,6 @@
-%% ERP analysis and plotting for Sequential PE Initial Submission
-% Developed over time, but editted 8/20/20 by Colin W Hoy
-% 	Fig. 1A: BHV02_plot_RT_hist
-%   Fig. 1B: BHV00_01_prelim_analysis.py
-%   Fig. 1C: BHV03_group_accuracy_plots_TT
+%% ERP analysis and plotting  of Target Time task for Sequential PE Revision 1 Submission
+% Developed over time, but editted 4/21/21 by Colin W Hoy
+% 	Sup. Fig. 10A: SBJ03c_ERP_plot_grp_pkLine
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -33,7 +31,7 @@ for an_ix = 1:numel(an_ids)
     for s = 1:numel(SBJs)
         % Re-align data to event, select channels and epoch, filter, save
         %   Options to downsample and run LaPlacian transform
-%         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
+        SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
 
         % Plot SBJ ERPs per condition
 %         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
@@ -49,7 +47,7 @@ for an_ix = 1:numel(an_ids)
     end
     
     % Plot Group ERPs
-    %*** plots Fig. 2A (Fz) and 2B (Pz)
+    %   can reproduce plots in Fig. 2A (Fz) and 2B (Pz), but see SBJ04d_ERP_plot_stats_LME_RL_fits.m
 %     SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
@@ -61,7 +59,7 @@ for an_ix = 1:numel(an_ids)
 end
 
 %% Plot ERPs with FRN peaks marked
-%*** plots Sup. Fig. 6A (easy/hard FB separately, neutral for Easy+Hard)
+%*** plots Sup. Fig. 10A (easy/hard FB separately, neutral for Easy+Hard)
 an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
 cond_list  = {'HdOutS','EzOutS','EHSu'};
 proc_id    = 'eeg_full_ft';
@@ -94,7 +92,7 @@ SBJ03c_ERP_save_grp_ERP_cond(SBJ_id,conditions,proc_id,an_id);
 % be unused... maybe it was a precursor to SBJ03c_ERP_plot_grp_topo_ts_cond?
 
 %% ERPs: Full Cap Topography
-% NOTE: Sup. Fig. 3 (ERP topo dynamics) plotted in run03_RL_model_results
+% NOTE: Sup. Fig. 6 (ERP topo dynamics) plotted in run03_RL_model_results
 % because it locks the averaging windows to peaks of model coefficients
 an_id      = 'ERP_all_F2t1_dm2t0_fl05t20';
 

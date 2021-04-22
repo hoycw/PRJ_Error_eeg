@@ -1,8 +1,7 @@
-%% Behavior and Pre-Processing for Sequential PE Initial Submission
-% Written 8/14/2020 by Colin Hoy
-% 	Fig. 1A: BHV02_plot_RT_hist
-%   Fig. 1B: BHV00_01_prelim_analysis.py
-%   Fig. 1C: BHV03_group_accuracy_plots_TT
+%% Behavior and Pre-Processing of behavioral rating dataset for Sequential PE Revision 1
+% Editted 4/16/21 by Colin W. Hoy
+%   Sup. Fig. 10A: SBJ04b_BHV_RL_model_rating_plot
+%   Sup. Fig. 10B and 10C: BHV05_grp_rating_stats
 
 %% Set Up
 % Running locally on Colin's MacBookPro; OS 10.13.6; MATLAB R2017b
@@ -84,17 +83,18 @@ fig_ftype = 'png';
 for s = 1:numel(SBJs)
     for st_ix = 1:numel(stat_ids)
         % Run model
-%         SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
+        SBJ04a_RL_model_ratings(SBJs{s},proc_id,stat_ids{st_ix});
         
-        % Fig. 1D: Plot model fit to tolerance and outcomes/accuracy
-%         SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
-%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+        % Sup. Fig. 10A: Plot model fit to tolerance and outcomes/accuracy
+        SBJ04b_BHV_RL_model_rating_plot(SBJs{s},proc_id,stat_ids{st_ix},...
+            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     close all;
 end
 
 plt_id    = 'line_cond';
 for st_ix = 1:numel(stat_ids)
+    % Sup. Fig. 10B and 10C
     BHV05_grp_rating_stats(SBJ_id,proc_id,stat_ids{st_ix},...
             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
