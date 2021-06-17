@@ -26,7 +26,7 @@ addpath([app_dir 'fieldtrip/']);
 ft_defaults
 
 %% General parameters
-SBJ_id = 'goodall';%'good2';%'good1';%
+SBJ_id = 'good2';%'good1';%'goodall';%
 SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% Single SBJ RL Model
@@ -82,9 +82,9 @@ end
 an_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};%,'ERP_Cz_F2t1_dm2t0_fl05t20'};
 
 % Main RL model:
-stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};
+% stat_ids  = {'ERPEsL_DifFB_lme_st05t5'};
 % Split negative and positive outcomes:
-% stat_ids  = {'uRPEL_Neg_lme_st05t5','uRPEL_Pos_lme_st05t5'}; %without Lik: 'uRPE_Neg_lme_st05t5','uRPE_Pos_lme_st05t5'};
+stat_ids  = {'uRPEL_Neg_lme_st05t5','uRPEL_Pos_lme_st05t5'}; %without Lik: 'uRPE_Neg_lme_st05t5','uRPE_Pos_lme_st05t5'};
 % hard subjective bias:
 % stat_ids  = {'ERPEsL_pW25hd_DifFB_lme_st05t5'};
 % Auditory Salience:
@@ -100,7 +100,7 @@ plt_id    = 'ts_F2t8_evnts_sigLine';%'ts_F0t6_evnts_sigLine';
 null_id   = 'SBJonly_all_lme_st05t5';
 
 proc_id   = 'eeg_full_ft';
-save_fig  = 0;
+save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'png';
 
@@ -125,13 +125,13 @@ for an_ix = 1:numel(an_ids)
           if contains(stat_ids{st_ix},'EsRPE'); beta_win_name = {'Lik'};
           else                                  beta_win_name = {'uRPE'}; end
       end
-      SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype,'erp_win_name',erp_win_name,'beta_win_name',beta_win_name);
+%       SBJ04d_ERP_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_ids{st_ix},plt_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype,'erp_win_name',erp_win_name,'beta_win_name',beta_win_name);
     end
     
     % Optional: run SBJ only model (random intercepts, no regressors) for
     %   baseline model performance 
-    SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
+%     SBJ04c_ERP_grp_stats_LME_SBJonly(SBJ_id,proc_id,an_ids{an_ix},null_id);
 
     % Model Comparison Plots: AIC Performance Relative to SBJonly null model
     %*** plots Fig. 2E and 2F
@@ -145,8 +145,8 @@ for an_ix = 1:numel(an_ids)
         aic_mean_win = [-0.025 0.025]+0.308;    % beta peaks in goodall for uRPE (0.308) and Lik (0.38)
     end
 %     aic_mean_win = [-0.025 0.025]+0.380;
-    SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'rm_null',1,'mean_win',aic_mean_win);%'mean_reg',aic_mean_reg);
+%     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'rm_null',1,'mean_win',aic_mean_win);%'mean_reg',aic_mean_reg);
 
     % Model Comparison Plots: AIC Performance with SBJonly plotted too
 %     SBJ04e_ERP_plot_RL_model_comparison_ts(SBJ_id,an_ids{an_ix},stat_ids,null_id,plt_id,save_fig,...
@@ -156,8 +156,8 @@ for an_ix = 1:numel(an_ids)
     %*** Sup. Table 2
     aic_mean_win = [-0.025 0.025]+[0.216 0.308 0.380]';
     for mw_ix = 1:size(aic_mean_win,1)
-        SBJ04e_ERP_print_RL_model_comparison_win(SBJ_id,an_ids{an_ix},stat_ids,null_id,...
-            aic_mean_win(mw_ix,:),'rm_null',1);
+%         SBJ04e_ERP_print_RL_model_comparison_win(SBJ_id,an_ids{an_ix},stat_ids,null_id,...
+%             aic_mean_win(mw_ix,:),'rm_null',1);
     end
 
     % Model Comparison Plots: R2 Fits Relative to SBJonly null model
@@ -172,8 +172,8 @@ end
 % Sup. Fig. 2: Electrode R2 Comparison Plot
 plt_id     = 'ts_F0t5_evnts_sigLine';   % plot only for stat_lim
 for st_ix = 1:numel(stat_ids)
-    SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_ids{st_ix},plt_id,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
+%     SBJ04e_ERP_plot_RL_elec_comparison_R2_ts(SBJ_id,an_ids,stat_ids{st_ix},plt_id,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype,'r2_version','Adjusted');
 end
 
 %% Beta Topographies: Linear Mixed Effects Model (Mean Windows)
@@ -185,9 +185,9 @@ stat_ids  = {'uRPEL_Neg_lme_mn05man216','uRPEL_Neg_lme_mn05man308','uRPEL_Neg_lm
 % stat_ids  = {'uRPE_Neg_lme_mn05man216','uRPE_Pos_lme_mn05man216','uRPE_Neg_lme_mn05man308','uRPE_Pos_lme_mn05man308'};
 % stat_ids = {'ERPEsL_all_lme_mn05sRPE','ERPEsL_all_lme_mn05uRPE','ERPEsL_all_lme_mn05Lik'};
 plt_id    = 'topo_F18t25';
-save_fig  = 0;
+save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)
@@ -205,8 +205,8 @@ for an_ix = 1:numel(an_ids)
     
     % Sup. Fig. 6: ERP topography dynamics in model averaging windows
     conditions = 'DifFB';
-    SBJ03c_ERP_plot_grp_topo_ts_cond(SBJ_id,conditions,proc_id,an_ids{an_ix},stat_ids,save_fig,...
-        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%     SBJ03c_ERP_plot_grp_topo_ts_cond(SBJ_id,conditions,proc_id,an_ids{an_ix},stat_ids,save_fig,...
+%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 end
 
 %% Power TFR: Linear Mixed Effects Model (Over Time-Frequency Power)
@@ -221,7 +221,7 @@ stat_ids  = {'uRPEL_Neg_lme_st0t5','uRPEL_Pos_lme_st0t5'};
 proc_id   = 'eeg_full_ft';
 save_fig  = 1;
 fig_vis   = 'on';
-fig_ftype = 'svg';
+fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(stat_ids)

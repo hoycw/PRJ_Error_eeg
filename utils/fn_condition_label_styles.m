@@ -115,6 +115,10 @@ switch grp_id
         labels = {'EzSu','EzLs','HdWn','HdSu'};
     case 'Unlik-Lik'                    % Conditions matched for valence and magnitude
         labels = {'EzWn','EzSu','HdSu','HdLs'};
+    case 'TTrare'
+        labels = {'EzLs','HdWn'};
+    case 'DifWL'
+        labels = {'EzLs','EzWn','HdLs','HdWn'};
     
     % Performance (RT) based trial selection
 %     case 'Tar2'                         % Performance split of early/late

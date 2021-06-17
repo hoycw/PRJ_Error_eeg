@@ -95,6 +95,14 @@ for ch_ix = 1:numel(roi.label)
         sems(cond_ix,:) = squeeze(std(stack(ch_ix,stack_cond==cond_ix,:),[],2))./sqrt(sum(stack_cond==cond_ix))';
     end
     
+    % Get color limits
+    clims = NaN([1 2]);
+    clims(1) = prctile(reshape(stack(ch_ix,:,:),...
+        [1 size(stack,2)*size(stack,3)]),plt.clim_perc(1));
+    clims(2) = prctile(reshape(stack(ch_ix,:,:),...
+        [1 size(stack,2)*size(stack,3)]),plt.clim_perc(2));
+    clims = [min(clims(1)) max(clims(2))];
+    
     %% Create plot
     fig_name = [SBJ '_' conditions '_' an_id '_' roi.label{ch_ix}];    
     figure('Name',fig_name,'units','normalized',...
@@ -132,7 +140,9 @@ for ch_ix = 1:numel(roi.label)
 %     if plt.legend
 %         legend(an.event_type,'Location',plt.legend_loc);
 %     end
-    colorbar('Location','northoutside');
+    cbar = colorbar;
+    caxis(clims);
+    %colorbar('Location','northoutside');
     
     %% Plot ERPs
     axes(2) = subplot(3,1,3); hold on;

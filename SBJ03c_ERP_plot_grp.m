@@ -142,7 +142,7 @@ for ch_ix = 1:numel(ch_list)
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end
-    leg_lab = [cond_lab plt.evnt_lab];
+    leg_lab = [cond_names plt.evnt_lab];
     
     % Axes and Labels
     ax.YLabel.String = 'uV';

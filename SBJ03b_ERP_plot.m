@@ -124,9 +124,10 @@ for ch_ix = 1:numel(roi.label)
     end
     
     % Plot Events
+    ylims = [-10 40];%ylim; 
     for evnt_ix = 1:numel(plt.evnt_lab)
         main_lines(numel(cond_lab)+evnt_ix) = line(...
-            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylim,...
+            [evnt_times(evnt_ix) evnt_times(evnt_ix)],ylims,...
             'LineWidth',plt.evnt_width,'Color',plt.evnt_color,...
             'LineStyle',plt.evnt_styles{evnt_ix});
     end
@@ -137,10 +138,12 @@ for ch_ix = 1:numel(roi.label)
     ax.XLim          = [plt.plt_lim(1) plt.plt_lim(2)];
     ax.XTick         = plt.plt_lim(1):plt.x_step_sz:plt.plt_lim(2);
     ax.XLabel.String = 'Time (s)';
+    ax.YLim          = ylims;
     ax.Title.String  = roi.label{ch_ix};
     if plt.legend
         legend(main_lines,leg_lab{:},'Location',plt.legend_loc);
     end
+    ax.FontSize = 16;
     
     % Save figure
     if save_fig

@@ -19,21 +19,21 @@ SBJs = fn_load_SBJ_list(SBJ_id);
 
 %% ERPs: Fz and Pz over time
 %   RL Model Analysis:
-an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};
-conditions = 'DifFB';%'EHSu';
+an_ids     = {'ERP_Fz_F2t1_dm2t0_fl05t20'};%,'ERP_Pz_F2t1_dm2t0_fl05t20'};
+conditions = 'DifWL';%'DifFB';%'EHSu';
 proc_id    = 'eeg_full_ft';
 save_fig   = 1;
 fig_vis    = 'on';
-fig_ftype  = 'svg';%'png';%
+fig_ftype  = 'png';%'svg';%
 
 for an_ix = 1:numel(an_ids)
-    plt_id     = 'stack_F2t1_evnt_c5';
     for s = 1:numel(SBJs)
         % Re-align data to event, select channels and epoch, filter, save
         %   Options to downsample and run LaPlacian transform
-        SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
+%         SBJ03a_ERP_save(SBJs{s},proc_id,an_ids{an_ix});
 
         % Plot SBJ ERPs per condition
+%         plt_id = 'ts_F2to1_evnts_sigLine';
 %         SBJ03b_ERP_plot(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %               'fig_vis',fig_vis,'fig_ftype',fig_ftype);
         
@@ -42,14 +42,15 @@ for an_ix = 1:numel(an_ids)
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
         % Plot SBJ single trial stack with ERP underneath
+%         plt_id     = 'stack_F2t1_evnt_c5';
 %         SBJ03b_ERP_plot_stack(SBJs{s},conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
 %             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
     
     % Plot Group ERPs
     %   can reproduce plots in Fig. 2A (Fz) and 2B (Pz), but see SBJ04d_ERP_plot_stats_LME_RL_fits.m
-%     SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
-%         'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+    SBJ03c_ERP_plot_grp(SBJ_id,conditions,proc_id,an_ids{an_ix},plt_id,save_fig,...
+        'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     
     % Plot all SBJ ERPs overlapping (butterfly)
 %     plt_id = 'ts_F2to1_but_evnts_sigPatch';

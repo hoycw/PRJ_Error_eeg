@@ -1,4 +1,4 @@
-# PRJ_Error_eeg
+# PRJ_Error_eeg: Sequential Prediction Errors in Reward Processing EEG
 Preprocessing, analysis, and modeling of behavior and EEG data for sequential prediciton error EEG Target Time study.
 The goal of the study is to understand the relationship between different learning-related computations
 are represented in the evoked potentials recorded in scalp electroencephalography (EEG).
@@ -6,7 +6,11 @@ Dataset includes 32 good EEG datasets (41 total collected) and 22 good behaviora
 Note that "TT" refers to the Target Time task, and "OB" refers to the three tone Oddball task.
 Key predictors: Expected value (EV), RPE value (sRPE), RPE magnitude (uRPE), probability (Lik)
 
-Manuscript is currently under review (revisions submitted 4/16/21); written by Colin W. Hoy.
+## Manuscript: 
+Manuscript has been accepted for publication at Communications Biology and is in press.
+First round of revisions submitted April 16, 2021, and second round of revisions submitted June 5, 2021.
+Initial biorxiv preprint: https://www.biorxiv.org/content/10.1101/2020.10.20.347740v1
+Code written by Colin W. Hoy.
 
 ## Dependencies
 OS: MacBook Pro running OS 10.13.6; MATLAB version R2017b; Python 2.7 (not tested on any other platforms)
