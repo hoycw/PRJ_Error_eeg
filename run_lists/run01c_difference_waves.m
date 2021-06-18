@@ -1,5 +1,5 @@
-%% ERP difference wave computations and plotting for Sequential PE Revision 1 Submission
-% Developed over time, but editted 4/21/21 by Colin W Hoy
+%% ERP difference wave computations and plotting for Sequential PE Manuscript
+% Code written by Colin W. Hoy
 %   Sup. Fig. 2: SBJ03c_ERP_plot_diff_grp
 
 %% Set up paths

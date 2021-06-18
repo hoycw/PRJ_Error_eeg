@@ -1,4 +1,4 @@
-%% Extract and compare features of Oddball and Target Time ERPs for Sequential PE Revision 1
+%% Extract and compare features of Oddball and Target Time ERPs for Sequential PE Manuscript
 % Started 11/25/20 by Colin W Hoy; edited 4/16/21
 % Final model_id = 'ERPEsL_all' (all = 'DifFB', which includes all conditions)
 %   Fig. 5D/E/F: SBJ06d_OB_TT_ERP_grp_stats_corr_pt and SBJ06e_OB_TT_ERP_grp_plot_corr_reg_comparison

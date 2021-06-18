@@ -1,5 +1,5 @@
-%% Behavior and Pre-Processing of behavioral rating dataset for Sequential PE Revision 1
-% Editted 4/16/21 by Colin W. Hoy
+%% Behavior and Pre-Processing of behavioral rating dataset for Sequential PE Manuscript
+% Code written by Colin W. Hoy
 %   Sup. Fig. 10A: SBJ04b_BHV_RL_model_rating_plot
 %   Sup. Fig. 10B and 10C: BHV05_grp_rating_stats
 
@@ -38,7 +38,7 @@ for s = 1:numel(SBJs)
     RATE01_behavior_rejection(SBJs{s}, proc_id);
 end
 
-%% Check Behavior (Fig. 1B, 1C)
+%% Check Behavior
 % Behavioral pre-processing and analysis
 %   run_BHV00_01_ratings.sh: pulls SBJ_list to automatically run BHV00_rating and BHV01_rating for those SBJs
 %   runs in PRJ_Error_py2.7 conda env with python 2.7

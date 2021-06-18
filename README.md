@@ -26,9 +26,9 @@ These run scripts contain parameters used to call each function. All individual 
 1. run00_behavior_preprocessing.m
     - BHV scripts preprocess and analyze behavioral log files.
     - SBJ00, SBJ01, and SBJ02 scripts preprocess EEG data.
-2a. run01a_ERP_preprocessing_TT_rev1.m
+2a. run01a_ERP_preprocessing_TT.m
     - SBJ03 scripts preprocess and plot event-related potentials (ERPs).
-2b. run01b_ERP_preprocessing_odd_rev1.m
+2b. run01b_ERP_preprocessing_odd.m
     - ODD01, ODD02a, ODD02c versions of preprocessing
     - SBJ03 scripts preprocess and plot event-related potentials (ERPs).
 2c. run01c_difference_waves.m
@@ -37,10 +37,10 @@ These run scripts contain parameters used to call each function. All individual 
     - SBJ05 scripts preprocess, plot, and model time-frequency representations (TFRs) of TT EEG data.
 3b. run02b_TFR_preprocessing_OB.m
     - SBJ07 scripts preprocess, plot, and model time-frequency representations (TFRs) of OB EEG data.
-4. run03_RL_model_results_rev1.m
+4. run03_RL_model_results.m
     - SBJ04 scripts model behavioral and ERP data and plot results.
-    - SBJ05 scripts model TFR (power and phase) data and plot results.
-5. run04_RL_model_point_estimates_rev1.m
+    - SBJ05 scripts model TFR power data and plot results.
+5. run04_RL_model_point_estimates.m
     - SBJ04 scripts to compute, model, and plot point estimates of FRN (mean window and peak-to-peak analyses)
 6. run05_OB_TT_feature_comparison.m
     - SBJ06 scripts to extract ERP features from TT and OB, run feature correlations

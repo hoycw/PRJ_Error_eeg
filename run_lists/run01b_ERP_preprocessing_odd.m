@@ -1,5 +1,5 @@
-%% ERP analysis and plotting  of Oddball task for Sequential PE Revision 1 Submission
-% Developed over time, but editted 4/21/21 by Colin W Hoy
+%% ERP analysis and plotting  of Oddball task for Sequential PE Manuscript
+% Code written by Colin W. Hoy
 %   Fig. 5A and 5B: SBJ03c_ERP_plot_grp
 %   Fig. 5C: SBJ03c_ERP_plot_grp_topo_cond
 
@@ -93,6 +93,7 @@ SBJ03c_ERP_plot_grp_topo_cond(SBJ_id,conditions,proc_id,an_id,plt_id,save_fig,..
     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 
 %% Save topo for CPA prototype selection
+% NOTE: candidate-prototype analyses were not included in the manuscript
 proc_id    = 'odd_full_ft';
 an_id      = 'ERP_all_S2t1_dm2t0_fl05t20';
 conditions = 'OB';

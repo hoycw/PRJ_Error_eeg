@@ -1,5 +1,5 @@
-%% Time-frequency power and phase analyses for Target Time task in Sequential PE Revision 1 Submission
-% Developed over time, but editted 4/16/21 by Colin W Hoy
+%% Time-frequency power and phase analyses for Target Time task in Sequential PE Manuscript
+% Code written by Colin W. Hoy
 %   Sup. Fig. 7 and 8: SBJ05c_TFR_ERP_plot_grp
 
 %% Set up paths
@@ -53,6 +53,9 @@ for an_ix = 1:numel(an_ids)
 end
 
 %% Compute Phase for ITPC
+% NOTE: Phase analyses were removed from the final manuscript since they
+%   were overly complicated to report and redundant with FRN latency
+%   effects (Sup. Fig. 9)
 proc_id    = 'eeg_full_ft';
 an_ids     = {'PHS_Fz_F2t1_fl1t12','PHS_Pz_F2t1_fl1t12'};
 erp_ids    = {'ERP_Fz_F2t1_dm2t0_fl05t20','ERP_Pz_F2t1_dm2t0_fl05t20'};

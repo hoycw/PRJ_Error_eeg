@@ -1,6 +1,6 @@
-%% Time-frequency power and phase analyses for Target Time task in Sequential PE Revision 1 Submission
-% Developed over time, but editted 4/16/21 by Colin W Hoy
-% Oddball TFRs were not included in the revision 1 manuscript
+%% Time-frequency power and phase analyses for Target Time task in Sequential PE Manuscript
+% Code written by Colin W. Hoy
+% Oddball TFRs were not included in the manuscript
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];

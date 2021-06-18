@@ -1,11 +1,11 @@
-%% Reinforcement Learning based modeling and analyses of classic ERP metrics for Sequential PE Revision 1
-% Developed over time, but last editted 4/16/21 by Colin W Hoy
+%% Reinforcement Learning based modeling and analyses of classic ERP metrics for Sequential PE Manuscript
+% Code written by Colin W. Hoy
 % Final model_id = 'ERPEsL_DifFB', which includes all conditions
 %       (no longer 'all', because that implies conditions are combined/averaged)
 %   Sup. Fig. 3A: SBJ04e_ERP_plot_FRN_cond_metric_comparison_point
 %   Sup. Fig. 3B and 3D: SBJ04c_ERP_grp_stats_LME_mean_window and SBJ04d_ERP_plot_stats_LME_mean_betas
 %   Sup. Fig. 3C: SBJ04c_ERP_grp_stats_LME_P2P and SBJ04d_ERP_plot_stats_LME_p2p_betas
-%   Sup. Fig. 3E/F/3G: SBJ04e_ERP_plot_RL_model_comparison_point
+%   Sup. Fig. 3E/F/G: SBJ04e_ERP_plot_RL_model_comparison_point
 %   Sup. Fig. 9B: SBJ04c_ERP_p2p_latency_reg
 
 %% Set up paths
@@ -139,7 +139,7 @@ save_fig  = 1;
 fig_vis   = 'on';
 fig_ftype = 'svg';
 
-% Sup. Fig. 1B: Plot mean window and peak-to-peak FRN point estimates
+% Sup. Fig. 3A: Plot mean window and peak-to-peak FRN point estimates
 SBJ04e_ERP_plot_FRN_cond_metric_comparison_point(SBJ_id,proc_id,an_ids,stat_ids,plt_id,save_fig,...
     'fig_vis',fig_vis,'fig_ftype',fig_ftype);
 

@@ -1,5 +1,5 @@
-%% Reinforcement Learning based modeling and analyses for Sequential PE Revision 1 Submission
-% Developed over time, but editted 4/16/21 by Colin W Hoy
+%% Reinforcement Learning based modeling and analyses for Sequential PE Manuscript
+% Code written by Colin W. Hoy
 % Final full model_id = 'ERPEsL_DifFB' which includes all conditions (difficulty, feedback)
 % Final split model_id = 'uRPEL_Pos' and 'uRPEL_Neg'
 %   Fig. 1D: SBJ04b_BHV_RL_model_plot and SBJ04b_BHV_RL_model_plot_grp
@@ -10,9 +10,14 @@
 %   Sup. Fig. 1: SBJ04b_RL_model_plot_grp_predictions
 %   Sup. Fig. 5: SBJ04e_ERP_plot_RL_elec_comparison_R2_ts
 %   Sup. Fig. 6: SBJ03c_ERP_plot_grp_topo_ts_cond
+%   Sup. Table 2: SBJ04e_ERP_print_RL_model_comparison_win
+% Initial submission (preprint v1) and revision 1 had phase analyses
+% supporting the FRN latency effects reported in Sup. Fig. 6, but these
+% results added little to the manuscript (localizing the FRN latency effect
+% to theta frequencies) and were too complicated to report. Therefore, they
+% were removed at the suggestion of Reviewer #2.
 %   Sup. Fig. 9C: SBJ05d_PHS_grp_stats_CLreg_RL and SBJ05e_PHS_plot_stats_CLreg_RL
 %   Sup. Fig. 9D: SBJ05d_PHS_grp_stats_ITPC_jkLME_RL and SBJ05e_TFR_plot_stats_LME_RL_fits
-%   Sup. Table 2: SBJ04e_ERP_print_RL_model_comparison_win
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -177,7 +182,7 @@ for st_ix = 1:numel(stat_ids)
 end
 
 %% Beta Topographies: Linear Mixed Effects Model (Mean Windows)
-% Plots Fig. 3 and Sup. Fig. 3
+% Plots Fig. 3 and Sup. Fig. 6
 proc_id   = 'eeg_full_ft';
 an_ids    = {'ERP_all_F2t1_dm2t0_fl05t20'};
 stat_ids  = {'uRPEL_Neg_lme_mn05man216','uRPEL_Neg_lme_mn05man308','uRPEL_Neg_lme_mn05man380'};
@@ -210,7 +215,7 @@ for an_ix = 1:numel(an_ids)
 end
 
 %% Power TFR: Linear Mixed Effects Model (Over Time-Frequency Power)
-% Plots Fig. 4 and Fig. 6
+% Plots Fig. 4 and Fig. 6E+F
 an_ids    = {'TFR_Fz_F2t1_db2t0_fl1t12','TFR_Pz_F2t1_db2t0_fl1t12'};
 % Main RL Model (Fig. 4):
 % stat_ids  = {'ERPEsL_all_lme_st0t5'};
@@ -235,7 +240,9 @@ for an_ix = 1:numel(an_ids)
 end
 
 %% PHS TFR: Linear Mixed Effects Model (Over Time-Frequency Phase)
-% Plots Sup. Fig. 9C and 9D
+% See above note on why these analyses/results were removed to simplify the
+%   final accepted manuscript
+% Plots original Sup. Fig. 9C and 9D
 proc_id   = 'eeg_full_ft';
 an_ids    = {'PHS_Fz_F2t1_fl1t12'};
 model_ids = {'uRPEL_Neg','uRPEL_Pos'};%'ERPEsL_DifFB'};
@@ -246,21 +253,21 @@ fig_ftype = 'png';
 
 for an_ix = 1:numel(an_ids)
     for st_ix = 1:numel(model_ids)
-        % Circular-Linear Regression: Group level, separate for each regressor
-        stat_id = [model_ids{st_ix} '_CLreg_' model_win];
-        SBJ05d_PHS_grp_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
-        
-        % Sup. Fig. 6C: Plot C-L Regression TFR Phase Coefficients
-        SBJ05e_PHS_plot_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
-        
-        % Jack-Knife ITPC LME Regression: Group level
-        stat_id = [model_ids{st_ix} '_lme_' model_win];
-        SBJ05d_PHS_grp_stats_ITPC_jkLME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
-        
-        % Sup. Fig. 6D: Plot ITPC TFR Phase Coefficients
-        SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
-            'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         % Circular-Linear Regression: Group level, separate for each regressor
+%         stat_id = [model_ids{st_ix} '_CLreg_' model_win];
+%         SBJ05d_PHS_grp_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+%         
+%         % Sup. Fig. 6C: Plot C-L Regression TFR Phase Coefficients
+%         SBJ05e_PHS_plot_stats_CLreg_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
+%         
+%         % Jack-Knife ITPC LME Regression: Group level
+%         stat_id = [model_ids{st_ix} '_lme_' model_win];
+%         SBJ05d_PHS_grp_stats_ITPC_jkLME_RL(SBJ_id,proc_id,an_ids{an_ix},stat_id);
+%         
+%         % Sup. Fig. 6D: Plot ITPC TFR Phase Coefficients
+%         SBJ05e_TFR_plot_stats_LME_RL_fits(SBJ_id,proc_id,an_ids{an_ix},stat_id,save_fig,...
+%             'fig_vis',fig_vis,'fig_ftype',fig_ftype);
     end
 end
 

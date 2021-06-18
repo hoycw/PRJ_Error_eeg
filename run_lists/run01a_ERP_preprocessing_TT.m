@@ -1,6 +1,6 @@
-%% ERP analysis and plotting  of Target Time task for Sequential PE Revision 1 Submission
-% Developed over time, but editted 4/21/21 by Colin W Hoy
-% 	Sup. Fig. 10A: SBJ03c_ERP_plot_grp_pkLine
+%% ERP analysis and plotting  of Target Time task for Sequential PE Manuscript
+% Code written by Colin W. Hoy
+% 	Sup. Fig. 9A: SBJ03c_ERP_plot_grp_pkLine
 
 %% Set up paths
 if exist('/home/knight/','dir');root_dir='/home/knight/';app_dir=[root_dir 'PRJ_Error_eeg/Apps/'];
@@ -60,7 +60,7 @@ for an_ix = 1:numel(an_ids)
 end
 
 %% Plot ERPs with FRN peaks marked
-%*** plots Sup. Fig. 10A (easy/hard FB separately, neutral for Easy+Hard)
+%*** plots Sup. Fig. 9A (easy/hard FB separately, neutral for Easy+Hard)
 an_id      = 'ERP_Fz_F2t1_dm2t0_fl05t20';
 cond_list  = {'HdOutS','EzOutS','EHSu'};
 proc_id    = 'eeg_full_ft';
