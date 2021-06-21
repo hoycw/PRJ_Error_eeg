@@ -6,6 +6,10 @@ Dataset includes 32 good EEG datasets (41 total collected) and 22 good behaviora
 Note that "TT" refers to the Target Time task, and "OB" refers to the three tone Oddball task.
 Key predictors: Expected value (EV), RPE value (sRPE), RPE magnitude (uRPE), probability (Lik)
 
+## Data and Experimental Paradigm:
+PsychoPy code available at https://github.com/hoycw/target_time_scripts.git
+All raw datasets are provided under Creative Commons CC0 1.0 license at https://doi.org/10.17605/OSF.IO/JGXFR.
+
 ## Manuscript: 
 Manuscript has been accepted for publication at Communications Biology and is in press.
 First round of revisions submitted April 16, 2021, and second round of revisions submitted June 5, 2021.
@@ -71,6 +75,3 @@ and analysis script, which then run the relevant code to load the parameters ins
   - Epochs, styles, markers, significance, legends, etc.
 - feat_vars: analysis parameters to extract ERP features from Oddball and Target Time data for correlations
   - measure of ERP activity, conditions, channels, epochs, peak selection, etc.
-
-## Example Data
-All raw datasets will be provided upon publication. I originally attempted to provide two example datasets in this repository, but the file sizes were too large and could not be merged. Anyone looking to use the data before publication is welcome to request it from hoycw (at) berkeley (dot) edu.
